@@ -1,0 +1,151 @@
+import React, { useState } from 'react';
+import { Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { GALLERY_ITEMS } from '../data/siteData';
+import { CyberCard } from '../components/ui/CyberCard';
+import { GalleryItem } from '../types';
+
+export const GalleryPage: React.FC = () => {
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [selectedItem, setSelectedItem] = useState<GalleryItem | null>(null);
+
+  const categories = ['All', 'Workshop', 'Hackathon', 'Bootcamp', 'Event'];
+
+  const filteredItems =
+    activeCategory === 'All'
+      ? GALLERY_ITEMS
+      : GALLERY_ITEMS.filter((item) => item.category === activeCategory);
+
+  const handlePrev = () => {
+    if (!selectedItem) return;
+    const currentIndex = filteredItems.findIndex((it) => it.id === selectedItem.id);
+    const prevIndex = currentIndex > 0 ? currentIndex - 1 : filteredItems.length - 1;
+    setSelectedItem(filteredItems[prevIndex]);
+  };
+
+  const handleNext = () => {
+    if (!selectedItem) return;
+    const currentIndex = filteredItems.findIndex((it) => it.id === selectedItem.id);
+    const nextIndex = currentIndex < filteredItems.length - 1 ? currentIndex + 1 : 0;
+    setSelectedItem(filteredItems[nextIndex]);
+  };
+
+  return (
+    <div className="relative pt-28 pb-20 space-y-20">
+      {/* 1. HERO (EXACT LIVE SITE COPY) */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
+        <h1 className="font-heading font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-[1.15]">
+          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-purple-400">Gallery</span>
+        </h1>
+        <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+          Explore moments from our workshops, hackathons, and events. See the innovation and creativity in action.
+        </p>
+      </section>
+
+      {/* 2. FILTER TABS */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex justify-center animate-fade-up animation-delay-100">
+        <div className="inline-flex flex-wrap justify-center p-1 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md gap-1">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer ${
+                activeCategory === cat
+                  ? 'bg-cyan-500/15 text-cyan-300 font-bold border border-cyan-400/30 shadow-[0_0_12px_rgba(0,217,255,0.2)]'
+                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. GALLERY GRID */}
+      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredItems.map((item) => (
+            <CyberCard
+              key={item.id}
+              glow="cyan"
+              className="p-0 overflow-hidden group cursor-pointer"
+              onClick={() => setSelectedItem(item)}
+            >
+              <div className="relative h-60 overflow-hidden bg-black/40">
+                <img
+                  src={item.thumbnail}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b101e] via-[#0b101e]/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
+                <div className="absolute top-3 right-3">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-black/60 border border-white/[0.1] text-cyan-300 backdrop-blur-md">
+                    {item.category}
+                  </span>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1">
+                  <h3 className="font-heading font-bold text-base text-white group-hover:text-cyan-300 transition-colors">
+                    {item.title}
+                  </h3>
+                  <p className="text-xs text-slate-300 line-clamp-2">
+                    {item.description}
+                  </p>
+                </div>
+              </div>
+            </CyberCard>
+          ))}
+        </div>
+      </section>
+
+      {/* Lightbox Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl">
+          <div className="relative max-w-3xl w-full rounded-2xl overflow-hidden bg-[#080c18] border border-white/[0.12] shadow-2xl">
+            <button
+              onClick={() => setSelectedItem(null)}
+              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="relative h-80 sm:h-96">
+              <img
+                src={selectedItem.thumbnail}
+                alt={selectedItem.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-6 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-cyan-500/10 text-cyan-300 border border-cyan-400/20">
+                  {selectedItem.category}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePrev}
+                    className="p-1.5 rounded-lg bg-white/[0.05] text-slate-300 hover:text-white hover:bg-white/[0.1]"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={handleNext}
+                    className="p-1.5 rounded-lg bg-white/[0.05] text-slate-300 hover:text-white hover:bg-white/[0.1]"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <h2 className="font-heading font-bold text-xl text-white">
+                {selectedItem.title}
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400">
+                {selectedItem.description}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

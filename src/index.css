@@ -1,0 +1,284 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    background-color: #070a13;
+    color: #f1f5f9;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    overflow-x: hidden;
+    selection-background-color: rgba(0, 217, 255, 0.25);
+  }
+  
+  /* Modern clean slim scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #070a13;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+}
+
+@layer utilities {
+  .text-glow-cyan {
+    text-shadow: 0 0 20px rgba(0, 217, 255, 0.25);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 20px rgba(121, 40, 202, 0.25);
+  }
+
+  /* Refined professional ambient gradients matching design reference */
+  .ambient-glow-hero {
+    background: 
+      radial-gradient(circle 650px at 12% 35%, rgba(0, 217, 255, 0.22), transparent 70%),
+      radial-gradient(circle 700px at 88% 30%, rgba(168, 85, 247, 0.22), transparent 70%),
+      radial-gradient(circle 500px at 50% -10%, rgba(0, 217, 255, 0.08), transparent 65%);
+  }
+
+  .text-gradient-clean {
+    background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, #38bdf8 0%, #00d9ff 50%, #818cf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* High-tier premium glassmorphism card */
+  .glass-card {
+    background: linear-gradient(135deg, rgba(16, 23, 42, 0.55) 0%, rgba(11, 16, 29, 0.65) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  .glass-card-hover {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.35s ease;
+    will-change: transform, box-shadow;
+    transform: translate3d(0, 0, 0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .glass-card-hover:hover {
+    border-color: rgba(0, 217, 255, 0.32);
+    box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.75), 0 0 28px rgba(0, 217, 255, 0.12), inset 0 1px 0 0 rgba(0, 217, 255, 0.18);
+    transform: translate3d(0, -4px, 0);
+  }
+
+  .glass-card-purple:hover {
+    border-color: rgba(168, 85, 247, 0.32);
+    box-shadow: 0 20px 48px -12px rgba(0, 0, 0, 0.75), 0 0 28px rgba(168, 85, 247, 0.12), inset 0 1px 0 0 rgba(168, 85, 247, 0.18);
+    transform: translate3d(0, -4px, 0);
+  }
+
+  /* Floating navigation bar blur */
+  .glass-nav {
+    background: rgba(7, 10, 19, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.5), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Cyber Grid Background Pattern with radial mask for non-intrusive ambient texture */
+  .cyber-grid {
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 80%);
+  }
+
+  /* Sophisticated, subtle cyber spatial grid */
+  .hero-cyber-grid {
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 15%, transparent 85%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 75% at 50% 50%, black 15%, transparent 85%);
+    opacity: 0.7;
+  }
+
+  /* Shimmer hairline at top border of cards */
+  .shimmer-hairline {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 20%, rgba(0, 217, 255, 0.55) 50%, rgba(255, 255, 255, 0.15) 80%, transparent 100%);
+    opacity: 0.35;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .group:hover .shimmer-hairline {
+    opacity: 1;
+  }
+
+  .shimmer-hairline-purple {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.15) 20%, rgba(168, 85, 247, 0.55) 50%, rgba(255, 255, 255, 0.15) 80%, transparent 100%);
+    opacity: 0.35;
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .group:hover .shimmer-hairline-purple {
+    opacity: 1;
+  }
+
+  /* Smooth Staggered Entrance Animations */
+  @keyframes smoothFadeUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: smoothFadeUp 0.75s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    will-change: transform, opacity;
+  }
+
+  /* High-tech crisp terminal cursor blink */
+  @keyframes cursorBlink {
+    0%, 45% { opacity: 1; }
+    50%, 95% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  .animate-cursor-blink {
+    animation: cursorBlink 0.9s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .animation-delay-75  { animation-delay: 75ms; }
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-150 { animation-delay: 150ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-250 { animation-delay: 250ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+
+  /* Refined Tech Scroll Reveal for Cards - Gentle Slow Start, Deep Smooth Glide */
+  .scroll-reveal-card {
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.985);
+    transition: opacity 1.7s cubic-bezier(0.32, 0.04, 0.24, 1),
+                transform 1.7s cubic-bezier(0.32, 0.04, 0.24, 1);
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .scroll-reveal-card.revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  /* Vision & Open Positions Card Entrance from Left - Gentle Slow Start Lateral Glide */
+  .scroll-reveal-left {
+    opacity: 0;
+    transform: translate3d(-38px, 0, 0) scale(0.985);
+    transition: opacity 1.5s cubic-bezier(0.32, 0.04, 0.24, 1),
+                transform 1.5s cubic-bezier(0.32, 0.04, 0.24, 1);
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .scroll-reveal-left.revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  /* Mission & Available Internships Card Entrance from Right - Gentle Slow Start Lateral Glide */
+  .scroll-reveal-right {
+    opacity: 0;
+    transform: translate3d(38px, 0, 0) scale(0.985);
+    transition: opacity 1.5s cubic-bezier(0.32, 0.04, 0.24, 1),
+                transform 1.5s cubic-bezier(0.32, 0.04, 0.24, 1);
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  .scroll-reveal-right.revealed {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  /* In-place Pure Fade Reveal (Zero Directional Movement - Appears Slower & Smoother) */
+  .scroll-reveal-fade {
+    opacity: 0;
+    transition: opacity 1.7s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: opacity;
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    pointer-events: none;
+  }
+
+  .scroll-reveal-fade.revealed {
+    opacity: 1;
+  }
+
+  .scroll-reveal-fade.revealed.hover-ready {
+    pointer-events: auto;
+  }
+
+  /* Disable hover effects & pointer events during entrance animation */
+  .scroll-reveal-card,
+  .scroll-reveal-left,
+  .scroll-reveal-right {
+    pointer-events: none;
+  }
+
+  .scroll-reveal-card.revealed.hover-ready,
+  .scroll-reveal-left.revealed.hover-ready,
+  .scroll-reveal-right.revealed.hover-ready {
+    pointer-events: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
