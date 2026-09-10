@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { ROBOT_ACCENT, LIGHT_INTENSITY } from '../config';
 
 export interface SceneLights {
   group: THREE.Group;
@@ -6,54 +7,67 @@ export interface SceneLights {
   fillLight: THREE.DirectionalLight;
   rimLightLeft: THREE.DirectionalLight;
   rimLightRight: THREE.DirectionalLight;
-  chestAccentLight: THREE.PointLight;
   ambientLight: THREE.AmbientLight;
   contactShadow: THREE.Mesh;
 }
 
+/**
+ * Creates dimensional studio/cinematic lighting per P2:
+ * 1. Soft Key Light: above/front/left, produces readable highlights on white armor with soft falloff
+ * 2. Controlled Fill Light: weaker than key, prevents dark side from becoming completely black
+ * 3. Purple Rim Light: behind/side of robot, subtle violet edge separation around shoulders, head, and torso
+ * 4. Ambient Environment Light: very subtle, maintains dark mechanical details
+ */
 export function createStudioLighting(): SceneLights {
   const group = new THREE.Group();
   group.name = 'StudioLightingGroup';
 
-  // 1. Ambient Light - neutral dark slate-indigo base with rich fill
-  const ambientLight = new THREE.AmbientLight(0x282c3f, 1.25);
+  // 1. Subtle Ambient Light - deep navy fill preserving cavity depth & mechanical contrast
+  const ambientLight = new THREE.AmbientLight(0x0e0d1a, LIGHT_INTENSITY.ambient);
   group.add(ambientLight);
 
-  // 2. Key Light (Top-Front-Left) - crisp neutral white light highlighting armor contours
-  const keyLight = new THREE.DirectionalLight(0xffffff, 1.7);
-  keyLight.position.set(-1.8, 3.2, 2.6);
+  // 2. Soft Key Light (Top-Front-Left) - neutral daylight sculpting armor curvature without clipping
+  const keyLight = new THREE.DirectionalLight(0xf2f6fd, LIGHT_INTENSITY.key);
+  keyLight.position.set(-2.0, 2.2, 2.2);
   keyLight.castShadow = true;
   keyLight.shadow.mapSize.width = 1024;
   keyLight.shadow.mapSize.height = 1024;
-  keyLight.shadow.bias = -0.0002;
+  keyLight.shadow.camera.near = 0.5;
+  keyLight.shadow.camera.far = 8;
+  keyLight.shadow.camera.left = -1.5;
+  keyLight.shadow.camera.right = 1.5;
+  keyLight.shadow.camera.top = 1.5;
+  keyLight.shadow.camera.bottom = -1.5;
+  keyLight.shadow.bias = -0.0004;
+  keyLight.shadow.normalBias = 0.02;
   group.add(keyLight);
 
-  // 3. Fill Light (Front-Right) - crisp cool-white fill illuminating ceramic arms & titanium joints
-  const fillLight = new THREE.DirectionalLight(0xdce7f6, 1.35);
-  fillLight.position.set(2.4, 1.6, 2.2);
+  // 3. Controlled Fill Light (Front-Right) - soft cool slate fill preventing pitch-black shadows
+  const fillLight = new THREE.DirectionalLight(0x7680a4, LIGHT_INTENSITY.fill);
+  fillLight.position.set(2.2, 0.8, 1.8);
   group.add(fillLight);
 
-  // 4. Rim Light Left (Back-Left) - subtle cool rim trace
-  const rimLightLeft = new THREE.DirectionalLight(0x4338ca, 0.9);
-  rimLightLeft.position.set(-2.8, 2.2, -2.0);
+  // 4. Rim Light Left (Back-Left) - subtle titanium contour edge trace
+  const rimLightLeft = new THREE.DirectionalLight(0x404870, LIGHT_INTENSITY.rimLeft);
+  rimLightLeft.position.set(-2.4, 1.4, -2.0);
   group.add(rimLightLeft);
 
-  // 5. Rim Light Right (Back-Right) - signature crisp neon violet rim trace along helmet, ear & shoulder
-  const rimLightRight = new THREE.DirectionalLight(0xb388ff, 2.8);
-  rimLightRight.position.set(2.8, 2.4, -1.8);
+  // 5. Purple Rim Light Right (Back-Right) - crisp violet edge separation on shoulders, head, and torso
+  const rimLightRight = new THREE.DirectionalLight(ROBOT_ACCENT, LIGHT_INTENSITY.rimRight);
+  rimLightRight.position.set(2.4, 1.6, -1.8);
   group.add(rimLightRight);
 
-  // 6. Chest Accent Light (Point Light) - subtle violet aura
-  const chestAccentLight = new THREE.PointLight(0xa855f7, 0.20, 0.6);
-  chestAccentLight.position.set(0, 0.76, 0.28);
-  group.add(chestAccentLight);
+  // 6. Subtle Local Purple Emissive Bounce (Visor & Chest area)
+  const purpleBounce = new THREE.PointLight(ROBOT_ACCENT, LIGHT_INTENSITY.purpleBounce, 2.5);
+  purpleBounce.position.set(0.12, 0.10, 0.65);
+  group.add(purpleBounce);
 
-  // 7. Stomach & Midriff Specular Light (Front-Low) - illuminates cybernetic abs, obliques, pistons & waist ring
-  const stomachLight = new THREE.DirectionalLight(0xb8b0ec, 1.8);
-  stomachLight.position.set(0.8, -0.05, 2.6);
-  group.add(stomachLight);
+  // 7. Subtle Lower Torso Fill - soft atmospheric ground connection into stats region
+  const lowerFill = new THREE.DirectionalLight(0x38186e, LIGHT_INTENSITY.lowerFill);
+  lowerFill.position.set(0.2, -0.6, 1.6);
+  group.add(lowerFill);
 
-  // 7. Contact Shadow Floor Mesh (Disabled in bust portrait to prevent clipping)
+  // 8. Contact Shadow Floor Mesh
   const contactShadow = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());
   contactShadow.visible = false;
   contactShadow.name = 'ContactShadowPlane';
@@ -64,7 +78,6 @@ export function createStudioLighting(): SceneLights {
     fillLight,
     rimLightLeft,
     rimLightRight,
-    chestAccentLight,
     ambientLight,
     contactShadow,
   };

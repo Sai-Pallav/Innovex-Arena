@@ -1,3 +1,5 @@
+import { CAMERA_POSITION } from '../config';
+
 export interface ViewportDimensions {
   width: number;
   height: number;
@@ -28,29 +30,32 @@ export function getViewportDimensions(container: HTMLElement): ViewportDimension
 
 /**
  * Calculates adaptive camera parameters (FOV, distance, height offset)
- * framing the humanoid robot from head down to waist/lower torso (Reference 2 target).
+ * framing the humanoid robot as a prominent, grounded hero character (~1.25-1.30x visual scale),
+ * with generous headroom below the navigation, full visibility of shoulders and hands,
+ * and bottom anchoring emerging seamlessly from the hero section.
  */
 export function calculateCameraFraming(aspect: number): {
   fov: number;
   cameraPosition: [number, number, number];
   targetPosition: [number, number, number];
 } {
-  const baseFov = 28;
-  // Center camera at y = 0.44 so sleek head crown has clean headroom, chest, arms and hands are in prime view, and waist stands firmly behind stats cards
-  const targetY = 0.44;
+  const baseFov = CAMERA_POSITION.baseFov;
+  // Center camera slightly below upper chest to balance headroom and lower body anchor
+  const targetY = CAMERA_POSITION.targetY;
   const halfFovRad = (baseFov / 2) * (Math.PI / 180);
 
-  // Vertical distance framing robot firmly from waist up to head
-  const minDistanceVert = 2.44;
+  // Vertical distance framing robot at ~1.24x visual scale with hands and head fully visible
+  const minDistanceVert = CAMERA_POSITION.minDistanceVert;
 
-  // Horizontal distance to ensure broad shoulders (span ~ 0.55) are framed with generous margins
-  const minDistanceHoriz = 0.46 / (aspect * Math.tan(halfFovRad));
+  // Horizontal distance to ensure shoulders, elbows, and hands have generous side margins
+  const minDistanceHoriz = CAMERA_POSITION.horizontalSpreadFactor / (aspect * Math.tan(halfFovRad));
 
   const distance = Math.max(minDistanceVert, minDistanceHoriz);
 
   return {
     fov: baseFov,
-    cameraPosition: [0, targetY + 0.02, distance],
+    cameraPosition: [0, targetY, distance],
     targetPosition: [0, targetY, 0],
   };
 }
+

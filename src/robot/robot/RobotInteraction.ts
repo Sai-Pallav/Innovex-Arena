@@ -38,12 +38,13 @@ export class RobotInteraction {
     this.boundPointerMove = this.onPointerMove.bind(this);
     this.boundPointerLeave = this.onPointerLeave.bind(this);
 
+    // Track cursor across the ENTIRE window so head follows anywhere on page
     window.addEventListener('pointermove', this.boundPointerMove, { passive: true });
     document.addEventListener('mouseleave', this.boundPointerLeave);
   }
 
   private onPointerMove(e: PointerEvent): void {
-    // Disable cursor tracking on touch devices per Requirement 16
+    // Disable cursor tracking on touch devices
     if (e.pointerType === 'touch') {
       return;
     }
@@ -51,9 +52,21 @@ export class RobotInteraction {
     const now = performance.now();
     const dt = Math.max((now - this.lastTime) / 1000, 0.001);
 
-    // Calculate viewport-relative coordinates [-1, 1]
-    const normX = (e.clientX / window.innerWidth) * 2 - 1;
-    const normY = -(e.clientY / window.innerHeight) * 2 + 1;
+    // Calculate normalized coordinates relative to the robot container center.
+    // This maps the cursor position across the WHOLE viewport so that moving
+    // the cursor from left edge to right edge sweeps the head from -1 to +1.
+    const rect = this.container.getBoundingClientRect();
+    const robotCenterX = rect.left + rect.width * 0.5;
+    const robotCenterY = rect.top + rect.height * 0.38; // Slightly above center (head level)
+
+    // Use viewport half-width/height for normalization so full-page movement
+    // maps to the full [-1, 1] range rather than just the robot container.
+    const halfW = window.innerWidth * 0.5;
+    const halfH = window.innerHeight * 0.5;
+
+    const normX = (e.clientX - robotCenterX) / halfW;
+    // Invert Y so moving cursor up gives positive Y (head looks up)
+    const normY = -(e.clientY - robotCenterY) / halfH;
 
     // Clamp to [-1, 1]
     const clampedX = Math.max(-1, Math.min(1, normX));
@@ -70,6 +83,7 @@ export class RobotInteraction {
 
     this.state.targetX = clampedX;
     this.state.targetY = clampedY;
+    // Always active — head follows cursor everywhere on page
     this.state.isHovered = true;
 
     this.lastTime = now;
@@ -78,6 +92,7 @@ export class RobotInteraction {
   }
 
   private onPointerLeave(): void {
+    // Mouse left the browser window entirely — return to idle
     this.state.isHovered = false;
     this.state.targetX = 0;
     this.state.targetY = 0;

@@ -1,6 +1,14 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 
 export const BackgroundGlow: React.FC = () => {
+  const location = useLocation();
+
+  // HomePage has its own dedicated, calibrated atmospheric background (Priority 7 & 8)
+  if (location.pathname === '/') {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {/* Reflect Notes Starlit Sky Constellation Field */}

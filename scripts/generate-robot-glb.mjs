@@ -271,43 +271,105 @@ for (const [shoulder, side, prefix] of [[leftShoulder, -1, 'Left'], [rightShould
   pauldron.scale.set(0.90, 1.32, 1.08);
   shoulder.add(pauldron);
 
+  // Concentric shoulder accent ring
+  const sAccent = new THREE.Mesh(new THREE.TorusGeometry(0.048, 0.003, 12, 24), violetMat);
+  sAccent.rotation.y = Math.PI / 2;
+  sAccent.position.set(side * 0.065, 0, 0);
+  shoulder.add(sAccent);
+
   const upperArm = new THREE.Group();
   upperArm.name = `${prefix}UpperArm`;
   shoulder.add(upperArm);
 
-  const bicep = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.044, 0.15, 20), armorMat);
+  // Sculpted Bicep with Scalloped Arch Cutout
+  const bicepGeo = new THREE.CylinderGeometry(0.052, 0.044, 0.16, 24);
+  const bicep = new THREE.Mesh(bicepGeo, armorMat);
   bicep.position.set(side * 0.008, -0.095, 0.008);
   upperArm.add(bicep);
 
-  // Elbow double discs
+  // Dual Elbow Rotational Discs with Purple Emissive Rings (Reference: ELBOW OVERVIEW)
+  const elbow = new THREE.Group();
+  elbow.name = `${prefix}Elbow`;
+  elbow.position.set(0, -0.19, 0);
+  upperArm.add(elbow);
+
+  const hingePin = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.082, 16), jointMat);
+  hingePin.rotation.z = Math.PI / 2;
+  elbow.add(hingePin);
+
   for (const dSide of [-1, 1]) {
-    const elbowDisc = new THREE.Mesh(new THREE.CylinderGeometry(0.046, 0.046, 0.014, 24), jointMat);
-    elbowDisc.rotation.z = Math.PI / 2;
-    elbowDisc.position.set(dSide * 0.020, -0.19, 0);
-    upperArm.add(elbowDisc);
+    const discGroup = new THREE.Group();
+    discGroup.position.set(dSide * 0.038, 0, 0);
+    elbow.add(discGroup);
+
+    const disc = new THREE.Mesh(new THREE.CylinderGeometry(0.034, 0.034, 0.006, 24), jointMat);
+    disc.rotation.z = Math.PI / 2;
+    discGroup.add(disc);
+
+    const purpleRing = new THREE.Mesh(new THREE.TorusGeometry(0.024, 0.0022, 8, 24), violetMat);
+    purpleRing.rotation.y = Math.PI / 2;
+    purpleRing.position.set(dSide * 0.0035, 0, 0);
+    discGroup.add(purpleRing);
   }
 
   const forearm = new THREE.Group();
   forearm.name = `${prefix}Forearm`;
-  forearm.position.set(0, -0.19, 0.015);
-  upperArm.add(forearm);
+  forearm.position.set(0, 0, 0.005);
+  elbow.add(forearm);
 
-  const forePlate = new THREE.Mesh(new THREE.CylinderGeometry(0.050, 0.038, 0.16, 20), armorMat);
-  forePlate.position.set(0, -0.085, 0.005);
+  const forePlate = new THREE.Mesh(new THREE.CylinderGeometry(0.049, 0.038, 0.17, 24), armorMat);
+  forePlate.position.set(0, -0.090, 0.005);
   forearm.add(forePlate);
+
+  const foreLed = new THREE.Mesh(new THREE.CylinderGeometry(0.002, 0.002, 0.12, 8), violetMat);
+  foreLed.position.set(side * 0.048, -0.090, 0.006);
+  forearm.add(foreLed);
 
   const hand = new THREE.Group();
   hand.name = `${prefix}Hand`;
-  hand.position.set(0, -0.175, 0.010);
+  hand.position.set(0, -0.185, 0.008);
   forearm.add(hand);
 
-  const handMesh = new THREE.Mesh(new THREE.BoxGeometry(0.048, 0.052, 0.018), jointMat);
-  handMesh.position.set(0, -0.034, 0);
+  const handMesh = new THREE.Mesh(new THREE.BoxGeometry(0.046, 0.054, 0.020), jointMat);
+  handMesh.position.set(0, -0.032, 0);
   hand.add(handMesh);
 
-  const dorsalPlate = new THREE.Mesh(new THREE.BoxGeometry(0.052, 0.046, 0.008), armorMat);
-  dorsalPlate.position.set(0, -0.032, 0.012);
+  const dorsalPlate = new THREE.Mesh(new THREE.BoxGeometry(0.048, 0.048, 0.008), armorMat);
+  dorsalPlate.position.set(0, -0.030, 0.012);
   hand.add(dorsalPlate);
+
+  const dorsalLed = new THREE.Mesh(new THREE.BoxGeometry(0.003, 0.032, 0.004), violetMat);
+  dorsalLed.position.set(0, -0.030, 0.016);
+  hand.add(dorsalLed);
+
+  // Fingers and Thumb
+  for (let f = 0; f < 4; f++) {
+    const fX = (f - 1.5) * 0.012 * side;
+    const fGroup = new THREE.Group();
+    fGroup.position.set(fX, -0.058, 0.004);
+    hand.add(fGroup);
+
+    const fProx = new THREE.Mesh(new THREE.CylinderGeometry(0.0045, 0.0040, 0.026, 10), jointMat);
+    fProx.position.set(0, -0.013, 0);
+    fGroup.add(fProx);
+
+    const fArmor = new THREE.Mesh(new THREE.BoxGeometry(0.009, 0.020, 0.005), armorMat);
+    fArmor.position.set(0, -0.013, 0.003);
+    fGroup.add(fArmor);
+  }
+
+  // Thumb
+  const thumbGroup = new THREE.Group();
+  thumbGroup.position.set(-side * 0.024, -0.028, 0.006);
+  thumbGroup.rotation.set(0.2, -side * 0.3, -side * 0.15);
+  hand.add(thumbGroup);
+
+  const tBall = new THREE.Mesh(new THREE.SphereGeometry(0.009, 12, 10), jointMat);
+  thumbGroup.add(tBall);
+
+  const tProx = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.0045, 0.024, 10), jointMat);
+  tProx.position.set(0, -0.014, 0);
+  thumbGroup.add(tProx);
 }
 
 const exporter = new GLTFExporter();

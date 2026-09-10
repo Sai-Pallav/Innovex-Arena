@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { RobotNodes } from './RobotProceduralFactory';
 import { RobotAnimationSystem } from './RobotAnimation';
-import { ROBOT_CONFIG } from '../config';
+import { ROBOT_CONFIG, HEAD_ROTATION_LIMIT, SHOULDER_RESPONSE, TORSO_RESPONSE } from '../config';
 
 export class RobotController {
   public nodes: RobotNodes;
@@ -81,75 +81,95 @@ export class RobotController {
 
     // 2. Desired Target Angles (Clamped to mechanical limits)
     // Left cursor -> negative Y yaw (turns left); Right cursor -> positive Y yaw (turns right)
-    const desiredHeadYaw = this.targetLookX * (cfg.headYawLimit * motionScale + speedBoost);
+    const desiredHeadYaw = this.targetLookX * (HEAD_ROTATION_LIMIT.yaw * motionScale + speedBoost);
     // Up cursor (targetLookY > 0) -> negative X pitch (looks up); Down cursor -> positive X pitch (looks down)
-    const desiredHeadPitch = -this.targetLookY * (cfg.headPitchLimit * motionScale);
-    const desiredHeadRoll = this.targetLookX * (cfg.headRollLimit * motionScale);
+    const desiredHeadPitch = -this.targetLookY * (HEAD_ROTATION_LIMIT.pitch * motionScale);
+    const desiredHeadRoll = this.targetLookX * (HEAD_ROTATION_LIMIT.roll * motionScale);
 
     // 3. Smooth Damping (Critically damped exponential interpolation)
     const headDampFactor = 1.0 - Math.exp(-cfg.headDamping * dt);
-    const eyeDampFactor = 1.0 - Math.exp(-cfg.eyeDamping * dt);
 
     this.currentHeadYaw += (desiredHeadYaw - this.currentHeadYaw) * headDampFactor;
     this.currentHeadPitch += (desiredHeadPitch - this.currentHeadPitch) * headDampFactor;
     this.currentHeadRoll += (desiredHeadRoll - this.currentHeadRoll) * headDampFactor;
 
-    // Apply rotation to Head (incorporating base heroic gaze angle turned down and toward screen-left per reference)
+    // Distribute yaw and pitch across the kinematic hierarchy without compounding.
+    // Root has base orientation towards screen-left (~-12°).
+    // Subtle gaze compensation (+0.04 rad) keeps head comfortably in heroic 3/4 alignment.
+    const baseGazeOffset = 0.04;
+
+    // Strict P5 Hierarchy:
+    // HEAD: primary response (~72% yaw, ~78% pitch)
+    // NECK: smooth transition (~22% yaw, ~20% pitch)
+    // SHOULDERS: subtle response (~3% yaw)
+    // TORSO: almost imperceptible response (~2% yaw, ~1.5% pitch)
+    const torsoYaw = this.currentHeadYaw * TORSO_RESPONSE.yawFactor;
+    const torsoPitch = this.currentHeadPitch * TORSO_RESPONSE.pitchFactor;
+
+    const neckYaw = (baseGazeOffset * 0.35) + (this.currentHeadYaw * 0.22);
+    const neckPitch = this.currentHeadPitch * 0.20;
+
+    const headLocalYaw = (baseGazeOffset * 0.65) + (this.currentHeadYaw * 0.74);
+    const headLocalPitch = this.currentHeadPitch * 0.78;
+    const headLocalRoll = this.currentHeadRoll * 0.35;
+
+    // Apply rotation to Head (natural forward eye level gaze)
     this.nodes.head.rotation.set(
-      0.08 + this.currentHeadPitch,
-      -0.38 + this.currentHeadYaw,
-      -0.04 + this.currentHeadRoll,
+      headLocalPitch,
+      headLocalYaw,
+      -0.01 + headLocalRoll,
       'YXZ'
     );
 
-    // 4. Eye Saccade & Gaze System (Tracks faster than head, stays centered within visor)
-    const desiredEyeX = this.targetLookX * cfg.eyeGazeRangeX * motionScale;
-    const desiredEyeY = this.targetLookY * cfg.eyeGazeRangeY * motionScale;
-
-    this.currentEyeX += (desiredEyeX - this.currentEyeX) * eyeDampFactor;
-    this.currentEyeY += (desiredEyeY - this.currentEyeY) * eyeDampFactor;
-
-    this.nodes.eyeTrackingGroup.position.x = this.currentEyeX;
-    this.nodes.eyeTrackingGroup.position.y = this.currentEyeY;
-    this.nodes.eyeTrackingGroup.position.z = 0;
-
-    // 5. Neck Follow-Through (~28% of head rotation)
-    const desiredNeckYaw = this.currentHeadYaw * cfg.neckFollowStrength;
-    const desiredNeckPitch = this.currentHeadPitch * cfg.neckFollowStrength;
-    const neckDampFactor = 1.0 - Math.exp(-(cfg.headDamping * 0.8) * dt);
-
-    this.currentNeckYaw += (desiredNeckYaw - this.currentNeckYaw) * neckDampFactor;
-    this.currentNeckPitch += (desiredNeckPitch - this.currentNeckPitch) * neckDampFactor;
-
+    // Apply rotation to Neck (upright alignment)
     this.nodes.neck.rotation.set(
-      0.05 + this.currentNeckPitch,
-      -0.10 + this.currentNeckYaw,
+      neckPitch,
+      neckYaw,
       0,
       'YXZ'
     );
 
-    // 6. Torso & Shoulder Reaction (Base -0.35 rad turns body ~20° toward SCREEN LEFT)
-    const desiredTorsoYaw = this.currentHeadYaw * cfg.torsoFollowStrength;
-    const desiredTorsoPitch = this.currentHeadPitch * cfg.torsoFollowStrength * 0.6;
-    const torsoDampFactor = 1.0 - Math.exp(-(cfg.headDamping * 0.6) * dt);
-
-    this.currentTorsoYaw += (desiredTorsoYaw - this.currentTorsoYaw) * torsoDampFactor;
-    this.currentTorsoPitch += (desiredTorsoPitch - this.currentTorsoPitch) * torsoDampFactor;
-
+    // Apply rotation to Torso (upright athletic posture)
     this.nodes.torso.rotation.set(
-      0.02 + this.currentTorsoPitch,
-      -0.35 + this.currentTorsoYaw,
-      -this.currentTorsoYaw * 0.15, // subtle counter-lean
+      torsoPitch,
+      torsoYaw,
+      -torsoYaw * 0.08,
       'YXZ'
     );
 
-    // Shoulders dynamic subtle reaction
-    const shoulderReaction = this.currentHeadYaw * cfg.shoulderFollowStrength;
-    this.nodes.leftShoulder.rotation.z = -0.02 - shoulderReaction * 0.08;
-    this.nodes.rightShoulder.rotation.z = 0.02 - shoulderReaction * 0.08;
+    // Keep eyeTrackingGroup centered on the curved visor glass
+    this.nodes.eyeTrackingGroup.position.set(0, 0, 0);
+
+    // Shoulders subtle dynamic response
+    const shoulderReaction = this.currentHeadYaw * SHOULDER_RESPONSE.yawFactor;
+    this.nodes.leftShoulder.rotation.z = -0.02 - shoulderReaction * SHOULDER_RESPONSE.zReaction;
+    this.nodes.leftShoulder.rotation.y = shoulderReaction * SHOULDER_RESPONSE.pitchFactor;
+    this.nodes.rightShoulder.rotation.z = 0.02 - shoulderReaction * SHOULDER_RESPONSE.zReaction;
+    this.nodes.rightShoulder.rotation.y = shoulderReaction * SHOULDER_RESPONSE.pitchFactor;
+
+    // Arms secondary follow-through (minimal)
+    const armFollow = this.currentHeadYaw * 0.02;
+    this.nodes.leftUpperArm.rotation.y = armFollow * 0.5;
+    this.nodes.rightUpperArm.rotation.y = armFollow * 0.5;
 
     // 7. Update Secondary Animations (Breathing, Eye Blink, LED Pulse, Hand Kinematics)
     this.animationSystem.update(dt, this.reducedMotion, this.currentHeadYaw, this.currentHeadPitch);
+  }
+
+  public getAnimationSystem(): RobotAnimationSystem {
+    return this.animationSystem;
+  }
+
+  public getArmController() {
+    return this.animationSystem.getArmController();
+  }
+
+  public getTorsoController() {
+    return this.animationSystem.getTorsoController();
+  }
+
+  public getLegController() {
+    return this.animationSystem.getLegController();
   }
 
   public dispose(): void {

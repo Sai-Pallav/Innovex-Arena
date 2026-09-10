@@ -1,25 +1,101 @@
+// Centralized Brand Accent Color (Part 14 & 15: Purple is the ONLY emissive accent)
+export const ROBOT_ACCENT = 0xa855f7;
+export const ROBOT_ACCENT_HEX = '#a855f7';
+
+// =========================================================================
+// CENTRALIZED MASTER PRODUCTION CONFIGURATION CONSTANTS (Hero Refinement)
+// =========================================================================
+
+export const ROBOT_SCALE = {
+  desktop: 1.62,
+  desktopWide: 1.68,
+  tablet: 1.40,
+  mobile: 1.24,
+};
+
+export const ROBOT_POSITION = {
+  desktop: { x: 0.0, y: -0.18, z: 0 },
+  desktopWide: { x: 0.0, y: -0.18, z: 0 },
+  tablet: { x: 0.0, y: -0.14, z: 0 },
+  mobile: { x: 0.0, y: -0.10, z: 0 },
+};
+
+export const ROBOT_ROTATION = {
+  yaw: -10 * (Math.PI / 180),   // ~-10 degrees (ideal 3/4 hero orientation revealing chest & joint depth)
+  pitch: 0,                     // Neutral upright posture (eliminates backward tilt)
+  roll: 0,
+};
+
+export const HEAD_ROTATION_LIMIT = {
+  yaw: 30 * (Math.PI / 180),    // Natural cursor response (~±30°)
+  pitch: 18 * (Math.PI / 180),  // (~±18°)
+  roll: 6 * (Math.PI / 180),    // (~±6°)
+};
+
+export const SHOULDER_RESPONSE = {
+  yawFactor: 0.03,
+  pitchFactor: 0.02,
+  zReaction: 0.03,
+};
+
+export const TORSO_RESPONSE = {
+  yawFactor: 0.02,
+  pitchFactor: 0.015,
+};
+
+export const CAMERA_POSITION = {
+  baseFov: 45,                  // Normal cinematic FOV
+  targetY: 0.04,                // Centered on chest/torso, lowering robot so legs descend downward
+  minDistanceVert: 2.16,        // Intimate, powerful hero scale showcasing head, chest, arms & waist
+  horizontalSpreadFactor: 0.62,
+};
+
+export const LIGHT_INTENSITY = {
+  ambient: 0.42,                // Very subtle ambient, maintains dark cavity depth
+  key: 1.15,                    // Soft key light with rich gradients across armor
+  fill: 0.32,                   // Controlled fill light preventing pure black shadows
+  rimLeft: 0.65,                // Subtle titanium edge contour
+  rimRight: 1.45,               // Crisp violet rim separation (shoulders, head, torso)
+  purpleBounce: 0.45,           // Subtle local emissive bounce
+  lowerFill: 0.25,              // Soft ground connection
+};
+
+export const EMISSIVE_INTENSITY = {
+  visor: 2.2,
+  bloomOpacity: 0.18,
+  visorPointLight: 1.1,
+  pulseRange: [1.9, 2.6] as [number, number],
+};
+
+export interface RobotDimensions {
+  headScale: number;
+  headWidth: number;
+  headHeight: number;
+  headDepth: number;
+  visorWidthRatio: number;
+  visorHeightRatio: number;
+  sideModuleDiameterRatio: number;
+  neckWidthRatio: number;
+  neckRingsCount: number;
+}
+
 export interface RobotConfig {
-  // Kinematic Angular Limits (in radians)
-  headYawLimit: number;        // Horizontal rotation limit (~±25°)
-  headPitchLimit: number;      // Vertical rotation limit (~±15°)
-  headRollLimit: number;       // Subtle tilt limit (~±6°)
+  headYawLimit: number;
+  headPitchLimit: number;
+  headRollLimit: number;
   
-  // Damping & Inertia (larger = faster, smaller = smoother lag)
   headDamping: number;
   eyeDamping: number;
   neckFollowStrength: number;
   torsoFollowStrength: number;
   shoulderFollowStrength: number;
 
-  // Eye Tracking System
-  eyeGazeRangeX: number;       // Horizontal displacement of digital eyes
-  eyeGazeRangeY: number;       // Vertical displacement of digital eyes
+  eyeGazeRangeX: number;
+  eyeGazeRangeY: number;
 
-  // Dynamic Cursor Speed Anticipation
   cursorSpeedThreshold: number;
   cursorSpeedAnticipation: number;
 
-  // Secondary Idle Animations
   idleBreathingSpeed: number;
   idleBreathingAmplitude: number;
   idleDriftSpeed: number;
@@ -28,15 +104,13 @@ export interface RobotConfig {
   blinkIntervalMax: number;
   blinkDuration: number;
 
-  // PBR Material Visual Tunings
+  dimensions: RobotDimensions;
+
   colors: {
     armorWhite: number;
     jointDark: number;
     visorGlass: number;
-    eyeBlue: number;
-    earRingViolet: number;
-    chestLogoViolet: number;
-    accentSeamViolet: number;
+    accentPurple: number;
     studioFloor: number;
   };
   materials: {
@@ -46,66 +120,76 @@ export interface RobotConfig {
     armorClearcoatRoughness: number;
     jointRoughness: number;
     jointMetalness: number;
-    visorTransmission: number;
     visorRoughness: number;
     visorMetalness: number;
+    visorClearcoat: number;
+    visorClearcoatRoughness: number;
     emissiveIntensity: number;
     emissivePulseRange: [number, number];
   };
 
-  // Performance & Rendering
   maxPixelRatio: number;
   shadowMapSize: number;
 }
 
 export const ROBOT_CONFIG: RobotConfig = {
-  headYawLimit: (22 * Math.PI) / 180,    // ±22 degrees (constrained per spec)
-  headPitchLimit: (11 * Math.PI) / 180,  // ±11 degrees (subtle vertical look)
-  headRollLimit: (5 * Math.PI) / 180,    // ±5 degrees (subtle mechanical tilt)
+  headYawLimit: (30 * Math.PI) / 180,
+  headPitchLimit: (18 * Math.PI) / 180,
+  headRollLimit: (6 * Math.PI) / 180,
 
-  headDamping: 5.2,                      // Smooth mechanical damping
-  eyeDamping: 8.5,                       // Eyes dart and focus ahead
-  neckFollowStrength: 0.32,              // Neck carries 32% of head yaw
-  torsoFollowStrength: 0.14,             // Subtle follow-through on torso
-  shoulderFollowStrength: 0.08,          // Subtle shoulder reaction
+  headDamping: 6.5,
+  eyeDamping: 7.2,
+  neckFollowStrength: 0.22,
+  torsoFollowStrength: 0.08,
+  shoulderFollowStrength: 0.04,
 
-  eyeGazeRangeX: 0.008,                  // Clamped tightly within visor width
-  eyeGazeRangeY: 0.006,                  // Clamped tightly within visor height
+  eyeGazeRangeX: 0.005,
+  eyeGazeRangeY: 0.003,
 
-  cursorSpeedThreshold: 1.2,
-  cursorSpeedAnticipation: 0.22,
+  cursorSpeedThreshold: 1.4,
+  cursorSpeedAnticipation: 0.16,
 
-  idleBreathingSpeed: 1.4,
-  idleBreathingAmplitude: 0.018,
-  idleDriftSpeed: 0.8,
-  idleDriftAmplitude: 0.008,
-  blinkIntervalMin: 3.5,
-  blinkIntervalMax: 7.0,
+  idleBreathingSpeed: 1.2,
+  idleBreathingAmplitude: 0.012,
+  idleDriftSpeed: 0.6,
+  idleDriftAmplitude: 0.004,
+  blinkIntervalMin: 4.0,
+  blinkIntervalMax: 8.0,
   blinkDuration: 0.16,
 
+  dimensions: {
+    headScale: 1.0,
+    headWidth: 0.280,
+    headHeight: 0.316,
+    headDepth: 0.310,
+    visorWidthRatio: 0.74,
+    visorHeightRatio: 0.36,
+    sideModuleDiameterRatio: 0.23,
+    neckWidthRatio: 0.34,
+    neckRingsCount: 4,
+  },
+
   colors: {
-    armorWhite: 0xf3f5fa,                // Premium clean automotive white
-    jointDark: 0x14161c,                 // Anodized dark titanium
-    visorGlass: 0x060810,                // Deep tinted glossy polycarbonate
-    eyeBlue: 0x38bdf8,                   // Cyan-blue digital HUD glow
-    earRingViolet: 0x8b5cf6,             // Ultraviolet circular sensor glow
-    chestLogoViolet: 0xa855f7,           // Neon violet chest 'A' crest
-    accentSeamViolet: 0x7c3aed,          // Subtle edge seam emissive
-    studioFloor: 0x030014,               // Matches Innovex cosmos background
+    armorWhite: 0xd6dae6,                // Refined ceramic off-white with natural gradient falloff
+    jointDark: 0x181a26,                 // Rich gunmetal titanium with specular depth
+    visorGlass: 0x04030a,                // Deep obsidian glossy black
+    accentPurple: ROBOT_ACCENT,          // Electric brand purple
+    studioFloor: 0x03010f,
   },
 
   materials: {
-    armorRoughness: 0.18,
-    armorMetalness: 0.06,
-    armorClearcoat: 0.95,
+    armorRoughness: 0.30,                // Plausible ceramic roughness for soft specular roll-off (P9)
+    armorMetalness: 0.14,                // Controlled dielectric behavior with soft specular highlights
+    armorClearcoat: 0.90,                // Liquid automotive/ceramic clearcoat
     armorClearcoatRoughness: 0.12,
-    jointRoughness: 0.38,
-    jointMetalness: 0.88,
-    visorTransmission: 0.35,
-    visorRoughness: 0.05,
-    visorMetalness: 0.15,
-    emissiveIntensity: 3.2,
-    emissivePulseRange: [2.6, 3.8],
+    jointRoughness: 0.35,                // Satin brushed titanium
+    jointMetalness: 0.85,                // Real metallic reflectance with visible cavity detail
+    visorRoughness: 0.02,
+    visorMetalness: 0.20,
+    visorClearcoat: 1.0,
+    visorClearcoatRoughness: 0.02,
+    emissiveIntensity: 2.2,              // Controlled, premium glow
+    emissivePulseRange: [1.9, 2.6],
   },
 
   maxPixelRatio: 2.0,

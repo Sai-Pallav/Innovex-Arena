@@ -116,8 +116,8 @@ export const Navbar: React.FC = () => {
                       to={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
                       className={`
-                        group/link relative px-3 xl:px-4 py-1.5 rounded-full text-sm font-medium
-                        transition-all duration-200 flex items-center gap-1.5
+                        group/link relative px-2.5 xl:px-3.5 py-1.5 rounded-full text-xs xl:text-sm font-medium
+                        transition-all duration-200 flex items-center gap-1
                         ${
                           isActive
                             ? 'text-white'
@@ -127,7 +127,7 @@ export const Navbar: React.FC = () => {
                     >
                       {/* Active Indicator */}
                       {isActive && (
-                        <div className="absolute inset-0 rounded-full bg-white/[0.05] border border-[#b7a4fb]/30 shadow-[inset_0_0_12px_rgba(183,164,251,0.08)]" />
+                        <div className="absolute inset-0 rounded-full bg-white/[0.07] border border-[#b7a4fb]/35 shadow-[inset_0_0_12px_rgba(183,164,251,0.12)]" />
                       )}
                       
                       {/* Hover Effect */}
@@ -232,16 +232,16 @@ export const Navbar: React.FC = () => {
             <div className="hidden lg:flex items-center gap-3 shrink-0">
               <Link
                 to="/admin/login"
-                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#b7a4fb]/40 flex items-center justify-center text-[#9b96b0] hover:text-[#b7a4fb] transition-all duration-200 group"
+                className="w-9 h-9 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 hover:border-[#b7a4fb]/40 flex items-center justify-center text-[#9b96b0] hover:text-[#b7a4fb] transition-all duration-200 group"
                 title="Admin Portal"
               >
-                <Shield className="w-4.5 h-4.5" />
+                <Shield className="w-4 h-4" />
               </Link>
 
               <Link to="/contact">
-                <span className="wope-glass-cta-pill px-6 py-2 text-sm group">
+                <span className="px-5 py-2 rounded-full bg-white text-[#040112] font-semibold text-xs sm:text-sm hover:bg-zinc-100 transition-all duration-200 flex items-center gap-1.5 shadow-[0_0_20px_rgba(255,255,255,0.18)] hover:shadow-[0_0_28px_rgba(255,255,255,0.30)] group">
                   <span>Get Started</span>
-                  <ArrowRight className="w-4 h-4 text-[#b7a4fb] group-hover:translate-x-0.5 transition-transform" />
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                 </span>
               </Link>
             </div>

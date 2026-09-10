@@ -99,6 +99,11 @@ export async function loadRobotModel(url?: string): Promise<LoadRobotResult> {
     const leftHand = (findNode(/hand.*l|l.*hand/i) as THREE.Group) || createProxyGroup('LeftHand', leftForearm);
     const rightHand = (findNode(/hand.*r|r.*hand/i) as THREE.Group) || createProxyGroup('RightHand', rightForearm);
 
+    const leftLeg = (findNode(/leg.*l|thigh.*l|hip.*l/i) as THREE.Group) || createProxyGroup('LeftLeg', torso);
+    const rightLeg = (findNode(/leg.*r|thigh.*r|hip.*r/i) as THREE.Group) || createProxyGroup('RightLeg', torso);
+    const leftFoot = (findNode(/foot.*l|l.*foot/i) as THREE.Group) || createProxyGroup('LeftFoot', leftLeg);
+    const rightFoot = (findNode(/foot.*r|r.*foot/i) as THREE.Group) || createProxyGroup('RightFoot', rightLeg);
+
     let mixer: THREE.AnimationMixer | undefined;
     if (gltf.animations && gltf.animations.length > 0) {
       mixer = new THREE.AnimationMixer(root);
@@ -126,15 +131,19 @@ export async function loadRobotModel(url?: string): Promise<LoadRobotResult> {
       rightForearm,
       leftHand,
       rightHand,
+      leftLeg,
+      rightLeg,
+      leftFoot,
+      rightFoot,
       ledMeshes,
       materials: {
         armor: new THREE.MeshPhysicalMaterial({ color: cfg.colors.armorWhite }),
         joint: new THREE.MeshPhysicalMaterial({ color: cfg.colors.jointDark }),
         visor: new THREE.MeshPhysicalMaterial({ color: cfg.colors.visorGlass }),
-        eyeGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.eyeBlue }),
-        earRingGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.earRingViolet }),
-        chestGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.chestLogoViolet }),
-        accentGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentSeamViolet }),
+        eyeGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
+        earRingGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
+        chestGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
+        accentGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
       },
     };
 

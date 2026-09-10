@@ -1,12 +1,15 @@
 import * as THREE from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { CameraManager } from './camera';
 import { createStudioLighting, SceneLights } from './lighting';
 import { loadRobotModel, LoadRobotResult } from '../robot/RobotLoader';
+import { RobotNodes } from '../robot/RobotProceduralFactory';
 import { RobotController } from '../robot/RobotController';
 import { RobotInteraction } from '../robot/RobotInteraction';
 import { getOptimalPixelRatio, deepDispose } from '../utils/performance';
 import { getViewportDimensions } from '../utils/responsiveness';
-import { ROBOT_CONFIG } from '../config';
+import { ROBOT_CONFIG, ROBOT_SCALE, ROBOT_POSITION, ROBOT_ROTATION } from '../config';
+import { DebugManager, DebugStats } from '../arm/DebugManager';
 
 export interface RobotSceneOptions {
   container: HTMLElement;
@@ -22,8 +25,10 @@ export class RobotScene {
   private cameraManager: CameraManager;
   private lights: SceneLights;
   private controller: RobotController | null = null;
+  private debugManager: DebugManager | null = null;
   private interaction: RobotInteraction;
   private mixer?: THREE.AnimationMixer;
+  private robotNodes: RobotNodes | null = null;
 
   private isRunning: boolean = false;
   private isVisible: boolean = true;
@@ -62,6 +67,13 @@ export class RobotScene {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
+    // Procedural Studio Environment for realistic PBR visor reflections (Part 5 & 16)
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+    pmremGenerator.compileEquirectangularShader();
+    const envTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
+    this.scene.environment = envTexture;
+    pmremGenerator.dispose();
+
     // Append canvas
     this.container.appendChild(this.renderer.domElement);
     this.renderer.domElement.style.width = '100%';
@@ -95,8 +107,15 @@ export class RobotScene {
       // Add to scene
       this.scene.add(result.nodes.root);
 
+      // Store nodes & apply responsive heroic scaling & bottom-anchored positioning
+      this.robotNodes = result.nodes;
+      this.updateRobotTransform();
+
       // Initialize kinematics controller
       this.controller = new RobotController(result.nodes);
+
+      // Initialize Section 9 Developer Debug Mode Manager
+      this.debugManager = new DebugManager(result.nodes.root);
 
       this.isReady = true;
       if (options.onLoaded) {
@@ -112,6 +131,36 @@ export class RobotScene {
     }
   }
 
+  private updateRobotTransform(): void {
+    if (!this.robotNodes?.root) return;
+    const width = this.container.clientWidth;
+
+    // Priority 1: Grounded, prominent hero character scale (~1.22x–1.28x)
+    // Anchored toward bottom of hero so lower torso naturally emerges from bottom stage,
+    // head remains comfortably below top navigation, and both shoulders & hands are fully visible.
+    let scale = ROBOT_SCALE.desktop;
+    let pos = ROBOT_POSITION.desktop;
+
+    if (width < 640) {
+      scale = ROBOT_SCALE.mobile;
+      pos = ROBOT_POSITION.mobile;
+    } else if (width < 1024) {
+      scale = ROBOT_SCALE.tablet;
+      pos = ROBOT_POSITION.tablet;
+    } else if (width > 1600) {
+      scale = ROBOT_SCALE.desktopWide;
+      pos = ROBOT_POSITION.desktopWide;
+    }
+
+    this.robotNodes.root.scale.setScalar(scale);
+    this.robotNodes.root.position.set(pos.x, pos.y, pos.z);
+
+    // Subtle 3/4 orientation toward screen-left and slight ground perspective
+    this.robotNodes.root.rotation.y = ROBOT_ROTATION.yaw;
+    this.robotNodes.root.rotation.x = ROBOT_ROTATION.pitch;
+    this.robotNodes.root.rotation.z = ROBOT_ROTATION.roll;
+  }
+
   private setupResizeObserver(): void {
     if (typeof ResizeObserver === 'undefined') return;
 
@@ -124,6 +173,7 @@ export class RobotScene {
 
           this.renderer.setSize(width, height);
           this.cameraManager.updateAspect(aspect);
+          this.updateRobotTransform();
         }
       }
     });
@@ -174,15 +224,14 @@ export class RobotScene {
     if (this.controller) {
       this.controller.setReducedMotion(interactionState.reducedMotion);
 
-      if (interactionState.isHovered) {
-        this.controller.setLookTarget(
-          interactionState.targetX,
-          interactionState.targetY,
-          interactionState.speed
-        );
-      } else {
-        this.controller.setIdleState();
-      }
+      // Always track — when cursor is in window follow it, when it leaves return to center
+      this.controller.setLookTarget(
+        interactionState.targetX,
+        interactionState.targetY,
+        interactionState.speed
+      );
+      // isHovered=false means cursor left browser window; mark interacting=false for idle breathing
+      this.controller.setInteractionState(interactionState.isHovered);
 
       this.controller.update(dt);
     }
@@ -199,19 +248,53 @@ export class RobotScene {
   };
 
   /**
-   * Diagnostic / Feature Controls
+   * Diagnostic / Feature Controls (Section 9)
    */
+  public toggleDebugMode(): boolean {
+    if (!this.debugManager) return false;
+    return this.debugManager.toggleDebugMode();
+  }
+
+  public setDebugMode(enabled: boolean): void {
+    this.debugManager?.setDebugMode(enabled);
+  }
+
+  public isDebugMode(): boolean {
+    return this.debugManager ? this.debugManager.isDebugEnabled() : false;
+  }
+
+  public getDebugStats(): DebugStats | null {
+    return this.debugManager ? this.debugManager.getStats() : null;
+  }
+
+  public getController(): RobotController | null {
+    return this.controller;
+  }
+
   public setWireframe(enabled: boolean): void {
-    this.scene.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const mesh = child as THREE.Mesh;
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((m) => ((m as THREE.MeshStandardMaterial).wireframe = enabled));
-        } else if (mesh.material) {
-          (mesh.material as THREE.MeshStandardMaterial).wireframe = enabled;
-        }
-      }
-    });
+    this.debugManager?.setDebugMode(enabled);
+  }
+
+  public toggleExplodedView(): boolean {
+    const torsoCtrl = this.controller?.getTorsoController();
+    const armCtrl = this.controller?.getArmController();
+    const legCtrl = this.controller?.getLegController();
+    let active = false;
+    if (torsoCtrl) {
+      active = torsoCtrl.toggleExplodedView();
+    }
+    if (armCtrl) {
+      armCtrl.setExplodedView(active);
+    }
+    if (legCtrl) {
+      legCtrl.setExplodedProgress(active ? 1 : 0);
+    }
+    return active;
+  }
+
+  public isExplodedView(): boolean {
+    const torsoCtrl = this.controller?.getTorsoController();
+    return torsoCtrl ? torsoCtrl.isExplodedActive() : false;
   }
 
   public resetGaze(): void {
@@ -230,6 +313,12 @@ export class RobotScene {
     document.removeEventListener('visibilitychange', this.boundVisibilityChange);
     this.interaction.dispose();
     this.controller?.dispose();
+    this.debugManager?.dispose();
+
+    if (this.scene.environment) {
+      this.scene.environment.dispose();
+      this.scene.environment = null;
+    }
 
     deepDispose(this.scene);
 
