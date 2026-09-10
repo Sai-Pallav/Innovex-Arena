@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { NormalizedInputState, HierarchicalGazeAngles } from './AnimationTypes';
 import { ANIMATION_CONFIG } from './AnimationConfig';
+import { ROBOT_ROTATION } from '../config';
 
 export class LookController {
   private currentYaw: number = 0;
@@ -34,16 +35,16 @@ export class LookController {
     this.currentPitch += (desiredPitch - this.currentPitch) * dampFactor;
     this.currentRoll += (desiredRoll - this.currentRoll) * dampFactor;
 
-    // Base gaze offset (+0.04 rad) keeps head comfortably in heroic 3/4 orientation
-    const baseGazeOffset = 0.04;
+    // Compensate for root's -10° 3/4 yaw so neutral gaze looks dead-straight at the camera/user
+    const baseGazeOffset = -ROBOT_ROTATION.yaw;
 
     // 4. Exact Hierarchical Look Distribution:
     // Head leads (100%), Neck follows (28%), Shoulders react (12%), Chest follows (5.5%), Waist barely reacts (2.0%)
     return {
-      headYaw: (baseGazeOffset * 0.65) + (this.currentYaw * 0.72),
+      headYaw: (baseGazeOffset * 0.72) + (this.currentYaw * 0.72),
       headPitch: this.currentPitch * 0.78,
       headRoll: this.currentRoll * 0.35,
-      neckYaw: (baseGazeOffset * 0.35) + (this.currentYaw * cfg.neckRatio),
+      neckYaw: (baseGazeOffset * 0.28) + (this.currentYaw * cfg.neckRatio),
       neckPitch: this.currentPitch * 0.25,
       shouldersYaw: this.currentYaw * cfg.shouldersRatio,
       chestYaw: this.currentYaw * cfg.chestRatio,

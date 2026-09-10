@@ -39,6 +39,7 @@ export class RobotScene {
 
   public isReady: boolean = false;
   public modelSource: 'glb' | 'procedural' = 'procedural';
+  private _tempFacePos = new THREE.Vector3();
 
   constructor(options: RobotSceneOptions) {
     this.container = options.container;
@@ -159,6 +160,18 @@ export class RobotScene {
     this.robotNodes.root.rotation.y = ROBOT_ROTATION.yaw;
     this.robotNodes.root.rotation.x = ROBOT_ROTATION.pitch;
     this.robotNodes.root.rotation.z = ROBOT_ROTATION.roll;
+
+    // Dynamically project the robot face center to calibrate cursor gaze origin
+    // When cursor is placed directly on the face, the robot looks completely straight ahead
+    this.robotNodes.root.updateMatrixWorld(true);
+    const faceTarget = this.robotNodes.faceVisor || this.robotNodes.head;
+    if (faceTarget) {
+      faceTarget.getWorldPosition(this._tempFacePos);
+      this._tempFacePos.project(this.cameraManager.camera);
+      const relX = this._tempFacePos.x * 0.5 + 0.5;
+      const relY = (1 - this._tempFacePos.y) * 0.5;
+      this.interaction.setFacePosition(relX, relY);
+    }
   }
 
   private setupResizeObserver(): void {

@@ -23,6 +23,11 @@ export class RobotInteraction {
   private boundPointerLeave: () => void;
   private mediaQueryList?: MediaQueryList;
 
+  // Relative anchor position of the robot face within the container [0, 1]
+  // Calibrated to the exact 3D projection of the visor/face
+  private faceRelX: number = 0.50;
+  private faceRelY: number = 0.23;
+
   constructor(container: HTMLElement) {
     this.container = container;
 
@@ -52,12 +57,12 @@ export class RobotInteraction {
     const now = performance.now();
     const dt = Math.max((now - this.lastTime) / 1000, 0.001);
 
-    // Calculate normalized coordinates relative to the robot container center.
-    // This maps the cursor position across the WHOLE viewport so that moving
-    // the cursor from left edge to right edge sweeps the head from -1 to +1.
+    // Calculate normalized coordinates relative to the robot FACE origin.
+    // When cursor is directly on the face, normX = 0 and normY = 0 (looks straight ahead).
+    // Moving up looks up, moving down looks down, moving left/right turns left/right.
     const rect = this.container.getBoundingClientRect();
-    const robotCenterX = rect.left + rect.width * 0.5;
-    const robotCenterY = rect.top + rect.height * 0.38; // Slightly above center (head level)
+    const robotCenterX = rect.left + rect.width * this.faceRelX;
+    const robotCenterY = rect.top + rect.height * this.faceRelY;
 
     // Use viewport half-width/height for normalization so full-page movement
     // maps to the full [-1, 1] range rather than just the robot container.
@@ -65,7 +70,7 @@ export class RobotInteraction {
     const halfH = window.innerHeight * 0.5;
 
     const normX = (e.clientX - robotCenterX) / halfW;
-    // Invert Y so moving cursor up gives positive Y (head looks up)
+    // Invert Y so moving cursor up from face gives positive Y (head looks up)
     const normY = -(e.clientY - robotCenterY) / halfH;
 
     // Clamp to [-1, 1]
@@ -92,7 +97,7 @@ export class RobotInteraction {
   }
 
   private onPointerLeave(): void {
-    // Mouse left the browser window entirely — return to idle
+    // Mouse left the browser window entirely — return to idle (looking straight forward)
     this.state.isHovered = false;
     this.state.targetX = 0;
     this.state.targetY = 0;
@@ -101,6 +106,11 @@ export class RobotInteraction {
 
   public getState(): Readonly<InteractionState> {
     return this.state;
+  }
+
+  public setFacePosition(relX: number, relY: number): void {
+    this.faceRelX = Math.max(0.1, Math.min(0.9, relX));
+    this.faceRelY = Math.max(0.05, Math.min(0.9, relY));
   }
 
   public setLookTarget(x: number, y: number): void {
