@@ -315,8 +315,8 @@ export class RobotAnimationController {
         this.baseRightUpperArmRot.z + armState.pose.rightUpperRoll
       );
 
-      this.nodes.leftForearm.rotation.x = this.baseLeftForearmRot.x + armState.pose.leftElbowBend;
-      this.nodes.rightForearm.rotation.x = this.baseRightForearmRot.x + armState.pose.rightElbowBend;
+      this.nodes.leftForearm.rotation.x = armState.pose.leftElbowBend;
+      this.nodes.rightForearm.rotation.x = armState.pose.rightElbowBend;
 
       this.nodes.leftHand.rotation.set(
         this.baseLeftHandRot.x + armState.leftWrist.pitch,

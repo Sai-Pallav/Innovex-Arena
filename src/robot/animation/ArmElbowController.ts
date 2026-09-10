@@ -133,18 +133,18 @@ export class ArmElbowController {
 
     // 2. Micro-motion and Mechanical Settling for Elbows
     // Layer 4 idle adjustment: very slow asynchronous sine offset
-    const elbowIdleL = Math.sin(time * 0.32) * 0.012 + breathOffset * 0.04 - lookPitch * 0.02;
-    const elbowIdleR = Math.cos(time * 0.28 + 1.2) * 0.012 + breathOffset * 0.04 - lookPitch * 0.02;
+    const elbowIdleL = -(Math.sin(time * 0.32) * 0.012 + breathOffset * 0.04 - lookPitch * 0.02);
+    const elbowIdleR = -(Math.cos(time * 0.28 + 1.2) * 0.012 + breathOffset * 0.04 - lookPitch * 0.02);
 
     const targetLeftElbow = THREE.MathUtils.clamp(
       this.currentPoseState.leftElbow + elbowIdleL,
-      0.26, // ~15° minimum
-      0.65  // ~37° maximum
+      -0.65, // ~ -37° maximum forward bend
+      -0.26  // ~ -15° minimum forward bend
     );
     const targetRightElbow = THREE.MathUtils.clamp(
       this.currentPoseState.rightElbow + elbowIdleR,
-      0.26,
-      0.65
+      -0.65,
+      -0.26
     );
 
     // Damped interpolation for mechanical inertia

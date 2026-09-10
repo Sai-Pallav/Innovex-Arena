@@ -406,9 +406,9 @@ export class ArmAnimationController {
 
     // 4. Wrist Kinematics (Pitch, Yaw, Roll)
     if (overrides.wrist) {
-      if (overrides.wrist.pitch !== undefined) arm.wrist.group.rotation.x = overrides.wrist.pitch;
-      if (overrides.wrist.roll !== undefined) arm.wrist.group.rotation.y = overrides.wrist.roll;
-      if (overrides.wrist.yaw !== undefined) arm.wrist.group.rotation.z = overrides.wrist.yaw;
+      if (overrides.wrist.pitch !== undefined) arm.wrist.group.rotation.x = baseWrist.x + overrides.wrist.pitch;
+      if (overrides.wrist.roll !== undefined) arm.wrist.group.rotation.y = baseWrist.y + overrides.wrist.roll;
+      if (overrides.wrist.yaw !== undefined) arm.wrist.group.rotation.z = baseWrist.z + overrides.wrist.yaw;
     } else {
       const wPitch = Math.cos(this.time * 0.55 + timePhase) * 0.022 + breathOffset * 0.08 - lookPitch * 0.02;
       const wRoll = Math.sin(this.time * 0.42 + timePhase) * 0.015 + lookYaw * 0.03;

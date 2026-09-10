@@ -51,12 +51,12 @@ export const ANIMATION_CONFIG = {
   // ==========================================
   arm: {
     // Poses with natural resting flexion (in radians):
-    // Elbow 15-35° (0.26 - 0.61 rad)
+    // Flexion is negative rotation around X-axis (-0.26 to -0.61 rad, i.e. ~ -15° to -35°)
     poses: {
       poseA: {
         name: 'PoseA_RightDominant',
-        leftElbow: 0.35,                      // ~20° flexion
-        rightElbow: 0.52,                     // ~30° flexion
+        leftElbow: -0.35,                     // ~ -20° forward flexion
+        rightElbow: -0.52,                    // ~ -30° forward flexion
         leftUpperPitch: -0.10,
         rightUpperPitch: -0.08,
         leftUpperRoll: -0.06,
@@ -64,8 +64,8 @@ export const ANIMATION_CONFIG = {
       },
       poseB: {
         name: 'PoseB_LeftDominant',
-        leftElbow: 0.52,                      // ~30° flexion
-        rightElbow: 0.35,                     // ~20° flexion
+        leftElbow: -0.52,                     // ~ -30° forward flexion
+        rightElbow: -0.35,                    // ~ -20° forward flexion
         leftUpperPitch: -0.08,
         rightUpperPitch: -0.10,
         leftUpperRoll: -0.07,
@@ -73,8 +73,8 @@ export const ANIMATION_CONFIG = {
       },
       poseC: {
         name: 'PoseC_Balanced',
-        leftElbow: 0.44,                      // ~25° flexion
-        rightElbow: 0.44,                     // ~25° flexion
+        leftElbow: -0.44,                     // ~ -25° forward flexion
+        rightElbow: -0.44,                    // ~ -25° forward flexion
         leftUpperPitch: -0.09,
         rightUpperPitch: -0.09,
         leftUpperRoll: -0.065,
