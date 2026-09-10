@@ -185,6 +185,15 @@ export class ArmAnimationController {
     this.setThumbPose(side, curl * 0.65, curl * 0.80, curl * 0.30);
   }
 
+  public setPoseOverrides(side: 'left' | 'right' | -1 | 1, overrides: ArmControlOverrides): void {
+    const isLeft = side === 'left' || side === -1;
+    if (isLeft) {
+      this.leftOverrides = { ...this.leftOverrides, ...overrides };
+    } else {
+      this.rightOverrides = { ...this.rightOverrides, ...overrides };
+    }
+  }
+
   public clearOverrides(side?: -1 | 1): void {
     if (side === -1 || side === undefined) this.leftOverrides = {};
     if (side === 1 || side === undefined) this.rightOverrides = {};
