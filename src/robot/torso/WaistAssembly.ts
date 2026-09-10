@@ -513,25 +513,25 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
   // Pelvic Front Armor Shield Plate between the hips (Sculpted multi-faceted groin shield)
   const pelvicPlateShape = new THREE.Shape();
-  pelvicPlateShape.moveTo(-0.046, 0.026);
-  pelvicPlateShape.quadraticCurveTo(0, 0.030, 0.046, 0.026);
-  pelvicPlateShape.lineTo(0.038, -0.020);
-  pelvicPlateShape.lineTo(0.024, -0.048);
-  pelvicPlateShape.quadraticCurveTo(0, -0.062, -0.024, -0.048);
-  pelvicPlateShape.lineTo(-0.038, -0.020);
+  pelvicPlateShape.moveTo(-0.048, 0.028);
+  pelvicPlateShape.quadraticCurveTo(0, 0.032, 0.048, 0.028);
+  pelvicPlateShape.lineTo(0.042, -0.018);
+  pelvicPlateShape.lineTo(0.026, -0.052);
+  pelvicPlateShape.quadraticCurveTo(0, -0.066, -0.026, -0.052);
+  pelvicPlateShape.lineTo(-0.042, -0.018);
   pelvicPlateShape.closePath();
 
   const plateGeo = new THREE.ExtrudeGeometry(pelvicPlateShape, {
-    depth: 0.016,
+    depth: 0.018,
     bevelEnabled: true,
-    bevelThickness: 0.0040,
-    bevelSize: 0.0032,
+    bevelThickness: 0.0045,
+    bevelSize: 0.0036,
     bevelSegments: 3,
-    curveSegments: 24,
+    curveSegments: 28,
   });
   plateGeo.center();
 
-  // Multi-faceted 3D curvature: central vertical keel ridge
+  // Multi-faceted 3D curvature: central vertical aerodynamic keel ridge
   const pPos = plateGeo.attributes.position;
   for (let i = 0; i < pPos.count; i++) {
     const x = pPos.getX(i);
@@ -539,9 +539,9 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     const z = pPos.getZ(i);
     if (z > 0) {
       // Keel peak at x = 0, sloping back laterally
-      const keel = (1.0 - Math.min(1.0, Math.abs(x) / 0.046)) * 0.0055;
+      const keel = (1.0 - Math.min(1.0, Math.abs(x) / 0.048)) * 0.0075;
       // Slight forward thrust in lower pelvis
-      const thrust = (y < 0) ? Math.sin(-y * 20) * 0.0025 : 0;
+      const thrust = (y < 0) ? Math.sin(-y * 18) * 0.0035 : 0;
       pPos.setZ(i, z + keel + thrust);
     }
   }
@@ -555,14 +555,59 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
   pelvicPlate.receiveShadow = true;
   hipConnectionGroup.add(pelvicPlate);
 
+  // Recessed dark titanium intake scoop pocket on the pelvic plate
+  const intakePocketGeo = new THREE.BoxGeometry(0.040, 0.007, 0.006);
+  const intakePocket = new THREE.Mesh(intakePocketGeo, materials.joint);
+  intakePocket.position.set(0, -0.266, 0.055);
+  intakePocket.rotation.x = -0.02;
+  hipConnectionGroup.add(intakePocket);
+
   // Signature horizontal violet emissive LED slit across the pelvic plate
-  const pelvicLightGeo = new THREE.BoxGeometry(0.036, 0.0028, 0.0025);
+  const pelvicLightGeo = new THREE.BoxGeometry(0.036, 0.0024, 0.003);
   const pelvicAccentLight = new THREE.Mesh(pelvicLightGeo, materials.purpleEmissive);
   pelvicAccentLight.name = 'PelvicAccentLight';
-  pelvicAccentLight.position.set(0, -0.266, 0.058);
+  pelvicAccentLight.position.set(0, -0.266, 0.0585);
   pelvicAccentLight.rotation.x = -0.02;
   hipConnectionGroup.add(pelvicAccentLight);
   ledMeshes.push(pelvicAccentLight);
+
+  // Left & Right Inguinal Armor Flaps (Bridges pelvis to lateral hip mounts - eliminates side voids)
+  for (const side of [-1, 1]) {
+    const flapShape = new THREE.Shape();
+    flapShape.moveTo(0, 0.024);
+    flapShape.lineTo(0.022, 0.016);
+    flapShape.lineTo(0.018, -0.030);
+    flapShape.lineTo(-0.004, -0.038);
+    flapShape.lineTo(-0.014, 0.012);
+    flapShape.closePath();
+
+    const flapGeo = new THREE.ExtrudeGeometry(flapShape, {
+      depth: 0.010,
+      bevelEnabled: true,
+      bevelThickness: 0.003,
+      bevelSize: 0.0024,
+      bevelSegments: 2,
+    });
+    flapGeo.center();
+
+    const flapMesh = new THREE.Mesh(flapGeo, materials.armor);
+    flapMesh.name = `InguinalFlap_${side === -1 ? 'L' : 'R'}`;
+    flapMesh.position.set(side * 0.046, -0.274, 0.036);
+    flapMesh.rotation.y = side * -0.28;
+    flapMesh.rotation.x = -0.04;
+    flapMesh.castShadow = true;
+    flapMesh.receiveShadow = true;
+    hipConnectionGroup.add(flapMesh);
+  }
+
+  // Sub-Pelvic Mechanical Cradle (Dark Titanium Frame connecting lower waist to hips)
+  const cradleGeo = new THREE.CylinderGeometry(0.046, 0.038, 0.036, 24);
+  const subPelvisCradle = new THREE.Mesh(cradleGeo, materials.joint);
+  subPelvisCradle.name = 'SubPelvisCradle';
+  subPelvisCradle.position.set(0, -0.262, 0.010);
+  subPelvisCradle.scale.set(1.15, 1.0, 0.85);
+  subPelvisCradle.castShadow = true;
+  hipConnectionGroup.add(subPelvisCradle);
 
   return {
     group: waistGroup,

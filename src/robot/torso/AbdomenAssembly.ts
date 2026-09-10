@@ -49,61 +49,65 @@ function createAbdominalArmorPlateGeometry(
   const shape = new THREE.Shape();
 
   const rx = spec.radiusX;
-  const h = spec.height * 1.10; // Controlled vertical extension for clean articulated overlap
+  const h = spec.height * 1.12; // Controlled vertical extension for clean articulated overlap
 
   // Half-width of front armor plate at top and bottom (anatomical athletic taper)
-  const topHalfW = rx * (0.82 - index * 0.02);
-  const botHalfW = rx * (0.76 - index * 0.02);
+  const topHalfW = rx * (0.84 - index * 0.022);
+  const botHalfW = rx * (0.76 - index * 0.022);
   const halfH = h * 0.50;
 
-  // Sculpted plate outline in front view (X, Y)
-  // Top edge: subtle arched contour for natural articulation
-  shape.moveTo(-topHalfW, halfH - 0.002);
-  shape.quadraticCurveTo(0, halfH + 0.001, topHalfW, halfH - 0.002);
-
+  // Sculpted dual-lobe plate outline with anatomical midline notch (linea alba)
+  shape.moveTo(-0.0025, halfH - 0.001);
+  // Left lobe top arch
+  shape.quadraticCurveTo(-topHalfW * 0.45, halfH + 0.002, -topHalfW, halfH - 0.003);
   // Outer lateral flank edge: smooth curve angling down and inward
-  shape.quadraticCurveTo(topHalfW * 1.01, 0, botHalfW, -halfH);
-
-  // Bottom edge: subtle downward chevron / flange that overlaps the segment below
-  shape.quadraticCurveTo(botHalfW * 0.40, -halfH - 0.002, 0, -halfH - 0.0035);
-  shape.quadraticCurveTo(-botHalfW * 0.40, -halfH - 0.002, -botHalfW, -halfH);
-
-  // Symmetrical return along left flank
-  shape.quadraticCurveTo(-topHalfW * 1.01, 0, -topHalfW, halfH - 0.002);
+  shape.quadraticCurveTo(-topHalfW * 1.02, 0, -botHalfW, -halfH);
+  // Bottom left edge: chevron flange overlapping segment below
+  shape.quadraticCurveTo(-botHalfW * 0.45, -halfH - 0.0025, -0.0025, -halfH - 0.004);
+  // Midline return groove
+  shape.lineTo(0.0025, -halfH - 0.004);
+  // Bottom right edge
+  shape.quadraticCurveTo(botHalfW * 0.45, -halfH - 0.0025, botHalfW, -halfH);
+  // Right lateral flank edge
+  shape.quadraticCurveTo(topHalfW * 1.02, 0, topHalfW, halfH - 0.003);
+  // Right lobe top arch
+  shape.quadraticCurveTo(topHalfW * 0.45, halfH + 0.002, 0.0025, halfH - 0.001);
   shape.closePath();
 
   // Precision automotive bevels
   const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-    depth: 0.014, // Solid, clean panel depth
+    depth: 0.012, // Controlled, clean panel depth
     bevelEnabled: true,
-    bevelThickness: 0.003,
-    bevelSize: 0.0025,
+    bevelThickness: 0.0032,
+    bevelSize: 0.0026,
     bevelSegments: 3,
-    curveSegments: 28,
+    curveSegments: 32,
   };
 
   const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
   geo.center();
 
-  // Compound 3D Curvature:
-  // 1. Cylindrical wrap: plate wraps smoothly back around the torso in Z (max 14mm at extreme flanks)
-  // 2. Central abdominal keel: subtle forward crest along midline (x = 0)
-  // 3. Camber: subtle vertical convexity
+  // Compound Biomechanical 3D Curvature:
+  // 1. Cylindrical wrap: plate wraps smoothly back around the ribcage in Z
+  // 2. Dual-lobe abdominal crest: distinct muscle-armor peaks on left and right, with recessed midline seam
+  // 3. Vertical convex roll: softens harsh step edges into luxurious liquid ceramic curvature
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
     const y = pos.getY(i);
     const z = pos.getZ(i);
 
-    const nx = Math.min(1, Math.abs(x) / (topHalfW * 1.02));
+    const nx = Math.min(1.0, Math.abs(x) / (topHalfW * 1.02));
     // Smooth parabolic flank wrap
-    const flankWrap = -Math.pow(nx, 2.0) * 0.014;
-    // Central keel crest (linea alba)
-    const centralKeel = Math.cos(nx * (Math.PI / 2)) * 0.0035;
-    // Vertical camber
-    const vertCamber = (1.0 - Math.pow(y / (halfH * 1.1), 2.0)) * 0.0015;
+    const flankWrap = -Math.pow(nx, 2.0) * 0.015;
+    // Dual-lobe crest: peak at nx ~ 0.45, recessed at nx = 0 and outer flank
+    const lobeCrest = Math.sin(nx * Math.PI) * 0.0045;
+    // Midline seam indent at x = 0
+    const midlineIndent = (1.0 - Math.min(1.0, Math.abs(x) / 0.012)) * -0.0022;
+    // Vertical convex roll
+    const vertRoll = Math.cos((y / (halfH * 1.05)) * (Math.PI * 0.48)) * 0.0030;
 
-    pos.setZ(i, z + flankWrap + centralKeel + vertCamber);
+    pos.setZ(i, z + flankWrap + lobeCrest + midlineIndent + vertRoll);
   }
   geo.computeVertexNormals();
 
