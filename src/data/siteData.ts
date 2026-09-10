@@ -13,7 +13,7 @@ import {
 
 export const NAVIGATION_LINKS: NavItem[] = [
   { name: 'Home', href: '/' },
-  { name: 'About', href: '/#about' },
+  { name: 'About', href: '/about' },
   { name: 'Services', href: '/services' },
   { name: 'Products', href: '/products' },
   { name: 'Classes', href: '/classes' },
@@ -818,7 +818,7 @@ export const BLOG_POSTS: BlogPostItem[] = [
 export const FOOTER_SECTIONS = {
   company: [
     { href: '/', label: 'Home' },
-    { href: '/#about', label: 'About' },
+    { href: '/about', label: 'About' },
     { href: '/services', label: 'Services' },
     { href: '/products', label: 'Products' },
     { href: '/classes', label: 'Classes' },

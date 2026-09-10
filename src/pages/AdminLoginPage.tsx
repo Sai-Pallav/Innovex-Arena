@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Shield, Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react';
-import { CyberCard } from '../components/ui/CyberCard';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useToast } from '../components/ui/Toast';
@@ -34,23 +33,33 @@ export const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-[85vh] flex items-center justify-center px-4 pt-24 pb-16">
-      <div className="w-full max-w-md space-y-5 animate-fade-up">
+      {/* Background Hero Bloom */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-96 ultraviolet-hero-bloom pointer-events-none" />
+
+      <div className="w-full max-w-md space-y-5 animate-fade-up relative z-10">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-cyan-300 transition-colors group"
+          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#9b96b0] hover:text-[#ba9cff] transition-colors group"
         >
           <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" /> Back to Home
         </Link>
 
-        <CyberCard glow="cyan" className="p-7 sm:p-9 space-y-6">
+        {/* Observatory Card */}
+        <div
+          className="relative rounded-2xl bg-[#0a0118] border border-white/[0.12] p-7 sm:p-9 space-y-6 overflow-hidden"
+          style={{ boxShadow: 'inset 0 0 24px rgba(255,255,255,0.04), 0 20px 40px rgba(0,0,0,0.6)' }}
+        >
+          {/* Top hairline aurora glow */}
+          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#ba9cff]/50 to-transparent" />
+
           <div className="text-center space-y-2">
-            <div className="w-11 h-11 mx-auto rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary mb-1">
+            <div className="w-12 h-12 mx-auto rounded-full bg-[#713dff]/15 border border-[#713dff]/30 flex items-center justify-center text-[#ba9cff] mb-2 shadow-[0_0_20px_rgba(113,61,255,0.3)]">
               <Shield className="w-5 h-5" />
             </div>
-            <h2 className="font-heading font-bold text-xl sm:text-2xl text-foreground tracking-tight">
+            <h2 className="font-rebond font-bold text-xl sm:text-2xl text-white tracking-tight">
               {isModeSignUp ? 'Request Admin Access' : 'Admin Sign In'}
             </h2>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-[#9b96b0] leading-relaxed max-w-xs mx-auto">
               Access the management console for hackathons, positions, and platform inquiries.
             </p>
           </div>
@@ -66,8 +75,8 @@ export const AdminLoginPage: React.FC = () => {
             />
 
             <div className="space-y-1.5 relative">
-              <label className="block text-xs font-medium uppercase tracking-wider text-slate-400">
-                Password <span className="text-primary">*</span>
+              <label className="block text-xs font-medium uppercase tracking-wider text-[#9b96b0]">
+                Password <span className="text-[#e59cff]">*</span>
               </label>
               <div className="relative">
                 <input
@@ -75,13 +84,14 @@ export const AdminLoginPage: React.FC = () => {
                   placeholder="••••••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-[#0b101e]/80 border border-white/[0.08] text-foreground text-sm placeholder:text-slate-500 focus:outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/20 pr-10 transition-all font-mono"
+                  className="w-full px-4 py-2.5 rounded-full bg-white/[0.04] border border-white/[0.12] text-white text-sm placeholder:text-slate-500 focus:outline-none focus:border-[#9382ff] focus:ring-1 focus:ring-[#9382ff]/50 pr-10 transition-all font-mono"
+                  style={{ boxShadow: 'inset 0 0 12px rgba(255,255,255,0.02)' }}
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer p-1 rounded-lg hover:bg-white/[0.04]"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#9b96b0] hover:text-white cursor-pointer p-1 rounded-full hover:bg-white/[0.06]"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -92,7 +102,7 @@ export const AdminLoginPage: React.FC = () => {
               type="submit"
               variant="hero"
               size="lg"
-              className="w-full mt-2"
+              className="w-full mt-3 cursor-pointer"
               isLoading={isLoading}
               rightIcon={<Lock className="w-4 h-4 ml-1" />}
             >
@@ -100,14 +110,14 @@ export const AdminLoginPage: React.FC = () => {
             </Button>
           </form>
 
-          <div className="pt-3 text-center text-xs text-slate-400 border-t border-white/[0.06]">
+          <div className="pt-3 text-center text-xs text-[#9b96b0] border-t border-white/[0.08]">
             {isModeSignUp ? (
               <p>
                 Already have an admin account?{' '}
                 <button
                   type="button"
                   onClick={() => setIsModeSignUp(false)}
-                  className="text-cyan-400 hover:underline font-semibold cursor-pointer ml-1"
+                  className="text-[#ba9cff] hover:text-[#e59cff] hover:underline font-semibold cursor-pointer ml-1"
                 >
                   Sign In
                 </button>
@@ -118,14 +128,15 @@ export const AdminLoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModeSignUp(true)}
-                  className="text-cyan-400 hover:underline font-semibold cursor-pointer ml-1"
+                  className="text-[#ba9cff] hover:text-[#e59cff] hover:underline font-semibold cursor-pointer ml-1"
                 >
                   Request Access
                 </button>
               </p>
             )}
           </div>
-        </CyberCard>
+          <div className="card-underglow-beam" />
+        </div>
       </div>
     </div>
   );

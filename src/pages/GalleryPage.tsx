@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Sparkles, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GALLERY_ITEMS } from '../data/siteData';
-import { CyberCard } from '../components/ui/CyberCard';
 import { GalleryItem } from '../types';
 
 export const GalleryPage: React.FC = () => {
@@ -30,28 +29,31 @@ export const GalleryPage: React.FC = () => {
   };
 
   return (
-    <div className="relative pt-28 pb-20 space-y-20">
-      {/* 1. HERO (EXACT LIVE SITE COPY) */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
-        <h1 className="font-heading font-extrabold text-3xl sm:text-5xl tracking-tight text-white leading-[1.15]">
-          Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-purple-400">Gallery</span>
+    <div className="relative pt-28 pb-24 space-y-16">
+      {/* Background Hero Bloom */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 ultraviolet-hero-bloom pointer-events-none" />
+
+      {/* 1. HERO */}
+      <section className="relative px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
+        <h1 className="font-rebond font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
+          Our <span className="cosmic-text-gradient">Gallery</span>
         </h1>
-        <p className="text-sm sm:text-base text-slate-400 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
           Explore moments from our workshops, hackathons, and events. See the innovation and creativity in action.
         </p>
       </section>
 
-      {/* 2. FILTER TABS */}
+      {/* 2. FILTER TABS (999px capsule pills) */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto flex justify-center animate-fade-up animation-delay-100">
-        <div className="inline-flex flex-wrap justify-center p-1 rounded-full bg-white/[0.03] border border-white/[0.08] backdrop-blur-md gap-1">
+        <div className="inline-flex flex-wrap justify-center p-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] backdrop-blur-md gap-1.5">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 sm:px-5 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`px-5 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 cursor-pointer ${
                 activeCategory === cat
-                  ? 'bg-cyan-500/15 text-cyan-300 font-bold border border-cyan-400/30 shadow-[0_0_12px_rgba(0,217,255,0.2)]'
-                  : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                  ? 'bg-[#713dff] text-white font-semibold shadow-[0_0_20px_rgba(113,61,255,0.4)] border border-[#b7a4fb]/40'
+                  : 'text-[#9b96b0] hover:text-white hover:bg-white/[0.06]'
               }`}
             >
               {cat}
@@ -60,39 +62,40 @@ export const GalleryPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3. GALLERY GRID */}
+      {/* 3. GALLERY GRID (16px cards with inset rim glow & bottom underglow) */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
           {filteredItems.map((item) => (
-            <CyberCard
+            <div
               key={item.id}
-              glow="cyan"
-              className="p-0 overflow-hidden group cursor-pointer"
+              className="group relative rounded-2xl bg-[#0a0118] border border-white/[0.08] hover:border-white/[0.18] overflow-hidden cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(113,61,255,0.2)]"
+              style={{ boxShadow: 'inset 0 0 24px rgba(255,255,255,0.03)' }}
               onClick={() => setSelectedItem(item)}
             >
-              <div className="relative h-60 overflow-hidden bg-black/40">
+              <div className="relative h-64 overflow-hidden bg-black/40">
                 <img
                   src={item.thumbnail}
                   alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b101e] via-[#0b101e]/30 to-transparent opacity-80 group-hover:opacity-90 transition-opacity" />
-                <div className="absolute top-3 right-3">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-black/60 border border-white/[0.1] text-cyan-300 backdrop-blur-md">
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0118] via-[#0a0118]/40 to-transparent opacity-85 group-hover:opacity-95 transition-opacity" />
+                <div className="absolute top-3.5 right-3.5">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#0a0118]/80 border border-white/[0.15] text-[#ba9cff] backdrop-blur-md shadow-[0_0_12px_rgba(113,61,255,0.25)]">
                     {item.category}
                   </span>
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1">
-                  <h3 className="font-heading font-bold text-base text-white group-hover:text-cyan-300 transition-colors">
+                <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1.5">
+                  <h3 className="font-rebond font-bold text-base text-white group-hover:text-[#ba9cff] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-slate-300 line-clamp-2">
+                  <p className="text-xs text-[#9b96b0] line-clamp-2">
                     {item.description}
                   </p>
                 </div>
               </div>
-            </CyberCard>
+              <div className="card-underglow-beam" />
+            </div>
           ))}
         </div>
       </section>
@@ -100,12 +103,16 @@ export const GalleryPage: React.FC = () => {
       {/* Lightbox Modal */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-xl">
-          <div className="relative max-w-3xl w-full rounded-2xl overflow-hidden bg-[#080c18] border border-white/[0.12] shadow-2xl">
+          <div
+            className="relative max-w-3xl w-full rounded-2xl overflow-hidden bg-[#0a0118] border border-white/[0.14] shadow-2xl"
+            style={{ boxShadow: 'inset 0 0 24px rgba(255,255,255,0.04), 0 24px 48px rgba(0,0,0,0.8)' }}
+          >
+            <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#ba9cff]/60 to-transparent" />
             <button
               onClick={() => setSelectedItem(null)}
-              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+              className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/[0.08] hover:bg-white/[0.18] text-white flex items-center justify-center border border-white/[0.15] transition-all cursor-pointer shadow-[0_0_12px_rgba(113,61,255,0.3)]"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
             <div className="relative h-80 sm:h-96">
@@ -114,35 +121,37 @@ export const GalleryPage: React.FC = () => {
                 alt={selectedItem.title}
                 className="w-full h-full object-cover"
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0a0118] via-transparent to-transparent opacity-80" />
             </div>
 
-            <div className="p-6 space-y-2">
+            <div className="p-6 sm:p-7 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-cyan-500/10 text-cyan-300 border border-cyan-400/20">
+                <span className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#713dff]/20 text-[#ba9cff] border border-[#713dff]/40">
                   {selectedItem.category}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePrev}
-                    className="p-1.5 rounded-lg bg-white/[0.05] text-slate-300 hover:text-white hover:bg-white/[0.1]"
+                    className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.15] text-slate-300 hover:text-white border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={handleNext}
-                    className="p-1.5 rounded-lg bg-white/[0.05] text-slate-300 hover:text-white hover:bg-white/[0.1]"
+                    className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.15] text-slate-300 hover:text-white border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-              <h2 className="font-heading font-bold text-xl text-white">
+              <h2 className="font-rebond font-bold text-xl sm:text-2xl text-white">
                 {selectedItem.title}
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400">
+              <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">
                 {selectedItem.description}
               </p>
             </div>
+            <div className="card-underglow-beam" />
           </div>
         </div>
       )}

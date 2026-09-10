@@ -15,13 +15,16 @@ import { LearningModesSection } from '../components/modules/LearningModesSection
 export const ClassesPage: React.FC = () => {
   return (
     <div className="relative pt-28 pb-20 space-y-16 sm:space-y-24">
+      {/* Background ultraviolet bloom */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] ultraviolet-hero-bloom pointer-events-none -z-10" />
+
       {/* 1. HERO BANNER */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center space-y-5 animate-fade-up">
-        <h1 className="font-heading font-bold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.12]">
-          Online & Offline <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-sky-200 to-purple-400">Class Ecosystem</span>
+        <h1 className="font-rebond font-bold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.12]">
+          Online & Offline <span className="cosmic-text-gradient">Class Ecosystem</span>
         </h1>
 
-        <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-3xl mx-auto leading-relaxed font-normal">
+        <p className="text-sm sm:text-base md:text-lg text-[#9b96b0] max-w-3xl mx-auto leading-relaxed font-normal">
           Accelerate your software engineering, cloud, and AI career through your preferred format. Choose between 100% live interactive online classes with 24/7 AI tutoring, or immersive in-person classroom labs with dual-monitor workstation rigs and desk-side mentors.
         </p>
 
@@ -39,19 +42,19 @@ export const ClassesPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Quick Highlights Summary Pills */}
-        <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-300">
-          <div className="px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] flex items-center gap-2">
-            <Video className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Live Interactive Virtual Cohorts</span>
+        {/* Quick Highlights Summary Pills - 999px Glass Pills */}
+        <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-[#9b96b0]">
+          <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center gap-2 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
+            <Video className="w-3.5 h-3.5 text-[#b7a4fb]" />
+            <span className="text-slate-200">Live Interactive Virtual Cohorts</span>
           </div>
-          <div className="px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] flex items-center gap-2">
-            <Building2 className="w-3.5 h-3.5 text-purple-400" />
-            <span>Physical Labs: Hyderabad, Bengaluru & Pune</span>
+          <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center gap-2 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
+            <Building2 className="w-3.5 h-3.5 text-[#ba9cff]" />
+            <span className="text-slate-200">Physical Labs: Hyderabad, Bengaluru & Pune</span>
           </div>
-          <div className="px-3.5 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.08] flex items-center gap-2">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>100% Shared Curriculum & Placement Guarantee</span>
+          <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center gap-2 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#b7a4fb]" />
+            <span className="text-slate-200">100% Shared Curriculum & Placement Guarantee</span>
           </div>
         </div>
       </section>

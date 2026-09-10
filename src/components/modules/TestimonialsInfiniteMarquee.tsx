@@ -146,7 +146,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
           {title.includes('Community Says') ? (
             <>
               What Our{' '}
-              <span className="text-gradient-cyan">
+              <span className="cosmic-text-gradient">
                 Community Says
               </span>
             </>
@@ -154,7 +154,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
             title
           )}
         </h2>
-        <p className="text-xs sm:text-sm text-slate-400 max-w-xl mx-auto">{subtitle}</p>
+        <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto">{subtitle}</p>
       </div>
 
       {/* Infinite Carousel Showcase Wrapper with Left and Right Side Buttons */}
@@ -167,29 +167,29 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
         }}
       >
         {/* Ambient Left Edge Gradient Fade Mask */}
-        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#070a13] via-[#070a13]/85 to-transparent z-20" />
+        <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-r from-[#060212] via-[#060212]/85 to-transparent z-20" />
 
         {/* Left Arrow Button Placed on the Left Side (Always Visible) */}
         <button
           onClick={() => handleScrollStep('left')}
           aria-label="Previous testimonial"
           title="Scroll left"
-          className="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0a1020]/90 hover:bg-[#0e172e] text-cyan-400 border border-cyan-400/30 hover:border-cyan-400 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(0,217,255,0.25)] flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 backdrop-blur-xl cursor-pointer group/btn"
+          className="absolute left-2 sm:left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#0c0818]/80 hover:bg-[#18112e] text-[#c4c0d4] hover:text-white border border-white/[0.08] hover:border-white/[0.2] shadow-[0_4px_20px_rgba(0,0,0,0.6)] flex items-center justify-center transition-all duration-200 backdrop-blur-md cursor-pointer group/btn"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 group-hover/btn:-translate-x-0.5 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover/btn:-translate-x-0.5 transition-transform duration-200" />
         </button>
 
         {/* Ambient Right Edge Gradient Fade Mask */}
-        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#070a13] via-[#070a13]/85 to-transparent z-20" />
+        <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 bg-gradient-to-l from-[#060212] via-[#060212]/85 to-transparent z-20" />
 
         {/* Right Arrow Button Placed on the Right Side (Always Visible) */}
         <button
           onClick={() => handleScrollStep('right')}
           aria-label="Next testimonial"
           title="Scroll right"
-          className="absolute right-2 sm:right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#0a1020]/90 hover:bg-[#0e172e] text-cyan-400 border border-cyan-400/30 hover:border-cyan-400 shadow-[0_4px_20px_rgba(0,0,0,0.8),0_0_20px_rgba(0,217,255,0.25)] flex items-center justify-center transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-105 active:scale-95 backdrop-blur-xl cursor-pointer group/btn"
+          className="absolute right-2 sm:right-4 md:right-6 lg:right-8 top-1/2 -translate-y-1/2 z-30 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-[#0c0818]/80 hover:bg-[#18112e] text-[#c4c0d4] hover:text-white border border-white/[0.08] hover:border-white/[0.2] shadow-[0_4px_20px_rgba(0,0,0,0.6)] flex items-center justify-center transition-all duration-200 backdrop-blur-md cursor-pointer group/btn"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover/btn:translate-x-0.5 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]" />
+          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 group-hover/btn:translate-x-0.5 transition-transform duration-200" />
         </button>
 
         {/* Horizontally Scrollable Marquee Track */}
@@ -198,7 +198,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUpOrLeave}
-          className={`flex overflow-x-auto scrollbar-none scroll-smooth py-8 sm:py-10 px-6 sm:px-14 md:px-20 cursor-grab active:cursor-grabbing ${
+          className={`flex overflow-x-auto scrollbar-none scroll-smooth py-6 sm:py-8 px-6 sm:px-14 md:px-20 cursor-grab active:cursor-grabbing ${
             isDragging ? 'select-none' : ''
           }`}
           style={{
@@ -206,84 +206,69 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
             msOverflowStyle: 'none',
           }}
         >
-          <div ref={trackRef} className="flex gap-5 sm:gap-6 items-stretch shrink-0">
+          <div ref={trackRef} className="flex gap-4 sm:gap-5 items-stretch shrink-0">
             {repeatedItems.map((testimonial, idx) => {
-              const isEven = idx % 2 === 0;
               return (
                 <div
                   key={`${testimonial.id}-${idx}`}
-                  className="w-[290px] sm:w-[360px] md:w-[400px] shrink-0 flex flex-col relative transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] hover:z-20 group/item"
+                  className="w-[280px] sm:w-[340px] md:w-[380px] shrink-0 flex flex-col relative transition-all duration-200 hover:z-20 group/item"
                 >
-                  <CyberCard
-                    glow={isEven ? 'cyan' : 'purple'}
-                    hoverEffect={false}
-                    className={`p-5 sm:p-6 flex-1 flex flex-col justify-between h-full transition-all duration-350 ease-[cubic-bezier(0.16,1,0.3,1)] cursor-pointer hover:scale-[1.02] hover:-translate-y-2 border border-white/[0.08] ${
-                      isEven
-                        ? 'hover:border-cyan-400/50 hover:shadow-[0_20px_42px_-10px_rgba(0,0,0,0.85),0_0_28px_rgba(0,217,255,0.22)]'
-                        : 'hover:border-purple-400/50 hover:shadow-[0_20px_42px_-10px_rgba(0,0,0,0.85),0_0_28px_rgba(168,85,247,0.22)]'
-                    } bg-[#0a0f1e]/90`}
+                  <div
+                    className="p-5 sm:p-6 flex-1 flex flex-col justify-between h-full rounded-2xl bg-[rgba(12,8,24,0.75)] border border-white/[0.07] hover:border-white/[0.18] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_-8px_rgba(0,0,0,0.5)] transition-all duration-200 cursor-pointer hover:-translate-y-1 relative overflow-hidden backdrop-blur-md"
                   >
                     {/* Top rating & Quote Badge */}
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-3.5">
                         {/* Rating Stars */}
-                        <div className="flex items-center gap-1 text-cyan-400">
+                        <div className="flex items-center gap-1 text-[#b7a4fb]">
                           {[...Array(testimonial.rating || 5)].map((_, starIdx) => (
                             <Star
                               key={starIdx}
-                              className="w-3.5 h-3.5 fill-cyan-400 text-cyan-400 drop-shadow-[0_0_4px_rgba(0,217,255,0.4)] transition-transform duration-300 group-hover/item:scale-110"
+                              className="w-3.5 h-3.5 fill-[#b7a4fb] text-[#b7a4fb]"
                             />
                           ))}
                         </div>
 
                         {/* Subtle decorative quote mark */}
-                        <div className="w-7 h-7 rounded-lg bg-white/[0.03] border border-white/[0.05] flex items-center justify-center text-slate-500 group-hover/item:text-cyan-400 group-hover/item:scale-110 group-hover/item:rotate-6 transition-all duration-300">
-                          <Quote className="w-3.5 h-3.5 opacity-60" />
+                        <div className="w-6 h-6 rounded-md bg-white/[0.03] border border-white/[0.06] flex items-center justify-center text-[#85808c] group-hover/item:text-[#b7a4fb] transition-colors">
+                          <Quote className="w-3 h-3 opacity-60" />
                         </div>
                       </div>
 
                       {/* Content Quote */}
-                      <p className="text-xs sm:text-sm text-slate-300/90 leading-relaxed italic mb-5 line-clamp-4 min-h-[4.75rem] sm:min-h-[5.25rem]">
+                      <p className="text-xs sm:text-[13px] text-[#dcd7ee] leading-relaxed mb-5 line-clamp-4 min-h-[4.5rem]">
                         &quot;{testimonial.content}&quot;
                       </p>
                     </div>
 
                     {/* Footer Author Profile */}
-                    <div className="mt-auto pt-4 border-t border-white/[0.07] flex items-center gap-3">
-                      {/* Avatar Circle with Initial and Gradient Border */}
+                    <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center gap-3">
+                      {/* Avatar Circle with Initial */}
                       <div
-                        className={`w-9 h-9 rounded-full flex items-center justify-center font-heading text-xs font-bold text-white shrink-0 shadow-inner transition-transform duration-300 group-hover/item:scale-110 ${
-                          isEven
-                            ? 'bg-gradient-to-tr from-cyan-500/30 to-blue-600/30 border border-cyan-400/40 text-cyan-300'
-                            : 'bg-gradient-to-tr from-purple-500/30 to-pink-600/30 border border-purple-400/40 text-purple-300'
-                        }`}
+                        className="w-8 h-8 rounded-full flex items-center justify-center font-heading text-xs font-semibold text-white shrink-0 bg-white/[0.06] border border-white/[0.12]"
                       >
                         {testimonial.name.charAt(0)}
                       </div>
 
                       {/* Author Details */}
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-heading text-xs sm:text-sm font-semibold text-foreground truncate">
+                        <h4 className="font-heading text-xs sm:text-[13px] font-semibold text-[#ffffff] truncate">
                           {testimonial.name}
                         </h4>
                         <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[11px] text-slate-400 truncate">
+                          <span className="text-[11px] text-[#9b96b0] truncate">
                             {testimonial.role}
                           </span>
-                          <span className="text-slate-600 text-[10px]">•</span>
+                          <span className="text-white/20 text-[10px]">•</span>
                           <span
-                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded border truncate ${
-                              isEven
-                                ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20'
-                                : 'bg-purple-500/10 text-purple-300 border-purple-500/20'
-                            }`}
+                            className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white/[0.03] text-[#b7a4fb] border border-white/[0.08] truncate"
                           >
                             {testimonial.companyOrCollege}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </CyberCard>
+                  </div>
                 </div>
               );
             })}

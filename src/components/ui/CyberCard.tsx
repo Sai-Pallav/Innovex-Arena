@@ -19,35 +19,31 @@ export const CyberCard: React.FC<CyberCardProps> = ({
     <div
       className={twMerge(
         clsx(
-          'glass-card rounded-2xl p-6 relative overflow-hidden group flex flex-col',
-          hoverEffect && 'glass-card-hover',
-          hoverEffect && glow === 'cyan' && 'hover:border-cyan-400/30 hover:shadow-[0_16px_40px_-10px_rgba(0,0,0,0.7),0_0_25px_rgba(0,217,255,0.08)]',
-          hoverEffect && glow === 'purple' && 'glass-card-purple hover:border-purple-400/30 hover:shadow-[0_16px_40px_-10px_rgba(0,0,0,0.7),0_0_25px_rgba(168,85,247,0.08)]',
+          'wope-surface-card rounded-2xl p-6 relative overflow-hidden group flex flex-col',
+          hoverEffect && 'hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_28px_rgba(183,164,251,0.08),0_0_28px_rgba(113,61,255,0.16)] hover:-translate-y-1',
           className
         )
       )}
       {...props}
     >
-      {/* Hairline shimmer at top border that glides on hover */}
-      {hoverEffect && (
-        <div className={glow === 'purple' ? 'shimmer-hairline-purple' : 'shimmer-hairline'} />
-      )}
+      {/* Bottom Underglow Beam */}
+      <div className="card-underglow-beam opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-      {/* Primary ambient spotlight in top-right */}
+      {/* Primary ambient violet spotlight in top-right */}
       <div
         className={clsx(
           'absolute -top-20 -right-20 w-48 h-48 rounded-full blur-3xl pointer-events-none transition-all duration-500 opacity-0',
           hoverEffect && 'group-hover:opacity-100 group-hover:scale-110',
-          glow === 'purple' ? 'bg-purple-500/[0.12]' : 'bg-cyan-400/[0.10]'
+          'bg-[#713dff]/[0.12]'
         )}
       />
 
-      {/* Complementary subtle counter-glow in bottom-left for dual-tone cyber depth */}
+      {/* Complementary subtle counter-glow in bottom-left */}
       <div
         className={clsx(
           'absolute -bottom-20 -left-20 w-44 h-44 rounded-full blur-3xl pointer-events-none transition-all duration-700 opacity-0',
           hoverEffect && 'group-hover:opacity-60',
-          glow === 'purple' ? 'bg-cyan-500/[0.05]' : 'bg-purple-500/[0.05]'
+          'bg-[#8562ff]/[0.08]'
         )}
       />
 

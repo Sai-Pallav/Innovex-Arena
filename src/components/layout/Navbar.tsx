@@ -34,67 +34,20 @@ export const Navbar: React.FC = () => {
   }, [location.pathname, location.hash]);
 
   useEffect(() => {
-    if (location.pathname !== '/') {
-      setActiveSection(location.pathname);
-      return;
-    }
-
-    const handleScrollActive = () => {
-      if (location.pathname !== '/') return;
-      const aboutEl = document.getElementById('about');
-      if (aboutEl) {
-        const rect = aboutEl.getBoundingClientRect();
-        if (rect.top <= 250 && rect.bottom >= 150) {
-          setActiveSection('/#about');
-          return;
-        }
-      }
-      if (window.scrollY < 300) {
-        setActiveSection('/');
-      } else if (location.hash === '#about') {
-        setActiveSection('/#about');
-      }
-    };
-
-    handleScrollActive();
-    window.addEventListener('scroll', handleScrollActive, { passive: true });
-    return () => window.removeEventListener('scroll', handleScrollActive);
-  }, [location.pathname, location.hash]);
+    setActiveSection(location.pathname);
+  }, [location.pathname]);
 
   const isLinkActive = (href: string) => {
-    if (location.pathname === '/') {
-      if (href === '/#about') return activeSection === '/#about';
-      if (href === '/') return activeSection === '/';
-      return false;
-    }
     return location.pathname === href;
   };
 
   const handleNavClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
-    href: string,
+    _e: React.MouseEvent<HTMLAnchorElement>,
+    _href: string,
     isMobile: boolean = false
   ) => {
     if (isMobile) {
       setIsMobileOpen(false);
-    }
-    if (href === '/#about') {
-      if (location.pathname === '/') {
-        e.preventDefault();
-        const el = document.getElementById('about');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth' });
-          window.history.pushState(null, '', '/#about');
-          setActiveSection('/#about');
-        }
-      }
-    } else if (href === '/') {
-      if (location.pathname === '/') {
-        e.preventDefault();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        window.history.pushState(null, '', '/');
-        setActiveSection('/');
-      }
     }
   };
 
@@ -110,14 +63,14 @@ export const Navbar: React.FC = () => {
         <div
           className={`absolute inset-0 transition-all duration-500 ${
             isScrolled
-              ? 'bg-gradient-to-b from-slate-950/95 via-slate-950/90 to-slate-950/80 backdrop-blur-xl'
-              : 'bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-transparent backdrop-blur-md'
+              ? 'bg-gradient-to-b from-[#060212]/95 via-[#060212]/90 to-[#060212]/80 backdrop-blur-xl border-b border-white/[0.06]'
+              : 'bg-gradient-to-b from-[#060212]/40 via-[#060212]/20 to-transparent backdrop-blur-md'
           }`}
         />
 
         {/* Top Border Accent */}
         <div
-          className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent transition-opacity duration-500 ${
+          className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#b7a4fb]/30 to-transparent transition-opacity duration-500 ${
             isScrolled ? 'opacity-100' : 'opacity-0'
           }`}
         />
@@ -131,16 +84,16 @@ export const Navbar: React.FC = () => {
               className="flex items-center gap-3 group relative z-10 shrink-0"
             >
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-400/20 to-blue-500/20 rounded-xl blur-md group-hover:blur-lg transition-all duration-300" />
-                <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-cyan-500/90 to-blue-600/90 flex items-center justify-center shadow-lg shadow-cyan-500/25 group-hover:shadow-cyan-500/40 transition-all duration-300">
-                  <Sparkles className="w-5 h-5 text-white" strokeWidth={2.5} />
+                <div className="absolute inset-0 bg-gradient-to-br from-[#713dff]/20 to-[#8562ff]/20 rounded-full blur-md group-hover:blur-lg transition-all duration-300" />
+                <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-[#713dff] to-[#8562ff] flex items-center justify-center shadow-[0_0_16px_rgba(113,61,255,0.4)] group-hover:shadow-[0_0_24px_rgba(113,61,255,0.6)] transition-all duration-300">
+                  <Sparkles className="w-5 h-5 text-white" strokeWidth={2.2} />
                 </div>
               </div>
               <div className="flex flex-col">
                 <span className="text-lg font-bold tracking-tight text-white leading-none">
                   Innovex Arena
                 </span>
-                <span className="text-[10px] font-medium tracking-wider text-slate-400 uppercase leading-none mt-0.5">
+                <span className="text-[10px] font-medium tracking-wider text-[#9b96b0] uppercase leading-none mt-1">
                   Fueling Creators
                 </span>
               </div>
@@ -163,22 +116,22 @@ export const Navbar: React.FC = () => {
                       to={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
                       className={`
-                        group/link relative px-2.5 xl:px-3.5 py-2 rounded-lg text-sm font-medium
+                        group/link relative px-3 xl:px-4 py-1.5 rounded-full text-sm font-medium
                         transition-all duration-200 flex items-center gap-1.5
                         ${
                           isActive
                             ? 'text-white'
-                            : 'text-slate-300 hover:text-white'
+                            : 'text-[#9b96b0] hover:text-white'
                         }
                       `}
                     >
                       {/* Active Indicator */}
                       {isActive && (
-                        <div className="absolute inset-0 rounded-lg bg-gradient-to-br from-cyan-500/10 to-blue-500/5 border border-cyan-500/20" />
+                        <div className="absolute inset-0 rounded-full bg-white/[0.05] border border-[#b7a4fb]/30 shadow-[inset_0_0_12px_rgba(183,164,251,0.08)]" />
                       )}
                       
                       {/* Hover Effect */}
-                      <div className="absolute inset-0 rounded-lg bg-white/0 group-hover/link:bg-white/5 transition-colors duration-200" />
+                      <div className="absolute inset-0 rounded-full bg-white/0 group-hover/link:bg-white/[0.04] transition-colors duration-200" />
                       
                       <span className="relative z-10">{link.name}</span>
                       
@@ -204,20 +157,20 @@ export const Navbar: React.FC = () => {
                           }
                         `}
                       >
-                        <div className="rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/50 overflow-hidden">
+                        <div className="rounded-[16px] bg-[#0a0118]/95 backdrop-blur-xl border border-white/10 shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] overflow-hidden">
                           <div className="p-2 space-y-1">
                             <Link
                               to="/classes#classes"
-                              className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-200 group/item"
+                              className="flex items-start gap-3 p-3 rounded-[5px] hover:bg-white/5 transition-all duration-200 group/item"
                             >
-                              <div className="w-10 h-10 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 shrink-0">
+                              <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#b7a4fb] shrink-0">
                                 <Video className="w-5 h-5" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-white group-hover/item:text-cyan-300 transition-colors">
+                                <div className="text-sm font-semibold text-[#f4f0ff] group-hover/item:text-[#b7a4fb] transition-colors">
                                   Live Online Classes
                                 </div>
-                                <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                                <p className="text-xs text-[#918ea0] mt-0.5 leading-relaxed">
                                   Interactive sessions with expert instructors
                                 </p>
                               </div>
@@ -225,16 +178,16 @@ export const Navbar: React.FC = () => {
 
                             <Link
                               to="/classes#classes"
-                              className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-200 group/item"
+                              className="flex items-start gap-3 p-3 rounded-[5px] hover:bg-white/5 transition-all duration-200 group/item"
                             >
-                              <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                              <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#9382ff] shrink-0">
                                 <Building2 className="w-5 h-5" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-white group-hover/item:text-purple-300 transition-colors">
+                                <div className="text-sm font-semibold text-[#f4f0ff] group-hover/item:text-[#9382ff] transition-colors">
                                   Campus Programs
                                 </div>
-                                <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
+                                <p className="text-xs text-[#918ea0] mt-0.5 leading-relaxed">
                                   Hands-on learning in premium facilities
                                 </p>
                               </div>
@@ -242,17 +195,17 @@ export const Navbar: React.FC = () => {
 
                             <Link
                               to="/classes#classes"
-                              className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/5 transition-all duration-200 group/item"
+                              className="flex items-start gap-3 p-3 rounded-[5px] hover:bg-white/5 transition-all duration-200 group/item"
                             >
-                              <div className="w-10 h-10 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                              <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-[#8562ff] shrink-0">
                                 <Layers className="w-5 h-5" />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="text-sm font-semibold text-white group-hover/item:text-emerald-300 transition-colors">
-                                  Hybrid Learning
+                                <div className="text-sm font-semibold text-[#f4f0ff] group-hover/item:text-[#8562ff] transition-colors">
+                                  Hybrid Cohorts
                                 </div>
-                                <p className="text-xs text-slate-400 mt-0.5 leading-relaxed">
-                                  Flexible blend of online and offline
+                                <p className="text-xs text-[#918ea0] mt-0.5 leading-relaxed">
+                                  Online theory + weekend campus labs
                                 </p>
                               </div>
                             </Link>
@@ -261,7 +214,7 @@ export const Navbar: React.FC = () => {
                           <div className="border-t border-white/5 p-3">
                             <Link
                               to="/classes"
-                              className="flex items-center justify-between text-xs font-semibold text-cyan-400 hover:text-cyan-300 transition-colors group/more"
+                              className="flex items-center justify-between text-xs font-semibold text-[#b7a4fb] hover:text-[#f4f0ff] transition-colors group/more"
                             >
                               <span>View All Programs</span>
                               <ArrowRight className="w-4 h-4 group-hover/more:translate-x-0.5 transition-transform" />
@@ -279,24 +232,24 @@ export const Navbar: React.FC = () => {
             <div className="hidden lg:flex items-center gap-3 shrink-0">
               <Link
                 to="/admin/login"
-                className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 hover:border-cyan-500/30 flex items-center justify-center text-slate-400 hover:text-cyan-400 transition-all duration-200 group"
+                className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#b7a4fb]/40 flex items-center justify-center text-[#9b96b0] hover:text-[#b7a4fb] transition-all duration-200 group"
                 title="Admin Portal"
               >
                 <Shield className="w-4.5 h-4.5" />
               </Link>
 
               <Link to="/contact">
-                <button className="relative px-6 py-2.5 rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/25 hover:shadow-cyan-500/40 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] flex items-center gap-2 group">
+                <span className="wope-glass-cta-pill px-6 py-2 text-sm group">
                   <span>Get Started</span>
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </button>
+                  <ArrowRight className="w-4 h-4 text-[#b7a4fb] group-hover:translate-x-0.5 transition-transform" />
+                </span>
               </Link>
             </div>
 
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="lg:hidden w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white transition-all duration-200"
+              className="lg:hidden w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-white transition-all duration-200"
               aria-label="Toggle menu"
             >
               {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -314,7 +267,7 @@ export const Navbar: React.FC = () => {
       >
         {/* Backdrop */}
         <div
-          className={`absolute inset-0 bg-slate-950/90 backdrop-blur-md transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-[#030014]/90 backdrop-blur-md transition-opacity duration-300 ${
             isMobileOpen ? 'opacity-100' : 'opacity-0'
           }`}
           onClick={() => setIsMobileOpen(false)}
@@ -324,8 +277,8 @@ export const Navbar: React.FC = () => {
         <div
           className={`
             absolute top-20 left-4 right-4 max-h-[calc(100vh-6rem)] overflow-y-auto
-            rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-white/10
-            shadow-2xl shadow-black/50 transition-all duration-300
+            rounded-[16px] bg-[#060317]/95 backdrop-blur-xl border border-white/10
+            shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] transition-all duration-300
             ${
               isMobileOpen
                 ? 'opacity-100 translate-y-0'
@@ -348,18 +301,18 @@ export const Navbar: React.FC = () => {
                       }
                     }}
                     className={`
-                      flex items-center justify-between px-4 py-3 rounded-xl
+                      flex items-center justify-between px-4 py-3 rounded-[5px]
                       text-sm font-medium transition-all duration-200
                       ${
                         isActive
-                          ? 'bg-cyan-500/10 text-white border border-cyan-500/20'
-                          : 'text-slate-300 hover:text-white hover:bg-white/5'
+                          ? 'bg-[#10093a] text-[#f4f0ff] border border-[#9382ff]/30 shadow-[inset_0_0_12px_rgba(147,130,255,0.12)]'
+                          : 'text-[#9b96b0] hover:text-[#f4f0ff] hover:bg-white/5'
                       }
                     `}
                   >
                     <span>{link.name}</span>
                     {isActive && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-[#9382ff]" />
                     )}
                   </Link>
 
@@ -368,7 +321,7 @@ export const Navbar: React.FC = () => {
                       <Link
                         to="/classes#classes"
                         onClick={() => setIsMobileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-cyan-400 hover:bg-white/5 transition-all"
+                        className="flex items-center gap-2 px-3 py-2 rounded-[5px] text-xs text-[#918ea0] hover:text-[#b7a4fb] hover:bg-white/5 transition-all"
                       >
                         <Video className="w-4 h-4" />
                         <span>Live Online</span>
@@ -376,7 +329,7 @@ export const Navbar: React.FC = () => {
                       <Link
                         to="/classes#classes"
                         onClick={() => setIsMobileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-purple-400 hover:bg-white/5 transition-all"
+                        className="flex items-center gap-2 px-3 py-2 rounded-[5px] text-xs text-[#918ea0] hover:text-[#9382ff] hover:bg-white/5 transition-all"
                       >
                         <Building2 className="w-4 h-4" />
                         <span>Campus</span>
@@ -384,7 +337,7 @@ export const Navbar: React.FC = () => {
                       <Link
                         to="/classes#classes"
                         onClick={() => setIsMobileOpen(false)}
-                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-slate-400 hover:text-emerald-400 hover:bg-white/5 transition-all"
+                        className="flex items-center gap-2 px-3 py-2 rounded-[5px] text-xs text-[#918ea0] hover:text-[#8562ff] hover:bg-white/5 transition-all"
                       >
                         <Layers className="w-4 h-4" />
                         <span>Hybrid</span>
@@ -400,7 +353,7 @@ export const Navbar: React.FC = () => {
             <Link
               to="/admin/login"
               onClick={() => setIsMobileOpen(false)}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-slate-300 hover:text-white transition-all"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-[5px] bg-white/5 hover:bg-white/10 border border-white/10 text-sm font-medium text-[#9b96b0] hover:text-[#f4f0ff] transition-all"
             >
               <Shield className="w-4 h-4" />
               <span>Admin Portal</span>
@@ -409,7 +362,7 @@ export const Navbar: React.FC = () => {
             <Link
               to="/contact"
               onClick={() => setIsMobileOpen(false)}
-              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-sm font-semibold text-white shadow-lg shadow-cyan-500/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="flex items-center justify-center gap-2 w-full px-4 py-3 rounded-[5px] reflect-primary-btn text-sm font-medium transition-all"
             >
               <span>Get Started</span>
               <ArrowRight className="w-4 h-4" />

@@ -7,6 +7,7 @@ import { ToastProvider } from './components/ui/Toast';
 
 // Pages
 import { HomePage } from './pages/HomePage';
+import { AboutPage } from './pages/AboutPage';
 import { ServicesPage } from './pages/ServicesPage';
 import { ProductsPage } from './pages/ProductsPage';
 import { EventsPage } from './pages/EventsPage';
@@ -39,6 +40,15 @@ const ScrollToTop: React.FC = () => {
   return null;
 };
 
+// Conditional Footer rendering - hides footer on Home page
+const AppFooter: React.FC = () => {
+  const { pathname } = useLocation();
+  if (pathname === '/') {
+    return null;
+  }
+  return <Footer />;
+};
+
 export const App: React.FC = () => {
   return (
     <ToastProvider>
@@ -55,7 +65,7 @@ export const App: React.FC = () => {
           <main className="flex-1 relative z-10">
             <Routes>
               <Route path="/" element={<HomePage />} />
-              <Route path="/about" element={<Navigate to="/#about" replace />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/classes" element={<ClassesPage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/products" element={<ProductsPage />} />
@@ -71,8 +81,8 @@ export const App: React.FC = () => {
             </Routes>
           </main>
 
-          {/* Global Footer */}
-          <Footer />
+          {/* Footer (conditionally rendered, hidden on Home) */}
+          <AppFooter />
         </div>
       </Router>
     </ToastProvider>

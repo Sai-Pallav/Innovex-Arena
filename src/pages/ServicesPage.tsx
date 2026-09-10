@@ -32,7 +32,7 @@ import { LearningModesSection } from '../components/modules/LearningModesSection
 import { useScrollReveal } from '../hooks/useScrollReveal';
 
 const getPillarIcon = (iconName: string, glow: 'cyan' | 'purple') => {
-  const iconColor = glow === 'cyan' ? 'text-cyan-400' : 'text-purple-400';
+  const iconColor = glow === 'cyan' ? 'text-[#b7a4fb]' : 'text-[#e59cff]';
   switch (iconName) {
     case 'Trophy':
       return <Trophy className={`w-5 h-5 ${iconColor}`} />;
@@ -102,10 +102,10 @@ const ServicePillarSection: React.FC<ServicePillarSectionProps> = ({ section, gl
     <section id={section.id} className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 scroll-mt-28">
       {/* 100% STATIC TITLE & DESCRIPTION - DOES NOT MOVE DURING REVEAL */}
       <div className="text-center space-y-1.5 max-w-2xl mx-auto">
-        <h2 className="font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-[-0.015em]">
+        <h2 className="font-rebond font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
           {section.title}
         </h2>
-        <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">
           {section.description}
         </p>
       </div>
@@ -138,24 +138,16 @@ const ServicePillarSection: React.FC<ServicePillarSectionProps> = ({ section, gl
             >
               <div className="flex-1 flex flex-col">
                 <div
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3.5 group-hover:scale-110 transition-all duration-300 ${
-                    glow === 'cyan'
-                      ? 'bg-cyan-500/[0.08] border border-cyan-400/20 text-cyan-400 group-hover:border-cyan-400/40 group-hover:bg-cyan-500/15 group-hover:shadow-[0_0_16px_rgba(0,217,255,0.2)]'
-                      : 'bg-purple-500/10 border border-purple-500/20 text-purple-400 group-hover:border-purple-400/40 group-hover:bg-purple-500/15 group-hover:shadow-[0_0_16px_rgba(168,85,247,0.25)]'
-                  }`}
+                  className="w-10 h-10 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-110 transition-all duration-300 bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)]"
                 >
                   {getPillarIcon(item.iconName, glow)}
                 </div>
                 <h3
-                  className={`font-heading text-base sm:text-lg font-semibold text-white transition-colors duration-200 mb-1.5 leading-snug min-h-[1.75rem] ${
-                    glow === 'cyan'
-                      ? 'group-hover:text-cyan-200'
-                      : 'group-hover:text-purple-200'
-                  }`}
+                  className="font-rebond text-base sm:text-lg font-semibold text-white group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1.5 leading-snug min-h-[1.75rem]"
                 >
                   {item.title}
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed min-h-[2.5rem]">
+                <p className="text-xs text-[#9b96b0] leading-relaxed min-h-[2.5rem]">
                   {item.description}
                 </p>
               </div>
@@ -187,10 +179,10 @@ const PastEventsSection: React.FC = () => {
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 scroll-mt-28">
       {/* STATIC TITLE & DESCRIPTION */}
       <div className="text-center space-y-1.5 max-w-2xl mx-auto">
-        <h2 className="font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-[-0.015em]">
-          Past <span className="text-gradient-cyan">Workshops & Events</span>
+        <h2 className="font-rebond font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+          Past <span className="cosmic-text-gradient">Workshops & Events</span>
         </h2>
-        <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+        <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">
           A look back at our successful events and training programs.
         </p>
       </div>
@@ -216,22 +208,22 @@ const PastEventsSection: React.FC = () => {
             >
               <div className="flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                  <h3 className="font-heading text-base font-semibold text-white group-hover:text-purple-200 transition-colors duration-200 line-clamp-2 min-h-[2.75rem] sm:min-h-[3rem] mb-1">
+                  <h3 className="font-rebond text-base font-semibold text-white group-hover:text-[#b7a4fb] transition-colors duration-200 line-clamp-2 min-h-[2.75rem] sm:min-h-[3rem] mb-1">
                     {evt.title}
                   </h3>
                 </div>
 
-                <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] group-hover:border-purple-400/25 group-hover:bg-white/[0.04] transition-all duration-300 space-y-2 text-xs text-slate-300 min-h-[5.5rem] flex flex-col justify-center">
+                <div className="p-3 rounded-[10px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-all duration-300 space-y-2 text-xs text-[#9b96b0] min-h-[5.5rem] flex flex-col justify-center">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-purple-400 shrink-0" />
-                    <span>{evt.date}</span>
+                    <Calendar className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
+                    <span className="text-[#f4f0ff]">{evt.date}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <Users className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
                     <span>{evt.attendees}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="w-3.5 h-3.5 text-purple-400 shrink-0" />
+                    <MapPin className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
                     <span>{evt.location}</span>
                   </div>
                 </div>
@@ -248,22 +240,22 @@ export const ServicesPage: React.FC = () => {
   return (
     <div className="relative pb-20">
       {/* Ambient Backdrop Spotlight matching HomePage */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[650px] ambient-glow-hero pointer-events-none -z-10" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[650px] ultraviolet-hero-bloom pointer-events-none -z-10" />
 
       <div className="pt-20 sm:pt-24 lg:pt-24 space-y-20 sm:space-y-28">
-        {/* 1. HERO (EXACT LIVE SITE COPY - REFINED CLEAN & PROFESSIONAL) */}
+        {/* 1. HERO */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-3.5 sm:space-y-4 animate-fade-up">
           <div className="space-y-1.5">
-            <h1 className="font-heading font-semibold text-3xl sm:text-5xl lg:text-[3.6rem] tracking-[-0.02em] text-white leading-[1.14]">
-              Our <span className="text-gradient-cyan">Services</span>
+            <h1 className="font-rebond font-bold text-3xl sm:text-5xl lg:text-[3.6rem] tracking-tight text-white leading-[1.14]">
+              Our <span className="cosmic-text-gradient">Services</span>
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed font-normal">
+            <p className="text-xs sm:text-sm text-[#9b96b0] max-w-2xl mx-auto leading-relaxed font-normal">
               Empowering individuals and organizations with cutting-edge technology education, hands-on workshops, and innovation programs.
             </p>
           </div>
         </section>
 
-        {/* 2. FOUR CORE SECTIONS MATCHING LIVE SITE PILLARS WITH DECOUPLED CARD REVEALS */}
+        {/* 2. FOUR CORE SECTIONS */}
         {SERVICE_SECTIONS.map((section, idx) => (
           <ServicePillarSection
             key={section.id}
@@ -277,18 +269,19 @@ export const ServicesPage: React.FC = () => {
           <LearningModesSection />
         </section>
 
-        {/* 4. PAST EVENTS & WORKSHOPS (EXACT LIVE SITE SECTION) */}
+        {/* 4. PAST EVENTS & WORKSHOPS */}
         <PastEventsSection />
 
-        {/* 5. SERVICES CTA (EXACT LIVE SITE COPY - REFINED CLEAN & PROFESSIONAL) */}
+        {/* 5. SERVICES CTA */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-          <div className="relative rounded-3xl p-8 sm:p-12 overflow-hidden border border-white/[0.07] bg-[#0b101e]/75 backdrop-blur-xl shadow-2xl text-center space-y-4 transition-all duration-300 hover:border-white/[0.14] hover:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.85),0_0_40px_rgba(0,217,255,0.08)] group">
-            <div className="shimmer-hairline opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-            <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/[0.04] via-transparent to-purple-500/[0.04] pointer-events-none" />
-            <h2 className="font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-[-0.015em]">
-              Ready to <span className="text-gradient-cyan">Get Started?</span>
+          <div className="relative rounded-2xl p-8 sm:p-12 overflow-hidden border border-white/[0.12] bg-[#0a0118] backdrop-blur-xl shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_24px_60px_rgba(0,0,0,0.8)] text-center space-y-4 transition-all duration-300 hover:border-[#9382ff]/40 group">
+            <div className="aurora-divider-line absolute top-0 left-0 right-0" />
+            <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
+            
+            <h2 className="font-rebond font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+              Ready to <span className="cosmic-text-gradient">Get Started?</span>
             </h2>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+            <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">
               Contact us to discuss how we can help you or your organization achieve your technology goals.
             </p>
             <div className="pt-2">

@@ -38,30 +38,33 @@ export const Dialog: React.FC<DialogProps> = ({
       />
 
       {/* Modal Dialog Card */}
-      <div className="relative w-full max-w-lg rounded-2xl bg-[#0b101e]/95 backdrop-blur-2xl border border-white/[0.09] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8),0_0_30px_rgba(0,217,255,0.08)] p-6 z-10 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg rounded-2xl bg-[#0a0118] backdrop-blur-2xl border border-white/[0.12] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_24px_60px_rgba(0,0,0,0.8)] p-6 z-10 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
         {/* Shimmer hairline */}
-        <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
+        <div className="aurora-divider-line absolute top-0 left-0 right-0" />
 
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <h3 className="font-heading text-lg font-bold text-foreground">
+            <h3 className="font-rebond text-lg font-bold text-white tracking-tight">
               {title}
             </h3>
             {description && (
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+              <p className="text-xs text-[#9b96b0] mt-1 leading-relaxed">
                 {description}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/[0.06] transition-colors cursor-pointer"
+            className="w-8 h-8 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#9b96b0] hover:text-white hover:border-[#9382ff]/60 hover:bg-white/[0.08] transition-all cursor-pointer"
             aria-label="Close dialog"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Subtle underglow beam */}
+        <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/40 to-transparent pointer-events-none" />
 
         {/* Content */}
         {children}

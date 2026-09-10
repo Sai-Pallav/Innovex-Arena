@@ -18,16 +18,16 @@ export const PillBadge: React.FC<PillBadgeProps> = ({
   className,
 }) => {
   const variantStyles = {
-    cyan: 'bg-primary/[0.08] border-primary/20 text-cyan-300 shadow-[0_0_12px_rgba(0,217,255,0.08)]',
-    purple: 'bg-secondary/[0.08] border-secondary/20 text-purple-300 shadow-[0_0_12px_rgba(121,40,202,0.08)]',
-    muted: 'bg-white/[0.04] border-white/[0.08] text-slate-300',
-    emerald: 'bg-emerald-500/[0.08] border-emerald-500/20 text-emerald-300',
+    cyan: 'bg-white/[0.04] border-white/[0.12] text-[#b7a4fb] shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]',
+    purple: 'bg-white/[0.04] border-[#9382ff]/30 text-[#e59cff] shadow-[inset_0_-7px_11px_rgba(164,143,255,0.15)]',
+    muted: 'bg-white/[0.03] border-white/[0.08] text-[#9b96b0]',
+    emerald: 'bg-emerald-500/[0.08] border-emerald-400/25 text-emerald-300 shadow-[inset_0_-7px_11px_rgba(16,185,129,0.1)]',
   };
 
   const dotColor = {
-    cyan: 'bg-cyan-400',
-    purple: 'bg-purple-400',
-    muted: 'bg-slate-400',
+    cyan: 'bg-[#9382ff]',
+    purple: 'bg-[#ba9cff]',
+    muted: 'bg-[#9b96b0]',
     emerald: 'bg-emerald-400',
   };
 
