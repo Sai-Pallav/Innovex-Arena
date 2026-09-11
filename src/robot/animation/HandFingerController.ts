@@ -63,7 +63,7 @@ export class HandFingerController {
       f.proximalCurl = Math.max(0, wave);
       f.middleCurl = Math.max(0, wave * 1.15); // Middle phalanx couples slightly stronger
       f.distalCurl = Math.max(0, wave * 0.90);
-      f.splay = (i - 1.5) * cfg.splayAmplitude * (1.0 + Math.sin(time * 0.2 + fingerPhase) * 0.2);
+      f.splay = (1.5 - i) * cfg.splayAmplitude * (1.0 + Math.sin(time * 0.2 + fingerPhase) * 0.2);
     }
 
     // Left Thumb Thenar Dynamics
@@ -87,7 +87,7 @@ export class HandFingerController {
       f.proximalCurl = Math.max(0, wave);
       f.middleCurl = Math.max(0, wave * 1.12);
       f.distalCurl = Math.max(0, wave * 0.88);
-      f.splay = (i - 1.5) * cfg.splayAmplitude * (1.0 + Math.cos(time * 0.22 + fingerPhase) * 0.2);
+      f.splay = (1.5 - i) * cfg.splayAmplitude * (1.0 + Math.cos(time * 0.22 + fingerPhase) * 0.2);
     }
 
     // Right Thumb Thenar Dynamics

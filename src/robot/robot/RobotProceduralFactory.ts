@@ -129,8 +129,11 @@ export function createProceduralRobot(): RobotNodes {
   rightArm.elbow.group.rotation.set(0, 0, 0);
   leftArm.elbow.forearmPivot.rotation.set(-0.48, 0.08, 0.04);
   rightArm.elbow.forearmPivot.rotation.set(-0.48, -0.08, -0.04);
-  leftArm.wrist.group.rotation.set(0.12, 0.05, -0.02);
-  rightArm.wrist.group.rotation.set(0.12, -0.05, 0.02);
+  // Semi-pronated athletic humanoid wrist posture:
+  // Palms face medially toward the thighs, dorsal ceramic shields face anterolaterally (45°),
+  // thumbs point forward/medially in grasping readiness, fingers cascade along thigh contours.
+  leftArm.wrist.group.rotation.set(0.06, -0.92, 0.04);
+  rightArm.wrist.group.rotation.set(0.06, 0.92, -0.04);
 
   const leftShoulder = leftArm.shoulder.group;
   const rightShoulder = rightArm.shoulder.group;

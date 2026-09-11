@@ -478,10 +478,10 @@ export function createFinger(
   // - Relaxed human/robotic hand: fingers curl naturally toward palm (-Z).
   // - Cascade: Index is most open, Little is most curled.
   const restingAngles: Record<string, { prox: number; mid: number; dist: number; splay: number }> = {
-    Index: { prox: 0.18, mid: 0.26, dist: 0.18, splay: 0.035 },
-    Middle: { prox: 0.24, mid: 0.32, dist: 0.22, splay: 0.008 },
-    Ring: { prox: 0.32, mid: 0.40, dist: 0.26, splay: -0.020 },
-    Little: { prox: 0.40, mid: 0.48, dist: 0.32, splay: -0.048 },
+    Index: { prox: 0.36, mid: 0.50, dist: 0.32, splay: 0.035 },
+    Middle: { prox: 0.44, mid: 0.58, dist: 0.36, splay: 0.008 },
+    Ring: { prox: 0.52, mid: 0.66, dist: 0.40, splay: -0.022 },
+    Little: { prox: 0.62, mid: 0.74, dist: 0.45, splay: -0.052 },
   };
 
   const angles = restingAngles[spec.name] || { prox: 0.24, mid: 0.32, dist: 0.22, splay: 0 };
@@ -527,10 +527,10 @@ export function createThumb(
   const thumbGroup = new THREE.Group();
   thumbGroup.name = 'Thumb';
   // Positioned at thenar eminence on medial-anterior palm margin
-  thumbGroup.position.set(-side * 0.027, -0.024, 0.009);
+  thumbGroup.position.set(-side * 0.026, -0.024, 0.008);
 
-  // Natural opposable resting orientation: angled forward (+Z) and medially toward index/palm
-  thumbGroup.rotation.set(0.38, -side * 0.48, -side * 0.20);
+  // Natural opposable resting orientation: angled forward (+Z) and medially toward index/palm in ready opposition
+  thumbGroup.rotation.set(0.30, -side * 0.32, -side * 0.24);
 
   const disposeTemp = (g: THREE.Group) => {
     g.traverse((child) => {
@@ -647,9 +647,9 @@ export function createThumb(
   distalGroup.add(tdMergedArmor);
 
   // Natural resting thumb flexion curling toward palm
-  proximalGroup.rotation.x = 0.32;
-  proximalGroup.rotation.z = -side * 0.12;
-  distalGroup.rotation.x = 0.36;
+  proximalGroup.rotation.x = 0.28;
+  proximalGroup.rotation.z = -side * 0.08;
+  distalGroup.rotation.x = 0.32;
 
   return {
     group: thumbGroup,

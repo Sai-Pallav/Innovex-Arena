@@ -682,16 +682,16 @@ export class ArmAnimationController {
     // - Index finger is most extended/relaxed (~68° total curl)
     // - Little finger is most flexed/curled (~103° total curl)
     const restingLeft = [
-      { prox: 0.36, mid: 0.50, dist: 0.32, splay: 0.035 },  // Index (~21°, 29°, 18°)
-      { prox: 0.44, mid: 0.58, dist: 0.36, splay: 0.008 },  // Middle (~25°, 33°, 21°)
-      { prox: 0.52, mid: 0.66, dist: 0.40, splay: -0.022 }, // Ring (~30°, 38°, 23°)
-      { prox: 0.62, mid: 0.74, dist: 0.45, splay: -0.052 }, // Little (~35°, 42°, 26°)
+      { prox: 0.32, mid: 0.46, dist: 0.28, splay: 0.042 },  // Index (~18°, 26°, 16° = ~60° total curl)
+      { prox: 0.40, mid: 0.54, dist: 0.32, splay: 0.012 },  // Middle (~23°, 31°, 18° = ~72° total curl)
+      { prox: 0.48, mid: 0.62, dist: 0.36, splay: -0.018 }, // Ring (~27°, 35°, 21° = ~83° total curl)
+      { prox: 0.56, mid: 0.70, dist: 0.42, splay: -0.048 }, // Little (~32°, 40°, 24° = ~96° total curl)
     ];
     const restingRight = [
-      { prox: 0.34, mid: 0.48, dist: 0.30, splay: 0.035 },  // Index
-      { prox: 0.42, mid: 0.56, dist: 0.34, splay: 0.008 },  // Middle
-      { prox: 0.50, mid: 0.64, dist: 0.38, splay: -0.022 }, // Ring
-      { prox: 0.60, mid: 0.72, dist: 0.44, splay: -0.052 }, // Little
+      { prox: 0.32, mid: 0.46, dist: 0.28, splay: 0.042 },  // Index
+      { prox: 0.40, mid: 0.54, dist: 0.32, splay: 0.012 },  // Middle
+      { prox: 0.48, mid: 0.62, dist: 0.36, splay: -0.018 }, // Ring
+      { prox: 0.56, mid: 0.70, dist: 0.42, splay: -0.048 }, // Little
     ];
 
     const target = isLeft ? restingLeft[idx] : restingRight[idx];
@@ -738,12 +738,12 @@ export class ArmAnimationController {
     const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.05;
     const addSplay = override?.splay !== undefined ? override.splay : 0;
 
-    // Natural relaxed thumb posture angled forward (+Z) and medially (-X) toward palm
-    thumb.group.rotation.set(0.38 + wave * 0.04, -side * 0.48, -side * (0.20 + addSplay));
-    thumb.proximal.group.rotation.x = 0.32 + addProx;
-    thumb.proximal.group.rotation.z = -side * 0.12;
-    thumb.distal.group.rotation.x = 0.36 + addDist;
-    if (thumb.middle) thumb.middle.group.rotation.x = 0.36 + addDist;
+    // Natural relaxed thumb posture angled forward (+Z) and medially toward index/palm in ready opposition
+    thumb.group.rotation.set(0.30 + wave * 0.04, -side * 0.32, -side * (0.24 + addSplay));
+    thumb.proximal.group.rotation.x = 0.28 + addProx;
+    thumb.proximal.group.rotation.z = -side * 0.08;
+    thumb.distal.group.rotation.x = 0.32 + addDist;
+    if (thumb.middle) thumb.middle.group.rotation.x = 0.32 + addDist;
   }
 }
 
