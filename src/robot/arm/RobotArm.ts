@@ -54,14 +54,15 @@ export function createRobotArm(
   armRoot.add(shoulder.group);
   ledMeshes.push(...shoulder.ledMeshes);
 
-  // 2. Upper Arm Pivot (attached hierarchically inside UpperArmConnector per Section 4)
+  // 2. Upper Arm Pivot (attached hierarchically inside UpperArmConnector)
   const upperArm = createUpperArm(side, materials);
-  upperArm.group.position.set(side * 0.002, -0.044, 0);
+  upperArm.group.position.set(side * 0.002, -0.028, 0);
   shoulder.upperArmConnector.add(upperArm.group);
+  ledMeshes.push(...upperArm.ledMeshes);
 
   // 3. Elbow Pivot (attached hierarchically at bottom of upperArm)
   const elbow = createElbow(side, materials);
-  elbow.group.position.set(0, -0.210, 0);
+  elbow.group.position.set(0, -0.185, 0);
   upperArm.group.add(elbow.group);
   ledMeshes.push(...elbow.ledMeshes);
 

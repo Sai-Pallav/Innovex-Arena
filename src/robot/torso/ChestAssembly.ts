@@ -540,55 +540,85 @@ export function createShoulderMount(
 
   const ledMeshes: THREE.Mesh[] = [];
 
-  // Dark titanium mechanical rotary socket cylinder
-  const socketGeo = new THREE.CylinderGeometry(0.054, 0.054, 0.024, 28);
+  // 1. Heavy-duty cast titanium clavicle trunnion sleeve anchoring inward into chest frame
+  // Bridges the horizontal span between lateral chest armor and the shoulder joint
+  const trunnionGeo = new THREE.CylinderGeometry(0.046, 0.052, 0.044, 24);
+  const trunnionSleeve = new THREE.Mesh(trunnionGeo, materials.joint);
+  trunnionSleeve.rotation.z = Math.PI / 2;
+  trunnionSleeve.position.set(-side * 0.022, 0, 0);
+  trunnionSleeve.castShadow = true;
+  trunnionSleeve.receiveShadow = true;
+  group.add(trunnionSleeve);
+
+  // 2. Structural reinforcement gusset ribs anchoring sleeve to chest frame
+  for (let g = 0; g < 3; g++) {
+    const angle = (g / 3) * Math.PI - Math.PI / 2;
+    const gussetGeo = new THREE.BoxGeometry(0.036, 0.008, 0.018);
+    const gusset = new THREE.Mesh(gussetGeo, materials.joint);
+    gusset.position.set(-side * 0.024, Math.sin(angle) * 0.038, Math.cos(angle) * 0.038);
+    gusset.rotation.x = angle;
+    gusset.castShadow = true;
+    group.add(gusset);
+  }
+
+  // 3. Heavy-Duty Circular Mounting Flange with 6 Hex Fasteners
+  const flangeGeo = new THREE.CylinderGeometry(0.052, 0.052, 0.006, 24);
+  const mountFlange = new THREE.Mesh(flangeGeo, materials.joint);
+  mountFlange.rotation.z = Math.PI / 2;
+  mountFlange.position.set(-side * 0.004, 0, 0);
+  mountFlange.castShadow = true;
+  group.add(mountFlange);
+
+  for (let b = 0; b < 6; b++) {
+    const angle = (b / 6) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.0035, 6);
+    const bolt = new THREE.Mesh(boltGeo, materials.joint);
+    bolt.rotation.z = Math.PI / 2;
+    bolt.position.set(
+      -side * 0.001,
+      Math.sin(angle) * 0.044,
+      Math.cos(angle) * 0.044
+    );
+    group.add(bolt);
+  }
+
+  // 4. Dark titanium mechanical rotary socket cylinder
+  const socketGeo = new THREE.CylinderGeometry(0.048, 0.050, 0.016, 24);
   const rotarySocket = new THREE.Mesh(socketGeo, materials.joint);
   rotarySocket.name = side === -1 ? 'SocketLeft' : 'SocketRight';
   rotarySocket.rotation.z = Math.PI / 2;
+  rotarySocket.position.set(-side * 0.002, 0, 0);
   rotarySocket.castShadow = true;
   rotarySocket.receiveShadow = true;
   group.add(rotarySocket);
 
-  // Socket Outer Rim Collar
-  const rimGeo = new THREE.TorusGeometry(0.054, 0.0055, 12, 28);
+  // 5. Socket Outer Rim Collar
+  const rimGeo = new THREE.TorusGeometry(0.048, 0.0035, 8, 24);
   const socketRim = new THREE.Mesh(rimGeo, materials.joint);
   socketRim.rotation.y = Math.PI / 2;
+  socketRim.position.set(-side * 0.002, 0, 0);
   group.add(socketRim);
 
-  // Signature Purple Emissive LED Accent Ring
-  const ringGeo = new THREE.TorusGeometry(0.040, 0.0024, 8, 28);
+  // 6. Interior bearing race ring & Purple Accent Ring
+  const ringGeo = new THREE.TorusGeometry(0.038, 0.0020, 8, 24);
   const accentRing = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRing.name = side === -1 ? 'ShoulderAccentRingLeft' : 'ShoulderAccentRingRight';
   accentRing.rotation.y = Math.PI / 2;
-  accentRing.position.set(side * 0.011, 0, 0);
+  accentRing.position.set(0, 0, 0);
   group.add(accentRing);
   ledMeshes.push(accentRing);
 
-  // White Armor Clavicle Connection Mantle (ShoulderArmorConnection)
-  // Bridges smoothly from upper chest armor over rotary socket to meet arm pauldron
-  const bridgeShape = new THREE.Shape();
-  bridgeShape.moveTo(-side * 0.068, 0.052);
-  bridgeShape.lineTo(side * 0.016, 0.040);
-  bridgeShape.bezierCurveTo(side * 0.034, 0.022, side * 0.030, -0.018, side * 0.010, -0.030);
-  bridgeShape.lineTo(-side * 0.064, -0.022);
-  bridgeShape.closePath();
+  // 7. Upper Actuator Clevis Anchor (Mates with shoulder damper strut)
+  const actBracketGeo = new THREE.BoxGeometry(0.012, 0.018, 0.014);
+  const actBracket = new THREE.Mesh(actBracketGeo, materials.joint);
+  actBracket.position.set(-side * 0.010, 0.044, 0.012);
+  actBracket.castShadow = true;
+  group.add(actBracket);
 
-  const bridgeGeo = new THREE.ExtrudeGeometry(bridgeShape, {
-    depth: 0.028,
-    bevelEnabled: true,
-    bevelThickness: 0.006,
-    bevelSize: 0.005,
-    bevelSegments: 3,
-  });
-  bridgeGeo.center();
-
-  const armorBridge = new THREE.Mesh(bridgeGeo, materials.armor);
+  // White Armor Clavicle Connection Mantle (Removed per user request to remove white shoulder parts)
+  const armorBridge = new THREE.Mesh();
   armorBridge.name = side === -1 ? 'ArmorBridgeLeft' : 'ArmorBridgeRight';
-  armorBridge.position.set(-side * 0.026, 0.024, 0.010);
-  armorBridge.rotation.y = -side * 0.12;
-  armorBridge.rotation.z = side * 0.06;
-  armorBridge.castShadow = true;
-  armorBridge.receiveShadow = true;
+  armorBridge.visible = false;
   group.add(armorBridge);
 
   return {

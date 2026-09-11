@@ -127,7 +127,7 @@ export class LegAnimationController {
     const applyExplodedToLeg = (leg: RobotLegNodes, side: -1 | 1) => {
       // Anterior Thigh armor slides forward (+Z) and outward (+X)
       leg.thigh.anteriorArmor.position.z = 0.024 + p * 0.045;
-      leg.thigh.lateralArmor.position.x = side * (0.038 + p * 0.040);
+      leg.thigh.lateralArmor.position.x = side * (0.025 + p * 0.040);
 
       // Patellar shield pops forward
       leg.knee.patellaShield.position.z = LEG_CONFIG.knee.patella.offsetZ + p * 0.040;

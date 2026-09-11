@@ -7,6 +7,9 @@ export interface NormalizedInputState {
   intensity: number;         // Interaction intensity [0, 1]
   isHovered: boolean;
   reducedMotion: boolean;
+  clientX?: number;          // Real viewport pixel X
+  clientY?: number;          // Real viewport pixel Y
+  hasPointer?: boolean;      // True if cursor is currently within the window
 }
 
 export interface HierarchicalGazeAngles {

@@ -15,24 +15,30 @@ export const ANIMATION_CONFIG = {
   // 1. CURSOR TRACKING & HIERARCHICAL LOOK
   // ==========================================
   look: {
-    // Physical joint limits (in radians)
-    headYawLimit: (18 * Math.PI) / 180,       // ~±18°
-    headPitchLimit: (10 * Math.PI) / 180,     // ~±10°
-    headRollLimit: (4 * Math.PI) / 180,       // ~±4°
+    // Physical joint limits (in radians) - wide natural humanoid range
+    headYawLimit: (38 * Math.PI) / 180,       // ~±38° total local turn
+    headPitchLimit: (26 * Math.PI) / 180,     // ~±26° downward pitch
+    headPitchUpLimit: (18 * Math.PI) / 180,   // ~±18° upward pitch
+    headRollLimit: (5 * Math.PI) / 180,       // ~±5° organic lateral tilt
 
-    // Hierarchical response ratios (Head leads, body follows progressively less)
-    headRatio: 1.0,                           // 100%
-    neckRatio: 0.28,                          // 28% (range 25-35%)
-    shouldersRatio: 0.12,                     // 12% (range 10-15%)
-    chestRatio: 0.055,                        // 5.5% (range 4-7%)
-    waistRatio: 0.020,                        // 2.0% (range 1-3%)
+    // Soft-knee linear thresholds (100% 1:1 direct tracking up to knee, smooth tanh compression beyond)
+    yawKnee: (26 * Math.PI) / 180,            // 26° linear zone
+    pitchDownKnee: (16 * Math.PI) / 180,      // 16° linear zone downward
+    pitchUpKnee: (12 * Math.PI) / 180,        // 12° linear zone upward
 
-    // Damping and spring smoothing (critically damped, zero jitter)
-    headDamping: 6.2,
-    neckDamping: 5.4,
-    bodyDamping: 4.2,
-    speedThreshold: 1.2,
-    speedAnticipation: 0.12,
+    // Hierarchical response ratios (Head leads 72%, Neck follows 22%, Chest follows 6% -> Exact 100% sum)
+    headRatio: 0.72,                          // 72%
+    neckRatio: 0.22,                          // 22%
+    chestRatio: 0.06,                         // 6%
+    shouldersRatio: 0.10,                     // 10%
+    waistRatio: 0.02,                         // 2%
+
+    // Damping and spring smoothing (responsive, fluid, critically damped, zero jitter)
+    headDamping: 8.5,
+    neckDamping: 6.8,
+    bodyDamping: 4.8,
+    speedThreshold: 1.0,
+    speedAnticipation: 0.08,
   },
 
   // ==========================================

@@ -41,6 +41,12 @@ export interface WaistAssemblyNodes {
   pelvicAccentLight?: THREE.Mesh;
   ledMeshes: THREE.Mesh[];
 
+  // Discrete nodes for mechanical & shell hierarchy / exploded view
+  pelvicIntakePocket?: THREE.Mesh;
+  inguinalFlapLeft?: THREE.Mesh;
+  inguinalFlapRight?: THREE.Mesh;
+  subPelvisCradle?: THREE.Mesh;
+
   // Backward compatibility aliases
   waistCollar: THREE.Mesh;
   waistRing01: THREE.Mesh;
@@ -129,136 +135,106 @@ export function createSingleHipConnection(
 
   const ledMeshes: THREE.Mesh[] = [];
 
-  // 1. Structural mounting bracket arm connecting lower waist ring to hip joint hub
+  // 1. Structural wishbone mounting bracket connecting lower waist collar to hip socket
   const bracketShape = new THREE.Shape();
-  bracketShape.moveTo(0, 0.018);
-  bracketShape.lineTo(0.014, 0.014);
-  bracketShape.lineTo(0.016, -0.014);
-  bracketShape.lineTo(-0.014, -0.018);
-  bracketShape.lineTo(-0.016, 0.012);
+  bracketShape.moveTo(-side * 0.016, 0.022);
+  bracketShape.lineTo(side * 0.010, 0.018);
+  bracketShape.lineTo(side * 0.008, -0.012);
+  bracketShape.lineTo(-side * 0.015, -0.014);
   bracketShape.closePath();
 
+  // Central circular lightening hole in wishbone bracket
+  const bracketHole = new THREE.Path();
+  bracketHole.absarc(0, 0.003, 0.005, 0, Math.PI * 2, false);
+  bracketShape.holes.push(bracketHole);
+
   const bracketGeo = new THREE.ExtrudeGeometry(bracketShape, {
-    depth: 0.030,
+    depth: 0.022,
     bevelEnabled: true,
-    bevelThickness: 0.003,
-    bevelSize: 0.0025,
+    bevelThickness: 0.0028,
+    bevelSize: 0.0022,
     bevelSegments: 2,
   });
   bracketGeo.center();
 
   const bracketArm = new THREE.Mesh(bracketGeo, materials.joint);
   bracketArm.name = side === -1 ? 'HipBracket_L' : 'HipBracket_R';
-  bracketArm.position.set(-side * 0.010, 0.014, 0);
-  bracketArm.rotation.z = -side * 0.22;
+  bracketArm.position.set(0, 0.010, 0);
   bracketArm.castShadow = true;
   bracketArm.receiveShadow = true;
   group.add(bracketArm);
 
-  // 2. Lateral Cylindrical Rotational Joint Hub (Dark Titanium Mechanism)
-  const hubGroup = new THREE.Group();
-  hubGroup.rotation.z = Math.PI / 2;
-
-  const hubGeo = new THREE.CylinderGeometry(cfg.hubRadius, cfg.hubRadius, cfg.hubWidth, 32);
-  const rotaryHub = new THREE.Mesh(hubGeo, materials.joint);
-  rotaryHub.name = side === -1 ? 'HipRotaryHub_L' : 'HipRotaryHub_R';
-  rotaryHub.castShadow = true;
-  rotaryHub.receiveShadow = true;
-  hubGroup.add(rotaryHub);
-
-  // Bearing Race Chamfer Rings on Rotary Hub
-  const bearingFlangeGeo = new THREE.CylinderGeometry(
-    cfg.hubRadius * 1.04,
-    cfg.hubRadius * 1.04,
-    0.004,
+  // 2. Pelvic Hip Receiving Socket Collar (Dark Titanium Dual-Bearing Mechanism)
+  const collarGeo = new THREE.CylinderGeometry(
+    cfg.hubRadius * 1.15,
+    cfg.hubRadius * 1.10,
+    0.015,
     32
   );
-  const bearingFlange = new THREE.Mesh(bearingFlangeGeo, materials.joint);
-  hubGroup.add(bearingFlange);
-  group.add(hubGroup);
+  const rotaryHub = new THREE.Mesh(collarGeo, materials.joint);
+  rotaryHub.name = side === -1 ? 'HipRotaryHub_L' : 'HipRotaryHub_R';
+  rotaryHub.position.set(0, 0.004, 0);
+  rotaryHub.castShadow = true;
+  rotaryHub.receiveShadow = true;
+  group.add(rotaryHub);
 
-  // 3. Concentric Purple Emissive Accent Ring on Joint Face
-  const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0022, 12, 32);
+  // Outer stepped bearing bevel ring
+  const bearingRingGeo = new THREE.TorusGeometry(cfg.hubRadius * 1.08, 0.0018, 8, 32);
+  const bearingRing = new THREE.Mesh(bearingRingGeo, materials.joint);
+  bearingRing.rotation.x = Math.PI / 2;
+  bearingRing.position.set(0, 0.009, 0);
+  group.add(bearingRing);
+
+  // 3. Concentric Purple Emissive Accent Ring inside Socket Collar
+  const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0018, 8, 32);
   const accentRing = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRing.name = side === -1 ? 'HipAccentRing_L' : 'HipAccentRing_R';
-  accentRing.rotation.y = Math.PI / 2;
-  accentRing.position.set(side * (cfg.hubWidth * 0.50 + 0.002), 0, 0);
+  accentRing.rotation.x = Math.PI / 2;
+  accentRing.position.set(0, 0.010, 0);
   group.add(accentRing);
   ledMeshes.push(accentRing);
 
-  // 4. Secondary White Ceramic Accent Cap (Snugly integrated into outer face of rotary hub)
-  const capShape = new THREE.Shape();
-  const capR = cfg.hubRadius * 0.78;
-  capShape.moveTo(0, capR);
-  capShape.quadraticCurveTo(capR * 0.90, capR * 0.90, capR, 0);
-  capShape.quadraticCurveTo(capR * 0.90, -capR * 0.90, 0, -capR);
-  capShape.quadraticCurveTo(-capR * 0.90, -capR * 0.90, -capR, 0);
-  capShape.quadraticCurveTo(-capR * 0.90, capR * 0.90, 0, capR);
-  capShape.closePath();
-
-  const capGeo = new THREE.ExtrudeGeometry(capShape, {
-    depth: 0.006,
-    bevelEnabled: true,
-    bevelThickness: 0.002,
-    bevelSize: 0.0018,
-    bevelSegments: 2,
-    curveSegments: 24,
-  });
-  capGeo.center();
-
-  const hipCowl = new THREE.Mesh(capGeo, materials.armor);
+  // 4. Integrated White Ceramic Hip Cowl Flange
+  const cowlFlangeGeo = new THREE.CylinderGeometry(cfg.hubRadius * 1.06, cfg.hubRadius * 1.16, 0.0045, 32);
+  const hipCowl = new THREE.Mesh(cowlFlangeGeo, materials.armor);
   hipCowl.name = side === -1 ? 'LeftHipArmor' : 'RightHipArmor';
-  hipCowl.rotation.y = Math.PI / 2;
-  hipCowl.position.set(side * (cfg.hubWidth * 0.50 + 0.004), 0, 0);
+  hipCowl.position.set(0, 0.013, 0);
   hipCowl.castShadow = true;
-  hipCowl.receiveShadow = true;
   group.add(hipCowl);
 
-  // 5. Sculpted White Ceramic Iliac Crest Armor Cowl (Flank Shield)
-  // Pauldron-style sculpted shield wrapping over the outer hip bracket and rotary hub
+  // 5. Sculpted White Ceramic Iliac Crest Armor (Flank Shield)
+  // Pauldron-style sculpted shield wrapping over the outer pelvic rim flush with waist
   const cowlShape = new THREE.Shape();
-  cowlShape.moveTo(0, 0.026);
-  cowlShape.quadraticCurveTo(0.018, 0.022, 0.026, 0.008);
-  cowlShape.quadraticCurveTo(0.028, -0.016, 0.014, -0.030);
-  cowlShape.quadraticCurveTo(0, -0.034, -0.016, -0.026);
-  cowlShape.quadraticCurveTo(-0.026, -0.008, -0.024, 0.010);
-  cowlShape.quadraticCurveTo(-0.018, 0.024, 0, 0.026);
+  cowlShape.moveTo(-0.018, 0.024);
+  cowlShape.quadraticCurveTo(0, 0.028, 0.018, 0.022);
+  cowlShape.quadraticCurveTo(0.022, 0.002, 0.014, -0.022);
+  cowlShape.quadraticCurveTo(0, -0.026, -0.014, -0.020);
+  cowlShape.quadraticCurveTo(-0.020, 0.002, -0.018, 0.024);
   cowlShape.closePath();
 
   const cowlGeo = new THREE.ExtrudeGeometry(cowlShape, {
-    depth: 0.010,
+    depth: 0.008,
     bevelEnabled: true,
     bevelThickness: 0.0025,
     bevelSize: 0.0020,
     bevelSegments: 2,
-    curveSegments: 24,
+    curveSegments: 20,
   });
   cowlGeo.center();
 
-  // Subtle lateral curvature
-  const cowlPos = cowlGeo.attributes.position;
-  for (let i = 0; i < cowlPos.count; i++) {
-    const y = cowlPos.getY(i);
-    const z = cowlPos.getZ(i);
-    if (z > 0) {
-      cowlPos.setZ(i, z + Math.sin((y + 0.03) * 35) * 0.0025);
-    }
-  }
-  cowlGeo.computeVertexNormals();
-
   const iliacCrestArmor = new THREE.Mesh(cowlGeo, materials.armor);
   iliacCrestArmor.name = side === -1 ? 'LeftIliacCrestArmor' : 'RightIliacCrestArmor';
-  iliacCrestArmor.rotation.y = Math.PI / 2;
-  iliacCrestArmor.position.set(side * (cfg.hubWidth * 0.50 + 0.008), 0.006, 0.002);
+  iliacCrestArmor.position.set(side * 0.008, 0.018, 0.002);
+  iliacCrestArmor.rotation.y = -side * 0.15;
   iliacCrestArmor.castShadow = true;
   iliacCrestArmor.receiveShadow = true;
   group.add(iliacCrestArmor);
 
   // Subtle lateral violet emissive slit on the iliac crest armor
-  const flankLightGeo = new THREE.BoxGeometry(0.0022, 0.018, 0.0016);
+  const flankLightGeo = new THREE.BoxGeometry(0.0020, 0.014, 0.0016);
   const flankLight = new THREE.Mesh(flankLightGeo, materials.purpleEmissive);
   flankLight.name = side === -1 ? 'LeftHipFlankLight' : 'RightHipFlankLight';
-  flankLight.position.set(side * (cfg.hubWidth * 0.50 + 0.014), 0.006, 0.002);
+  flankLight.position.set(side * 0.012, 0.018, 0.004);
   group.add(flankLight);
   ledMeshes.push(flankLight);
 
@@ -513,19 +489,28 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
   // Pelvic Front Armor Shield Plate between the hips (Sculpted multi-faceted groin shield)
   const pelvicPlateShape = new THREE.Shape();
-  pelvicPlateShape.moveTo(-0.048, 0.028);
-  pelvicPlateShape.quadraticCurveTo(0, 0.032, 0.048, 0.028);
-  pelvicPlateShape.lineTo(0.042, -0.018);
-  pelvicPlateShape.lineTo(0.026, -0.052);
-  pelvicPlateShape.quadraticCurveTo(0, -0.066, -0.026, -0.052);
-  pelvicPlateShape.lineTo(-0.042, -0.018);
+  pelvicPlateShape.moveTo(-0.046, 0.026);
+  pelvicPlateShape.quadraticCurveTo(0, 0.030, 0.046, 0.026);
+  pelvicPlateShape.lineTo(0.040, -0.016);
+  pelvicPlateShape.lineTo(0.024, -0.050);
+  pelvicPlateShape.quadraticCurveTo(0, -0.062, -0.024, -0.050);
+  pelvicPlateShape.lineTo(-0.040, -0.016);
   pelvicPlateShape.closePath();
 
+  // Intake window cutout in the ceramic plate
+  const intakeWindow = new THREE.Path();
+  intakeWindow.moveTo(-0.022, 0.015);
+  intakeWindow.lineTo(0.022, 0.015);
+  intakeWindow.lineTo(0.020, 0.007);
+  intakeWindow.lineTo(-0.020, 0.007);
+  intakeWindow.closePath();
+  pelvicPlateShape.holes.push(intakeWindow);
+
   const plateGeo = new THREE.ExtrudeGeometry(pelvicPlateShape, {
-    depth: 0.018,
+    depth: 0.016,
     bevelEnabled: true,
-    bevelThickness: 0.0045,
-    bevelSize: 0.0036,
+    bevelThickness: 0.0040,
+    bevelSize: 0.0032,
     bevelSegments: 3,
     curveSegments: 28,
   });
@@ -539,9 +524,9 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     const z = pPos.getZ(i);
     if (z > 0) {
       // Keel peak at x = 0, sloping back laterally
-      const keel = (1.0 - Math.min(1.0, Math.abs(x) / 0.048)) * 0.0075;
+      const keel = (1.0 - Math.min(1.0, Math.abs(x) / 0.046)) * 0.007;
       // Slight forward thrust in lower pelvis
-      const thrust = (y < 0) ? Math.sin(-y * 18) * 0.0035 : 0;
+      const thrust = (y < 0) ? Math.sin(-y * 18) * 0.003 : 0;
       pPos.setZ(i, z + keel + thrust);
     }
   }
@@ -555,59 +540,89 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
   pelvicPlate.receiveShadow = true;
   hipConnectionGroup.add(pelvicPlate);
 
-  // Recessed dark titanium intake scoop pocket on the pelvic plate
-  const intakePocketGeo = new THREE.BoxGeometry(0.040, 0.007, 0.006);
-  const intakePocket = new THREE.Mesh(intakePocketGeo, materials.joint);
-  intakePocket.position.set(0, -0.266, 0.055);
-  intakePocket.rotation.x = -0.02;
-  hipConnectionGroup.add(intakePocket);
+  // Recessed dark titanium intake scoop pocket parented inside pelvic plate
+  const intakePocketGeo = new THREE.BoxGeometry(0.042, 0.009, 0.008);
+  const pelvicIntakePocket = new THREE.Mesh(intakePocketGeo, materials.joint);
+  pelvicIntakePocket.name = 'PelvicIntakePocket';
+  pelvicIntakePocket.position.set(0, 0.011, 0.005);
+  pelvicPlate.add(pelvicIntakePocket);
 
-  // Signature horizontal violet emissive LED slit across the pelvic plate
-  const pelvicLightGeo = new THREE.BoxGeometry(0.036, 0.0024, 0.003);
+  // Horizontal titanium radiator grille louvers across intake
+  for (const lY of [-0.002, 0.002]) {
+    const louverGeo = new THREE.BoxGeometry(0.038, 0.0008, 0.006);
+    const louver = new THREE.Mesh(louverGeo, materials.joint);
+    louver.position.set(0, lY, 0.002);
+    pelvicIntakePocket.add(louver);
+  }
+
+  // Signature horizontal violet emissive LED slit nested inside intake
+  const pelvicLightGeo = new THREE.BoxGeometry(0.036, 0.0022, 0.003);
   const pelvicAccentLight = new THREE.Mesh(pelvicLightGeo, materials.purpleEmissive);
   pelvicAccentLight.name = 'PelvicAccentLight';
-  pelvicAccentLight.position.set(0, -0.266, 0.0585);
-  pelvicAccentLight.rotation.x = -0.02;
-  hipConnectionGroup.add(pelvicAccentLight);
+  pelvicAccentLight.position.set(0, 0.011, 0.009);
+  pelvicPlate.add(pelvicAccentLight);
   ledMeshes.push(pelvicAccentLight);
 
-  // Left & Right Inguinal Armor Flaps (Bridges pelvis to lateral hip mounts - eliminates side voids)
-  for (const side of [-1, 1]) {
+  // Left & Right Inguinal Armor Flaps (Contoured ceramic pauldrons with titanium hinge clevises)
+  function createInguinalFlap(fSide: -1 | 1): THREE.Mesh {
     const flapShape = new THREE.Shape();
-    flapShape.moveTo(0, 0.024);
-    flapShape.lineTo(0.022, 0.016);
-    flapShape.lineTo(0.018, -0.030);
-    flapShape.lineTo(-0.004, -0.038);
-    flapShape.lineTo(-0.014, 0.012);
+    flapShape.moveTo(0, 0.022);
+    flapShape.quadraticCurveTo(0.018, 0.018, 0.020, 0.012);
+    flapShape.lineTo(0.016, -0.028);
+    flapShape.quadraticCurveTo(0.004, -0.036, -0.004, -0.034);
+    flapShape.lineTo(-0.014, 0.010);
     flapShape.closePath();
 
     const flapGeo = new THREE.ExtrudeGeometry(flapShape, {
-      depth: 0.010,
+      depth: 0.009,
       bevelEnabled: true,
-      bevelThickness: 0.003,
-      bevelSize: 0.0024,
+      bevelThickness: 0.0028,
+      bevelSize: 0.0022,
       bevelSegments: 2,
+      curveSegments: 20,
     });
     flapGeo.center();
 
     const flapMesh = new THREE.Mesh(flapGeo, materials.armor);
-    flapMesh.name = `InguinalFlap_${side === -1 ? 'L' : 'R'}`;
-    flapMesh.position.set(side * 0.046, -0.274, 0.036);
-    flapMesh.rotation.y = side * -0.28;
+    flapMesh.name = `InguinalFlap_${fSide === -1 ? 'L' : 'R'}`;
+    flapMesh.position.set(fSide * 0.046, -0.274, 0.038);
+    flapMesh.rotation.y = fSide * -0.26;
     flapMesh.rotation.x = -0.04;
     flapMesh.castShadow = true;
     flapMesh.receiveShadow = true;
-    hipConnectionGroup.add(flapMesh);
+
+    // Machined titanium top hinge clevis
+    const clevisGeo = new THREE.CylinderGeometry(0.0035, 0.0035, 0.010, 12);
+    const clevis = new THREE.Mesh(clevisGeo, materials.joint);
+    clevis.rotation.z = Math.PI / 2;
+    clevis.position.set(0, 0.020, 0);
+    flapMesh.add(clevis);
+
+    return flapMesh;
   }
 
+  const inguinalFlapLeft = createInguinalFlap(-1);
+  hipConnectionGroup.add(inguinalFlapLeft);
+
+  const inguinalFlapRight = createInguinalFlap(1);
+  hipConnectionGroup.add(inguinalFlapRight);
+
   // Sub-Pelvic Mechanical Cradle (Dark Titanium Frame connecting lower waist to hips)
-  const cradleGeo = new THREE.CylinderGeometry(0.046, 0.038, 0.036, 24);
+  const cradleGeo = new THREE.CylinderGeometry(0.046, 0.038, 0.036, 28);
   const subPelvisCradle = new THREE.Mesh(cradleGeo, materials.joint);
   subPelvisCradle.name = 'SubPelvisCradle';
   subPelvisCradle.position.set(0, -0.262, 0.010);
   subPelvisCradle.scale.set(1.15, 1.0, 0.85);
   subPelvisCradle.castShadow = true;
   hipConnectionGroup.add(subPelvisCradle);
+
+  // Additional CNC ribbing details on sub-pelvis cradle
+  for (let i = 0; i < 3; i++) {
+    const ribGeo = new THREE.BoxGeometry(0.042 - i * 0.006, 0.003, 0.006);
+    const rib = new THREE.Mesh(ribGeo, materials.joint);
+    rib.position.set(0, -0.008 - i * 0.008, 0.026);
+    subPelvisCradle.add(rib);
+  }
 
   return {
     group: waistGroup,
@@ -627,6 +642,10 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     rightHip,
     pelvicPlate,
     pelvicAccentLight,
+    pelvicIntakePocket,
+    inguinalFlapLeft,
+    inguinalFlapRight,
+    subPelvisCradle,
     ledMeshes,
 
     // Backward compatibility aliases

@@ -18,6 +18,16 @@ export class RobotController {
     this.animController = new RobotAnimationController(nodes);
   }
 
+  public setCameraContext(camera: THREE.Camera, container: HTMLElement): void {
+    this.animController.setCameraContext(camera, container);
+  }
+
+  public setPointerTarget(clientX: number, clientY: number, isHovered: boolean, speed: number = 0): void {
+    this.cursorSpeed = speed;
+    this.isInteracting = isHovered;
+    this.animController.setPointerTarget(clientX, clientY, isHovered, speed);
+  }
+
   public setLookTarget(x: number, y: number, speed: number = 0): void {
     this.targetLookX = Math.max(-1, Math.min(1, x));
     this.targetLookY = Math.max(-1, Math.min(1, y));

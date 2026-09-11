@@ -24,15 +24,15 @@ export function createRobotMaterials(): RobotMaterialPalette {
   const cfg = ROBOT_CONFIG;
 
   const armor = new THREE.MeshPhysicalMaterial({
-    color: cfg.colors.armorWhite,
-    roughness: cfg.materials.armorRoughness,
-    metalness: cfg.materials.armorMetalness,
-    clearcoat: cfg.materials.armorClearcoat,
-    clearcoatRoughness: cfg.materials.armorClearcoatRoughness,
-    sheen: 0.32,
-    sheenColor: new THREE.Color(0x9ca8c8),
-    sheenRoughness: 0.35,
-    reflectivity: 0.88,
+    color: 0xe2e7f4, // Luminous pearl ceramic off-white with smooth gradient falloff
+    roughness: 0.22, // Silky smooth ceramic surface
+    metalness: 0.12, // Subtle dielectric highlight
+    clearcoat: 0.98, // Liquid-smooth clearcoat lacquer
+    clearcoatRoughness: 0.06,
+    sheen: 0.36,
+    sheenColor: new THREE.Color(0xb4c2e6),
+    sheenRoughness: 0.30,
+    reflectivity: 0.95,
     name: 'RobotWhiteArmorMaterial',
   });
 
@@ -41,23 +41,23 @@ export function createRobotMaterials(): RobotMaterialPalette {
   armorDoubleSide.name = 'RobotWhiteArmorDoubleSideMaterial';
 
   const visor = new THREE.MeshPhysicalMaterial({
-    color: cfg.colors.visorGlass,
-    roughness: cfg.materials.visorRoughness,
-    metalness: cfg.materials.visorMetalness,
-    clearcoat: cfg.materials.visorClearcoat,
-    clearcoatRoughness: cfg.materials.visorClearcoatRoughness,
-    reflectivity: 0.99,
-    ior: 1.58,
+    color: 0x020108, // Deep obsidian glossy mirror
+    roughness: 0.01,
+    metalness: 0.18,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.01,
+    reflectivity: 1.0,
+    ior: 1.62,
     name: 'RobotObsidianVisorMaterial',
   });
 
   const joint = new THREE.MeshPhysicalMaterial({
-    color: cfg.colors.jointDark,
-    roughness: cfg.materials.jointRoughness,
-    metalness: cfg.materials.jointMetalness,
-    clearcoat: 0.45,
-    clearcoatRoughness: 0.18,
-    reflectivity: 0.92,
+    color: 0x141624, // Rich gunmetal titanium with specular depth
+    roughness: 0.30, // Satin brushed titanium
+    metalness: 0.90, // Real metallic reflectance
+    clearcoat: 0.42,
+    clearcoatRoughness: 0.16,
+    reflectivity: 0.94,
     name: 'RobotDarkTitaniumMaterial',
   });
 

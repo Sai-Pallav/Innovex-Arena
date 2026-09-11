@@ -44,6 +44,17 @@ export class ArmAnimationController {
   private rightBaseShoulderJointPos: THREE.Vector3;
   private leftBaseConnectorPos: THREE.Vector3;
   private rightBaseConnectorPos: THREE.Vector3;
+  private leftBaseGimbalYokePos: THREE.Vector3;
+  private rightBaseGimbalYokePos: THREE.Vector3;
+  private leftBaseCycloidalPos: THREE.Vector3;
+  private rightBaseCycloidalPos: THREE.Vector3;
+  private leftBaseFaceplatePos: THREE.Vector3;
+  private rightBaseFaceplatePos: THREE.Vector3;
+  private leftBaseDamperPistonPos: THREE.Vector3;
+  private rightBaseDamperPistonPos: THREE.Vector3;
+  private leftBaseBicepSubGroupPos: THREE.Vector3;
+  private rightBaseBicepSubGroupPos: THREE.Vector3;
+
   private leftBaseLatDiscPos: THREE.Vector3;
   private rightBaseLatDiscPos: THREE.Vector3;
   private leftBaseMedDiscPos: THREE.Vector3;
@@ -52,8 +63,32 @@ export class ArmAnimationController {
   private rightBasePinPos: THREE.Vector3;
   private leftBaseForearmPivotPos: THREE.Vector3;
   private rightBaseForearmPivotPos: THREE.Vector3;
+
+  private leftBaseRamPos: THREE.Vector3;
+  private rightBaseRamPos: THREE.Vector3;
+  private leftBaseRamPistonPos: THREE.Vector3;
+  private rightBaseRamPistonPos: THREE.Vector3;
+  private leftBaseOlecranonPos: THREE.Vector3;
+  private rightBaseOlecranonPos: THREE.Vector3;
+
+  private leftBaseForearmArmorPos: THREE.Vector3;
+  private rightBaseForearmArmorPos: THREE.Vector3;
+  private leftBaseBrachioPos: THREE.Vector3;
+  private rightBaseBrachioPos: THREE.Vector3;
+
   private leftBaseDorsalPos: THREE.Vector3;
   private rightBaseDorsalPos: THREE.Vector3;
+
+  private leftBaseWristStyloidLPos: THREE.Vector3;
+  private rightBaseWristStyloidLPos: THREE.Vector3;
+  private leftBaseWristStyloidRPos: THREE.Vector3;
+  private rightBaseWristStyloidRPos: THREE.Vector3;
+  private leftBaseWristDorsalPos: THREE.Vector3;
+  private rightBaseWristDorsalPos: THREE.Vector3;
+  private leftBaseWristClevisPos: THREE.Vector3;
+  private rightBaseWristClevisPos: THREE.Vector3;
+  private leftBaseWristSwivelPos: THREE.Vector3;
+  private rightBaseWristSwivelPos: THREE.Vector3;
 
   // Manual overrides for programmatic posing
   private leftOverrides: ArmControlOverrides = {};
@@ -80,6 +115,17 @@ export class ArmAnimationController {
     this.leftBaseConnectorPos = leftArm.shoulder.upperArmConnector.position.clone();
     this.rightBaseConnectorPos = rightArm.shoulder.upperArmConnector.position.clone();
 
+    this.leftBaseGimbalYokePos = (leftArm.shoulder.gimbalYoke || leftArm.shoulder.group).position.clone();
+    this.rightBaseGimbalYokePos = (rightArm.shoulder.gimbalYoke || rightArm.shoulder.group).position.clone();
+    this.leftBaseCycloidalPos = (leftArm.shoulder.cycloidalDrive || leftArm.shoulder.jointGroup).position.clone();
+    this.rightBaseCycloidalPos = (rightArm.shoulder.cycloidalDrive || rightArm.shoulder.jointGroup).position.clone();
+    this.leftBaseFaceplatePos = (leftArm.shoulder.faceplateHub || leftArm.shoulder.jointGroup).position.clone();
+    this.rightBaseFaceplatePos = (rightArm.shoulder.faceplateHub || rightArm.shoulder.jointGroup).position.clone();
+    this.leftBaseDamperPistonPos = (leftArm.shoulder.damperPiston || leftArm.shoulder.jointGroup).position.clone();
+    this.rightBaseDamperPistonPos = (rightArm.shoulder.damperPiston || rightArm.shoulder.jointGroup).position.clone();
+    this.leftBaseBicepSubGroupPos = leftArm.upperArm.bicepSubGroup.position.clone();
+    this.rightBaseBicepSubGroupPos = rightArm.upperArm.bicepSubGroup.position.clone();
+
     this.leftBaseLatDiscPos = leftArm.elbow.lateralDisc.position.clone();
     this.rightBaseLatDiscPos = rightArm.elbow.lateralDisc.position.clone();
     this.leftBaseMedDiscPos = leftArm.elbow.medialDisc.position.clone();
@@ -89,10 +135,33 @@ export class ArmAnimationController {
     this.leftBaseForearmPivotPos = leftArm.elbow.forearmPivot.position.clone();
     this.rightBaseForearmPivotPos = rightArm.elbow.forearmPivot.position.clone();
 
+    this.leftBaseRamPos = leftArm.elbow.hydraulicRam ? leftArm.elbow.hydraulicRam.position.clone() : new THREE.Vector3();
+    this.rightBaseRamPos = rightArm.elbow.hydraulicRam ? rightArm.elbow.hydraulicRam.position.clone() : new THREE.Vector3();
+    this.leftBaseRamPistonPos = leftArm.elbow.ramPiston ? leftArm.elbow.ramPiston.position.clone() : new THREE.Vector3();
+    this.rightBaseRamPistonPos = rightArm.elbow.ramPiston ? rightArm.elbow.ramPiston.position.clone() : new THREE.Vector3();
+    this.leftBaseOlecranonPos = leftArm.elbow.olecranonMesh ? leftArm.elbow.olecranonMesh.position.clone() : new THREE.Vector3();
+    this.rightBaseOlecranonPos = rightArm.elbow.olecranonMesh ? rightArm.elbow.olecranonMesh.position.clone() : new THREE.Vector3();
+
+    this.leftBaseForearmArmorPos = leftArm.forearm.armorGroup ? leftArm.forearm.armorGroup.position.clone() : new THREE.Vector3();
+    this.rightBaseForearmArmorPos = rightArm.forearm.armorGroup ? rightArm.forearm.armorGroup.position.clone() : new THREE.Vector3();
+    this.leftBaseBrachioPos = leftArm.forearm.brachioradialis ? leftArm.forearm.brachioradialis.position.clone() : new THREE.Vector3();
+    this.rightBaseBrachioPos = rightArm.forearm.brachioradialis ? rightArm.forearm.brachioradialis.position.clone() : new THREE.Vector3();
+
     this.leftBaseDorsalPos = leftArm.hand.dorsalArmor.position.clone();
     this.rightBaseDorsalPos = rightArm.hand.dorsalArmor.position.clone();
 
-    // Cache pad & cap Z positions
+    this.leftBaseWristStyloidLPos = leftArm.wrist.styloidArmorLeft ? leftArm.wrist.styloidArmorLeft.position.clone() : new THREE.Vector3();
+    this.rightBaseWristStyloidLPos = rightArm.wrist.styloidArmorLeft ? rightArm.wrist.styloidArmorLeft.position.clone() : new THREE.Vector3();
+    this.leftBaseWristStyloidRPos = leftArm.wrist.styloidArmorRight ? leftArm.wrist.styloidArmorRight.position.clone() : new THREE.Vector3();
+    this.rightBaseWristStyloidRPos = rightArm.wrist.styloidArmorRight ? rightArm.wrist.styloidArmorRight.position.clone() : new THREE.Vector3();
+    this.leftBaseWristDorsalPos = leftArm.wrist.dorsalCowl ? leftArm.wrist.dorsalCowl.position.clone() : new THREE.Vector3();
+    this.rightBaseWristDorsalPos = rightArm.wrist.dorsalCowl ? rightArm.wrist.dorsalCowl.position.clone() : new THREE.Vector3();
+    this.leftBaseWristClevisPos = leftArm.wrist.distalClevis ? leftArm.wrist.distalClevis.position.clone() : new THREE.Vector3();
+    this.rightBaseWristClevisPos = rightArm.wrist.distalClevis ? rightArm.wrist.distalClevis.position.clone() : new THREE.Vector3();
+    this.leftBaseWristSwivelPos = leftArm.wrist.swivelCollar ? leftArm.wrist.swivelCollar.position.clone() : new THREE.Vector3();
+    this.rightBaseWristSwivelPos = rightArm.wrist.swivelCollar ? rightArm.wrist.swivelCollar.position.clone() : new THREE.Vector3();
+
+    // Cache pad & cap Z positions and disc subnode X positions
     [leftArm, rightArm].forEach((arm) => {
       arm.hand.palmarPads.forEach((pad) => {
         pad.userData.baseZ = pad.position.z;
@@ -100,6 +169,23 @@ export class ArmAnimationController {
       arm.hand.knuckleCaps.forEach((cap) => {
         cap.userData.baseZ = cap.position.z;
       });
+
+      if (arm.elbow.lateralDiscNodes) {
+        const l = arm.elbow.lateralDiscNodes;
+        l.bearingRace.userData.baseX = l.bearingRace.position.x;
+        l.accentRing.userData.baseX = l.accentRing.position.x;
+        l.outerBezel.userData.baseX = l.outerBezel.position.x;
+        l.innerDisc.userData.baseX = l.innerDisc.position.x;
+        l.hubCap.userData.baseX = l.hubCap.position.x;
+      }
+      if (arm.elbow.medialDiscNodes) {
+        const m = arm.elbow.medialDiscNodes;
+        m.bearingRace.userData.baseX = m.bearingRace.position.x;
+        m.accentRing.userData.baseX = m.accentRing.position.x;
+        m.outerBezel.userData.baseX = m.outerBezel.position.x;
+        m.innerDisc.userData.baseX = m.innerDisc.position.x;
+        m.hubCap.userData.baseX = m.hubCap.position.x;
+      }
     });
   }
 
@@ -268,55 +354,189 @@ export class ArmAnimationController {
 
     const baseDorsal = isLeft ? this.leftBaseDorsalPos : this.rightBaseDorsalPos;
 
-    // 1. SHOULDER EXPLODED VIEW (Reference: SHOULDER OVERVIEW -> EXPLODED VIEW)
-    // Shoulder Armor (Outer Shell) lifts +Y and separates outward
-    arm.shoulder.armorGroup.position.set(
-      baseShoulderArmor.x + side * exp * 0.045,
-      baseShoulderArmor.y + exp * 0.055,
-      baseShoulderArmor.z
-    );
+    // 1. SHOULDER & BICEP MULTI-STAGE MECHANICAL OPEN VIEW (CAD Hierarchy)
+    // Stage A: Structural Gimbal Yoke lifts upward and separates outward
+    if (arm.shoulder.gimbalYoke) {
+      const baseYoke = isLeft ? this.leftBaseGimbalYokePos : this.rightBaseGimbalYokePos;
+      arm.shoulder.gimbalYoke.position.set(
+        baseYoke.x + side * exp * 0.024,
+        baseYoke.y + exp * 0.038,
+        baseYoke.z + exp * 0.018
+      );
+    }
 
-    // Rotational Core separates laterally along X
+    // Stage B: Hydraulic Damper Actuator extends chrome piston rod
+    if (arm.shoulder.damperPiston) {
+      const basePiston = isLeft ? this.leftBaseDamperPistonPos : this.rightBaseDamperPistonPos;
+      arm.shoulder.damperPiston.position.y = basePiston.y - exp * 0.024;
+    }
+
+    // Stage C: Rotational Joint Core separates along X axis
     arm.shoulder.jointGroup.position.set(
-      baseShoulderJoint.x + side * exp * 0.035,
+      baseShoulderJoint.x + side * exp * 0.025,
       baseShoulderJoint.y,
       baseShoulderJoint.z
     );
 
-    // Upper Arm Connector separates downward in -Y
+    // Stage D: Cycloidal Planetary Drive Ring separates further along X (Concentric Layer 2)
+    if (arm.shoulder.cycloidalDrive) {
+      const baseCyclo = isLeft ? this.leftBaseCycloidalPos : this.rightBaseCycloidalPos;
+      arm.shoulder.cycloidalDrive.position.x = baseCyclo.x + side * exp * 0.040;
+    }
+
+    // Stage E: Purple Reactor Accent Ring separates further along X (Concentric Layer 3)
+    if (arm.shoulder.accentRing) {
+      arm.shoulder.accentRing.position.x = side * (0.034 + exp * 0.060);
+    }
+
+    // Stage F: Precision Billet Faceplate & Fasteners separates farthest along X (Concentric Layer 4)
+    if (arm.shoulder.faceplateHub) {
+      const baseFace = isLeft ? this.leftBaseFaceplatePos : this.rightBaseFaceplatePos;
+      arm.shoulder.faceplateHub.position.x = baseFace.x + side * exp * 0.082;
+    }
+
+    // Stage G: Articulated Clevis & Trunnion drops downward along -Y
     arm.shoulder.upperArmConnector.position.set(
       baseConnector.x,
-      baseConnector.y - exp * 0.030,
+      baseConnector.y - exp * 0.038,
       baseConnector.z
     );
 
-    // 2. ELBOW EXPLODED VIEW (Reference: ELBOW OVERVIEW -> EXPLODED VIEW)
-    // Dual Side Rotational Discs separate laterally along ±X
-    const latSign = side === 1 ? 1 : -1;
-    arm.elbow.lateralDisc.position.set(
-      baseLatDisc.x + latSign * exp * 0.042,
-      baseLatDisc.y,
-      baseLatDisc.z
-    );
-    arm.elbow.medialDisc.position.set(
-      baseMedDisc.x - latSign * exp * 0.042,
-      baseMedDisc.y,
-      baseMedDisc.z
-    );
+    // Stage H: Bicep Armor Shell slides downward and outward along -Y and +Z,
+    // uncovering the internal dark titanium bone armature core!
+    if (arm.upperArm.bicepSubGroup) {
+      const baseBicep = isLeft ? this.leftBaseBicepSubGroupPos : this.rightBaseBicepSubGroupPos;
+      arm.upperArm.bicepSubGroup.position.set(
+        baseBicep.x + side * exp * 0.015,
+        baseBicep.y - exp * 0.046,
+        baseBicep.z + exp * 0.028
+      );
+    }
 
-    // Central Hinge Pin slides along X
+    // 2. ELBOW & FOREARM MULTI-STAGE MECHANICAL OPEN VIEW (CAD Engineering Hierarchy)
+    // Stage A: Central Hinge Axle Pin slides outward along transverse X axis
+    const latSign = side === 1 ? 1 : -1;
     arm.elbow.centralPin.position.set(
-      basePin.x + latSign * exp * 0.018,
+      basePin.x + latSign * exp * 0.032,
       basePin.y,
       basePin.z
     );
 
-    // Forearm Pivot separates downward along Y
+    // Stage B: Dual Rotational Side Discs slide laterally along ±X
+    arm.elbow.lateralDisc.position.set(
+      baseLatDisc.x + latSign * exp * 0.038,
+      baseLatDisc.y,
+      baseLatDisc.z
+    );
+    arm.elbow.medialDisc.position.set(
+      baseMedDisc.x - latSign * exp * 0.038,
+      baseMedDisc.y,
+      baseMedDisc.z
+    );
+
+    // Stage C: Concentric Disassembly of the Lateral & Medial Rotational Discs
+    // Bearing Race -> Purple LED Halo -> Outer Bezel with Hex Screws -> Hub Cap
+    if (arm.elbow.lateralDiscNodes) {
+      const l = arm.elbow.lateralDiscNodes;
+      const bRace = l.bearingRace.userData.baseX ?? l.bearingRace.position.x;
+      const bAccent = l.accentRing.userData.baseX ?? l.accentRing.position.x;
+      const bBezel = l.outerBezel.userData.baseX ?? l.outerBezel.position.x;
+      const bHub = l.hubCap.userData.baseX ?? l.hubCap.position.x;
+
+      l.bearingRace.position.x = bRace + latSign * exp * 0.014;
+      l.accentRing.position.x = bAccent + latSign * exp * 0.026;
+      l.outerBezel.position.x = bBezel + latSign * exp * 0.040;
+      l.hubCap.position.x = bHub + latSign * exp * 0.055;
+    }
+
+    if (arm.elbow.medialDiscNodes) {
+      const m = arm.elbow.medialDiscNodes;
+      const medSign = -latSign;
+      const bRace = m.bearingRace.userData.baseX ?? m.bearingRace.position.x;
+      const bAccent = m.accentRing.userData.baseX ?? m.accentRing.position.x;
+      const bBezel = m.outerBezel.userData.baseX ?? m.outerBezel.position.x;
+      const bHub = m.hubCap.userData.baseX ?? m.hubCap.position.x;
+
+      m.bearingRace.position.x = bRace + medSign * exp * 0.014;
+      m.accentRing.position.x = bAccent + medSign * exp * 0.026;
+      m.outerBezel.position.x = bBezel + medSign * exp * 0.040;
+      m.hubCap.position.x = bHub + medSign * exp * 0.055;
+    }
+
+    // Stage D: Posterior Hydraulic Flexion Ram extends piston rod & pivots back
+    if (arm.elbow.hydraulicRam) {
+      const baseRam = isLeft ? this.leftBaseRamPos : this.rightBaseRamPos;
+      arm.elbow.hydraulicRam.position.set(
+        baseRam.x,
+        baseRam.y + exp * 0.014,
+        baseRam.z - exp * 0.022
+      );
+    }
+    if (arm.elbow.ramPiston) {
+      const basePiston = isLeft ? this.leftBaseRamPistonPos : this.rightBaseRamPistonPos;
+      arm.elbow.ramPiston.position.y = basePiston.y - exp * 0.018;
+    }
+
+    // Stage E: Posterior Olecranon Armor Shield separates backward along -Z & +Y
+    if (arm.elbow.olecranonMesh) {
+      const baseOle = isLeft ? this.leftBaseOlecranonPos : this.rightBaseOlecranonPos;
+      arm.elbow.olecranonMesh.position.set(
+        baseOle.x,
+        baseOle.y + exp * 0.018,
+        baseOle.z - exp * 0.038
+      );
+    }
+
+    // Stage F: Lower Clevis Housing & Forearm Pivot drops downward along -Y
     arm.elbow.forearmPivot.position.set(
       baseForearmPivot.x,
-      baseForearmPivot.y - exp * 0.040,
+      baseForearmPivot.y - exp * 0.048,
       baseForearmPivot.z
     );
+
+    // Stage G: Forearm Outer Armor Shell slides downward and forward along -Y and +Z,
+    // uncovering the internal dark titanium bone armature sleeve!
+    if (arm.forearm.armorGroup) {
+      const baseForearmArmor = isLeft ? this.leftBaseForearmArmorPos : this.rightBaseForearmArmorPos;
+      arm.forearm.armorGroup.position.set(
+        baseForearmArmor.x,
+        baseForearmArmor.y - exp * 0.036,
+        baseForearmArmor.z + exp * 0.022
+      );
+    }
+
+    // Stage H: Contoured Brachioradialis Accent Plate slides laterally outward
+    if (arm.forearm.brachioradialis) {
+      const baseBrachio = isLeft ? this.leftBaseBrachioPos : this.rightBaseBrachioPos;
+      arm.forearm.brachioradialis.position.x = baseBrachio.x + side * exp * 0.026;
+    }
+
+    // 2.5 WRIST EXPLODED VIEW (Open view exposing internal harmonic drive, trunnion hinge pin & bearing)
+    if (arm.wrist.styloidArmorLeft && arm.wrist.styloidArmorRight) {
+      const baseStyL = isLeft ? this.leftBaseWristStyloidLPos : this.rightBaseWristStyloidLPos;
+      const baseStyR = isLeft ? this.leftBaseWristStyloidRPos : this.rightBaseWristStyloidRPos;
+      // White ceramic lateral styloid armor cowls separate laterally outward
+      arm.wrist.styloidArmorLeft.position.x = baseStyL.x - exp * 0.024;
+      arm.wrist.styloidArmorRight.position.x = baseStyR.x + exp * 0.024;
+    }
+
+    if (arm.wrist.dorsalCowl) {
+      const baseDorsalW = isLeft ? this.leftBaseWristDorsalPos : this.rightBaseWristDorsalPos;
+      // White ceramic dorsal bridge cowl moves forward in +Z
+      arm.wrist.dorsalCowl.position.z = baseDorsalW.z + exp * 0.022;
+    }
+
+    if (arm.wrist.distalClevis) {
+      const baseClevis = isLeft ? this.leftBaseWristClevisPos : this.rightBaseWristClevisPos;
+      // Machined dark titanium dual-fork clevis yoke slides downward in -Y towards hand
+      arm.wrist.distalClevis.position.y = baseClevis.y - exp * 0.016;
+    }
+
+    if (arm.wrist.swivelCollar) {
+      const baseSwivel = isLeft ? this.leftBaseWristSwivelPos : this.rightBaseWristSwivelPos;
+      // Swivel collar sleeve moves slightly upward in +Y towards forearm
+      arm.wrist.swivelCollar.position.y = baseSwivel.y + exp * 0.008;
+    }
 
     // 3. HAND EXPLODED VIEW
     // Dorsal Armor Shield separates forward along +Z
@@ -457,29 +677,21 @@ export class ArmAnimationController {
     timePhase: number,
     breathOffset: number
   ): void {
-    if (override) {
-      if (override.proxCurl !== undefined) finger.proximal.group.rotation.x = -override.proxCurl;
-      if (override.midCurl !== undefined) finger.middle.group.rotation.x = -override.midCurl;
-      if (override.distCurl !== undefined) finger.distal.group.rotation.x = -override.distCurl;
-      if (override.splay !== undefined) finger.proximal.group.rotation.z = -side * override.splay;
-      return;
-    }
-
     const isLeft = side === -1;
     // Progressive anatomical flexion angles (cascade of flexion curving naturally into palm):
-    // - Index finger is most extended/relaxed
-    // - Little finger is most flexed/curled
+    // - Index finger is most extended/relaxed (~68° total curl)
+    // - Little finger is most flexed/curled (~103° total curl)
     const restingLeft = [
-      { prox: 0.20, mid: 0.35, dist: 0.24, splay: 0.025 },  // Index (~11°, 20°, 14° -> 45° total)
-      { prox: 0.24, mid: 0.40, dist: 0.28, splay: 0.000 },  // Middle (~14°, 23°, 16° -> 53° total)
-      { prox: 0.28, mid: 0.46, dist: 0.32, splay: -0.018 }, // Ring (~16°, 26°, 18° -> 60° total)
-      { prox: 0.32, mid: 0.52, dist: 0.36, splay: -0.038 }, // Little (~18°, 30°, 21° -> 69° total)
+      { prox: 0.36, mid: 0.50, dist: 0.32, splay: 0.035 },  // Index (~21°, 29°, 18°)
+      { prox: 0.44, mid: 0.58, dist: 0.36, splay: 0.008 },  // Middle (~25°, 33°, 21°)
+      { prox: 0.52, mid: 0.66, dist: 0.40, splay: -0.022 }, // Ring (~30°, 38°, 23°)
+      { prox: 0.62, mid: 0.74, dist: 0.45, splay: -0.052 }, // Little (~35°, 42°, 26°)
     ];
     const restingRight = [
-      { prox: 0.18, mid: 0.32, dist: 0.22, splay: 0.025 },  // Index
-      { prox: 0.22, mid: 0.38, dist: 0.26, splay: 0.000 },  // Middle
-      { prox: 0.26, mid: 0.44, dist: 0.30, splay: -0.018 }, // Ring
-      { prox: 0.30, mid: 0.50, dist: 0.34, splay: -0.038 }, // Little
+      { prox: 0.34, mid: 0.48, dist: 0.30, splay: 0.035 },  // Index
+      { prox: 0.42, mid: 0.56, dist: 0.34, splay: 0.008 },  // Middle
+      { prox: 0.50, mid: 0.64, dist: 0.38, splay: -0.022 }, // Ring
+      { prox: 0.60, mid: 0.72, dist: 0.44, splay: -0.052 }, // Little
     ];
 
     const target = isLeft ? restingLeft[idx] : restingRight[idx];
@@ -495,13 +707,19 @@ export class ArmAnimationController {
       Math.sin(this.time * speed * 2.0 + phase * 0.7) * (amp * 0.25) +
       breathOffset * 0.008;
 
+    // Overrides are additive deltas on top of resting posture (or user grip command)
+    const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.3;
+    const addMid = override?.midCurl !== undefined ? override.midCurl : wave * 0.5;
+    const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.4;
+    const addSplay = override?.splay !== undefined ? override.splay : Math.sin(this.time * 0.25 + phase) * 0.004;
+
     // Segmented bending: positive rotation around X axis flexes fingers naturally toward palm (-Z)
-    finger.proximal.group.rotation.x = target.prox + wave * 0.3;
-    finger.middle.group.rotation.x = target.mid + wave * 0.5;
-    finger.distal.group.rotation.x = target.dist + wave * 0.4;
+    finger.proximal.group.rotation.x = target.prox + addProx;
+    finger.middle.group.rotation.x = target.mid + addMid;
+    finger.distal.group.rotation.x = target.dist + addDist;
 
     // Subtle natural lateral splay along Z axis
-    finger.proximal.group.rotation.z = -side * (target.splay + Math.sin(this.time * 0.25 + phase) * 0.004);
+    finger.proximal.group.rotation.z = -side * (target.splay + addSplay);
   }
 
   private updateThumbKinematics(
@@ -511,27 +729,21 @@ export class ArmAnimationController {
     timePhase: number,
     breathOffset: number
   ): void {
-    if (override) {
-      if (override.proxCurl !== undefined) thumb.proximal.group.rotation.x = override.proxCurl;
-      if (override.distCurl !== undefined) {
-        thumb.distal.group.rotation.x = override.distCurl;
-        if (thumb.middle) thumb.middle.group.rotation.x = override.distCurl;
-      }
-      if (override.splay !== undefined) thumb.group.rotation.z = -side * override.splay;
-      return;
-    }
-
     const wave =
       Math.cos(this.time * 0.40 + timePhase) * 0.012 +
       Math.sin(this.time * 0.80 + timePhase) * 0.008 +
       breathOffset * 0.006;
 
-    // Natural relaxed thumb posture angled toward palm
-    thumb.group.rotation.set(0.24 + wave * 0.04, -side * 0.32, -side * 0.14);
-    thumb.proximal.group.rotation.x = 0.20 + wave * 0.05;
-    thumb.proximal.group.rotation.z = -side * 0.10;
-    thumb.distal.group.rotation.x = 0.24 + wave * 0.05;
-    if (thumb.middle) thumb.middle.group.rotation.x = 0.24 + wave * 0.05;
+    const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.05;
+    const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.05;
+    const addSplay = override?.splay !== undefined ? override.splay : 0;
+
+    // Natural relaxed thumb posture angled forward (+Z) and medially (-X) toward palm
+    thumb.group.rotation.set(0.38 + wave * 0.04, -side * 0.48, -side * (0.20 + addSplay));
+    thumb.proximal.group.rotation.x = 0.32 + addProx;
+    thumb.proximal.group.rotation.z = -side * 0.12;
+    thumb.distal.group.rotation.x = 0.36 + addDist;
+    if (thumb.middle) thumb.middle.group.rotation.x = 0.36 + addDist;
   }
 }
 

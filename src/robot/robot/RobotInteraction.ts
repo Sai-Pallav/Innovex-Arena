@@ -1,4 +1,7 @@
 export interface InteractionState {
+  clientX: number;
+  clientY: number;
+  hasPointer: boolean;
   targetX: number;             // Normalized [-1, 1]
   targetY: number;             // Normalized [-1, 1]
   speed: number;               // Current cursor velocity (units/sec)
@@ -8,6 +11,9 @@ export interface InteractionState {
 
 export class RobotInteraction {
   private state: InteractionState = {
+    clientX: 0,
+    clientY: 0,
+    hasPointer: false,
     targetX: 0,
     targetY: 0,
     speed: 0,
@@ -19,8 +25,11 @@ export class RobotInteraction {
   private lastTime: number = performance.now();
   private lastX: number = 0;
   private lastY: number = 0;
+  private lastClientX: number = 0;
+  private lastClientY: number = 0;
   private boundPointerMove: (e: PointerEvent) => void;
   private boundPointerLeave: () => void;
+  private boundWindowBlur: () => void;
   private mediaQueryList?: MediaQueryList;
 
   // Relative anchor position of the robot face within the container [0, 1]
@@ -42,10 +51,13 @@ export class RobotInteraction {
 
     this.boundPointerMove = this.onPointerMove.bind(this);
     this.boundPointerLeave = this.onPointerLeave.bind(this);
+    this.boundWindowBlur = this.onPointerLeave.bind(this);
 
     // Track cursor across the ENTIRE window so head follows anywhere on page
     window.addEventListener('pointermove', this.boundPointerMove, { passive: true });
+    window.addEventListener('pointerdown', this.boundPointerMove, { passive: true });
     document.addEventListener('mouseleave', this.boundPointerLeave);
+    window.addEventListener('blur', this.boundWindowBlur);
   }
 
   private onPointerMove(e: PointerEvent): void {
@@ -57,6 +69,11 @@ export class RobotInteraction {
     const now = performance.now();
     const dt = Math.max((now - this.lastTime) / 1000, 0.001);
 
+    this.state.clientX = e.clientX;
+    this.state.clientY = e.clientY;
+    this.state.hasPointer = true;
+    this.state.isHovered = true;
+
     // Calculate normalized coordinates relative to the robot FACE origin.
     // When cursor is directly on the face, normX = 0 and normY = 0 (looks straight ahead).
     // Moving up looks up, moving down looks down, moving left/right turns left/right.
@@ -64,23 +81,30 @@ export class RobotInteraction {
     const robotCenterX = rect.left + rect.width * this.faceRelX;
     const robotCenterY = rect.top + rect.height * this.faceRelY;
 
-    // Use viewport half-width/height for normalization so full-page movement
-    // maps to the full [-1, 1] range rather than just the robot container.
-    const halfW = window.innerWidth * 0.5;
-    const halfH = window.innerHeight * 0.5;
+    // Direct proportional distance from the face origin to viewport edges:
+    // Guarantees cursor on face is strictly (0, 0), and moving to each screen edge reaches ±1.0
+    const distUp = Math.max(robotCenterY, 80);
+    const distDown = Math.max(window.innerHeight - robotCenterY, 80);
+    const distLeft = Math.max(robotCenterX, 80);
+    const distRight = Math.max(window.innerWidth - robotCenterX, 80);
 
-    const normX = (e.clientX - robotCenterX) / halfW;
+    const deltaX = e.clientX - robotCenterX;
+    const deltaY = e.clientY - robotCenterY;
+
+    const normX = deltaX < 0 ? deltaX / distLeft : deltaX / distRight;
     // Invert Y so moving cursor up from face gives positive Y (head looks up)
-    const normY = -(e.clientY - robotCenterY) / halfH;
+    const normY = deltaY < 0 ? -deltaY / distUp : -deltaY / distDown;
 
     // Clamp to [-1, 1]
     const clampedX = Math.max(-1, Math.min(1, normX));
     const clampedY = Math.max(-1, Math.min(1, normY));
 
-    // Calculate velocity
-    const dx = clampedX - this.lastX;
-    const dy = clampedY - this.lastY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    // Calculate velocity based on screen fraction distance
+    const screenW = Math.max(window.innerWidth, 1);
+    const screenH = Math.max(window.innerHeight, 1);
+    const pDx = (e.clientX - (this.lastClientX || e.clientX)) / screenW;
+    const pDy = (e.clientY - (this.lastClientY || e.clientY)) / screenH;
+    const dist = Math.sqrt(pDx * pDx + pDy * pDy);
     const instantSpeed = dist / dt;
 
     // Smooth speed metric
@@ -88,17 +112,18 @@ export class RobotInteraction {
 
     this.state.targetX = clampedX;
     this.state.targetY = clampedY;
-    // Always active — head follows cursor everywhere on page
-    this.state.isHovered = true;
 
     this.lastTime = now;
     this.lastX = clampedX;
     this.lastY = clampedY;
+    this.lastClientX = e.clientX;
+    this.lastClientY = e.clientY;
   }
 
   private onPointerLeave(): void {
     // Mouse left the browser window entirely — return to idle (looking straight forward)
     this.state.isHovered = false;
+    this.state.hasPointer = false;
     this.state.targetX = 0;
     this.state.targetY = 0;
     this.state.speed = 0;
@@ -120,6 +145,8 @@ export class RobotInteraction {
 
   public dispose(): void {
     window.removeEventListener('pointermove', this.boundPointerMove);
+    window.removeEventListener('pointerdown', this.boundPointerMove);
     document.removeEventListener('mouseleave', this.boundPointerLeave);
+    window.removeEventListener('blur', this.boundWindowBlur);
   }
 }

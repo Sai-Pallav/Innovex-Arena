@@ -101,20 +101,27 @@ for (let i = 0; i < 30; i++) {
 }
 
 // Check that components have separated along their respective axes
-const lShoulderArmorPos = leftArm.shoulder.armorGroup.position;
+const lShoulderJointPos = leftArm.shoulder.jointGroup.position;
+const lGimbalPos = leftArm.shoulder.gimbalYoke ? leftArm.shoulder.gimbalYoke.position : lShoulderJointPos;
 const lLatDiscPos = leftArm.elbow.lateralDisc.position;
+const lForearmPivotPos = leftArm.elbow.forearmPivot.position;
 const lDorsalArmorPos = leftArm.hand.dorsalArmor.position;
 
 console.log('Exploded Positions:');
-console.log(`  Left Shoulder Armor Y: ${lShoulderArmorPos.y.toFixed(4)} (Separated upward)`);
+console.log(`  Left Shoulder Gimbal Y: ${lGimbalPos.y.toFixed(4)} (Separated upward)`);
+console.log(`  Left Shoulder Joint X: ${lShoulderJointPos.x.toFixed(4)} (Separated laterally)`);
 console.log(`  Left Elbow Lateral Disc X: ${lLatDiscPos.x.toFixed(4)} (Separated laterally)`);
+console.log(`  Left Forearm Pivot Y: ${lForearmPivotPos.y.toFixed(4)} (Separated downward)`);
 console.log(`  Left Hand Dorsal Armor Z: ${lDorsalArmorPos.z.toFixed(4)} (Separated forward)`);
 
-if (lShoulderArmorPos.y <= 0.02) {
-  throw new Error('Shoulder armor did not separate in exploded view');
+if (Math.abs(lShoulderJointPos.x) <= 0.01 && lGimbalPos.y <= 0.01) {
+  throw new Error('Shoulder mechanism did not separate in exploded view');
 }
 if (Math.abs(lLatDiscPos.x) <= 0.05) {
   throw new Error('Elbow lateral disc did not separate in exploded view');
+}
+if (lForearmPivotPos.y >= -0.01) {
+  throw new Error('Forearm pivot did not drop in exploded view');
 }
 if (lDorsalArmorPos.z <= 0.02) {
   throw new Error('Hand dorsal armor did not separate in exploded view');

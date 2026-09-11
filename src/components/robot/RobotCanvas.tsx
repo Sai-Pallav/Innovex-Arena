@@ -37,8 +37,10 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
     });
 
     sceneRef.current = scene;
+    (window as any).__robotScene = scene;
 
     return () => {
+      (window as any).__robotScene = null;
       scene.dispose();
       sceneRef.current = null;
     };

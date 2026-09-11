@@ -30,6 +30,15 @@ export class TorsoAnimationController {
   private baseWaistRot: THREE.Euler;
   private baseRingYs: number[] = [];
 
+  // Base waist positions for exploded view
+  private baseUpperWaistRingY: number;
+  private baseLowerWaistRingY: number;
+  private baseInguinalFlapLeftPos: THREE.Vector3;
+  private baseInguinalFlapRightPos: THREE.Vector3;
+  private baseSubPelvisCradleY: number;
+  private baseLeftIliacCrestX: number;
+  private baseRightIliacCrestX: number;
+
   // Exploded view state
   private explodedProgress: number = 0;
   private isExploded: boolean = false;
@@ -50,6 +59,19 @@ export class TorsoAnimationController {
     torso.stomach.rings.forEach((ring) => {
       this.baseRingYs.push(ring.group.position.y);
     });
+
+    // Cache waist base resting positions for exploded open view
+    this.baseUpperWaistRingY = torso.waist.upperWaistRing.position.y;
+    this.baseLowerWaistRingY = torso.waist.lowerWaistRing.position.y;
+    this.baseInguinalFlapLeftPos = torso.waist.inguinalFlapLeft
+      ? torso.waist.inguinalFlapLeft.position.clone()
+      : new THREE.Vector3(-0.046, -0.274, 0.038);
+    this.baseInguinalFlapRightPos = torso.waist.inguinalFlapRight
+      ? torso.waist.inguinalFlapRight.position.clone()
+      : new THREE.Vector3(0.046, -0.274, 0.038);
+    this.baseSubPelvisCradleY = torso.waist.subPelvisCradle ? torso.waist.subPelvisCradle.position.y : -0.262;
+    this.baseLeftIliacCrestX = torso.waist.leftHip.iliacCrestArmor ? torso.waist.leftHip.iliacCrestArmor.position.x : -0.008;
+    this.baseRightIliacCrestX = torso.waist.rightHip.iliacCrestArmor ? torso.waist.rightHip.iliacCrestArmor.position.x : 0.008;
 
     // Cache original materials for wireframe toggling
     torso.group.traverse((obj) => {
@@ -157,15 +179,43 @@ export class TorsoAnimationController {
     });
     // - Waist and hips drop slightly in -Y
     this.torso.waist.waistPivot.position.y = -exp * 0.06;
-    // - Pelvic shield and accent light move forward in +Z
-    this.torso.waist.pelvicPlate.position.z = 0.046 + exp * 0.05;
-    if (this.torso.waist.pelvicAccentLight) {
-      this.torso.waist.pelvicAccentLight.position.z = 0.058 + exp * 0.05;
+
+    // - Upper and Lower Waist Collars separate vertically, exposing the central turntable bearing core & stator teeth!
+    this.torso.waist.upperWaistRing.position.y = this.baseUpperWaistRingY + exp * 0.032;
+    this.torso.waist.lowerWaistRing.position.y = this.baseLowerWaistRingY - exp * 0.032;
+
+    // - Pelvic shield (carrying nested intake vent & violet optical sensor) moves forward in +Z
+    this.torso.waist.pelvicPlate.position.z = 0.046 + exp * 0.09;
+
+    // - Left & Right Inguinal Flaps slide diagonally outward and forward in ±X, +Z
+    if (this.torso.waist.inguinalFlapLeft && this.torso.waist.inguinalFlapRight) {
+      this.torso.waist.inguinalFlapLeft.position.set(
+        this.baseInguinalFlapLeftPos.x - exp * 0.038,
+        this.baseInguinalFlapLeftPos.y,
+        this.baseInguinalFlapLeftPos.z + exp * 0.045
+      );
+      this.torso.waist.inguinalFlapRight.position.set(
+        this.baseInguinalFlapRightPos.x + exp * 0.038,
+        this.baseInguinalFlapRightPos.y,
+        this.baseInguinalFlapRightPos.z + exp * 0.045
+      );
     }
+
+    // - Iliac Crest pauldron cowls slide laterally outward from hip hubs
+    if (this.torso.waist.leftHip.iliacCrestArmor && this.torso.waist.rightHip.iliacCrestArmor) {
+      this.torso.waist.leftHip.iliacCrestArmor.position.x = this.baseLeftIliacCrestX - exp * 0.024;
+      this.torso.waist.rightHip.iliacCrestArmor.position.x = this.baseRightIliacCrestX + exp * 0.024;
+    }
+
     // - Left & Right Hip assemblies separate laterally along ±X
     const hipCfg = TORSO_CONFIG.waist.hipConnector;
-    this.torso.waist.leftHip.group.position.x = -hipCfg.mountX - exp * 0.04;
-    this.torso.waist.rightHip.group.position.x = hipCfg.mountX + exp * 0.04;
+    this.torso.waist.leftHip.group.position.x = -hipCfg.mountX - exp * 0.055;
+    this.torso.waist.rightHip.group.position.x = hipCfg.mountX + exp * 0.055;
+
+    // - Sub-Pelvic Mechanical Cradle drops downward in -Y to reveal lower spine connection
+    if (this.torso.waist.subPelvisCradle) {
+      this.torso.waist.subPelvisCradle.position.y = this.baseSubPelvisCradleY - exp * 0.042;
+    }
 
     // If fully exploded for inspection, pause kinematic rotations
     if (this.explodedProgress > 0.85) return;

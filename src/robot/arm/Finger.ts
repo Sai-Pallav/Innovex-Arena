@@ -42,91 +42,132 @@ export interface FingerSpec {
 }
 
 /**
- * Creates an aerodynamic beveled white ceramic dorsal armor plate for a finger segment.
- * Features rounded trapezoidal camber and high-precision beveling matching reference "FINGER DETAIL".
+ * Creates a precision-sculpted, volumetric 3D white ceramic exoskeleton phalanx shell.
+ * 
+ * Design Features:
+ * - Full 3D volumetric enclosure with 7-vertex cross-sectional contour wrapping
+ *   from palmar margin over lateral flanks, angled shoulder chamfers, to the dorsal spine crest.
+ * - Encloses the dark titanium core so that the sides are solid sculpted white ceramic
+ *   (eliminating the flat popsicle-stick profile and exposed dark side-stripes).
+ * - Distal segment wraps over the entire apex of the fingertip, creating a sleek,
+ *   aerodynamic cybernetic fingertip cowl (eliminating blunt black rubber thimbles).
+ * - Cylindrical clearance arch at proximal end for smooth articulation around hinge axis.
  */
-/**
- * Creates an aerodynamic beveled white ceramic dorsal armor plate for a finger segment.
- * Features:
- * - Compound 3D camber curvature with central spine ridge to catch specular roll-off
- * - Concave joint relief notches at proximal and distal margins clearing the hinge pins
- * - Curving distal "fingernail hood" for terminal phalanx segments
- * - Precision automotive beveling
- */
-function createFingerArmorPlate(
+function createSculptedPhalanxShell(
   width: number,
   length: number,
   depth: number,
   material: THREE.Material,
   isDistalTip: boolean = false
 ): THREE.Mesh {
-  const shape = new THREE.Shape();
+  const geo = new THREE.BufferGeometry();
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  const segmentsY = isDistalTip ? 14 : 10;
   const halfW = width * 0.5;
-  const r = Math.min(width * 0.26, 0.0035);
+  const curD = depth * 0.5;
 
-  const topW = halfW * 0.96;
-  const botW = isDistalTip ? halfW * 0.72 : halfW * 0.86;
+  // 7 cross-sectional contour vertices wrapping from left palmar margin to right palmar margin
+  const numX = 7;
 
-  // Top edge with subtle concave arch notch clearing the proximal joint axle
-  shape.moveTo(-topW + r, 0);
-  shape.quadraticCurveTo(0, -0.0012, topW - r, 0);
-  shape.quadraticCurveTo(topW, 0, topW, -r);
+  for (let iy = 0; iy <= segmentsY; iy++) {
+    const v = iy / segmentsY; // 0 = proximal base, 1 = distal end
+    let y = -v * length;
 
-  // Lateral flank tapering smoothly toward distal joint
-  shape.lineTo(botW, -(length - r));
+    // Width taper factor along length
+    let wFactor = 1.0;
+    if (v < 0.12) {
+      wFactor = 0.94 + 0.06 * (v / 0.12);
+    } else if (v > 0.65) {
+      wFactor = 1.0 - (isDistalTip ? 0.38 : 0.12) * ((v - 0.65) / 0.35);
+    }
+    const curW = halfW * wFactor;
 
-  // Bottom edge: for distal tip, a rounded shield tip; for intermediate, a concave clearance arch
-  if (isDistalTip) {
-    shape.quadraticCurveTo(botW, -length, 0, -length - 0.0022);
-    shape.quadraticCurveTo(-botW, -length, -botW, -(length - r));
-  } else {
-    shape.quadraticCurveTo(botW, -length, botW - r, -length);
-    shape.quadraticCurveTo(0, -length + 0.0012, -botW + r, -length);
-    shape.quadraticCurveTo(-botW, -length, -botW, -(length - r));
-  }
+    // Height / Depth taper factor
+    let dFactor = 1.0 - 0.16 * v;
 
-  // Medial flank return
-  shape.lineTo(-topW, -r);
-  shape.quadraticCurveTo(-topW, 0, -topW + r, 0);
-  shape.closePath();
+    // Distal tip wrap: curves apex around and down to close smoothly
+    let tipZOffset = 0;
+    if (isDistalTip && v > 0.55) {
+      const tipT = (v - 0.55) / 0.45;
+      y -= tipT * 0.0024;
+      tipZOffset = -Math.sin(tipT * Math.PI * 0.5) * (curD * 0.85);
+      dFactor *= (1.0 - tipT * 0.32);
+      wFactor *= (1.0 - tipT * 0.25);
+    }
 
-  const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-    steps: 1,
-    depth: depth,
-    bevelEnabled: true,
-    bevelThickness: 0.0018,
-    bevelSize: 0.0015,
-    bevelSegments: 3,
-    curveSegments: 20,
-  };
+    const effD = curD * dFactor;
 
-  const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  geo.center();
+    // 7 vertices:
+    // 0: Left palmar seam
+    // 1: Left lateral flank
+    // 2: Left dorsal shoulder chamfer
+    // 3: Centerline dorsal spine crest (sharp highlight ridge)
+    // 4: Right dorsal shoulder chamfer
+    // 5: Right lateral flank
+    // 6: Right palmar seam
+    const rowPoints = [
+      { x: -curW * 0.92, z: -effD * 0.40 },
+      { x: -curW,        z:  effD * 0.12 },
+      { x: -curW * 0.62, z:  effD * 0.84 },
+      { x: 0,            z:  effD + tipZOffset },
+      { x:  curW * 0.62, z:  effD * 0.84 },
+      { x:  curW,        z:  effD * 0.12 },
+      { x:  curW * 0.92, z: -effD * 0.40 },
+    ];
 
-  // Compound 3D Curvature & Central Keel:
-  // Give the dorsal surface a parabolic cross-sectional arch and a defined centerline spine
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const y = pos.getY(i);
-    const z = pos.getZ(i);
+    for (let ix = 0; ix < numX; ix++) {
+      let vx = rowPoints[ix].x;
+      let vy = y;
+      let vz = rowPoints[ix].z;
 
-    if (z > 0) {
-      const nx = Math.min(1.0, Math.abs(x) / (halfW * 0.95));
-      // Parabolic camber curvature across X
-      const camber = (1.0 - Math.pow(nx, 1.8)) * (depth * 0.38);
-      // Subtle taper along length
-      const ny = Math.abs(y) / (length * 0.5 + 0.001);
-      let newZ = z + camber * (1.0 - ny * 0.15);
-
-      // If distal tip, wrap the terminal apex forward over the fingertip
-      if (isDistalTip && y < -length * 0.30) {
-        const wrapProgress = Math.min(1.0, (-y - length * 0.30) / (length * 0.25));
-        newZ += Math.sin(wrapProgress * Math.PI * 0.5) * 0.0018;
+      // Proximal clearance arch on the first row
+      if (iy === 0) {
+        const arch = 0.0012 * Math.cos((vx / (curW || 1)) * (Math.PI / 2));
+        vy += arch;
       }
-      pos.setZ(i, newZ);
+
+      positions.push(vx, vy, vz);
+      uvs.push(ix / (numX - 1), v);
     }
   }
+
+  // Generate grid quads
+  for (let iy = 0; iy < segmentsY; iy++) {
+    for (let ix = 0; ix < numX - 1; ix++) {
+      const a = iy * numX + ix;
+      const b = (iy + 1) * numX + ix;
+      const c = (iy + 1) * numX + (ix + 1);
+      const d = iy * numX + (ix + 1);
+
+      indices.push(a, b, d);
+      indices.push(b, c, d);
+    }
+  }
+
+  // End cap closures
+  // Proximal end cap (facing +Y)
+  indices.push(3, 2, 1);
+  indices.push(3, 1, 0);
+  indices.push(3, 4, 5);
+  indices.push(3, 5, 6);
+  indices.push(0, 6, 3);
+
+  // Distal end cap (facing -Y)
+  const baseLast = segmentsY * numX;
+  const d0 = baseLast + 0, d1 = baseLast + 1, d2 = baseLast + 2;
+  const d3 = baseLast + 3, d4 = baseLast + 4, d5 = baseLast + 5, d6 = baseLast + 6;
+  indices.push(d3, d1, d2);
+  indices.push(d3, d0, d1);
+  indices.push(d3, d5, d4);
+  indices.push(d3, d6, d5);
+  indices.push(d0, d3, d6);
+
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
   geo.computeVertexNormals();
 
   const mesh = new THREE.Mesh(geo, material);
@@ -136,8 +177,7 @@ function createFingerArmorPlate(
 }
 
 /**
- * Creates a palmar dark tactile friction grip pad for a finger segment.
- * Matches reference showing dark segmented pads on the palmar surface.
+ * Creates an ergonomic dark tactile friction grip pad for the inner palmar face.
  */
 function createPalmarGripPad(
   width: number,
@@ -146,9 +186,9 @@ function createPalmarGripPad(
   jointMat: THREE.Material
 ): THREE.Mesh {
   const padShape = new THREE.Shape();
-  const hw = width * 0.44;
-  const hl = length * 0.42;
-  const r = 0.0018;
+  const hw = width * 0.46;
+  const hl = length * 0.44;
+  const r = 0.0010;
 
   padShape.moveTo(-hw + r, -hl);
   padShape.lineTo(hw - r, -hl);
@@ -163,58 +203,78 @@ function createPalmarGripPad(
   const padGeo = new THREE.ExtrudeGeometry(padShape, {
     depth: thickness,
     bevelEnabled: true,
-    bevelThickness: 0.0010,
-    bevelSize: 0.0008,
+    bevelThickness: 0.0005,
+    bevelSize: 0.0004,
     bevelSegments: 2,
   });
   padGeo.center();
 
   const mesh = new THREE.Mesh(padGeo, jointMat);
   mesh.castShadow = true;
+  mesh.receiveShadow = true;
   return mesh;
 }
 
 /**
- * Creates a detailed mechanical hinge pin assembly with end-caps.
- * Axle is aligned with the X axis for natural transverse bending.
+ * Creates a flush, internal mechanical hinge pin assembly with concentric pivot caps
+ * and an articulated dorsal ceramic knuckle cowl.
  */
 function createHingeAssembly(
   radius: number,
   width: number,
-  jointMat: THREE.Material
-): { pin: THREE.Mesh; caps: THREE.Mesh[] } {
-  // Main cylindrical hinge axle aligned with transverse X axis
-  const pinGeo = new THREE.CylinderGeometry(radius, radius, width, 16);
+  jointMat: THREE.Material,
+  armorMat?: THREE.Material
+): { pin: THREE.Mesh; caps: THREE.Mesh[]; cowl?: THREE.Mesh } {
+  const pinGeo = new THREE.CylinderGeometry(radius, radius, width, 14);
   const pin = new THREE.Mesh(pinGeo, jointMat);
   pin.rotation.z = Math.PI / 2;
 
   const caps: THREE.Mesh[] = [];
-  // Two lateral circular end-cap washers with stepped beveled rim along axle
   for (const s of [-1, 1]) {
-    const capGeo = new THREE.CylinderGeometry(radius * 1.30, radius * 1.30, 0.0022, 16);
+    // Flush concentric bearing flange
+    const capGeo = new THREE.CylinderGeometry(radius * 1.15, radius * 1.15, 0.0006, 14);
     const cap = new THREE.Mesh(capGeo, jointMat);
-    cap.position.set(0, s * (width * 0.5 + 0.0011), 0);
+    cap.position.set(0, s * (width * 0.5 + 0.0003), 0);
     pin.add(cap);
     caps.push(cap);
 
-    // Micro axle center recess
-    const holeGeo = new THREE.CylinderGeometry(radius * 0.45, radius * 0.45, 0.0028, 12);
-    const hole = new THREE.Mesh(holeGeo, jointMat);
-    hole.position.set(0, s * (width * 0.5 + 0.0024), 0);
-    pin.add(hole);
+    // Micro Allen bolt center recess
+    const boltGeo = new THREE.CylinderGeometry(radius * 0.42, radius * 0.42, 0.0008, 6);
+    const bolt = new THREE.Mesh(boltGeo, jointMat);
+    bolt.position.set(0, s * (width * 0.5 + 0.0007), 0);
+    pin.add(bolt);
   }
 
-  return { pin, caps };
+  let cowl: THREE.Mesh | undefined;
+  if (armorMat) {
+    // Sculpted ceramic dorsal knuckle cowl bridging the hinge
+    const cowlGeo = new THREE.CylinderGeometry(
+      radius * 1.18,
+      radius * 1.18,
+      width * 0.88,
+      14,
+      1,
+      false,
+      -Math.PI * 0.45,
+      Math.PI * 0.90
+    );
+    cowl = new THREE.Mesh(cowlGeo, armorMat);
+    cowl.rotation.z = Math.PI / 2;
+    cowl.position.set(0, 0, radius * 0.15);
+    cowl.castShadow = true;
+    pin.add(cowl);
+  }
+
+  return { pin, caps, cowl };
 }
 
 /**
  * Creates a single 3-segment articulated robotic finger:
- * - Internal structural dark titanium core bone
- * - Sculpted white ceramic cambered armor plate on dorsal side (+Z)
- * - Segmented palmar dark tactile grip pad on inner palmar side (-Z)
- * - Mechanical hinge pins with circular end-caps between segments along transverse X
- * - Progressive taper toward tip with dark tactile sensor dome and ceramic protective cowl
- * - Hierarchical THREE.Group nesting for clean independent joint bending
+ * - Internal structural dark titanium core bone (fully enclosed, no exposed side stripes)
+ * - Sculpted white ceramic 3D volumetric exoskeleton phalanx shell (compound camber & chamfers)
+ * - Segmented palmar dark tactile grip pad (-Z)
+ * - Precision cylindrical mechanical hinges with concentric pivot caps & ceramic knuckle cowls
+ * - Sculpted distal ceramic fingertip cowl wrapping over tactile sensor aperture
  */
 export function createFinger(
   spec: FingerSpec,
@@ -233,49 +293,53 @@ export function createFinger(
 
   // Knuckle socket collar linking proximal phalanx to palm's MCP hinge
   const socketGeo = new THREE.CylinderGeometry(
-    spec.proximalRadius * 1.08,
     spec.proximalRadius * 0.95,
-    0.008,
-    16
+    spec.proximalRadius * 0.85,
+    0.005,
+    14
   );
   const socketMesh = new THREE.Mesh(socketGeo, materials.joint);
-  socketMesh.position.set(0, 0.002, 0);
+  socketMesh.position.set(0, 0.001, 0);
   socketMesh.castShadow = true;
   proximalGroup.add(socketMesh);
 
-  // Dark titanium bone
+  // Slender internal titanium structural bone (enclosed within shell)
   const pBoneGeo = new THREE.CylinderGeometry(
-    spec.proximalRadius * 0.88,
-    spec.proximalRadius * 0.80,
+    spec.proximalRadius * 0.45,
+    spec.proximalRadius * 0.40,
     spec.proximalLength,
-    14
+    12
   );
   const pBoneMesh = new THREE.Mesh(pBoneGeo, materials.joint);
   pBoneMesh.position.set(0, -spec.proximalLength * 0.5, 0);
   pBoneMesh.castShadow = true;
   proximalGroup.add(pBoneMesh);
 
-  // Sculpted dorsal white armor plate on +Z face (dorsal side)
-  const pArmorWidth = spec.proximalRadius * 2.15;
-  const pArmorLength = spec.proximalLength * 0.88;
-  const pArmorDepth = spec.proximalRadius * 1.25;
-  const pArmorMesh = createFingerArmorPlate(pArmorWidth, pArmorLength, pArmorDepth, materials.armor);
-  pArmorMesh.position.set(0, -spec.proximalLength * 0.5, spec.proximalRadius * 0.58);
+  // 3D Volumetric sculpted ceramic exoskeleton shell
+  const pArmorWidth = spec.proximalRadius * 2.0;
+  const pArmorLength = spec.proximalLength * 0.96;
+  const pArmorDepth = spec.proximalRadius * 1.80;
+  const pArmorMesh = createSculptedPhalanxShell(pArmorWidth, pArmorLength, pArmorDepth, materials.armor);
+  pArmorMesh.position.set(0, -spec.proximalLength * 0.02, 0);
   proximalGroup.add(pArmorMesh);
 
-  // Palmar dark tactile friction grip pad on -Z face (palmar side)
+  // Palmar dark tactile friction grip pad (-Z face)
   const pPadMesh = createPalmarGripPad(
-    spec.proximalRadius * 1.6,
-    spec.proximalLength * 0.72,
-    0.003,
+    pArmorWidth * 0.72,
+    spec.proximalLength * 0.70,
+    0.0018,
     materials.joint
   );
-  pPadMesh.position.set(0, -spec.proximalLength * 0.5, -spec.proximalRadius * 0.65);
+  pPadMesh.position.set(0, -spec.proximalLength * 0.50, -pArmorDepth * 0.26);
   proximalGroup.add(pPadMesh);
 
   // PIP Hinge Assembly at distal end of proximal segment
-  const pipHingeWidth = spec.proximalRadius * 2.25;
-  const pipHinge = createHingeAssembly(spec.proximalRadius * 0.72, pipHingeWidth, materials.joint);
+  const pipHinge = createHingeAssembly(
+    spec.proximalRadius * 0.52,
+    pArmorWidth * 0.88,
+    materials.joint,
+    materials.armor
+  );
   pipHinge.pin.position.set(0, -spec.proximalLength, 0);
   proximalGroup.add(pipHinge.pin);
 
@@ -287,39 +351,43 @@ export function createFinger(
   middleGroup.position.set(0, -spec.proximalLength, 0);
   proximalGroup.add(middleGroup);
 
-  // Dark titanium bone
+  // Slender internal bone
   const mBoneGeo = new THREE.CylinderGeometry(
-    spec.middleRadius * 0.86,
-    spec.middleRadius * 0.78,
+    spec.middleRadius * 0.45,
+    spec.middleRadius * 0.40,
     spec.middleLength,
-    14
+    12
   );
   const mBoneMesh = new THREE.Mesh(mBoneGeo, materials.joint);
   mBoneMesh.position.set(0, -spec.middleLength * 0.5, 0);
   mBoneMesh.castShadow = true;
   middleGroup.add(mBoneMesh);
 
-  // Sculpted dorsal white armor plate on +Z face
-  const mArmorWidth = spec.middleRadius * 2.05;
-  const mArmorLength = spec.middleLength * 0.86;
-  const mArmorDepth = spec.middleRadius * 1.20;
-  const mArmorMesh = createFingerArmorPlate(mArmorWidth, mArmorLength, mArmorDepth, materials.armor);
-  mArmorMesh.position.set(0, -spec.middleLength * 0.5, spec.middleRadius * 0.52);
+  // 3D Volumetric sculpted ceramic exoskeleton shell
+  const mArmorWidth = spec.middleRadius * 2.0;
+  const mArmorLength = spec.middleLength * 0.96;
+  const mArmorDepth = spec.middleRadius * 1.80;
+  const mArmorMesh = createSculptedPhalanxShell(mArmorWidth, mArmorLength, mArmorDepth, materials.armor);
+  mArmorMesh.position.set(0, -spec.middleLength * 0.02, 0);
   middleGroup.add(mArmorMesh);
 
-  // Palmar dark tactile friction grip pad on -Z face
+  // Palmar dark tactile friction grip pad
   const mPadMesh = createPalmarGripPad(
-    spec.middleRadius * 1.5,
+    mArmorWidth * 0.72,
     spec.middleLength * 0.70,
-    0.0028,
+    0.0016,
     materials.joint
   );
-  mPadMesh.position.set(0, -spec.middleLength * 0.5, -spec.middleRadius * 0.60);
+  mPadMesh.position.set(0, -spec.middleLength * 0.50, -mArmorDepth * 0.26);
   middleGroup.add(mPadMesh);
 
   // DIP Hinge Assembly at distal end of middle segment
-  const dipHingeWidth = spec.middleRadius * 2.15;
-  const dipHinge = createHingeAssembly(spec.middleRadius * 0.68, dipHingeWidth, materials.joint);
+  const dipHinge = createHingeAssembly(
+    spec.middleRadius * 0.50,
+    mArmorWidth * 0.84,
+    materials.joint,
+    materials.armor
+  );
   dipHinge.pin.position.set(0, -spec.middleLength, 0);
   middleGroup.add(dipHinge.pin);
 
@@ -331,62 +399,64 @@ export function createFinger(
   distalGroup.position.set(0, -spec.middleLength, 0);
   middleGroup.add(distalGroup);
 
-  // Tapered dark bone
+  // Tapered internal bone
   const dBoneGeo = new THREE.CylinderGeometry(
-    spec.distalRadius * 0.84,
-    spec.distalRadius * 0.58,
-    spec.distalLength,
-    14
+    spec.distalRadius * 0.40,
+    spec.distalRadius * 0.26,
+    spec.distalLength * 0.85,
+    12
   );
   const dBoneMesh = new THREE.Mesh(dBoneGeo, materials.joint);
-  dBoneMesh.position.set(0, -spec.distalLength * 0.5, 0);
+  dBoneMesh.position.set(0, -spec.distalLength * 0.45, 0);
   dBoneMesh.castShadow = true;
   distalGroup.add(dBoneMesh);
 
-  // Distal armor plate with fingernail hood wrapping over sensor tip
+  // Distal ceramic shell with curved aerodynamic fingertip cowl wrapping apex
   const dArmorWidth = spec.distalRadius * 1.95;
-  const dArmorLength = spec.distalLength * 0.82;
-  const dArmorDepth = spec.distalRadius * 1.15;
-  const dArmorMesh = createFingerArmorPlate(dArmorWidth, dArmorLength, dArmorDepth, materials.armor, true);
-  dArmorMesh.position.set(0, -spec.distalLength * 0.46, spec.distalRadius * 0.48);
+  const dArmorLength = spec.distalLength * 1.02;
+  const dArmorDepth = spec.distalRadius * 1.75;
+  const dArmorMesh = createSculptedPhalanxShell(dArmorWidth, dArmorLength, dArmorDepth, materials.armor, true);
+  dArmorMesh.position.set(0, -spec.distalLength * 0.02, 0);
   distalGroup.add(dArmorMesh);
 
-  // Palmar dark tactile friction grip pad on distal segment (-Z face)
+  // Palmar tactile friction grip pad
   const dPadMesh = createPalmarGripPad(
-    spec.distalRadius * 1.4,
-    spec.distalLength * 0.65,
-    0.0025,
+    dArmorWidth * 0.68,
+    spec.distalLength * 0.62,
+    0.0015,
     materials.joint
   );
-  dPadMesh.position.set(0, -spec.distalLength * 0.46, -spec.distalRadius * 0.55);
+  dPadMesh.position.set(0, -spec.distalLength * 0.44, -dArmorDepth * 0.24);
   distalGroup.add(dPadMesh);
 
-  // Dark tactile sensor dome at fingertip
-  const tipGeo = new THREE.SphereGeometry(spec.distalRadius * 0.78, 14, 14);
+  // Precision tactile sensor aperture on palmar face near apex
+  const tipGeo = new THREE.CylinderGeometry(
+    spec.distalRadius * 0.40,
+    spec.distalRadius * 0.30,
+    0.0016,
+    14
+  );
   const tipMesh = new THREE.Mesh(tipGeo, materials.joint);
-  tipMesh.position.set(0, -spec.distalLength, 0);
-  tipMesh.scale.set(1.0, 1.15, 0.92);
+  tipMesh.position.set(0, -spec.distalLength * 0.90, -dArmorDepth * 0.16);
+  tipMesh.rotation.x = Math.PI * 0.25;
+  tipMesh.castShadow = true;
   distalGroup.add(tipMesh);
 
-  // Progressive anatomical resting flexion:
-  // - Natural relaxed human/robotic hand: fingers curl toward the palm (-Z).
-  // - Positive rotation around X axis smoothly flexes the digit toward -Z.
-  // - Cascade: Index is most open/extended, Little is most flexed.
+  // Progressive anatomical cascading resting flexion:
+  // - Relaxed human/robotic hand: fingers curl naturally toward palm (-Z).
+  // - Cascade: Index is most open, Little is most curled.
   const restingAngles: Record<string, { prox: number; mid: number; dist: number; splay: number }> = {
-    Index: { prox: 0.20, mid: 0.35, dist: 0.24, splay: 0.025 },
-    Middle: { prox: 0.24, mid: 0.40, dist: 0.28, splay: 0.000 },
-    Ring: { prox: 0.28, mid: 0.46, dist: 0.32, splay: -0.018 },
-    Little: { prox: 0.32, mid: 0.52, dist: 0.36, splay: -0.038 },
+    Index: { prox: 0.18, mid: 0.26, dist: 0.18, splay: 0.035 },
+    Middle: { prox: 0.24, mid: 0.32, dist: 0.22, splay: 0.008 },
+    Ring: { prox: 0.32, mid: 0.40, dist: 0.26, splay: -0.020 },
+    Little: { prox: 0.40, mid: 0.48, dist: 0.32, splay: -0.048 },
   };
 
-  const angles = restingAngles[spec.name] || { prox: 0.24, mid: 0.40, dist: 0.28, splay: 0 };
+  const angles = restingAngles[spec.name] || { prox: 0.24, mid: 0.32, dist: 0.22, splay: 0 };
 
-  // Natural inward curl toward palm (-Z direction)
   proximalGroup.rotation.x = angles.prox;
   middleGroup.rotation.x = angles.mid;
   distalGroup.rotation.x = angles.dist;
-
-  // Natural anatomical finger splay along Z axis
   proximalGroup.rotation.z = -side * angles.splay;
 
   return {
@@ -419,11 +489,11 @@ export function createFinger(
 
 /**
  * Creates the opposable articulated robotic thumb:
- * - Angled thenar mount with dark spherical swivel ball and socket bracket
+ * - Medial thenar base bracket with sculpted ceramic protective cowl
  * - 2 articulated segments (proximal & distal)
- * - Beveled white ceramic dorsal plates & palmar tactile pads
- * - Interphalangeal cylindrical hinge with end-caps
- * - Dark tactile sensor dome at tip
+ * - Sleek multi-faceted white ceramic dorsal plates & palmar tactile pads
+ * - Flush interphalangeal cylindrical hinge
+ * - Natural anatomical opposable grasping posture angled forward and inward
  */
 export function createThumb(
   side: -1 | 1,
@@ -431,22 +501,30 @@ export function createThumb(
 ): ThumbNodes {
   const thumbGroup = new THREE.Group();
   thumbGroup.name = 'Thumb';
-  // Positioned at medial-anterior thenar eminence
-  thumbGroup.position.set(-side * 0.022, -0.026, 0.006);
+  // Positioned at thenar eminence on medial-anterior palm margin
+  thumbGroup.position.set(-side * 0.020, -0.016, 0.006);
 
-  // Resting orientation: angled inward toward the palm and fingers
-  thumbGroup.rotation.set(0.24, -side * 0.32, -side * 0.14);
+  // Natural opposable resting orientation: angled forward (+Z) and medially toward index/palm
+  thumbGroup.rotation.set(0.38, -side * 0.48, -side * 0.20);
 
-  // 1. Thenar Base Swivel Ball
-  const ballGeo = new THREE.SphereGeometry(0.011, 18, 16);
+  // 1. Thenar Base Swivel Knuckle (Dark core ball)
+  const ballGeo = new THREE.SphereGeometry(0.0092, 16, 14);
   const baseBall = new THREE.Mesh(ballGeo, materials.joint);
   baseBall.castShadow = true;
   thumbGroup.add(baseBall);
 
+  // Sculpted white ceramic thenar protector cowl over base ball
+  const thenarCowlGeo = new THREE.SphereGeometry(0.0104, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.52);
+  const thenarCowl = new THREE.Mesh(thenarCowlGeo, materials.armor);
+  thenarCowl.position.set(0, 0, 0.0020);
+  thenarCowl.scale.set(0.92, 0.96, 0.72);
+  thenarCowl.castShadow = true;
+  thumbGroup.add(thenarCowl);
+
   // Dark Swivel Collar Bracket
-  const collarGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.008, 16);
+  const collarGeo = new THREE.CylinderGeometry(0.0078, 0.0078, 0.006, 14);
   const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
-  baseCollar.position.set(0, -0.005, 0);
+  baseCollar.position.set(0, -0.004, 0);
   thumbGroup.add(baseCollar);
 
   // 2. Proximal Segment
@@ -454,26 +532,29 @@ export function createThumb(
   proximalGroup.name = 'ThumbProximal';
   thumbGroup.add(proximalGroup);
 
-  const proxLen = 0.030;
-  const proxRad = 0.0070;
-  const pBoneGeo = new THREE.CylinderGeometry(proxRad * 0.88, proxRad * 0.80, proxLen, 14);
+  const proxLen = 0.021;
+  const proxRad = 0.0054;
+  const pBoneGeo = new THREE.CylinderGeometry(proxRad * 0.45, proxRad * 0.40, proxLen, 12);
   const pBoneMesh = new THREE.Mesh(pBoneGeo, materials.joint);
   pBoneMesh.position.set(0, -proxLen * 0.5, 0);
   pBoneMesh.castShadow = true;
   proximalGroup.add(pBoneMesh);
 
-  // White armor shell on outer dorsal side (+Z)
-  const pArmor = createFingerArmorPlate(proxRad * 2.15, proxLen * 0.86, proxRad * 1.30, materials.armor);
-  pArmor.position.set(0, -proxLen * 0.5, proxRad * 0.56);
+  // 3D Volumetric sculpted ceramic exoskeleton shell
+  const pArmorWidth = proxRad * 2.0;
+  const pArmorLength = proxLen * 0.96;
+  const pArmorDepth = proxRad * 1.80;
+  const pArmor = createSculptedPhalanxShell(pArmorWidth, pArmorLength, pArmorDepth, materials.armor);
+  pArmor.position.set(0, -proxLen * 0.02, 0);
   proximalGroup.add(pArmor);
 
   // Palmar grip pad (-Z)
-  const pPadMesh = createPalmarGripPad(proxRad * 1.6, proxLen * 0.70, 0.0028, materials.joint);
-  pPadMesh.position.set(0, -proxLen * 0.5, -proxRad * 0.62);
+  const pPadMesh = createPalmarGripPad(pArmorWidth * 0.72, proxLen * 0.70, 0.0018, materials.joint);
+  pPadMesh.position.set(0, -proxLen * 0.50, -pArmorDepth * 0.26);
   proximalGroup.add(pPadMesh);
 
-  // Thumb IP Hinge Joint Assembly
-  const ipHinge = createHingeAssembly(proxRad * 0.72, proxRad * 2.20, materials.joint);
+  // Thumb IP Hinge Joint Assembly with ceramic knuckle cowl
+  const ipHinge = createHingeAssembly(proxRad * 0.52, pArmorWidth * 0.88, materials.joint, materials.armor);
   ipHinge.pin.position.set(0, -proxLen, 0);
   proximalGroup.add(ipHinge.pin);
 
@@ -483,35 +564,39 @@ export function createThumb(
   distalGroup.position.set(0, -proxLen, 0);
   proximalGroup.add(distalGroup);
 
-  const distLen = 0.024;
-  const distRad = 0.0060;
-  const dBoneGeo = new THREE.CylinderGeometry(distRad * 0.86, distRad * 0.60, distLen, 14);
+  const distLen = 0.016;
+  const distRad = 0.0046;
+  const dBoneGeo = new THREE.CylinderGeometry(distRad * 0.40, distRad * 0.26, distLen * 0.85, 12);
   const dBoneMesh = new THREE.Mesh(dBoneGeo, materials.joint);
-  dBoneMesh.position.set(0, -distLen * 0.5, 0);
+  dBoneMesh.position.set(0, -distLen * 0.45, 0);
   dBoneMesh.castShadow = true;
   distalGroup.add(dBoneMesh);
 
-  // Distal armor plate with curved protective fingernail hood
-  const dArmor = createFingerArmorPlate(distRad * 2.05, distLen * 0.82, distRad * 1.20, materials.armor, true);
-  dArmor.position.set(0, -distLen * 0.46, distRad * 0.48);
+  // Distal ceramic shell with curved aerodynamic fingertip cowl wrapping apex
+  const dArmorWidth = distRad * 1.95;
+  const dArmorLength = distLen * 1.02;
+  const dArmorDepth = distRad * 1.75;
+  const dArmor = createSculptedPhalanxShell(dArmorWidth, dArmorLength, dArmorDepth, materials.armor, true);
+  dArmor.position.set(0, -distLen * 0.02, 0);
   distalGroup.add(dArmor);
 
   // Palmar pad
-  const dPad = createPalmarGripPad(distRad * 1.4, distLen * 0.65, 0.0025, materials.joint);
-  dPad.position.set(0, -distLen * 0.46, -distRad * 0.54);
+  const dPad = createPalmarGripPad(dArmorWidth * 0.68, distLen * 0.62, 0.0015, materials.joint);
+  dPad.position.set(0, -distLen * 0.44, -dArmorDepth * 0.24);
   distalGroup.add(dPad);
 
-  // Tactile sensor dome tip
-  const tipGeo = new THREE.SphereGeometry(distRad * 0.76, 14, 14);
+  // Precision tactile sensor aperture on palmar face near apex
+  const tipGeo = new THREE.CylinderGeometry(distRad * 0.40, distRad * 0.30, 0.0016, 14);
   const tipMesh = new THREE.Mesh(tipGeo, materials.joint);
-  tipMesh.position.set(0, -distLen, 0);
-  tipMesh.scale.set(1.0, 1.15, 0.92);
+  tipMesh.position.set(0, -distLen * 0.90, -dArmorDepth * 0.16);
+  tipMesh.rotation.x = Math.PI * 0.25;
+  tipMesh.castShadow = true;
   distalGroup.add(tipMesh);
 
-  // Natural resting thumb flexion
-  proximalGroup.rotation.x = 0.20;
-  proximalGroup.rotation.z = -side * 0.10;
-  distalGroup.rotation.x = 0.24;
+  // Natural resting thumb flexion curling toward palm
+  proximalGroup.rotation.x = 0.32;
+  proximalGroup.rotation.z = -side * 0.12;
+  distalGroup.rotation.x = 0.36;
 
   return {
     group: thumbGroup,

@@ -46,6 +46,9 @@ assert(!!leftArm.forearm.gauntletBody, 'Forearm athletic gauntlet with saddle co
 assert(!!leftArm.forearm.panelSeam, 'Forearm longitudinal tech groove has purple LED strip');
 assert(!!leftArm.wrist.swivelCollar, 'Wrist swivel collar exists');
 assert(!!leftArm.wrist.distalClevis, 'Wrist distal clevis yoke clasping carpal base exists');
+assert(!!leftArm.wrist.styloidArmorLeft && !!leftArm.wrist.styloidArmorRight, 'Wrist sculpted white ceramic styloid armor cowls exist');
+assert(!!leftArm.wrist.dorsalCowl, 'Wrist white ceramic dorsal bridge cowl exists');
+assert(!!leftArm.wrist.rotaryCore, 'Wrist cycloidal harmonic drive rotary core exists');
 
 // ==============================================================
 // 2. HAND & FINGERS REFINEMENT
@@ -99,9 +102,12 @@ assert(!!torso.waist.leftHip.accentRing && !!torso.waist.rightHip.accentRing, 'C
 assert(!!torso.waist.leftHip.iliacCrestArmor && !!torso.waist.rightHip.iliacCrestArmor, 'Sculpted white ceramic Iliac Crest Flank Armor Cowls exist');
 assert(!!torso.waist.leftHip.flankLight && !!torso.waist.rightHip.flankLight, 'Lateral violet emissive flank lights exist on iliac crest armor');
 
-// Pelvic Shield Plate
+// Pelvic Shield Plate, Inguinal Cowls & Sub-Pelvis Cradle
 assert(!!torso.waist.pelvicPlate, 'Sculpted multi-faceted pelvic groin shield exists');
 assert(!!torso.waist.pelvicAccentLight, 'Horizontal violet emissive LED slit on pelvic shield exists');
+assert(!!torso.waist.pelvicIntakePocket, 'Nested dark titanium intake pocket with louvers exists');
+assert(!!torso.waist.inguinalFlapLeft && !!torso.waist.inguinalFlapRight, 'Left and right articulated inguinal armor pauldrons exist');
+assert(!!torso.waist.subPelvisCradle, 'Sub-pelvic dark titanium mechanical chassis cradle exists');
 
 // ==============================================================
 // 4. CENTRALIZED LED SYSTEM
@@ -120,8 +126,12 @@ torsoCtrl.setExplodedView(true);
 for (let i = 0; i < 10; i++) torsoCtrl.update(0.1); // Step exploded view to full extension
 
 assert(torso.waist.pelvicPlate.position.z > 0.05, 'Pelvic shield separates forward in exploded view');
+assert(torso.waist.upperWaistRing.position.y > -0.20, 'Upper waist collar separates upward in +Y in exploded view');
+assert(torso.waist.lowerWaistRing.position.y < -0.28, 'Lower waist collar separates downward in -Y in exploded view');
 assert(torso.waist.leftHip.group.position.x < -0.096, 'Left hip and iliac crest cowl separate laterally in -X');
 assert(torso.waist.rightHip.group.position.x > 0.096, 'Right hip and iliac crest cowl separate laterally in +X');
+assert(torso.waist.inguinalFlapLeft!.position.z > 0.05, 'Left inguinal cowl separates forward in +Z');
+assert(torso.waist.subPelvisCradle!.position.y < -0.28, 'Sub-pelvis cradle drops downward in -Y');
 
 // Return to normal
 torsoCtrl.setExplodedView(false);

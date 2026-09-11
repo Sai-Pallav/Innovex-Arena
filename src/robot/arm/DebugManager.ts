@@ -137,10 +137,15 @@ export class DebugManager {
   private attachAxesHelpers(): void {
     this.removeAxesHelpers();
 
-    // Attach small axes helper (0.04m length) to all named pivot groups
+    // Attach sleek axes helper (0.035m length) to primary articulation pivot groups
     this.targetGroup.traverse((child) => {
-      if (child.type === 'Group' && child.name && !child.name.includes('Mesh')) {
-        const axes = new THREE.AxesHelper(0.04);
+      if (
+        child.type === 'Group' &&
+        child.name &&
+        !child.name.includes('Mesh') &&
+        (child.name.includes('Pivot') || child.name.includes('Joint') || child.name.includes('Root'))
+      ) {
+        const axes = new THREE.AxesHelper(0.035);
         axes.name = `DebugAxes_${child.name}`;
         axes.renderOrder = 999;
         (axes.material as THREE.Material).depthTest = false;

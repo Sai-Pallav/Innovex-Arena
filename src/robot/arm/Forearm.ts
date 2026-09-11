@@ -4,6 +4,8 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 export interface ForearmNodes {
   group: THREE.Group;
   gauntletBody: THREE.Mesh;
+  innerSleeve: THREE.Mesh;
+  armorGroup: THREE.Group;
   elbowSocketCollar: THREE.Mesh;
   brachioradialis: THREE.Mesh;
   wristCuff: THREE.Mesh;
@@ -113,12 +115,16 @@ export function createForearm(
     return geo;
   }
 
+  const armorGroup = new THREE.Group();
+  armorGroup.name = 'ForearmArmorGroup';
+  forearmGroup.add(armorGroup);
+
   const gauntletGeo = createGauntletGeometry();
   const gauntletBody = new THREE.Mesh(gauntletGeo, materials.armorDoubleSide);
   gauntletBody.name = 'GauntletArmorBody';
   gauntletBody.castShadow = true;
   gauntletBody.receiveShadow = true;
-  forearmGroup.add(gauntletBody);
+  armorGroup.add(gauntletBody);
 
   // 2. Internal Dark Titanium Sleeve (Prevents any hollow voids when viewed from any angle)
   const innerSleeveGeo = new THREE.CylinderGeometry(0.042, 0.034, 0.176, 28);
@@ -168,7 +174,7 @@ export function createForearm(
   brachioradialis.rotation.y = side * (Math.PI / 2);
   brachioradialis.rotation.z = side * 0.05;
   brachioradialis.castShadow = true;
-  forearmGroup.add(brachioradialis);
+  armorGroup.add(brachioradialis);
 
   // 5. Distal Wrist Collar Rim (White ceramic cuff framing wrist joint)
   const cuffGeo = new THREE.CylinderGeometry(0.042, 0.039, 0.016, 32);
@@ -177,7 +183,7 @@ export function createForearm(
   wristCuff.position.set(0, -0.178, 0);
   wristCuff.castShadow = true;
   wristCuff.receiveShadow = true;
-  forearmGroup.add(wristCuff);
+  armorGroup.add(wristCuff);
 
   // Inner dark titanium wrist socket ring
   const wristSocketGeo = new THREE.CylinderGeometry(0.038, 0.036, 0.018, 28);
@@ -190,19 +196,21 @@ export function createForearm(
   const panelSeam = new THREE.Mesh(seamGeo, materials.joint);
   panelSeam.name = 'ForearmPanelSeam';
   panelSeam.position.set(side * 0.049, -0.088, 0.004);
-  forearmGroup.add(panelSeam);
+  armorGroup.add(panelSeam);
 
   // 7. Embedded Violet LED Accent Strip inside Channel
   const ledGeo = new THREE.CylinderGeometry(0.0020, 0.0020, 0.118, 12);
   const forearmLed = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   forearmLed.name = 'ForearmLedStrip';
   forearmLed.position.set(side * 0.050, -0.088, 0.004);
-  forearmGroup.add(forearmLed);
+  armorGroup.add(forearmLed);
   ledMeshes.push(forearmLed);
 
   return {
     group: forearmGroup,
     gauntletBody,
+    innerSleeve,
+    armorGroup,
     elbowSocketCollar,
     brachioradialis,
     wristCuff,

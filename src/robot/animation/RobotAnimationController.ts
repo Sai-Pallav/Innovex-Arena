@@ -93,12 +93,30 @@ export class RobotAnimationController {
     }
   }
 
+  public setCameraContext(camera: THREE.Camera, container: HTMLElement): void {
+    const parentNode = this.nodes.neck.parent || this.nodes.neck;
+    this.lookController.setRaycastContext(camera, container, this.nodes.head, parentNode);
+  }
+
+  public setPointerTarget(clientX: number, clientY: number, isHovered: boolean, speed: number = 0): void {
+    this.lookController.setPointerTarget(clientX, clientY, isHovered, speed);
+    const inputState = this.inputController.getState();
+    this.inputController.update(
+      inputState.targetX,
+      inputState.targetY,
+      0.016,
+      isHovered,
+      inputState.reducedMotion
+    );
+  }
+
   public setLookTarget(x: number, y: number, speed: number = 0): void {
     const inputState = this.inputController.getState();
     this.inputController.update(x, y, 0.016, true, inputState.reducedMotion);
   }
 
   public setIdleState(): void {
+    this.lookController.setPointerTarget(0, 0, false, 0);
     const inputState = this.inputController.getState();
     this.inputController.update(0, 0, 0.016, false, inputState.reducedMotion);
   }

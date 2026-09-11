@@ -320,7 +320,7 @@ export function createThigh(
   );
   const lateralArmor = new THREE.Mesh(latGeo, materials.armor);
   lateralArmor.name = side === -1 ? 'ThighLateralArmor_L' : 'ThighLateralArmor_R';
-  lateralArmor.position.set(side * 0.040, -cfg.length * 0.45, 0.004);
+  lateralArmor.position.set(side * 0.025, -cfg.length * 0.45, 0.004);
   lateralArmor.rotation.y = side * (Math.PI / 2);
   lateralArmor.castShadow = true;
   lateralArmor.receiveShadow = true;
@@ -328,9 +328,9 @@ export function createThigh(
 
   // Lateral cooling louvers on the flank
   for (let i = 0; i < 3; i++) {
-    const louverGeo = new THREE.BoxGeometry(0.0025, 0.003, 0.022);
+    const louverGeo = new THREE.BoxGeometry(0.0022, 0.003, 0.020);
     const louver = new THREE.Mesh(louverGeo, materials.joint);
-    louver.position.set(side * 0.047, -cfg.length * (0.34 + i * 0.06), 0.002);
+    louver.position.set(side * 0.028, -cfg.length * (0.34 + i * 0.06), 0.002);
     louver.rotation.z = side * 0.15;
     thighGroup.add(louver);
   }
@@ -341,7 +341,7 @@ export function createThigh(
   const ledGeo = new THREE.BoxGeometry(cfg.ledStrip.width, cfg.ledStrip.length, cfg.ledStrip.depth);
   const ledStrip = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   ledStrip.name = side === -1 ? 'ThighLedStrip_L' : 'ThighLedStrip_R';
-  ledStrip.position.set(side * 0.048, -cfg.length * 0.47, 0.006);
+  ledStrip.position.set(side * 0.029, -cfg.length * 0.47, 0.006);
   thighGroup.add(ledStrip);
   ledMeshes.push(ledStrip);
 

@@ -114,6 +114,7 @@ export class RobotScene {
 
       // Initialize kinematics controller
       this.controller = new RobotController(result.nodes);
+      this.controller.setCameraContext(this.cameraManager.camera, this.container);
 
       // Initialize Section 9 Developer Debug Mode Manager
       this.debugManager = new DebugManager(result.nodes.root);
@@ -237,7 +238,15 @@ export class RobotScene {
     if (this.controller) {
       this.controller.setReducedMotion(interactionState.reducedMotion);
 
-      // Always track — when cursor is in window follow it, when it leaves return to center
+      // High-precision 3D raycast tracking across viewport
+      this.controller.setPointerTarget(
+        interactionState.clientX,
+        interactionState.clientY,
+        interactionState.isHovered,
+        interactionState.speed
+      );
+
+      // Symmetrical 2D normalized target
       this.controller.setLookTarget(
         interactionState.targetX,
         interactionState.targetY,
@@ -282,6 +291,18 @@ export class RobotScene {
 
   public getController(): RobotController | null {
     return this.controller;
+  }
+
+  public getCamera(): THREE.PerspectiveCamera {
+    return this.cameraManager.camera;
+  }
+
+  public getScene(): THREE.Scene {
+    return this.scene;
+  }
+
+  public getRenderer(): THREE.WebGLRenderer {
+    return this.renderer;
   }
 
   public setWireframe(enabled: boolean): void {

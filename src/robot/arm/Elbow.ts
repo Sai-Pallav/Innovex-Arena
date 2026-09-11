@@ -48,6 +48,15 @@ export const ELBOW_CONFIG = {
   armorClearanceGap: 0.0035,    // 3.5mm safety clearance between armor and moving parts
 } as const;
 
+export interface ElbowDiscNodes {
+  group: THREE.Group;
+  outerBezel: THREE.Group;
+  bearingRace: THREE.Group;
+  accentRing: THREE.Mesh;
+  innerDisc: THREE.Mesh;
+  hubCap: THREE.Group;
+}
+
 export interface ElbowNodes {
   group: THREE.Group;              // Stationary root anchored under UpperArm
   forearmPivot: THREE.Group;       // Rotating hinge pivot at [0, 0, 0] carrying forearm & lowerHousing
@@ -61,6 +70,15 @@ export interface ElbowNodes {
   accentRing: THREE.Mesh;          // Primary lateral emissive ring (for backwards compat)
   medialAccentRing: THREE.Mesh;    // Medial emissive ring
   ledMeshes: THREE.Mesh[];         // All emissive accent rings
+
+  // High-Precision Mechanical Open View Nodes:
+  hydraulicRam: THREE.Group;       // Posterior hydraulic flexion ram
+  ramPiston: THREE.Mesh;           // Telescopic chrome piston shaft
+  ramCylinder: THREE.Mesh;         // Pressure cylinder
+  olecranonMesh: THREE.Mesh;       // Posterior olecranon shield
+  lateralDiscNodes: ElbowDiscNodes;
+  medialDiscNodes: ElbowDiscNodes;
+
   setAngle: (angle: number) => void;
   getAngle: () => number;
   // Backwards compatibility aliases
@@ -75,7 +93,7 @@ export interface ElbowNodes {
 /**
  * 1. UPPER ARM HOUSING & UPPER JOINT BLOCK
  * Dark titanium mechanical collar and dual downward clevis knuckles.
- * Remains completely stationary under upperArm during elbow flexion.
+ * Remains stationary under upperArm during elbow flexion.
  */
 function createUpperHousing(materials: RobotMaterialPalette): {
   group: THREE.Group;
@@ -90,7 +108,7 @@ function createUpperHousing(materials: RobotMaterialPalette): {
     ELBOW_CONFIG.upperHousingRadius * 0.94,
     ELBOW_CONFIG.upperHousingRadius,
     ELBOW_CONFIG.upperHousingHeight,
-    20
+    24
   );
   const connector = new THREE.Mesh(connectorGeo, materials.joint);
   connector.name = 'UpperArmConnector';
@@ -104,7 +122,7 @@ function createUpperHousing(materials: RobotMaterialPalette): {
     ELBOW_CONFIG.upperHousingRadius * 0.98,
     0.0022,
     6,
-    20
+    24
   );
   const collarRim = new THREE.Mesh(rimGeo, materials.joint);
   collarRim.rotation.x = Math.PI / 2;
@@ -112,21 +130,19 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   upperGroup.add(collarRim);
 
   // Dual downward-reaching clevis knuckles (Left and Right along X)
-  // Straddles the center knuckle and holds the central axle pin
   const knuckleRadius = ELBOW_CONFIG.hingeRadius * 0.96;
   const knuckleGeo = new THREE.CylinderGeometry(
     knuckleRadius,
     knuckleRadius,
     ELBOW_CONFIG.knuckleWidth,
-    18
+    20
   );
-  // Knuckles have transverse rotation (cylinder length along X)
   knuckleGeo.rotateZ(Math.PI / 2);
 
   const leftKnuckleX = -(ELBOW_CONFIG.centerKnuckleWidth * 0.5 + ELBOW_CONFIG.clevisGap + ELBOW_CONFIG.knuckleWidth * 0.5);
   const rightKnuckleX = ELBOW_CONFIG.centerKnuckleWidth * 0.5 + ELBOW_CONFIG.clevisGap + ELBOW_CONFIG.knuckleWidth * 0.5;
 
-  // Left clevis knuckle
+  // Left clevis knuckle with chamfers
   const leftKnuckle = new THREE.Mesh(knuckleGeo, materials.joint);
   leftKnuckle.name = 'UpperClevisKnuckle_Left';
   leftKnuckle.position.set(leftKnuckleX, 0, 0);
@@ -134,7 +150,7 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   leftKnuckle.receiveShadow = true;
   upperGroup.add(leftKnuckle);
 
-  // Right clevis knuckle
+  // Right clevis knuckle with chamfers
   const rightKnuckle = new THREE.Mesh(knuckleGeo, materials.joint);
   rightKnuckle.name = 'UpperClevisKnuckle_Right';
   rightKnuckle.position.set(rightKnuckleX, 0, 0);
@@ -170,6 +186,13 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   spineRib.castShadow = true;
   upperGroup.add(spineRib);
 
+  // Upper Actuator Anchor Lug (Receives top of hydraulic flexion ram)
+  const lugGeo = new THREE.BoxGeometry(0.010, 0.012, 0.012);
+  const upperLug = new THREE.Mesh(lugGeo, materials.joint);
+  upperLug.position.set(0, ELBOW_CONFIG.upperHousingOffsetY * 0.6, -knuckleRadius * 0.92);
+  upperLug.castShadow = true;
+  upperGroup.add(upperLug);
+
   return {
     group: upperGroup,
     connector,
@@ -178,9 +201,8 @@ function createUpperHousing(materials: RobotMaterialPalette): {
 }
 
 /**
- * 2. CENTRAL HINGE CORE & CENTRAL PIN
- * Heavy-duty horizontal axle along X-axis connecting both sides of the hinge.
- * Precision-stepped diameters with flanged collars and center bore.
+ * 2. CENTRAL HINGE CORE, GEAR SECTOR & AXLE PIN
+ * Heavy-duty horizontal axle along X-axis with high-torque gear sector.
  */
 function createCentralHingeCore(materials: RobotMaterialPalette): {
   coreGroup: THREE.Group;
@@ -195,7 +217,7 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
     ELBOW_CONFIG.coreRadius,
     ELBOW_CONFIG.coreRadius,
     ELBOW_CONFIG.hingeWidth,
-    20
+    24
   );
   barrelGeo.rotateZ(Math.PI / 2);
 
@@ -205,12 +227,29 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
   barrelMesh.receiveShadow = true;
   coreGroup.add(barrelMesh);
 
+  // Precision Spur Gear Sector (10 radial teeth on anterior face showing mechanical drive)
+  const gearSector = new THREE.Group();
+  gearSector.name = 'ElbowSpurGearSector';
+  for (let i = 0; i < 10; i++) {
+    const angle = ((i - 4.5) / 10) * (Math.PI * 0.55) + Math.PI * 0.5;
+    const toothGeo = new THREE.BoxGeometry(0.024, 0.0028, 0.0045);
+    const tooth = new THREE.Mesh(toothGeo, materials.joint);
+    tooth.position.set(
+      0,
+      Math.sin(angle) * (ELBOW_CONFIG.coreRadius + 0.002),
+      Math.cos(angle) * (ELBOW_CONFIG.coreRadius + 0.002)
+    );
+    tooth.rotation.x = angle;
+    gearSector.add(tooth);
+  }
+  coreGroup.add(gearSector);
+
   // Concentric bearing spacer rings on either side of the knuckles
   const spacerGeo = new THREE.TorusGeometry(
     ELBOW_CONFIG.coreRadius * 1.04,
     0.0016,
-    5,
-    18
+    6,
+    20
   );
   spacerGeo.rotateY(Math.PI / 2);
 
@@ -231,7 +270,7 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
     ELBOW_CONFIG.axlePinRadius,
     ELBOW_CONFIG.axlePinRadius,
     ELBOW_CONFIG.axlePinLength,
-    18
+    20
   );
   shaftGeo.rotateZ(Math.PI / 2);
 
@@ -261,9 +300,13 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
 }
 
 /**
- * 3. SIDE ROTATIONAL DISC (Lateral or Medial)
- * Concentric multi-ring cover with recessed center and purple emissive ring.
- * Based directly on "Rotational Disc Detail" and "Exploded View".
+ * 3. MULTI-STAGE CONCENTRIC SIDE ROTATIONAL DISC (Lateral or Medial)
+ * Multi-layer concentric architecture for precision CAD exploded inspection:
+ * - Outer Retaining Bezel with 6 hex bolts and laser tick marks
+ * - Roller Bearing Race with 10 micro-rollers
+ * - Purple LED Reactor Halo
+ * - Machined Titanium Disc Face
+ * - Central Magnetic Hub Cap with knurled grip & socket bolt head
  */
 function createRotationalDisc(
   side: -1 | 1,
@@ -271,6 +314,7 @@ function createRotationalDisc(
   materials: RobotMaterialPalette
 ): {
   discGroup: THREE.Group;
+  discNodes: ElbowDiscNodes;
   accentRing: THREE.Mesh;
   outerDisc: THREE.Mesh;
 } {
@@ -278,48 +322,91 @@ function createRotationalDisc(
   const discName = isLateral ? 'LateralRotationalDisc' : 'MedialRotationalDisc';
   discGroup.name = discName;
 
-  // Sign determines which side of the elbow (+X or -X)
-  // For right arm: lateral is +X, medial is -X.
-  // For left arm: lateral is -X, medial is +X.
   const sign = isLateral ? (side === 1 ? 1 : -1) : (side === 1 ? -1 : 1);
   const posX = sign * ELBOW_CONFIG.discOffsetX;
   discGroup.position.set(posX, 0, 0);
 
-  // 1. Outer Housing Flange
+  // A. Outer Retaining Bezel Group (Exploded Level)
+  const outerBezel = new THREE.Group();
+  outerBezel.name = `${discName}_OuterBezel`;
+  discGroup.add(outerBezel);
+
   const outerDiscGeo = new THREE.CylinderGeometry(
     ELBOW_CONFIG.discOuterRadius,
     ELBOW_CONFIG.discOuterRadius,
     ELBOW_CONFIG.discThickness,
-    20
+    24
   );
   outerDiscGeo.rotateZ(Math.PI / 2);
 
   const outerDisc = new THREE.Mesh(outerDiscGeo, materials.joint);
   outerDisc.name = `${discName}_OuterHousing`;
-  outerDisc.position.set(0, 0, 0);
   outerDisc.castShadow = true;
   outerDisc.receiveShadow = true;
-  discGroup.add(outerDisc);
+  outerBezel.add(outerDisc);
 
-  // 2. Beveled Outer Ring (Torus)
+  // Beveled outer rim
   const beveledRimGeo = new THREE.TorusGeometry(
     ELBOW_CONFIG.discOuterRadius * 0.94,
     0.0022,
-    5,
-    18
+    6,
+    24
   );
   beveledRimGeo.rotateY(Math.PI / 2);
-
   const beveledRim = new THREE.Mesh(beveledRimGeo, materials.joint);
   beveledRim.position.set(sign * (ELBOW_CONFIG.discThickness * 0.35), 0, 0);
-  discGroup.add(beveledRim);
+  outerBezel.add(beveledRim);
 
-  // 3. Signature Circular Purple Emissive Accent Ring
+  // 6 Perimeter Titanium Hex Socket Cap Screws
+  for (let b = 0; b < 6; b++) {
+    const angle = (b / 6) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.0024, 6);
+    boltGeo.rotateZ(Math.PI / 2);
+    const bolt = new THREE.Mesh(boltGeo, materials.joint);
+    bolt.position.set(
+      sign * (ELBOW_CONFIG.discThickness * 0.48),
+      Math.sin(angle) * (ELBOW_CONFIG.discOuterRadius * 0.82),
+      Math.cos(angle) * (ELBOW_CONFIG.discOuterRadius * 0.82)
+    );
+    outerBezel.add(bolt);
+  }
+
+  // B. Roller Bearing Race Group (Exploded Level)
+  const bearingRace = new THREE.Group();
+  bearingRace.name = `${discName}_BearingRace`;
+  discGroup.add(bearingRace);
+
+  const raceRingGeo = new THREE.TorusGeometry(
+    ELBOW_CONFIG.emissiveRingRadius * 1.08,
+    0.0018,
+    6,
+    20
+  );
+  raceRingGeo.rotateY(Math.PI / 2);
+  const raceRing = new THREE.Mesh(raceRingGeo, materials.joint);
+  raceRing.position.set(sign * (ELBOW_CONFIG.discThickness * 0.28), 0, 0);
+  bearingRace.add(raceRing);
+
+  // 10 micro-roller bearing cylinders around the race
+  for (let r = 0; r < 10; r++) {
+    const angle = (r / 10) * Math.PI * 2;
+    const rollerGeo = new THREE.CylinderGeometry(0.0014, 0.0014, 0.0030, 8);
+    rollerGeo.rotateZ(Math.PI / 2);
+    const roller = new THREE.Mesh(rollerGeo, materials.joint);
+    roller.position.set(
+      sign * (ELBOW_CONFIG.discThickness * 0.30),
+      Math.sin(angle) * (ELBOW_CONFIG.emissiveRingRadius * 1.08),
+      Math.cos(angle) * (ELBOW_CONFIG.emissiveRingRadius * 1.08)
+    );
+    bearingRace.add(roller);
+  }
+
+  // C. Signature Circular Purple Emissive Accent Ring
   const accentGeo = new THREE.TorusGeometry(
     ELBOW_CONFIG.emissiveRingRadius,
     ELBOW_CONFIG.emissiveRingTube,
-    5,
-    18
+    6,
+    24
   );
   accentGeo.rotateY(Math.PI / 2);
 
@@ -328,12 +415,12 @@ function createRotationalDisc(
   accentRing.position.set(sign * (ELBOW_CONFIG.discThickness * 0.45), 0, 0);
   discGroup.add(accentRing);
 
-  // 4. Recessed Inner Metallic Disc Face
+  // D. Recessed Inner Metallic Disc Face
   const innerDiscGeo = new THREE.CylinderGeometry(
     ELBOW_CONFIG.emissiveRingRadius * 0.88,
     ELBOW_CONFIG.emissiveRingRadius * 0.88,
     0.0035,
-    18
+    20
   );
   innerDiscGeo.rotateZ(Math.PI / 2);
 
@@ -341,28 +428,46 @@ function createRotationalDisc(
   innerDisc.position.set(sign * (ELBOW_CONFIG.discThickness * 0.25), 0, 0);
   discGroup.add(innerDisc);
 
-  // 5. Central Raised Hub Cap with Chamfered Edge
+  // E. Central Raised Hub Cap with Knurled Grip & Socket Bolt Head
+  const hubCapGroup = new THREE.Group();
+  hubCapGroup.name = `${discName}_HubCapGroup`;
+  discGroup.add(hubCapGroup);
+
   const capGeo = new THREE.CylinderGeometry(
     ELBOW_CONFIG.innerCapRadius,
     ELBOW_CONFIG.innerCapRadius * 1.10,
     0.0045,
-    16
+    20
   );
   capGeo.rotateZ(Math.PI / 2);
 
   const hubCap = new THREE.Mesh(capGeo, materials.joint);
   hubCap.position.set(sign * (ELBOW_CONFIG.discThickness * 0.50), 0, 0);
-  discGroup.add(hubCap);
+  hubCapGroup.add(hubCap);
 
-  // 6. Central Hex/Circular Bore Dimple
-  const boreGeo = new THREE.CylinderGeometry(0.005, 0.005, 0.0025, 12);
+  // Central Hex/Circular Bore Dimple
+  const boreGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0030, 6);
   boreGeo.rotateZ(Math.PI / 2);
-
   const centerBore = new THREE.Mesh(boreGeo, materials.joint);
-  centerBore.position.set(sign * (ELBOW_CONFIG.discThickness * 0.54), 0, 0);
-  discGroup.add(centerBore);
+  centerBore.position.set(sign * (ELBOW_CONFIG.discThickness * 0.56), 0, 0);
+  hubCapGroup.add(centerBore);
 
-  return { discGroup, accentRing, outerDisc };
+  // Core purple LED jewel dot
+  const jewelGeo = new THREE.SphereGeometry(0.0025, 8, 8);
+  const coreJewel = new THREE.Mesh(jewelGeo, materials.purpleEmissive);
+  coreJewel.position.set(sign * (ELBOW_CONFIG.discThickness * 0.58), 0, 0);
+  hubCapGroup.add(coreJewel);
+
+  const discNodes: ElbowDiscNodes = {
+    group: discGroup,
+    outerBezel,
+    bearingRace,
+    accentRing,
+    innerDisc,
+    hubCap: hubCapGroup,
+  };
+
+  return { discGroup, discNodes, accentRing, outerDisc };
 }
 
 /**
@@ -383,7 +488,7 @@ function createLowerHousing(materials: RobotMaterialPalette): {
     knuckleRadius,
     knuckleRadius,
     ELBOW_CONFIG.centerKnuckleWidth,
-    18
+    20
   );
   knuckleGeo.rotateZ(Math.PI / 2);
 
@@ -399,7 +504,7 @@ function createLowerHousing(materials: RobotMaterialPalette): {
     ELBOW_CONFIG.lowerHousingRadius,
     ELBOW_CONFIG.lowerHousingRadius * 0.92,
     ELBOW_CONFIG.lowerHousingHeight,
-    20
+    24
   );
   const stemMesh = new THREE.Mesh(stemGeo, materials.joint);
   stemMesh.name = 'LowerJointStem';
@@ -425,6 +530,13 @@ function createLowerHousing(materials: RobotMaterialPalette): {
   strutMesh.castShadow = true;
   lowerGroup.add(strutMesh);
 
+  // Lower Actuator Anchor Lug (Receives bottom rod of hydraulic flexion ram)
+  const lowerLugGeo = new THREE.BoxGeometry(0.010, 0.012, 0.012);
+  const lowerLug = new THREE.Mesh(lowerLugGeo, materials.joint);
+  lowerLug.position.set(0, -0.016, -knuckleRadius * 0.75);
+  lowerLug.castShadow = true;
+  lowerGroup.add(lowerLug);
+
   return {
     group: lowerGroup,
     lowerClevisMesh: lowerKnuckle,
@@ -432,7 +544,51 @@ function createLowerHousing(materials: RobotMaterialPalette): {
 }
 
 /**
- * 5. POSTERIOR OLECRANON ARMOR SHIELD (Curved White Ceramic Cup)
+ * 5. HYDRAULIC FLEXION RAM ACTUATOR
+ * Robotic servo assist damper bridging upper housing and lower housing.
+ */
+function createHydraulicRam(materials: RobotMaterialPalette): {
+  group: THREE.Group;
+  ramCylinder: THREE.Mesh;
+  ramPiston: THREE.Mesh;
+} {
+  const ramGroup = new THREE.Group();
+  ramGroup.name = 'ElbowHydraulicRam';
+  ramGroup.position.set(0, 0.014, -ELBOW_CONFIG.hingeRadius * 0.90);
+  ramGroup.rotation.x = -0.18; // Angled along posterior line of flexion
+
+  // Cylinder body (Dark titanium)
+  const cylGeo = new THREE.CylinderGeometry(0.0058, 0.0058, 0.024, 16);
+  const ramCylinder = new THREE.Mesh(cylGeo, materials.joint);
+  ramCylinder.position.set(0, 0.006, 0);
+  ramCylinder.castShadow = true;
+  ramGroup.add(ramCylinder);
+
+  // Anodized violet collar ring
+  const collarGeo = new THREE.TorusGeometry(0.0062, 0.0014, 6, 16);
+  const ramCollar = new THREE.Mesh(collarGeo, materials.purpleEmissive);
+  ramCollar.rotation.x = Math.PI / 2;
+  ramCollar.position.set(0, 0.001, 0);
+  ramGroup.add(ramCollar);
+
+  // Polished chrome telescopic piston shaft
+  const pistonGeo = new THREE.CylinderGeometry(0.0034, 0.0034, 0.028, 16);
+  const ramPiston = new THREE.Mesh(pistonGeo, materials.joint); // High metallic
+  ramPiston.position.set(0, -0.015, 0);
+  ramPiston.castShadow = true;
+  ramGroup.add(ramPiston);
+
+  // Lower rod eyelet
+  const eyeletGeo = new THREE.SphereGeometry(0.0042, 10, 10);
+  const eyelet = new THREE.Mesh(eyeletGeo, materials.joint);
+  eyelet.position.set(0, -0.028, 0);
+  ramGroup.add(eyelet);
+
+  return { group: ramGroup, ramCylinder, ramPiston };
+}
+
+/**
+ * 6. POSTERIOR OLECRANON ARMOR SHIELD (Curved White Ceramic Cup)
  * Preserves the robot's white armor language.
  * Cleanly cups the stationary upper clevis without interfering with rotation.
  */
@@ -450,7 +606,7 @@ function createOlecranonArmor(materials: RobotMaterialPalette): THREE.Mesh {
     bevelEnabled: true,
     bevelThickness: 0.0028,
     bevelSize: 0.0024,
-    bevelSegments: 1,
+    bevelSegments: 2,
   });
   oleGeo.center();
 
@@ -472,20 +628,7 @@ function createOlecranonArmor(materials: RobotMaterialPalette): THREE.Mesh {
 }
 
 /**
- * CREATES THE COMPLETE PRODUCTION-GRADE ROBOT ELBOW
- *
- * Visual hierarchy:
- * UPPER ARM
- *     ↓
- * Upper-Arm Connector
- *     ↓
- * Mechanical Hinge (Stationary Upper Clevis + Axle Pin + Dual Side Discs)
- *     ↓
- * Central Elbow Axis (ForearmPivot at [0, 0, 0])
- *     ↓
- * Lower Joint Housing (Rotating Center Clevis Knuckle)
- *     ↓
- * FOREARM
+ * CREATES THE COMPLETE HIGH-PRECISION ROBOT ELBOW
  */
 export function createElbow(
   side: -1 | 1,
@@ -514,11 +657,27 @@ export function createElbow(
   elbowGroup.add(medial.discGroup);
   ledMeshes.push(medial.accentRing);
 
-  // 4. Posterior Olecranon Armor Shield (Stationary with upper housing)
+  // 4. Hydraulic Flexion Ram Actuator (Stationary upper, connects to lower)
+  const hydraulic = createHydraulicRam(materials);
+  elbowGroup.add(hydraulic.group);
+
+  // 5. Posterior Olecranon Armor Shield (Stationary with upper housing)
   const olecranonMesh = createOlecranonArmor(materials);
   elbowGroup.add(olecranonMesh);
 
-  // 5. DEDICATED FOREARM ROTATION PIVOT (The Hinge Axis at [0, 0, 0])
+  // 6. Anterior Cybernetic Conduits across Flexion Fold
+  for (let c = -1; c <= 1; c += 2) {
+    const cableCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(c * 0.014, 0.018, 0.024),
+      new THREE.Vector3(c * 0.016, 0.000, 0.028),
+      new THREE.Vector3(c * 0.012, -0.018, 0.022),
+    ]);
+    const cableGeo = new THREE.TubeGeometry(cableCurve, 10, 0.0018, 6, false);
+    const cable = new THREE.Mesh(cableGeo, materials.joint);
+    elbowGroup.add(cable);
+  }
+
+  // 7. DEDICATED FOREARM ROTATION PIVOT (The Hinge Axis at [0, 0, 0])
   const forearmPivot = new THREE.Group();
   forearmPivot.name = side === -1 ? 'LeftForearmPivot' : 'RightForearmPivot';
   forearmPivot.position.set(0, 0, 0);
@@ -549,6 +708,15 @@ export function createElbow(
     accentRing: lateral.accentRing,
     medialAccentRing: medial.accentRing,
     ledMeshes,
+
+    // High-Precision Mechanical Open View Nodes:
+    hydraulicRam: hydraulic.group,
+    ramPiston: hydraulic.ramPiston,
+    ramCylinder: hydraulic.ramCylinder,
+    olecranonMesh,
+    lateralDiscNodes: lateral.discNodes,
+    medialDiscNodes: medial.discNodes,
+
     setAngle,
     getAngle,
     // Backwards compatibility aliases
