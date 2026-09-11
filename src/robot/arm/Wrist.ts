@@ -21,17 +21,17 @@ export interface WristNodes {
 }
 
 /**
- * Creates an engineered multi-axis robotic wrist joint that physically bridges the forearm to the hand:
- * 1. Outer Ceramic Shell Layer:
- *    - Left & Right sculpted white ceramic styloid process armor cowls with beveled chamfers
- *    - Dorsal ceramic bridge cowl with recessed violet optical sensor slit
- * 2. Precision Mechanical Core Layer:
- *    - Rotational dark titanium swivel collar sleeve
- *    - Concentric purple emissive accent ring
- *    - Cycloidal / harmonic drive bearing race with micro-stator teeth
- *    - Heavy-duty transverse hinge pin with machined flange caps
- *    - Machined dual-fork clevis yoke with lightening cutouts
- *    - Distal carpal socket clasping the palm root
+ * CRITICAL CHANGE #5: REBUILT ROBOTIC WRIST TRANSMISSION
+ * FOREARM -> BEARING -> ROTATIONAL COLLAR -> WRIST MOTOR -> WRIST AXLE -> PALM MOUNT
+ *
+ * Visually separates the hand from the forearm:
+ * - Circular bearing interface with beveled titanium race
+ * - Rotational pronation/supination collar with precision micro-splines
+ * - Compact transverse cylindrical motor housing with radial cooling ribs
+ * - Transverse flexion/extension axle pin with beveled bolt caps
+ * - Tendon cable ring & actuator pulley
+ * - Distal palm mounting plate with 4 M3 socket head fasteners
+ * - Ergonomic ceramic styloid armor guards that leave the core mechanisms visible
  */
 export function createWrist(
   side: -1 | 1,
@@ -43,77 +43,93 @@ export function createWrist(
   const ledMeshes: THREE.Mesh[] = [];
   const ribbedRings: THREE.Mesh[] = [];
   const styloidCaps: THREE.Mesh[] = [];
+  const wristStaticMechanics = new THREE.Group();
 
   // ==============================================================
-  // 1. ROTARY SWIVEL COLLAR SLEEVE (Receives Forearm Gauntlet)
+  // 1. CIRCULAR BEARING & FOREARM INTERFACE FLANGE
   // ==============================================================
-  const swivelGeo = new THREE.CylinderGeometry(0.043, 0.039, 0.020, 32);
+  const bearingFlangeGeo = new THREE.CylinderGeometry(0.038, 0.039, 0.008, 32);
+  const bearingFlange = new THREE.Mesh(bearingFlangeGeo, materials.joint);
+  bearingFlange.position.set(0, -0.004, 0);
+  wristStaticMechanics.add(bearingFlange);
+
+  const bearingRaceGeo = new THREE.TorusGeometry(0.0375, 0.0020, 8, 32);
+  const bearingRace = new THREE.Mesh(bearingRaceGeo, materials.joint);
+  bearingRace.rotation.x = Math.PI / 2;
+  bearingRace.position.set(0, -0.002, 0);
+  wristStaticMechanics.add(bearingRace);
+
+  // ==============================================================
+  // 2. ROTATIONAL PRONATION / SUPINATION COLLAR (Rotational Structure #1)
+  // ==============================================================
+  const swivelGeo = new THREE.CylinderGeometry(0.036, 0.034, 0.016, 32);
   const swivelCollar = new THREE.Mesh(swivelGeo, materials.joint);
   swivelCollar.name = 'WristSwivelCollar';
-  swivelCollar.position.set(0, -0.004, 0);
+  swivelCollar.position.set(0, -0.012, 0);
   swivelCollar.castShadow = true;
   swivelCollar.receiveShadow = true;
   wristGroup.add(swivelCollar);
 
-  const wristStaticMechanics = new THREE.Group();
-
-  // Concentric Ribbed Mechanical Rings (Layered dark metal detailing)
-  for (const wY of [-0.002, -0.009]) {
-    const wRingGeo = new THREE.TorusGeometry(0.041, 0.0025, 10, 32);
+  // Ribbed mechanical rings with micro-grooves
+  for (const wY of [-0.008, -0.016]) {
+    const wRingGeo = new THREE.TorusGeometry(0.0362, 0.0016, 8, 32);
     const wRing = new THREE.Mesh(wRingGeo, materials.joint);
     wRing.rotation.x = Math.PI / 2;
     wRing.position.set(0, wY, 0);
-    wRing.castShadow = true;
     wristStaticMechanics.add(wRing);
     ribbedRings.push(wRing);
   }
 
-  const tempWristAccents = new THREE.Group();
-
-  // Signature Purple Emissive Accent Ring (Concentric glowing band around swivel collar)
-  const accentGeo = new THREE.TorusGeometry(0.0418, 0.0018, 10, 36);
-  const accentRingRaw = new THREE.Mesh(accentGeo, materials.purpleEmissive);
-  accentRingRaw.rotation.x = Math.PI / 2;
-  accentRingRaw.position.set(0, -0.006, 0);
-  tempWristAccents.add(accentRingRaw);
-
-  // ==============================================================
-  // 2. ROTARY CORE & HARMONIC DRIVE BEARING RACE
-  // ==============================================================
-  const coreHousingGeo = new THREE.CylinderGeometry(0.033, 0.031, 0.012, 28);
-  const rotaryCore = new THREE.Mesh(coreHousingGeo, materials.joint);
-  rotaryCore.name = 'WristRotaryCore';
-  rotaryCore.position.set(0, -0.012, 0);
-  rotaryCore.castShadow = true;
-  rotaryCore.receiveShadow = true;
-  wristStaticMechanics.add(rotaryCore);
-
-  // Perimeter micro-stator spline teeth around harmonic drive
-  const splineCount = 14;
+  // Micro-spline teeth around rotational collar perimeter
+  const splineCount = 16;
   for (let i = 0; i < splineCount; i++) {
     const angle = (i / splineCount) * Math.PI * 2;
-    const toothGeo = new THREE.BoxGeometry(0.0022, 0.008, 0.0025);
+    const toothGeo = new THREE.BoxGeometry(0.0020, 0.010, 0.0020);
     const tooth = new THREE.Mesh(toothGeo, materials.joint);
     tooth.position.set(
-      Math.cos(angle) * 0.033,
+      Math.cos(angle) * 0.0355,
       -0.012,
-      Math.sin(angle) * 0.031
+      Math.sin(angle) * 0.0355
     );
     tooth.rotation.y = -angle;
-    tooth.castShadow = true;
     wristStaticMechanics.add(tooth);
   }
 
+  // Signature Concentric Purple Emissive Accent Ring
+  const tempWristAccents = new THREE.Group();
+  const accentGeo = new THREE.TorusGeometry(0.0365, 0.0016, 8, 36);
+  const accentRingRaw = new THREE.Mesh(accentGeo, materials.purpleEmissive);
+  accentRingRaw.rotation.x = Math.PI / 2;
+  accentRingRaw.position.set(0, -0.012, 0);
+  tempWristAccents.add(accentRingRaw);
+
   // ==============================================================
-  // 3. FLEXION/EXTENSION CROSS-AXIS PIVOT PIN (Transverse Hinge)
+  // 3. COMPACT WRIST MOTOR & TRANSVERSE AXLE (Rotational Structure #2)
   // ==============================================================
-  const pinGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.048, 24);
+  const coreHousingGeo = new THREE.CylinderGeometry(0.026, 0.026, 0.014, 24);
+  const rotaryCore = new THREE.Mesh(coreHousingGeo, materials.joint);
+  rotaryCore.name = 'WristRotaryCore';
+  rotaryCore.position.set(0, -0.022, 0);
+  rotaryCore.castShadow = true;
+  wristStaticMechanics.add(rotaryCore);
+
+  // Motor cooling fin ribs
+  for (let f = 0; f < 8; f++) {
+    const angle = (f / 8) * Math.PI * 2;
+    const finGeo = new THREE.BoxGeometry(0.0016, 0.012, 0.004);
+    const fin = new THREE.Mesh(finGeo, materials.joint);
+    fin.position.set(Math.cos(angle) * 0.027, -0.022, Math.sin(angle) * 0.027);
+    fin.rotation.y = -angle;
+    wristStaticMechanics.add(fin);
+  }
+
+  // Transverse Flexion/Extension Axle Pin (X-axis)
+  const pinGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.052, 24);
   const pivotPin = new THREE.Mesh(pinGeo, materials.joint);
   pivotPin.name = 'WristPivotPin';
   pivotPin.rotation.z = Math.PI / 2;
-  pivotPin.position.set(0, -0.014, 0);
+  pivotPin.position.set(0, -0.022, 0);
   pivotPin.castShadow = true;
-  pivotPin.receiveShadow = true;
   wristStaticMechanics.add(pivotPin);
 
   // Machined Titanium Flange Caps at pin ends
@@ -121,59 +137,72 @@ export function createWrist(
     const endCapGeo = new THREE.CylinderGeometry(0.011, 0.011, 0.003, 16);
     const endCap = new THREE.Mesh(endCapGeo, materials.joint);
     endCap.rotation.z = Math.PI / 2;
-    endCap.position.set(s * 0.0245, -0.014, 0);
-    endCap.castShadow = true;
+    endCap.position.set(s * 0.0265, -0.022, 0);
     wristStaticMechanics.add(endCap);
   }
 
+  // Tendon Cable Ring & Actuator Pulley
+  const cableRingGeo = new THREE.TorusGeometry(0.020, 0.0016, 6, 20);
+  const cableRing = new THREE.Mesh(cableRingGeo, materials.joint);
+  cableRing.rotation.x = Math.PI / 2;
+  cableRing.position.set(0, -0.026, 0);
+  wristStaticMechanics.add(cableRing);
+
   // ==============================================================
-  // 4. MACHINED DUAL-FORK CLEVIS YOKE (Clasps Carpal Stem)
+  // 4. DUAL-FORK CLEVIS YOKE & PALM MOUNTING PLATE
   // ==============================================================
-  // True dual-fork clevis shape with lightening window
   const clevisShape = new THREE.Shape();
-  clevisShape.moveTo(-0.019, 0.012);
-  clevisShape.lineTo(0.019, 0.012);
-  clevisShape.lineTo(0.015, -0.013);
-  clevisShape.lineTo(0.009, -0.015);
-  clevisShape.lineTo(0.009, -0.004);
-  clevisShape.lineTo(-0.009, -0.004);
-  clevisShape.lineTo(-0.009, -0.015);
-  clevisShape.lineTo(-0.015, -0.013);
+  clevisShape.moveTo(-0.020, 0.014);
+  clevisShape.lineTo(0.020, 0.014);
+  clevisShape.lineTo(0.016, -0.014);
+  clevisShape.lineTo(0.010, -0.016);
+  clevisShape.lineTo(0.010, -0.004);
+  clevisShape.lineTo(-0.010, -0.004);
+  clevisShape.lineTo(-0.010, -0.016);
+  clevisShape.lineTo(-0.016, -0.014);
   clevisShape.closePath();
 
-  // Central lightening hole
   const clevisHole = new THREE.Path();
-  clevisHole.moveTo(-0.008, 0.007);
-  clevisHole.lineTo(0.008, 0.007);
-  clevisHole.lineTo(0.006, 0.000);
-  clevisHole.lineTo(-0.006, 0.000);
+  clevisHole.moveTo(-0.008, 0.008);
+  clevisHole.lineTo(0.008, 0.008);
+  clevisHole.lineTo(0.006, 0.001);
+  clevisHole.lineTo(-0.006, 0.001);
   clevisHole.closePath();
   clevisShape.holes.push(clevisHole);
 
   const clevisGeo = new THREE.ExtrudeGeometry(clevisShape, {
     depth: 0.028,
     bevelEnabled: true,
-    bevelThickness: 0.0025,
-    bevelSize: 0.0020,
+    bevelThickness: 0.0022,
+    bevelSize: 0.0018,
     bevelSegments: 2,
   });
   clevisGeo.center();
 
   const distalClevis = new THREE.Mesh(clevisGeo, materials.joint);
   distalClevis.name = 'WristDistalClevis';
-  distalClevis.position.set(0, -0.018, 0);
+  distalClevis.position.set(0, -0.026, 0);
   distalClevis.castShadow = true;
   distalClevis.receiveShadow = true;
   wristGroup.add(distalClevis);
 
-  // Distal Carpal Socket Collar (Mating ring for the hand)
-  const socketGeo = new THREE.CylinderGeometry(0.023, 0.025, 0.008, 24);
+  // Distal Palm Mounting Plate (Separates hand from forearm!)
+  const socketGeo = new THREE.CylinderGeometry(0.026, 0.028, 0.008, 24);
   const distalSocket = new THREE.Mesh(socketGeo, materials.joint);
   distalSocket.name = 'WristDistalSocket';
-  distalSocket.position.set(0, -0.024, 0);
+  distalSocket.position.set(0, -0.034, 0);
   distalSocket.castShadow = true;
   distalSocket.receiveShadow = true;
   wristStaticMechanics.add(distalSocket);
+
+  // 4 M3 socket screws on palm mounting plate
+  for (let b = 0; b < 4; b++) {
+    const angle = (b / 4) * Math.PI * 2 + Math.PI / 4;
+    const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.0024, 6);
+    const bolt = new THREE.Mesh(boltGeo, materials.joint);
+    bolt.position.set(Math.cos(angle) * 0.021, -0.038, Math.sin(angle) * 0.021);
+    wristStaticMechanics.add(bolt);
+  }
 
   // Merge static mechanical components of the wrist
   const mergedWristMechanics = mergeGroupMeshesByMaterial(wristStaticMechanics, materials.joint, 'WristCoreMechanics_Merged', false);
@@ -184,10 +213,10 @@ export function createWrist(
   }
 
   // Concentric purple accent ring at carpal socket interface
-  const carpalAccentGeo = new THREE.TorusGeometry(0.024, 0.0014, 8, 24);
+  const carpalAccentGeo = new THREE.TorusGeometry(0.026, 0.0014, 8, 24);
   const carpalAccent = new THREE.Mesh(carpalAccentGeo, materials.purpleEmissive);
   carpalAccent.rotation.x = Math.PI / 2;
-  carpalAccent.position.set(0, -0.024, 0);
+  carpalAccent.position.set(0, -0.034, 0);
   tempWristAccents.add(carpalAccent);
 
   const accentRing = mergeGroupMeshesByMaterial(tempWristAccents, materials.purpleEmissive, 'WristAccentRing', false, false) || accentRingRaw;
@@ -196,37 +225,36 @@ export function createWrist(
   ledMeshes.push(accentRing);
 
   // ==============================================================
-  // 5. OUTER SHELL: SCULPTED WHITE CERAMIC STYLOID COWLS
+  // 5. OUTER CERAMIC STYLOID ARMOR GUARDS
+  // Flank the wrist pivot without hiding the central mechanics
   // ==============================================================
-  // Left and Right ergonomic styloid armor guards wrapping the pivot
   function createStyloidCowl(cowlSide: -1 | 1): THREE.Mesh {
     const sShape = new THREE.Shape();
-    sShape.moveTo(0, 0.018);
-    sShape.quadraticCurveTo(0.010, 0.014, 0.011, 0.000);
-    sShape.quadraticCurveTo(0.009, -0.016, 0.000, -0.020);
-    sShape.quadraticCurveTo(-0.009, -0.016, -0.011, 0.000);
-    sShape.quadraticCurveTo(-0.010, 0.014, 0, 0.018);
+    sShape.moveTo(0, 0.016);
+    sShape.quadraticCurveTo(0.009, 0.012, 0.010, 0.000);
+    sShape.quadraticCurveTo(0.008, -0.014, 0.000, -0.018);
+    sShape.quadraticCurveTo(-0.008, -0.014, -0.010, 0.000);
+    sShape.quadraticCurveTo(-0.009, 0.012, 0, 0.016);
     sShape.closePath();
 
     const sGeo = new THREE.ExtrudeGeometry(sShape, {
-      depth: 0.0075,
+      depth: 0.0065,
       bevelEnabled: true,
-      bevelThickness: 0.0022,
-      bevelSize: 0.0018,
-      bevelSegments: 3,
-      curveSegments: 16,
+      bevelThickness: 0.0020,
+      bevelSize: 0.0016,
+      bevelSegments: 2,
     });
     sGeo.center();
 
     const mesh = new THREE.Mesh(sGeo, materials.armor);
     mesh.name = cowlSide === -1 ? 'WristStyloidArmor_L' : 'WristStyloidArmor_R';
-    mesh.position.set(cowlSide * 0.0265, -0.014, 0);
+    mesh.position.set(cowlSide * 0.028, -0.022, 0);
     mesh.rotation.y = cowlSide * (Math.PI / 2);
     mesh.castShadow = true;
     mesh.receiveShadow = true;
 
-    // Embedded dark titanium pivot fastener hub in the cowl center
-    const boltGeo = new THREE.CylinderGeometry(0.0045, 0.0045, 0.0085, 12);
+    // Fastener hub
+    const boltGeo = new THREE.CylinderGeometry(0.0040, 0.0040, 0.008, 12);
     const boltMesh = new THREE.Mesh(boltGeo, materials.joint);
     boltMesh.rotation.x = Math.PI / 2;
     mesh.add(boltMesh);
@@ -242,40 +270,36 @@ export function createWrist(
   wristGroup.add(styloidArmorRight);
   styloidCaps.push(styloidArmorRight);
 
-  // ==============================================================
-  // 6. OUTER SHELL: SCULPTED DORSAL BRIDGE COWL
-  // ==============================================================
-  // Ceramic dorsal cowl bridging forearm cuff to metacarpal base
+  // Dorsal ceramic cowl bridging forearm cuff to metacarpal base
   const dorsalShape = new THREE.Shape();
-  dorsalShape.moveTo(-0.018, 0.008);
-  dorsalShape.quadraticCurveTo(0, 0.010, 0.018, 0.008);
-  dorsalShape.lineTo(0.015, -0.012);
-  dorsalShape.quadraticCurveTo(0, -0.014, -0.015, -0.012);
+  dorsalShape.moveTo(-0.016, 0.008);
+  dorsalShape.quadraticCurveTo(0, 0.010, 0.016, 0.008);
+  dorsalShape.lineTo(0.013, -0.012);
+  dorsalShape.quadraticCurveTo(0, -0.014, -0.013, -0.012);
   dorsalShape.closePath();
 
   const dorsalGeo = new THREE.ExtrudeGeometry(dorsalShape, {
-    depth: 0.005,
+    depth: 0.0045,
     bevelEnabled: true,
-    bevelThickness: 0.0020,
-    bevelSize: 0.0016,
+    bevelThickness: 0.0018,
+    bevelSize: 0.0014,
     bevelSegments: 2,
-    curveSegments: 16,
   });
   dorsalGeo.center();
 
   const dorsalCowl = new THREE.Mesh(dorsalGeo, materials.armor);
   dorsalCowl.name = 'WristDorsalBridgeCowl';
-  dorsalCowl.position.set(0, -0.013, 0.018);
+  dorsalCowl.position.set(0, -0.020, 0.018);
   dorsalCowl.rotation.x = 0.08;
   dorsalCowl.castShadow = true;
   dorsalCowl.receiveShadow = true;
   wristGroup.add(dorsalCowl);
 
   // Recessed violet optical sensor slit in dorsal bridge cowl
-  const slitGeo = new THREE.BoxGeometry(0.018, 0.0020, 0.002);
+  const slitGeo = new THREE.BoxGeometry(0.016, 0.0018, 0.002);
   const slitMesh = new THREE.Mesh(slitGeo, materials.purpleEmissive);
   slitMesh.name = 'WristDorsalOpticalSlit';
-  slitMesh.position.set(0, 0, 0.0035);
+  slitMesh.position.set(0, 0, 0.0032);
   dorsalCowl.add(slitMesh);
   ledMeshes.push(slitMesh);
 

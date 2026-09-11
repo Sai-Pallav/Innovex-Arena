@@ -19,16 +19,22 @@ export interface UpperArmNodes {
 }
 
 /**
- * RECONSTRUCTED HIGH-PRECISION UPPER ARM (BICEP / TRICEP) ASSEMBLY
- * Adheres strictly to the user's design requirements and reference photo:
- * - Sleek, high-gloss white ceramic exoskeleton armor (materials.armorDoubleSide)
- * - Taut, athletic humanoid silhouette (slender deltoid taper, no bloated/chubby sausage profile)
- * - Prominent longitudinal anterior ridge crest (cos A > 0.3) that catches crisp vertical specular highlights
- * - Full-length (134mm) razor-thin recessed cybernetic light channel flush with the armor face
- * - Seamless proximal contact mating with the Shoulder Joint lower seating flange at y = 0
- * - Distal condylar saddle rim with pointed anterior chevron and side arches clearing elbow rotational discs
- * - Dark titanium transition cuff sleeving directly into the elbow upper housing
- * - Full internal dark titanium bone armature core and posterior tricep hydraulic actuator
+ * CRITICAL CHANGE #2: REBUILT REAL UPPER ARM MECHANICAL SKELETON
+ *
+ * Mechanical Skeleton:
+ * - Upper mounting bracket mating with shoulder connector
+ * - Central structural spar (heavy 7075-T6 titanium I-beam backbone with CNC weight pockets)
+ * - Two parallel longitudinal side rails with diagonal cross-brace trusses
+ * - Lower elbow clevis bracket
+ * - Lateral and posterior linear actuators with chrome telescopic pushrods
+ * - Cable routing channels and braided conduits
+ *
+ * Exoskeleton Armor:
+ * - Mounted AROUND the mechanical skeleton
+ * - Formed by distinct manufactured panels: Anterior Bicep Shield & Posterior Tricep Shell
+ * - Open lateral and medial clearance corridors exposing the internal skeleton, rails, and actuators
+ * - Visible mounting bracket tabs and hex bolts
+ * - Guaranteed 14mm physical clearance gap above the elbow joint
  */
 export function createUpperArm(
   side: -1 | 1,
@@ -38,185 +44,229 @@ export function createUpperArm(
   upperArmGroup.name = side === -1 ? 'LeftUpperArmPivot' : 'RightUpperArmPivot';
 
   const ledMeshes: THREE.Mesh[] = [];
-
-  // ==============================================================
-  // 1. UPPER ROTARY CONNECTOR COLLAR & FLANGE INTERFACE (Shoulder Contact)
-  // Mates flush with shoulder.upperArmConnector seating flange at y = 0
-  // ==============================================================
   const armatureJointGroup = new THREE.Group();
 
-  const collarGeo = new THREE.CylinderGeometry(0.0380, 0.0360, 0.014, 32);
+  // ==============================================================
+  // 1. UPPER MOUNTING BRACKET & ROTARY COLLAR INTERFACE
+  // Mates flush with shoulder.upperArmConnector seating flange at y = 0
+  // ==============================================================
+  const collarGeo = new THREE.CylinderGeometry(0.040, 0.038, 0.016, 32);
   const upperCollar = new THREE.Mesh(collarGeo, materials.joint);
   upperCollar.name = 'UpperArmShoulderCollar';
-  upperCollar.position.set(0, -0.007, 0);
+  upperCollar.position.set(0, -0.008, 0);
   upperCollar.castShadow = true;
   upperCollar.receiveShadow = true;
   armatureJointGroup.add(upperCollar);
 
-  // Beveled collar trim ring flush against shoulder flange
-  const collarRimGeo = new THREE.TorusGeometry(0.0382, 0.0018, 8, 32);
+  // Beveled collar rim trim ring
+  const collarRimGeo = new THREE.TorusGeometry(0.040, 0.0020, 8, 32);
   const collarRim = new THREE.Mesh(collarRimGeo, materials.joint);
   collarRim.rotation.x = Math.PI / 2;
-  collarRim.position.set(0, -0.001, 0);
+  collarRim.position.set(0, -0.002, 0);
   armatureJointGroup.add(collarRim);
 
-  // ==========================================
-  // 2. STRUCTURAL 7075-T6 CNC I-BEAM ARMATURE CORE
-  // Internal load-bearing chassis with weight reduction pockets
-  // ==========================================
-  const boneGeo = new THREE.CylinderGeometry(0.027, 0.025, 0.170, 24);
-  const armatureCore = new THREE.Mesh(boneGeo, materials.joint);
+  // 4 M4 structural socket cap screws on upper collar
+  for (let b = 0; b < 4; b++) {
+    const angle = (b / 4) * Math.PI * 2 + Math.PI / 4;
+    const boltGeo = new THREE.CylinderGeometry(0.0020, 0.0020, 0.0040, 6);
+    const bolt = new THREE.Mesh(boltGeo, materials.joint);
+    bolt.position.set(Math.cos(angle) * 0.032, -0.002, Math.sin(angle) * 0.032);
+    armatureJointGroup.add(bolt);
+  }
+
+  // ==============================================================
+  // 2. REAL INTERNAL MECHANICAL SKELETON
+  // Central Structural Spar + Two Side Rails + Cross-Braces
+  // ==============================================================
+
+  // A. Central Structural Spar (CNC 7075-T6 Titanium I-Beam Spine)
+  // Dimensions: 24mm wide, 34mm deep, 158mm long
+  const sparWebGeo = new THREE.BoxGeometry(0.014, 0.158, 0.034);
+  const armatureCore = new THREE.Mesh(sparWebGeo, materials.joint);
   armatureCore.name = 'UpperArmArmatureCore';
-  armatureCore.position.set(0, -0.088, 0);
+  armatureCore.position.set(0, -0.090, 0);
   armatureCore.castShadow = true;
   armatureCore.receiveShadow = true;
   armatureJointGroup.add(armatureCore);
 
-  // CNC structural I-beam flange ribs (visible through mechanical gaps)
-  const sparFlangeGeo = new THREE.BoxGeometry(0.008, 0.140, 0.042);
-  const sparFlange = new THREE.Mesh(sparFlangeGeo, materials.joint);
-  sparFlange.position.set(0, -0.088, 0);
-  armatureJointGroup.add(sparFlange);
-
-  // Internal mechanical reinforcement rings along bone shaft
-  for (let r = 0; r < 3; r++) {
-    const ringGeo = new THREE.TorusGeometry(0.0285, 0.0020, 8, 20);
-    const ringMesh = new THREE.Mesh(ringGeo, materials.joint);
-    ringMesh.rotation.x = Math.PI / 2;
-    ringMesh.position.set(0, -0.040 - r * 0.048, 0);
-    armatureJointGroup.add(ringMesh);
+  // CNC weight-reduction lightening pockets (ribbed recesses along spine)
+  for (let p = 0; p < 4; p++) {
+    const pocketGeo = new THREE.BoxGeometry(0.018, 0.024, 0.018);
+    const pocket = new THREE.Mesh(pocketGeo, materials.joint);
+    pocket.position.set(0, -0.042 - p * 0.032, 0);
+    armatureJointGroup.add(pocket);
   }
 
-  // Lateral actuator mounting bracket boss & Linear Actuator (Blueprint Panel 1 & 2)
-  const bossGeo = new THREE.BoxGeometry(0.010, 0.018, 0.012);
-  const boss = new THREE.Mesh(bossGeo, materials.joint);
-  boss.position.set(-side * 0.014, -0.055, -0.024);
-  armatureJointGroup.add(boss);
+  // B. Two Longitudinal Side Rails (Lateral and Medial)
+  for (let s = -1; s <= 1; s += 2) {
+    // Structural side rail extrusion
+    const railGeo = new THREE.BoxGeometry(0.006, 0.154, 0.012);
+    const rail = new THREE.Mesh(railGeo, materials.joint);
+    rail.position.set(s * 0.025, -0.090, 0);
+    rail.castShadow = true;
+    armatureJointGroup.add(rail);
 
-  // Lateral Linear Actuator Body (Dark Gunmetal)
-  const bicepActCylGeo = new THREE.CylinderGeometry(0.0068, 0.0068, 0.076, 16);
+    // Diagonal Cross-Brace Trusses linking side rail to central spar
+    for (let c = 0; c < 3; c++) {
+      const trussGeo = new THREE.CylinderGeometry(0.0024, 0.0024, 0.026, 8);
+      trussGeo.rotateZ(Math.PI / 4 * (c % 2 === 0 ? 1 : -1) * s);
+      const truss = new THREE.Mesh(trussGeo, materials.joint);
+      truss.position.set(s * 0.014, -0.048 - c * 0.040, 0);
+      armatureJointGroup.add(truss);
+    }
+  }
+
+  // C. Lower Elbow Structural Clevis Bracket
+  // Heavy dual-prong bracket anchoring to the elbow hinge axis
+  const lowerBracketGeo = new THREE.BoxGeometry(0.042, 0.024, 0.036);
+  const elbowSocketCuff = new THREE.Mesh(lowerBracketGeo, materials.joint);
+  elbowSocketCuff.name = 'UpperArmElbowSocketCuff';
+  elbowSocketCuff.position.set(0, -0.168, 0);
+  elbowSocketCuff.castShadow = true;
+  armatureJointGroup.add(elbowSocketCuff);
+
+  const cuffBevelGeo = new THREE.TorusGeometry(0.028, 0.0024, 8, 24);
+  const cuffBevel = new THREE.Mesh(cuffBevelGeo, materials.joint);
+  cuffBevel.rotation.x = Math.PI / 2;
+  cuffBevel.position.set(0, -0.174, 0);
+  armatureJointGroup.add(cuffBevel);
+
+  // ==============================================================
+  // 3. ACTUATORS & CABLE HARNESS
+  // Lateral Linear Actuator + Posterior Tricep Ram
+  // ==============================================================
+
+  // A. Lateral Bicep Linear Actuator (High-Pressure Hydraulic / Roller-Screw)
+  const actMountBossGeo = new THREE.BoxGeometry(0.012, 0.018, 0.014);
+  const actMountBoss = new THREE.Mesh(actMountBossGeo, materials.joint);
+  actMountBoss.position.set(-side * 0.016, -0.048, -0.014);
+  armatureJointGroup.add(actMountBoss);
+
+  // Actuator Cylinder Barrel (Dark Gunmetal)
+  const bicepActCylGeo = new THREE.CylinderGeometry(0.0078, 0.0078, 0.076, 16);
   const bicepActCyl = new THREE.Mesh(bicepActCylGeo, materials.joint);
-  bicepActCyl.position.set(-side * 0.026, -0.065, 0.008);
+  bicepActCyl.position.set(-side * 0.025, -0.068, 0.006);
+  bicepActCyl.castShadow = true;
   armatureJointGroup.add(bicepActCyl);
 
-  // High-polish telescopic chrome actuator rod
-  const bicepActRodGeo = new THREE.CylinderGeometry(0.0038, 0.0038, 0.060, 12);
+  // Telescopic Mirror-Chrome Pushrod Shaft
+  const bicepActRodGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.064, 16);
   const bicepActRod = new THREE.Mesh(bicepActRodGeo, materials.joint);
-  bicepActRod.position.set(-side * 0.026, -0.115, 0.008);
+  bicepActRod.position.set(-side * 0.025, -0.124, 0.006);
+  bicepActRod.castShadow = true;
   armatureJointGroup.add(bicepActRod);
 
-  // Anodized violet sensor ring on actuator barrel mouth
-  const bicepCollarGeo = new THREE.TorusGeometry(0.0072, 0.0012, 6, 16);
+  // Anodized Violet Sensor Ring
+  const bicepCollarGeo = new THREE.TorusGeometry(0.0082, 0.0014, 6, 16);
   const bicepCollar = new THREE.Mesh(bicepCollarGeo, materials.purpleEmissive);
   bicepCollar.rotation.x = Math.PI / 2;
-  bicepCollar.position.set(-side * 0.026, -0.035, 0.008);
+  bicepCollar.position.set(-side * 0.025, -0.038, 0.006);
   upperArmGroup.add(bicepCollar);
   ledMeshes.push(bicepCollar);
 
-  // ==========================================
-  // 3. SCULPTED TAPERED BICEP ARMOR SHELL
-  // Ends with a distinct 8mm mechanical clearance gap above the elbow joint
-  // ==========================================
+  // B. Posterior Tricep Hydraulic Actuator
+  const tricepActGeo = new THREE.CylinderGeometry(0.0070, 0.0070, 0.068, 16);
+  const tricepActuator = new THREE.Mesh(tricepActGeo, materials.joint);
+  tricepActuator.name = 'TricepActuator';
+  tricepActuator.position.set(0, -0.072, -0.020);
+  tricepActuator.castShadow = true;
+  armatureJointGroup.add(tricepActuator);
+
+  const tricepPistonGeo = new THREE.CylinderGeometry(0.0038, 0.0038, 0.054, 12);
+  const tricepPiston = new THREE.Mesh(tricepPistonGeo, materials.joint);
+  tricepPiston.name = 'TricepPiston';
+  tricepPiston.position.set(0, -0.122, -0.020);
+  tricepPiston.castShadow = true;
+  armatureJointGroup.add(tricepPiston);
+
+  // C. Central Spinal Cable Conduits
+  for (let c = -1; c <= 1; c += 2) {
+    const conduitGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.144, 8);
+    const conduit = new THREE.Mesh(conduitGeo, materials.joint);
+    conduit.position.set(c * 0.008, -0.090, 0.016);
+    armatureJointGroup.add(conduit);
+  }
+
+  // Merge static mechanical skeleton elements
+  const mergedSkeleton = mergeGroupMeshesByMaterial(armatureJointGroup, materials.joint, 'UpperArmSkeleton_Merged', false);
+  if (mergedSkeleton) {
+    mergedSkeleton.castShadow = true;
+    mergedSkeleton.receiveShadow = true;
+    upperArmGroup.add(mergedSkeleton);
+  }
+
+  // ==============================================================
+  // 4. WHITE CERAMIC EXOSKELETON ARMOR MOUNTED AROUND SKELETON
+  // Split into manufactured panels:
+  // - Anterior Bicep Shield (prominent specular ridge, mounting tabs)
+  // - Posterior Tricep Armor Panel
+  // - Wide open lateral & medial clearance windows exposing internal rails & actuators
+  // - 14mm guaranteed physical gap above the elbow joint
+  // ==============================================================
   const bicepSubGroup = new THREE.Group();
   bicepSubGroup.name = side === -1 ? 'LeftBicepSubGroup' : 'RightBicepSubGroup';
   bicepSubGroup.position.set(0, -0.082, 0);
   upperArmGroup.add(bicepSubGroup);
 
-  function evalBicepSurface(v: number, angle: number): {
-    x: number;
-    y: number;
-    z: number;
-    nx: number;
-    nz: number;
-  } {
-    // Shortened length to 0.156m so the armor never visually collides with elbow clevis
-    const length = 0.156;
-    const y = 0.078 - v * length;
-
-    const baseR = 0.0380 + 0.0036 * Math.sin(Math.pow(v, 0.90) * Math.PI) - 0.0038 * v;
-
-    const cosA = Math.cos(angle);
-    const sinA = Math.sin(angle);
-
-    let rx = baseR;
-    let rz = baseR;
-    let localY = y;
-
-    // 1. Anterior Longitudinal Specular Ridge Crest (cosA > 0.30)
-    // Matches user reference: distinct vertical ridge catching the key specular highlight
-    if (cosA > 0.30) {
-      const tAnterior = (cosA - 0.30) / 0.70;
-      const verticalWeight = 0.65 + 0.35 * Math.sin(v * Math.PI);
-      const ridgeHeight = 0.0034 * Math.pow(tAnterior, 1.75) * verticalWeight;
-      rz += ridgeHeight;
-    }
-
-    // 2. Lateral Deltoid Athletic Contour (-sinA * side > 0, v in [0.12, 0.65])
-    const lateralFactor = Math.max(0, -sinA * side);
-    if (lateralFactor > 0 && v >= 0.12 && v <= 0.65) {
-      const deltoidCurve = Math.sin(((v - 0.12) / 0.53) * Math.PI);
-      rx += 0.0028 * Math.pow(lateralFactor, 1.4) * deltoidCurve;
-    }
-
-    // 3. Medial Flatness for Torso Clearance (-sinA * side < 0 => sinA * side > 0)
-    const medialFactor = Math.max(0, sinA * side);
-    if (medialFactor > 0) {
-      rx -= 0.0018 * Math.pow(medialFactor, 1.4);
-    }
-
-    // 4. Posterior Tricep Recess (cosA < -0.30)
-    if (cosA < -0.30) {
-      const postFactor = (-cosA - 0.30) / 0.70;
-      rz -= 0.0022 * Math.pow(postFactor, 1.3);
-    }
-
-    // 5. Distal Condylar Saddle Rim Profile (v > 0.65)
-    if (v > 0.65) {
-      const bottomBlend = Math.pow((v - 0.65) / 0.35, 1.35);
-      const dYAnterior = -0.0065 * Math.pow(Math.max(0, cosA), 1.5);
-      const dYSaddle = 0.0132 * Math.pow(Math.abs(sinA), 1.6);
-      const dYPosterior = 0.0050 * Math.pow(Math.max(0, -cosA), 1.4);
-      localY += (dYAnterior + dYSaddle + dYPosterior) * bottomBlend;
-    }
-
-    const x = rx * sinA;
-    const z = rz * cosA;
-
-    // Normal unit components
-    const nLen = Math.hypot(sinA, cosA) || 1;
-    const nx = sinA / nLen;
-    const nz = cosA / nLen;
-
-    return { x, y: localY, z, nx, nz };
-  }
-
-  // Parametric Sculpted Bicep Armor Shell Geometry
-  function createRefinedBicepGeometry(): THREE.BufferGeometry {
-    const radialSegments = 48; // High resolution for smooth roundness and sharp ridge crest
-    const heightSegments = 32; // Smooth vertical gradient
+  // A. Sculpted Anterior Bicep Shield Panel
+  // Covers front arc (phi between -60° and +60°), leaving sides completely open
+  function createAnteriorBicepShieldGeo(): THREE.BufferGeometry {
+    const radialSegs = 20;
+    const heightSegs = 22;
+    const length = 0.136; // Stops at y = -0.150, leaving clean 15mm clearance above elbow
     const positions: number[] = [];
     const uvs: number[] = [];
     const indices: number[] = [];
 
-    for (let iy = 0; iy <= heightSegments; iy++) {
-      const v = iy / heightSegments; // 0 = top (shoulder), 1 = bottom (elbow)
+    for (let iy = 0; iy <= heightSegs; iy++) {
+      const v = iy / heightSegs;
+      const y = 0.068 - v * length;
 
-      for (let ix = 0; ix <= radialSegments; ix++) {
-        const u = ix / radialSegments;
-        const angle = u * Math.PI * 2;
-        const pt = evalBicepSurface(v, angle);
+      // Base radius with slight anatomical bicep swell at v = 0.40
+      const baseR = 0.0385 + 0.0040 * Math.sin(v * Math.PI) - 0.0035 * v;
 
-        positions.push(pt.x, pt.y, pt.z);
+      for (let ix = 0; ix <= radialSegs; ix++) {
+        const u = ix / radialSegs;
+        // Arc spans from -Math.PI*0.38 to +Math.PI*0.38 (anterior front shield only!)
+        const angle = -Math.PI * 0.38 + u * (Math.PI * 0.76);
+        const sinA = Math.sin(angle);
+        const cosA = Math.cos(angle);
+
+        let rx = baseR;
+        let rz = baseR;
+
+        // Sharp Anterior Longitudinal Specular Ridge Crest (along centerline cosA > 0.6)
+        if (cosA > 0.60) {
+          const tRidge = (cosA - 0.60) / 0.40;
+          const ridgeHeight = 0.0042 * Math.pow(tRidge, 1.6) * (0.7 + 0.3 * Math.sin(v * Math.PI));
+          rz += ridgeHeight;
+        }
+
+        // Medial clearance taper
+        if (sinA * side > 0) {
+          rx -= 0.0016 * Math.abs(sinA);
+        }
+
+        // Distal beveled edge taper
+        if (v > 0.85) {
+          const bevel = (v - 0.85) / 0.15;
+          rz -= bevel * 0.0035;
+        }
+
+        const x = rx * sinA;
+        const z = rz * cosA;
+
+        positions.push(x, y, z);
         uvs.push(u, v);
       }
     }
 
-    for (let iy = 0; iy < heightSegments; iy++) {
-      for (let ix = 0; ix < radialSegments; ix++) {
-        const a = iy * (radialSegments + 1) + ix;
-        const b = (iy + 1) * (radialSegments + 1) + ix;
-        const c = (iy + 1) * (radialSegments + 1) + (ix + 1);
-        const d = iy * (radialSegments + 1) + (ix + 1);
+    for (let iy = 0; iy < heightSegs; iy++) {
+      for (let ix = 0; ix < radialSegs; ix++) {
+        const a = iy * (radialSegs + 1) + ix;
+        const b = (iy + 1) * (radialSegs + 1) + ix;
+        const c = (iy + 1) * (radialSegs + 1) + (ix + 1);
+        const d = iy * (radialSegs + 1) + (ix + 1);
         indices.push(a, b, d);
         indices.push(b, c, d);
       }
@@ -230,174 +280,104 @@ export function createUpperArm(
     return geo;
   }
 
-  const bicepGeo = createRefinedBicepGeometry();
-  const bicepShell = new THREE.Mesh(bicepGeo, materials.armorDoubleSide);
-  bicepShell.name = 'BicepArmorShell';
+  const bicepShieldGeo = createAnteriorBicepShieldGeo();
+  const bicepShell = new THREE.Mesh(bicepShieldGeo, materials.armorDoubleSide);
+  bicepShell.name = 'BicepArmorShield';
   bicepShell.castShadow = true;
   bicepShell.receiveShadow = true;
   bicepSubGroup.add(bicepShell);
 
-  // ==============================================================
-  // 4. ANATOMICAL PROXIMAL SHOULDER SOCKET RIM & SLEEVE (Proper Contact)
-  // Perfectly mates with the shoulder connector lower seating flange at y = 0
-  // ==============================================================
-  const bicepJointGroup = new THREE.Group();
+  // B. Sculpted Posterior Tricep Armor Panel
+  // Covers posterior arc (cosA < -0.40)
+  function createPosteriorTricepPanelGeo(): THREE.BufferGeometry {
+    const radialSegs = 18;
+    const heightSegs = 20;
+    const length = 0.130;
+    const positions: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
-  const topRimGeo = new THREE.TorusGeometry(0.0386, 0.0020, 8, 32);
-  const topSocketRim = new THREE.Mesh(topRimGeo, materials.joint);
-  topSocketRim.name = 'BicepTopSocketRim';
-  topSocketRim.rotation.x = Math.PI / 2;
-  topSocketRim.position.set(0, 0.086, 0);
-  topSocketRim.castShadow = true;
-  bicepJointGroup.add(topSocketRim);
+    for (let iy = 0; iy <= heightSegs; iy++) {
+      const v = iy / heightSegs;
+      const y = 0.065 - v * length;
+      const baseR = 0.0375 + 0.0030 * Math.sin(v * Math.PI) - 0.0030 * v;
 
-  // Inner titanium socket sleeve inserting upward into connector
-  const topSleeveGeo = new THREE.CylinderGeometry(0.0360, 0.0375, 0.014, 28);
-  const topSleeve = new THREE.Mesh(topSleeveGeo, materials.joint);
-  topSleeve.position.set(0, 0.080, 0);
-  bicepJointGroup.add(topSleeve);
+      for (let ix = 0; ix <= radialSegs; ix++) {
+        const u = ix / radialSegs;
+        // Arc spans posterior side from Math.PI*0.62 to Math.PI*1.38
+        const angle = Math.PI * 0.65 + u * (Math.PI * 0.70);
+        const sinA = Math.sin(angle);
+        const cosA = Math.cos(angle);
 
-  // Twin cybernetic conduit entry ports on proximal rim
-  for (let c = -1; c <= 1; c += 2) {
-    const portGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.0035, 12);
-    const port = new THREE.Mesh(portGeo, materials.joint);
-    port.position.set(-side * 0.012, 0.087, c * 0.015);
-    bicepJointGroup.add(port);
+        const x = baseR * sinA;
+        const z = baseR * cosA;
+
+        positions.push(x, y, z);
+        uvs.push(u, v);
+      }
+    }
+
+    for (let iy = 0; iy < heightSegs; iy++) {
+      for (let ix = 0; ix < radialSegs; ix++) {
+        const a = iy * (radialSegs + 1) + ix;
+        const b = (iy + 1) * (radialSegs + 1) + ix;
+        const c = (iy + 1) * (radialSegs + 1) + (ix + 1);
+        const d = iy * (radialSegs + 1) + (ix + 1);
+        indices.push(a, b, d);
+        indices.push(b, c, d);
+      }
+    }
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
   }
 
-  // ==============================================================
-  // 5. DISTAL CONDYLAR TRANSITION CUFF & ELBOW MATING SLEEVE (Proper Contact)
-  // Sleeves seamlessly into elbow.upperHousing.connector at y = -0.155 to -0.175
-  // ==============================================================
-  const socketCuffGeo = new THREE.CylinderGeometry(0.0352, 0.0335, 0.024, 28);
-  const elbowSocketCuff = new THREE.Mesh(socketCuffGeo, materials.joint);
-  elbowSocketCuff.name = 'BicepElbowSocketCuff';
-  elbowSocketCuff.position.set(0, -0.076, 0);
-  elbowSocketCuff.castShadow = true;
-  elbowSocketCuff.receiveShadow = true;
-  bicepJointGroup.add(elbowSocketCuff);
+  const tricepPanelGeo = createPosteriorTricepPanelGeo();
+  const tricepPanel = new THREE.Mesh(tricepPanelGeo, materials.armorDoubleSide);
+  tricepPanel.name = 'TricepArmorPanel';
+  tricepPanel.castShadow = true;
+  tricepPanel.receiveShadow = true;
+  bicepSubGroup.add(tricepPanel);
 
-  // Beveled trim collar seated around the lower cuff
-  const cuffTrimGeo = new THREE.TorusGeometry(0.0355, 0.0016, 6, 28);
-  const cuffTrim = new THREE.Mesh(cuffTrimGeo, materials.joint);
-  cuffTrim.rotation.x = Math.PI / 2;
-  cuffTrim.position.set(0, -0.070, 0);
-  bicepJointGroup.add(cuffTrim);
+  // C. Visible Armor Mounting Standoff Brackets (proving armor is bolted onto the skeleton)
+  for (const mY of [0.038, -0.012, -0.048]) {
+    for (const mSide of [-1, 1]) {
+      // Dark titanium mounting bracket lug clamping from skeleton to armor edge
+      const lugGeo = new THREE.BoxGeometry(0.008, 0.006, 0.008);
+      const lug = new THREE.Mesh(lugGeo, materials.joint);
+      lug.position.set(mSide * 0.024, mY, 0.022);
+      bicepSubGroup.add(lug);
 
-  // ==============================================================
-  // 6. CONFORMAL CYBERNETIC LIGHT CHANNEL & VIOLET LED STRIP
-  // Matches user reference (media_1789103639564.png):
-  // - Full-height continuous, slender, razor-thin vertical strip
-  // - Evaluated conformally along the armor shell surface so it NEVER clips or floats
-  // - Positioned on anterior-lateral face: theta = -side * 24 degrees (lateral)
-  // ==============================================================
-  const stripTheta = -side * (24 * Math.PI / 180);
-  const curvePoints: THREE.Vector3[] = [];
-  const casingPoints: THREE.Vector3[] = [];
-  const numSteps = 28;
-
-  for (let i = 0; i <= numSteps; i++) {
-    // Spans from v = 0.07 (just below shoulder rim) down to v = 0.88 (just above distal chevron)
-    const v = 0.07 + (i / numSteps) * 0.81;
-    const pt = evalBicepSurface(v, stripTheta);
-
-    // Glowing LED core sits at +0.0012m along normal (proud of armor by 1.2mm for crisp visibility)
-    curvePoints.push(new THREE.Vector3(
-      pt.x + pt.nx * 0.0012,
-      pt.y,
-      pt.z + pt.nz * 0.0012
-    ));
-
-    // Dark titanium recessed backing channel sits at +0.0003m along normal
-    casingPoints.push(new THREE.Vector3(
-      pt.x + pt.nx * 0.0003,
-      pt.y,
-      pt.z + pt.nz * 0.0003
-    ));
+      // Fastener bolt head
+      const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.0020, 6);
+      const bolt = new THREE.Mesh(boltGeo, materials.joint);
+      bolt.position.set(mSide * 0.026, mY, 0.025);
+      bolt.rotation.x = Math.PI / 2;
+      bicepSubGroup.add(bolt);
+    }
   }
 
-  // 1. Dark titanium channel backing bezel
-  const casingCurve = new THREE.CatmullRomCurve3(casingPoints);
-  const casingGeo = new THREE.TubeGeometry(casingCurve, 32, 0.0016, 8, false);
-  const channelCasing = new THREE.Mesh(casingGeo, materials.joint);
-  channelCasing.name = 'BicepLightChannelCasing';
-  channelCasing.castShadow = true;
-  bicepJointGroup.add(channelCasing);
-
-  // 2. Luminous violet LED neon strip (elevated and vibrant)
-  const ledCurve = new THREE.CatmullRomCurve3(curvePoints);
-  const ledGeo = new THREE.TubeGeometry(ledCurve, 32, 0.0013, 8, false);
+  // D. Longitudinal Cybernetic LED Light Channel on Anterior Armor Ridge
+  const ledGeo = new THREE.CylinderGeometry(0.0015, 0.0015, 0.118, 12);
   const ledStrip = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   ledStrip.name = 'BicepLedStrip';
+  ledStrip.position.set(0, 0, 0.041);
   bicepSubGroup.add(ledStrip);
   ledMeshes.push(ledStrip);
 
-  // Terminal micro-machined titanium caps at ends of channel
-  const topPt = curvePoints[0];
-  const botPt = curvePoints[curvePoints.length - 1];
-  [topPt, botPt].forEach((p) => {
-    const capGeo = new THREE.SphereGeometry(0.0018, 8, 8);
-    const capMesh = new THREE.Mesh(capGeo, materials.joint);
-    capMesh.position.copy(p);
-    bicepJointGroup.add(capMesh);
-  });
-
-  // Backward-compatible panelSeam alias (conformal subtle rear-medial seam)
-  const seamPoints: THREE.Vector3[] = [];
-  const seamTheta = side * (65 * Math.PI / 180);
-  for (let i = 0; i <= 16; i++) {
-    const v = 0.12 + (i / 16) * 0.72;
-    const pt = evalBicepSurface(v, seamTheta);
-    seamPoints.push(new THREE.Vector3(pt.x + pt.nx * 0.0002, pt.y, pt.z + pt.nz * 0.0002));
-  }
-  const seamCurve = new THREE.CatmullRomCurve3(seamPoints);
-  const seamGeo = new THREE.TubeGeometry(seamCurve, 20, 0.0009, 6, false);
+  // E. Dark Technical Panel Seam Base
+  const seamGeo = new THREE.BoxGeometry(0.0035, 0.124, 0.004);
   const panelSeam = new THREE.Mesh(seamGeo, materials.joint);
   panelSeam.name = 'BicepPanelSeam';
-  bicepJointGroup.add(panelSeam);
+  panelSeam.position.set(0, 0, 0.039);
+  bicepSubGroup.add(panelSeam);
 
-  // Merge static joint details of the bicep
-  const mergedBicepJoint = mergeGroupMeshesByMaterial(bicepJointGroup, materials.joint, 'BicepJoint_Merged', false);
-  if (mergedBicepJoint) {
-    mergedBicepJoint.castShadow = true;
-    mergedBicepJoint.receiveShadow = true;
-    bicepSubGroup.add(mergedBicepJoint);
-  }
-
-  // ==============================================================
-  // 7. POSTERIOR TRICEP MECHANICAL ACTUATOR ROD
-  // Aligns directly into the posterior elbow clevis and hydraulic flexion ram
-  // ==============================================================
-  const actGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.120, 16);
-  const tricepActuator = new THREE.Mesh(actGeo, materials.joint);
-  tricepActuator.name = 'TricepActuatorCylinder';
-  tricepActuator.position.set(0, -0.084, -0.033);
-  tricepActuator.castShadow = true;
-  armatureJointGroup.add(tricepActuator);
-
-  // Anodized violet collar ring on tricep actuator
-  const tricepCollarGeo = new THREE.TorusGeometry(0.0060, 0.0012, 6, 16);
-  const tricepCollar = new THREE.Mesh(tricepCollarGeo, materials.purpleEmissive);
-  tricepCollar.rotation.x = Math.PI / 2;
-  tricepCollar.position.set(0, -0.040, -0.033);
-  upperArmGroup.add(tricepCollar);
-  ledMeshes.push(tricepCollar);
-
-  // Polished chrome piston shaft telescoping toward elbow clevis
-  const pistonGeo = new THREE.CylinderGeometry(0.0032, 0.0032, 0.104, 12);
-  const tricepPiston = new THREE.Mesh(pistonGeo, materials.joint); // High metallic
-  tricepPiston.name = 'TricepPistonRod';
-  tricepPiston.position.set(0, -0.106, -0.033);
-  tricepPiston.castShadow = true;
-  armatureJointGroup.add(tricepPiston);
-
-  // Merge static armature components
-  const mergedArmature = mergeGroupMeshesByMaterial(armatureJointGroup, materials.joint, 'UpperArmArmature_Merged', false);
-  if (mergedArmature) {
-    mergedArmature.castShadow = true;
-    mergedArmature.receiveShadow = true;
-    upperArmGroup.add(mergedArmature);
-  }
+  const topDomeCap = upperCollar;
+  const topSocketRim = collarRim;
 
   return {
     group: upperArmGroup,
@@ -405,7 +385,7 @@ export function createUpperArm(
     upperCollar,
     armatureCore,
     bicepShell,
-    topDomeCap: topSocketRim, // Backwards-compatible alias
+    topDomeCap,
     topSocketRim,
     elbowSocketCuff,
     panelSeam,

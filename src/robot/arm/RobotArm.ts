@@ -78,9 +78,9 @@ export function createRobotArm(
   forearm.group.add(wrist.group);
   ledMeshes.push(...wrist.ledMeshes);
 
-  // 6. Hand Assembly (attached hierarchically to wristPivot)
+  // 6. Hand Assembly (attached hierarchically to wristPivot at distal mounting plate)
   const hand = createHand(side, materials);
-  hand.group.position.set(0, -0.024, 0);
+  hand.group.position.set(0, -0.034, 0);
   wrist.group.add(hand.group);
   ledMeshes.push(...hand.ledMeshes);
 
