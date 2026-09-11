@@ -19,6 +19,7 @@ export const NAVIGATION_LINKS: NavItem[] = [
   { name: 'Classes', href: '/classes' },
   { name: 'Events', href: '/events' },
   { name: 'Careers', href: '/careers' },
+  { name: 'CAD Blueprint', href: '/blueprint' },
   { name: 'Internships', href: '/interns' },
   { name: 'Contact', href: '/contact' },
 ];
