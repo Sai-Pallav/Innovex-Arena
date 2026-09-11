@@ -60,44 +60,48 @@ export function createUpperArm(
   collarRim.position.set(0, -0.001, 0);
   armatureJointGroup.add(collarRim);
 
-  // ==============================================================
-  // 2. STRUCTURAL DARK TITANIUM ARMATURE CORE (Internal Bone Chassis)
-  // Runs continuously from shoulder collar to elbow housing to prevent hollow voids
-  // ==============================================================
-  const boneGeo = new THREE.CylinderGeometry(0.029, 0.027, 0.174, 24);
+  // ==========================================
+  // 2. STRUCTURAL 7075-T6 CNC I-BEAM ARMATURE CORE
+  // Internal load-bearing chassis with weight reduction pockets
+  // ==========================================
+  const boneGeo = new THREE.CylinderGeometry(0.027, 0.025, 0.170, 24);
   const armatureCore = new THREE.Mesh(boneGeo, materials.joint);
   armatureCore.name = 'UpperArmArmatureCore';
-  armatureCore.position.set(0, -0.090, 0);
+  armatureCore.position.set(0, -0.088, 0);
   armatureCore.castShadow = true;
   armatureCore.receiveShadow = true;
   armatureJointGroup.add(armatureCore);
 
+  // CNC structural I-beam flange ribs (visible through mechanical gaps)
+  const sparFlangeGeo = new THREE.BoxGeometry(0.008, 0.140, 0.042);
+  const sparFlange = new THREE.Mesh(sparFlangeGeo, materials.joint);
+  sparFlange.position.set(0, -0.088, 0);
+  armatureJointGroup.add(sparFlange);
+
   // Internal mechanical reinforcement rings along bone shaft
-  for (let r = 0; r < 2; r++) {
-    const ringGeo = new THREE.TorusGeometry(0.0295, 0.0016, 6, 20);
+  for (let r = 0; r < 3; r++) {
+    const ringGeo = new THREE.TorusGeometry(0.0285, 0.0020, 8, 20);
     const ringMesh = new THREE.Mesh(ringGeo, materials.joint);
     ringMesh.rotation.x = Math.PI / 2;
-    ringMesh.position.set(0, -0.050 - r * 0.065, 0);
+    ringMesh.position.set(0, -0.040 - r * 0.048, 0);
     armatureJointGroup.add(ringMesh);
   }
 
-  // ==============================================================
-  // 3. SCULPTED WHITE CERAMIC BICEP ARMOR SHELL SUBGROUP
-  // Grouped to support multi-stage exploded view animation
-  // ==============================================================
+  // Lateral actuator mounting bracket boss
+  const bossGeo = new THREE.BoxGeometry(0.010, 0.018, 0.012);
+  const boss = new THREE.Mesh(bossGeo, materials.joint);
+  boss.position.set(-side * 0.014, -0.055, -0.024);
+  armatureJointGroup.add(boss);
+
+  // ==========================================
+  // 3. SCULPTED TAPERED BICEP ARMOR SHELL
+  // Ends with a distinct 8mm mechanical clearance gap above the elbow joint
+  // ==========================================
   const bicepSubGroup = new THREE.Group();
   bicepSubGroup.name = side === -1 ? 'LeftBicepSubGroup' : 'RightBicepSubGroup';
-  // Anchored at y = -0.088 so local y in [-0.087, +0.087] spans upperArm Y in [-0.175, -0.001]
-  bicepSubGroup.position.set(0, -0.088, 0);
+  bicepSubGroup.position.set(0, -0.082, 0);
   upperArmGroup.add(bicepSubGroup);
 
-  /**
-   * Conformal surface evaluation function for bicep armor shell.
-   * Coordinate conventions:
-   * Left Arm (side = -1): Lateral is +X (sinA > 0), Medial is -X (sinA < 0)
-   * Right Arm (side = +1): Lateral is -X (sinA < 0), Medial is +X (sinA > 0)
-   * Thus, lateral direction is given by (-sinA * side > 0).
-   */
   function evalBicepSurface(v: number, angle: number): {
     x: number;
     y: number;
@@ -105,13 +109,11 @@ export function createUpperArm(
     nx: number;
     nz: number;
   } {
-    const length = 0.174;
-    const y = 0.087 - v * length;
+    // Shortened length to 0.156m so the armor never visually collides with elbow clevis
+    const length = 0.156;
+    const y = 0.078 - v * length;
 
-    // Slender athletic humanoid base radius:
-    // 0.0385m at shoulder collar, gentle swell to ~0.0410m at bicep peak,
-    // and tapers down to 0.0353m at elbow joint
-    const baseR = 0.0385 + 0.0038 * Math.sin(Math.pow(v, 0.90) * Math.PI) - 0.0032 * v;
+    const baseR = 0.0380 + 0.0036 * Math.sin(Math.pow(v, 0.90) * Math.PI) - 0.0038 * v;
 
     const cosA = Math.cos(angle);
     const sinA = Math.sin(angle);

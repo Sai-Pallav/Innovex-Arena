@@ -129,13 +129,71 @@ export function createForearm(
 
   const forearmJointGroup = new THREE.Group();
 
-  // 2. Internal Dark Titanium Sleeve (Prevents any hollow voids when viewed from any angle)
-  const innerSleeveGeo = new THREE.CylinderGeometry(0.042, 0.034, 0.176, 28);
-  const innerSleeve = new THREE.Mesh(innerSleeveGeo, materials.joint);
-  innerSleeve.name = 'ForearmInternalSleeve';
-  innerSleeve.position.set(0, -0.092, 0);
-  innerSleeve.castShadow = true;
-  forearmJointGroup.add(innerSleeve);
+  // 2. INTERNAL 7075-T6 TRIANGULATED CNC SPACEFRAME CHASSIS
+  // Real mechanical truss replacing solid cylinder, visible through armor cutouts
+  const chassisSpineGeo = new THREE.BoxGeometry(0.032, 0.170, 0.034);
+  const chassisSpine = new THREE.Mesh(chassisSpineGeo, materials.joint);
+  chassisSpine.name = 'ForearmChassisSpine';
+  chassisSpine.position.set(0, -0.092, 0);
+  chassisSpine.castShadow = true;
+  forearmJointGroup.add(chassisSpine);
+
+  // Longitudinal CNC structural spars (Lateral and Medial)
+  for (let s = -1; s <= 1; s += 2) {
+    const sparGeo = new THREE.BoxGeometry(0.005, 0.160, 0.010);
+    const spar = new THREE.Mesh(sparGeo, materials.joint);
+    spar.position.set(s * 0.024, -0.092, 0);
+    forearmJointGroup.add(spar);
+  }
+
+  // Triangulated diagonal cross-brace ribs
+  for (let r = 0; r < 3; r++) {
+    const braceGeo = new THREE.CylinderGeometry(0.0025, 0.0025, 0.046, 8);
+    braceGeo.rotateZ(Math.PI / 4 * (r % 2 === 0 ? 1 : -1));
+    const brace = new THREE.Mesh(braceGeo, materials.joint);
+    brace.position.set(0, -0.045 - r * 0.045, 0);
+    forearmJointGroup.add(brace);
+  }
+
+  // 3. DUAL INVERTED ROLLER-SCREW LINEAR ACTUATORS
+  // Parallel mechanical pushrod cylinders driving wrist pitch & yaw
+  for (let a = -1; a <= 1; a += 2) {
+    // Actuator Pressure Cylinder (Dark gunmetal)
+    const actCylGeo = new THREE.CylinderGeometry(0.0060, 0.0060, 0.078, 16);
+    const actCyl = new THREE.Mesh(actCylGeo, materials.joint);
+    actCyl.position.set(a * 0.013, -0.070, 0.006);
+    actCyl.castShadow = true;
+    forearmJointGroup.add(actCyl);
+
+    // Chrome telescopic pushrod shaft
+    const rodGeo = new THREE.CylinderGeometry(0.0034, 0.0034, 0.072, 12);
+    const rod = new THREE.Mesh(rodGeo, materials.joint);
+    rod.position.set(a * 0.013, -0.130, 0.006);
+    rod.castShadow = true;
+    forearmJointGroup.add(rod);
+
+    // Anodized violet collar ring
+    const collarGeo = new THREE.TorusGeometry(0.0064, 0.0012, 6, 16);
+    const collar = new THREE.Mesh(collarGeo, materials.purpleEmissive);
+    collar.rotation.x = Math.PI / 2;
+    collar.position.set(a * 0.013, -0.045, 0.006);
+    forearmGroup.add(collar);
+    ledMeshes.push(collar);
+  }
+
+  // Central Wrist Roll Hollow Drive Tube (Carbon fiber / titanium pass-through)
+  const driveTubeGeo = new THREE.CylinderGeometry(0.009, 0.009, 0.168, 16);
+  const driveTube = new THREE.Mesh(driveTubeGeo, materials.joint);
+  driveTube.position.set(0, -0.092, -0.004);
+  forearmJointGroup.add(driveTube);
+
+  // Braided Cybernetic Wiring Conduit Harness
+  const conduitGeo = new THREE.CylinderGeometry(0.004, 0.004, 0.160, 10);
+  const conduit = new THREE.Mesh(conduitGeo, materials.joint);
+  conduit.position.set(-side * 0.018, -0.092, -0.014);
+  forearmJointGroup.add(conduit);
+
+  const innerSleeve = chassisSpine; // Backwards-compatible alias
 
   // 3. Upper Elbow Socket Transition Collar (Sleek dark titanium cup receiving the lower joint housing)
   const collarGeo = new THREE.CylinderGeometry(0.043, 0.041, 0.016, 32);

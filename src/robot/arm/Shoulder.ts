@@ -53,17 +53,50 @@ export function createShoulder(
   const ledMeshes: THREE.Mesh[] = [];
 
   // ==========================================
-  // 2. DUMMY ARMOR GROUP (Compatibility)
+  // 2. SCULPTED WHITE CERAMIC PAULDRON COWL
+  // Floating hard-surface armor shell wrapping the shoulder joint crown
+  // while exposing the inner bearing race, stator, and dampers
   // ==========================================
   const armorGroup = new THREE.Group();
   armorGroup.name = side === -1 ? 'LeftShoulderArmor' : 'RightShoulderArmor';
-  armorGroup.visible = false;
+  armorGroup.position.set(side * 0.012, 0.024, 0);
   shoulderGroup.add(armorGroup);
 
-  const shoulderArmor = new THREE.Mesh();
+  // Sculpted volumetric aerodynamic pauldron cowl
+  const pauldronGeo = new THREE.SphereGeometry(
+    0.052,
+    28,
+    18,
+    0,
+    Math.PI * 2,
+    0,
+    Math.PI * 0.48
+  );
+  // Scale non-uniformly for athletic deltoid contour
+  pauldronGeo.scale(1.05, 0.72, 0.95);
+
+  const shoulderArmor = new THREE.Mesh(pauldronGeo, materials.armorDoubleSide);
   shoulderArmor.name = side === -1 ? 'LeftShoulderArmorShell' : 'RightShoulderArmorShell';
-  shoulderArmor.visible = false;
+  shoulderArmor.rotation.z = -side * 0.28;
+  shoulderArmor.rotation.x = 0.08;
+  shoulderArmor.castShadow = true;
+  shoulderArmor.receiveShadow = true;
   armorGroup.add(shoulderArmor);
+
+  // Pauldron lower chamfer rim ring
+  const pauldronRimGeo = new THREE.TorusGeometry(0.048, 0.0022, 8, 28);
+  const pauldronRim = new THREE.Mesh(pauldronRimGeo, materials.joint);
+  pauldronRim.rotation.x = Math.PI / 2;
+  pauldronRim.position.set(0, -0.016, 0);
+  armorGroup.add(pauldronRim);
+
+  // Pauldron recessed purple accent slit
+  const pauldronAccentGeo = new THREE.TorusGeometry(0.042, 0.0014, 6, 24, Math.PI * 0.8);
+  const pauldronAccent = new THREE.Mesh(pauldronAccentGeo, materials.purpleEmissive);
+  pauldronAccent.rotation.z = side * 0.4;
+  pauldronAccent.position.set(side * 0.006, 0.008, 0.024);
+  armorGroup.add(pauldronAccent);
+  ledMeshes.push(pauldronAccent);
 
   // ==========================================
   // 3. STRUCTURAL GIMBAL YOKE (Chassis Frame)
@@ -194,6 +227,17 @@ export function createShoulder(
   tempJointCore.add(inwardRim);
   tempJointCore.add(coreHousing);
   tempJointCore.add(coreBevel);
+
+  // 6 M4 Socket Cap Fasteners on Torso Mount Flange
+  for (let b = 0; b < 6; b++) {
+    const angle = (b / 6) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.003, 6);
+    const bolt = new THREE.Mesh(boltGeo, materials.joint);
+    bolt.rotation.z = Math.PI / 2;
+    bolt.position.set(-side * 0.012, Math.sin(angle) * 0.040, Math.cos(angle) * 0.040);
+    tempJointCore.add(bolt);
+  }
+
   const jointCoreMerged = mergeGroupMeshesByMaterial(tempJointCore, materials.joint, 'ShoulderCore_Merged')!;
   tempJointCore.traverse((child) => {
     if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
