@@ -527,7 +527,7 @@ export function createThumb(
   const thumbGroup = new THREE.Group();
   thumbGroup.name = 'Thumb';
   // Positioned at thenar eminence on medial-anterior palm margin
-  thumbGroup.position.set(-side * 0.024, -0.020, 0.008);
+  thumbGroup.position.set(-side * 0.027, -0.024, 0.009);
 
   // Natural opposable resting orientation: angled forward (+Z) and medially toward index/palm
   thumbGroup.rotation.set(0.38, -side * 0.48, -side * 0.20);
@@ -541,11 +541,11 @@ export function createThumb(
   };
 
   // 1. Thenar Base Swivel Knuckle (Dark core ball)
-  const ballGeo = new THREE.SphereGeometry(0.0108, 16, 14);
+  const ballGeo = new THREE.SphereGeometry(0.0125, 16, 14);
   const baseBall = new THREE.Mesh(ballGeo, materials.joint);
 
   // Sculpted white ceramic thenar protector cowl over base ball
-  const thenarCowlGeo = new THREE.SphereGeometry(0.0120, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.52);
+  const thenarCowlGeo = new THREE.SphereGeometry(0.0138, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.52);
   const thenarCowl = new THREE.Mesh(thenarCowlGeo, materials.armor);
   thenarCowl.position.set(0, 0, 0.0020);
   thenarCowl.scale.set(0.92, 0.96, 0.72);
@@ -554,9 +554,9 @@ export function createThumb(
   thumbGroup.add(thenarCowl);
 
   // Dark Swivel Collar Bracket
-  const collarGeo = new THREE.CylinderGeometry(0.0090, 0.0090, 0.007, 14);
+  const collarGeo = new THREE.CylinderGeometry(0.0105, 0.0105, 0.008, 14);
   const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
-  baseCollar.position.set(0, -0.005, 0);
+  baseCollar.position.set(0, -0.006, 0);
 
   const tempBase = new THREE.Group();
   tempBase.add(baseBall);
@@ -570,8 +570,8 @@ export function createThumb(
   proximalGroup.name = 'ThumbProximal';
   thumbGroup.add(proximalGroup);
 
-  const proxLen = 0.028;
-  const proxRad = 0.0070;
+  const proxLen = 0.035;
+  const proxRad = 0.0084;
   const pBoneGeo = new THREE.CylinderGeometry(proxRad * 0.45, proxRad * 0.40, proxLen, 12);
   const pBoneMesh = new THREE.Mesh(pBoneGeo, materials.joint);
   pBoneMesh.position.set(0, -proxLen * 0.5, 0);
@@ -610,8 +610,8 @@ export function createThumb(
   distalGroup.position.set(0, -proxLen, 0);
   proximalGroup.add(distalGroup);
 
-  const distLen = 0.022;
-  const distRad = 0.0060;
+  const distLen = 0.026;
+  const distRad = 0.0070;
   const dBoneGeo = new THREE.CylinderGeometry(distRad * 0.40, distRad * 0.26, distLen * 0.85, 12);
   const dBoneMesh = new THREE.Mesh(dBoneGeo, materials.joint);
   dBoneMesh.position.set(0, -distLen * 0.45, 0);

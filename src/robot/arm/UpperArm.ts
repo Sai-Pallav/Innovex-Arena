@@ -87,11 +87,31 @@ export function createUpperArm(
     armatureJointGroup.add(ringMesh);
   }
 
-  // Lateral actuator mounting bracket boss
+  // Lateral actuator mounting bracket boss & Linear Actuator (Blueprint Panel 1 & 2)
   const bossGeo = new THREE.BoxGeometry(0.010, 0.018, 0.012);
   const boss = new THREE.Mesh(bossGeo, materials.joint);
   boss.position.set(-side * 0.014, -0.055, -0.024);
   armatureJointGroup.add(boss);
+
+  // Lateral Linear Actuator Body (Dark Gunmetal)
+  const bicepActCylGeo = new THREE.CylinderGeometry(0.0068, 0.0068, 0.076, 16);
+  const bicepActCyl = new THREE.Mesh(bicepActCylGeo, materials.joint);
+  bicepActCyl.position.set(-side * 0.026, -0.065, 0.008);
+  armatureJointGroup.add(bicepActCyl);
+
+  // High-polish telescopic chrome actuator rod
+  const bicepActRodGeo = new THREE.CylinderGeometry(0.0038, 0.0038, 0.060, 12);
+  const bicepActRod = new THREE.Mesh(bicepActRodGeo, materials.joint);
+  bicepActRod.position.set(-side * 0.026, -0.115, 0.008);
+  armatureJointGroup.add(bicepActRod);
+
+  // Anodized violet sensor ring on actuator barrel mouth
+  const bicepCollarGeo = new THREE.TorusGeometry(0.0072, 0.0012, 6, 16);
+  const bicepCollar = new THREE.Mesh(bicepCollarGeo, materials.purpleEmissive);
+  bicepCollar.rotation.x = Math.PI / 2;
+  bicepCollar.position.set(-side * 0.026, -0.035, 0.008);
+  upperArmGroup.add(bicepCollar);
+  ledMeshes.push(bicepCollar);
 
   // ==========================================
   // 3. SCULPTED TAPERED BICEP ARMOR SHELL

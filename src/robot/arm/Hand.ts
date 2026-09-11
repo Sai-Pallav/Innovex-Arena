@@ -29,51 +29,51 @@ export interface HandNodes {
 const ANATOMICAL_FINGER_SPECS: FingerSpec[] = [
   {
     name: 'Index',
-    spreadX: -0.0210,
-    offsetY: -0.045,
+    spreadX: -0.0240,
+    offsetY: -0.054,
     offsetZ: 0.003,
-    proximalLength: 0.031,
-    middleLength: 0.021,
-    distalLength: 0.016,
-    proximalRadius: 0.0066,
-    middleRadius: 0.0056,
-    distalRadius: 0.0048,
+    proximalLength: 0.038,
+    middleLength: 0.025,
+    distalLength: 0.018,
+    proximalRadius: 0.0076,
+    middleRadius: 0.0066,
+    distalRadius: 0.0056,
   },
   {
     name: 'Middle',
-    spreadX: -0.0070,
-    offsetY: -0.048,
+    spreadX: -0.0080,
+    offsetY: -0.058,
     offsetZ: 0.005,
-    proximalLength: 0.034,
-    middleLength: 0.023,
-    distalLength: 0.017,
-    proximalRadius: 0.0068,
-    middleRadius: 0.0058,
-    distalRadius: 0.0050,
+    proximalLength: 0.042,
+    middleLength: 0.028,
+    distalLength: 0.020,
+    proximalRadius: 0.0080,
+    middleRadius: 0.0070,
+    distalRadius: 0.0060,
   },
   {
     name: 'Ring',
-    spreadX: 0.0070,
-    offsetY: -0.046,
+    spreadX: 0.0085,
+    offsetY: -0.055,
     offsetZ: 0.003,
-    proximalLength: 0.032,
-    middleLength: 0.021,
-    distalLength: 0.016,
-    proximalRadius: 0.0066,
-    middleRadius: 0.0056,
-    distalRadius: 0.0048,
+    proximalLength: 0.039,
+    middleLength: 0.026,
+    distalLength: 0.018,
+    proximalRadius: 0.0076,
+    middleRadius: 0.0066,
+    distalRadius: 0.0056,
   },
   {
     name: 'Little',
-    spreadX: 0.0200,
-    offsetY: -0.042,
+    spreadX: 0.0245,
+    offsetY: -0.050,
     offsetZ: -0.001,
-    proximalLength: 0.026,
-    middleLength: 0.017,
-    distalLength: 0.013,
-    proximalRadius: 0.0058,
-    middleRadius: 0.0048,
-    distalRadius: 0.0040,
+    proximalLength: 0.032,
+    middleLength: 0.021,
+    distalLength: 0.015,
+    proximalRadius: 0.0068,
+    middleRadius: 0.0058,
+    distalRadius: 0.0048,
   },
 ];
 
@@ -90,15 +90,15 @@ function createSculptedDorsalArmor(material: THREE.Material): THREE.Mesh {
   const normals: number[] = [];
 
   // Lengthwise slices from proximal carpal border to distal knuckle arch
-  const ySteps = [-0.004, -0.012, -0.022, -0.032, -0.040, -0.046];
+  const ySteps = [-0.004, -0.014, -0.026, -0.038, -0.048, -0.055];
   const numY = ySteps.length;
 
-  // Broad width profile along Y (flares out across the wide palm to 56mm span)
-  const halfWidths = [0.0210, 0.0235, 0.0265, 0.0285, 0.0285, 0.0265];
+  // Broad width profile along Y (flares out across the wide palm to 66mm span)
+  const halfWidths = [0.0240, 0.0270, 0.0300, 0.0325, 0.0325, 0.0305];
 
   // Distal arch offsets (Middle knuckle projects most distal, sides curve back)
   const getDistalY = (normX: number): number => {
-    return -0.040 + 0.005 * Math.pow(normX, 2);
+    return -0.048 + 0.006 * Math.pow(normX, 2);
   };
 
   // Helper to add a quad (2 triangles) with computed face normal
@@ -253,11 +253,11 @@ export function createHand(
   // ==========================================
   // 1. DARK TITANIUM PALM CHASSIS (Wide Athletic Monocoque)
   // ==========================================
-  // Widths calibrated to knuckle arch: 42mm at carpal, 54mm at knuckles, 40mm length
+  // Widths calibrated to knuckle arch: 48mm at carpal, 63mm at knuckles, 50mm length
   const chassisShape = new THREE.Shape();
-  const topW = 0.0210;
-  const botW = 0.0270;
-  const len = 0.040;
+  const topW = 0.0240;
+  const botW = 0.0315;
+  const len = 0.050;
 
   chassisShape.moveTo(-topW, 0);
   chassisShape.lineTo(topW, 0);
@@ -266,34 +266,34 @@ export function createHand(
   chassisShape.closePath();
 
   const chassisGeo = new THREE.ExtrudeGeometry(chassisShape, {
-    depth: 0.017,
+    depth: 0.019,
     bevelEnabled: true,
-    bevelThickness: 0.0022,
-    bevelSize: 0.0016,
+    bevelThickness: 0.0024,
+    bevelSize: 0.0018,
     bevelSegments: 2,
   });
   chassisGeo.center();
 
   const palmChassis = new THREE.Mesh(chassisGeo, materials.joint);
   palmChassis.name = 'Palm';
-  palmChassis.position.set(0, -0.024, -0.002);
+  palmChassis.position.set(0, -0.029, -0.002);
   palmChassis.castShadow = true;
   palmChassis.receiveShadow = true;
   palmJointGroup.add(palmChassis);
 
   // CNC Titanium Metacarpal Frame Ribs (Hard-surface internal chassis detailing)
   for (let r = 0; r < 3; r++) {
-    const ribX = (r - 1) * 0.014;
-    const ribGeo = new THREE.BoxGeometry(0.0025, 0.028, 0.004);
+    const ribX = (r - 1) * 0.016;
+    const ribGeo = new THREE.BoxGeometry(0.0028, 0.036, 0.0045);
     const ribMesh = new THREE.Mesh(ribGeo, materials.joint);
-    ribMesh.position.set(ribX, -0.024, -0.007);
+    ribMesh.position.set(ribX, -0.029, -0.008);
     palmJointGroup.add(ribMesh);
   }
 
   // Finger Knuckle Mounting Header Plate (Transverse CNC titanium bar)
-  const headerGeo = new THREE.BoxGeometry(0.052, 0.005, 0.014);
+  const headerGeo = new THREE.BoxGeometry(0.062, 0.006, 0.016);
   const headerMesh = new THREE.Mesh(headerGeo, materials.joint);
-  headerMesh.position.set(0, -0.042, 0.001);
+  headerMesh.position.set(0, -0.051, 0.001);
   palmJointGroup.add(headerMesh);
 
   // ==========================================
@@ -307,18 +307,18 @@ export function createHand(
   // 3. SIGNATURE VIOLET EMISSIVE LED ACCENT SLIT
   // (Flush mounted in sculpted dorsal armor channel)
   // ==========================================
-  const dorsalLedGeo = new THREE.BoxGeometry(0.0022, 0.022, 0.0022);
+  const dorsalLedGeo = new THREE.BoxGeometry(0.0024, 0.028, 0.0024);
   const dorsalLed = new THREE.Mesh(dorsalLedGeo, materials.purpleEmissive);
   dorsalLed.name = 'DorsalLed';
-  dorsalLed.position.set(0, -0.019, 0.0088);
+  dorsalLed.position.set(0, -0.024, 0.0092);
   handGroup.add(dorsalLed);
   ledMeshes.push(dorsalLed);
 
   // Titanium bezel end-brackets for the LED slit
-  for (const bY of [-0.008, -0.030]) {
-    const bezelGeo = new THREE.BoxGeometry(0.0032, 0.0022, 0.0024);
+  for (const bY of [-0.010, -0.038]) {
+    const bezelGeo = new THREE.BoxGeometry(0.0034, 0.0024, 0.0026);
     const bezel = new THREE.Mesh(bezelGeo, materials.joint);
-    bezel.position.set(0, bY, 0.0088);
+    bezel.position.set(0, bY, 0.0092);
     palmJointGroup.add(bezel);
   }
 
@@ -357,23 +357,23 @@ export function createHand(
   // A. Thenar Eminence Pad (Medial thumb base cushion)
   const thenarGeo = new THREE.BoxGeometry(0.015, 0.024, 0.0030);
   const thenarPad = new THREE.Mesh(thenarGeo, materials.joint);
-  thenarPad.position.set(-side * 0.013, -0.022, -0.0105);
+  thenarPad.position.set(-side * 0.015, -0.026, -0.0115);
   thenarPad.rotation.z = -side * 0.14;
   palmarPadsTemp.add(thenarPad);
 
   // B. Hypothenar Eminence Pad (Lateral palm runner)
-  const hypoGeo = new THREE.BoxGeometry(0.013, 0.026, 0.0030);
+  const hypoGeo = new THREE.BoxGeometry(0.015, 0.030, 0.0032);
   const hypoPad = new THREE.Mesh(hypoGeo, materials.joint);
-  hypoPad.position.set(side * 0.014, -0.024, -0.0105);
+  hypoPad.position.set(side * 0.016, -0.028, -0.0115);
   hypoPad.rotation.z = side * 0.06;
   palmarPadsTemp.add(hypoPad);
 
   // C. Metacarpal Grip Cushion Tiles (Under each knuckle base)
   ANATOMICAL_FINGER_SPECS.forEach((spec) => {
     const posX = side * spec.spreadX;
-    const mcpPadGeo = new THREE.BoxGeometry(0.0085, 0.0085, 0.0026);
+    const mcpPadGeo = new THREE.BoxGeometry(0.010, 0.010, 0.0028);
     const mcpPad = new THREE.Mesh(mcpPadGeo, materials.joint);
-    mcpPad.position.set(posX, spec.offsetY + 0.009, -0.0105);
+    mcpPad.position.set(posX, spec.offsetY + 0.011, -0.0115);
     palmarPadsTemp.add(mcpPad);
   });
 

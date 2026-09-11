@@ -54,75 +54,75 @@ export function createShoulder(
 
   // ==========================================
   // 2. SCULPTED WHITE CERAMIC PAULDRON COWL
-  // Floating hard-surface armor shell wrapping the shoulder joint crown
-  // while exposing the inner bearing race, stator, and dampers
+  // Full anatomical deltoid armor shell wrapping the shoulder joint crown,
+  // anterior face, and lateral deltoid contour, eliminating exposed pipe look
   // ==========================================
   const armorGroup = new THREE.Group();
   armorGroup.name = side === -1 ? 'LeftShoulderArmor' : 'RightShoulderArmor';
-  armorGroup.position.set(side * 0.012, 0.024, 0);
+  armorGroup.position.set(side * 0.008, 0.012, 0);
   shoulderGroup.add(armorGroup);
 
-  // Sculpted volumetric aerodynamic pauldron cowl
+  // Form-fitting aerodynamic deltoid pauldron cowl
   const pauldronGeo = new THREE.SphereGeometry(
-    0.052,
-    28,
-    18,
+    0.064,
+    32,
+    22,
     0,
     Math.PI * 2,
     0,
-    Math.PI * 0.48
+    Math.PI * 0.54
   );
-  // Scale non-uniformly for athletic deltoid contour
-  pauldronGeo.scale(1.05, 0.72, 0.95);
+  // Athletic deltoid curvature
+  pauldronGeo.scale(1.12, 0.88, 1.06);
 
   const shoulderArmor = new THREE.Mesh(pauldronGeo, materials.armorDoubleSide);
   shoulderArmor.name = side === -1 ? 'LeftShoulderArmorShell' : 'RightShoulderArmorShell';
-  shoulderArmor.rotation.z = -side * 0.28;
-  shoulderArmor.rotation.x = 0.08;
+  shoulderArmor.rotation.z = -side * 0.16;
+  shoulderArmor.rotation.x = 0.04;
   shoulderArmor.castShadow = true;
   shoulderArmor.receiveShadow = true;
   armorGroup.add(shoulderArmor);
 
-  // Pauldron lower chamfer rim ring
-  const pauldronRimGeo = new THREE.TorusGeometry(0.048, 0.0022, 8, 28);
+  // Pauldron lower chamfer rim gasket
+  const pauldronRimGeo = new THREE.TorusGeometry(0.062, 0.0028, 8, 32);
   const pauldronRim = new THREE.Mesh(pauldronRimGeo, materials.joint);
   pauldronRim.rotation.x = Math.PI / 2;
-  pauldronRim.position.set(0, -0.016, 0);
+  pauldronRim.position.set(0, -0.024, 0);
   armorGroup.add(pauldronRim);
 
-  // Pauldron recessed purple accent slit
-  const pauldronAccentGeo = new THREE.TorusGeometry(0.042, 0.0014, 6, 24, Math.PI * 0.8);
+  // Pauldron recessed purple accent slit along deltoid line
+  const pauldronAccentGeo = new THREE.TorusGeometry(0.056, 0.0016, 6, 28, Math.PI * 0.75);
   const pauldronAccent = new THREE.Mesh(pauldronAccentGeo, materials.purpleEmissive);
-  pauldronAccent.rotation.z = side * 0.4;
-  pauldronAccent.position.set(side * 0.006, 0.008, 0.024);
+  pauldronAccent.rotation.z = side * 0.25;
+  pauldronAccent.position.set(side * 0.004, 0.004, 0.028);
   armorGroup.add(pauldronAccent);
   ledMeshes.push(pauldronAccent);
 
   // ==========================================
   // 3. STRUCTURAL GIMBAL YOKE (Chassis Frame)
   // Arches over the joint from the chest frame, giving the shoulder a solid,
-  // engineered industrial skeleton rather than a floating naked disc.
+  // engineered industrial skeleton integrated into the torso socket
   // ==========================================
   const gimbalYoke = new THREE.Group();
   gimbalYoke.name = side === -1 ? 'LeftGimbalYoke' : 'RightGimbalYoke';
   shoulderGroup.add(gimbalYoke);
 
-  // A. Heavy-duty C-shaped cast titanium truss yoke wrapping the joint
+  // Heavy-duty C-shaped cast titanium truss yoke wrapping the joint
   const yokeCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(-side * 0.012, 0.010, -0.024),
-    new THREE.Vector3(-side * 0.008, 0.038, -0.014),
-    new THREE.Vector3(side * 0.014, 0.046, 0.000),
-    new THREE.Vector3(side * 0.032, 0.036, 0.012),
-    new THREE.Vector3(side * 0.038, 0.012, 0.020),
+    new THREE.Vector3(-side * 0.010, 0.006, -0.020),
+    new THREE.Vector3(-side * 0.004, 0.032, -0.010),
+    new THREE.Vector3(side * 0.010, 0.038, 0.000),
+    new THREE.Vector3(side * 0.024, 0.028, 0.010),
+    new THREE.Vector3(side * 0.028, 0.008, 0.016),
   ]);
-  const yokeSpineGeo = new THREE.TubeGeometry(yokeCurve, 18, 0.0068, 8, false);
+  const yokeSpineGeo = new THREE.TubeGeometry(yokeCurve, 18, 0.0058, 8, false);
   const yokeSpine = new THREE.Mesh(yokeSpineGeo, materials.joint);
 
-  // B. Structural cross-ribs & weight-reduction gussets
-  const ribGeo = new THREE.BoxGeometry(0.012, 0.028, 0.008);
+  // Structural cross-ribs & weight-reduction gussets
+  const ribGeo = new THREE.BoxGeometry(0.010, 0.022, 0.006);
   const yokeRib = new THREE.Mesh(ribGeo, materials.joint);
-  yokeRib.position.set(side * 0.008, 0.034, 0.000);
-  yokeRib.rotation.z = side * 0.35;
+  yokeRib.position.set(side * 0.006, 0.026, 0.000);
+  yokeRib.rotation.z = side * 0.25;
 
   const tempYoke = new THREE.Group();
   tempYoke.add(yokeSpine);
@@ -134,14 +134,6 @@ export function createShoulder(
     }
   });
   gimbalYoke.add(yokeMerged);
-
-  // C. Conduit harness clamp with purple accent line
-  const clampGeo = new THREE.TorusGeometry(0.007, 0.0022, 6, 12);
-  const clampMesh = new THREE.Mesh(clampGeo, materials.purpleEmissive);
-  clampMesh.position.set(side * 0.018, 0.038, 0.008);
-  clampMesh.rotation.y = Math.PI / 2;
-  gimbalYoke.add(clampMesh);
-  ledMeshes.push(clampMesh);
 
   // ==========================================
   // 4. HYDRAULIC DAMPER ACTUATOR
@@ -210,21 +202,27 @@ export function createShoulder(
   inwardRim.rotation.y = Math.PI / 2;
   inwardRim.position.set(-side * 0.010, 0, 0);
 
-  // Main Dark Titanium Spherical-Cylindrical Rotary Housing Core
-  const coreHousingGeo = new THREE.CylinderGeometry(0.046, 0.046, 0.036, 28);
+  // Main Dark Titanium Spherical Ball Joint Core (Blueprint Panel 3)
+  const sphereBallGeo = new THREE.SphereGeometry(0.046, 28, 22);
+  const sphereBall = new THREE.Mesh(sphereBallGeo, materials.joint);
+  sphereBall.position.set(side * 0.008, 0, 0);
+
+  // Concentric bearing race collar
+  const coreHousingGeo = new THREE.CylinderGeometry(0.046, 0.046, 0.024, 28);
   const coreHousing = new THREE.Mesh(coreHousingGeo, materials.joint);
   coreHousing.rotation.z = Math.PI / 2;
-  coreHousing.position.set(side * 0.016, 0, 0);
+  coreHousing.position.set(side * 0.008, 0, 0);
 
   // Machined bevel ring around core housing
-  const coreBevelGeo = new THREE.TorusGeometry(0.046, 0.0030, 8, 28);
+  const coreBevelGeo = new THREE.TorusGeometry(0.046, 0.0028, 8, 28);
   const coreBevel = new THREE.Mesh(coreBevelGeo, materials.joint);
   coreBevel.rotation.y = Math.PI / 2;
-  coreBevel.position.set(side * 0.002, 0, 0);
+  coreBevel.position.set(side * 0.004, 0, 0);
 
   const tempJointCore = new THREE.Group();
   tempJointCore.add(torsoMountPlate);
   tempJointCore.add(inwardRim);
+  tempJointCore.add(sphereBall);
   tempJointCore.add(coreHousing);
   tempJointCore.add(coreBevel);
 
@@ -234,7 +232,7 @@ export function createShoulder(
     const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.003, 6);
     const bolt = new THREE.Mesh(boltGeo, materials.joint);
     bolt.rotation.z = Math.PI / 2;
-    bolt.position.set(-side * 0.012, Math.sin(angle) * 0.040, Math.cos(angle) * 0.040);
+    bolt.position.set(-side * 0.006, Math.sin(angle) * 0.038, Math.cos(angle) * 0.038);
     tempJointCore.add(bolt);
   }
 
@@ -249,7 +247,7 @@ export function createShoulder(
   // B. Stator Ring & Harmonic Core
   const innerStructure = new THREE.Group();
   innerStructure.name = side === -1 ? 'LeftInnerStructure' : 'RightInnerStructure';
-  innerStructure.position.set(side * 0.018, 0, 0);
+  innerStructure.position.set(side * 0.010, 0, 0);
   jointGroup.add(innerStructure);
 
   const statorBaseGeo = new THREE.CylinderGeometry(0.047, 0.047, 0.016, 24);
@@ -283,7 +281,7 @@ export function createShoulder(
   // C. Cycloidal Planetary Drive Ring (Exploded Stage 4)
   const cycloidalDrive = new THREE.Group();
   cycloidalDrive.name = side === -1 ? 'LeftCycloidalDrive' : 'RightCycloidalDrive';
-  cycloidalDrive.position.set(side * 0.026, 0, 0);
+  cycloidalDrive.position.set(side * 0.014, 0, 0);
   jointGroup.add(cycloidalDrive);
 
   // Planetary ring body
@@ -318,18 +316,18 @@ export function createShoulder(
   // D. Precision Concentric Bearing Race & LED Halo (Exploded Stage 5)
   const tempShoulderAccents = new THREE.Group();
 
-  // Signature Concentric Purple Emissive Accent Ring
-  const accentGeo = new THREE.TorusGeometry(0.032, 0.0024, 8, 28);
+  // Signature Concentric Purple Emissive Accent Ring (Concentric within bearing)
+  const accentGeo = new THREE.TorusGeometry(0.032, 0.0022, 8, 28);
   const accentRingRaw = new THREE.Mesh(accentGeo, materials.purpleEmissive);
   accentRingRaw.rotation.y = Math.PI / 2;
-  accentRingRaw.position.set(side * 0.034, 0, 0);
+  accentRingRaw.position.set(side * 0.017, 0, 0);
   tempShoulderAccents.add(accentRingRaw);
 
   // Secondary inner concentric halo line
-  const innerHaloGeo = new THREE.TorusGeometry(0.020, 0.0016, 6, 20);
+  const innerHaloGeo = new THREE.TorusGeometry(0.020, 0.0015, 6, 20);
   const innerHalo = new THREE.Mesh(innerHaloGeo, materials.purpleEmissive);
   innerHalo.rotation.y = Math.PI / 2;
-  innerHalo.position.set(side * 0.036, 0, 0);
+  innerHalo.position.set(side * 0.018, 0, 0);
   tempShoulderAccents.add(innerHalo);
 
   const accentRing = mergeGroupMeshesByMaterial(tempShoulderAccents, materials.purpleEmissive, side === -1 ? 'LeftShoulderAccentRing' : 'RightShoulderAccentRing', false, false) || accentRingRaw;
@@ -342,13 +340,13 @@ export function createShoulder(
   const innerRing = new THREE.Mesh(innerRingGeo, materials.joint);
   innerRing.name = side === -1 ? 'LeftInnerRing' : 'RightInnerRing';
   innerRing.rotation.y = Math.PI / 2;
-  innerRing.position.set(side * 0.035, 0, 0);
+  innerRing.position.set(side * 0.0185, 0, 0);
   jointGroup.add(innerRing);
 
   // E. Precision Billet Faceplate & Fasteners (Exploded Stage 6)
   const faceplateHub = new THREE.Group();
   faceplateHub.name = side === -1 ? 'LeftFaceplateHub' : 'RightFaceplateHub';
-  faceplateHub.position.set(side * 0.038, 0, 0);
+  faceplateHub.position.set(side * 0.020, 0, 0);
   jointGroup.add(faceplateHub);
 
   // Outer beveled retaining casing ring

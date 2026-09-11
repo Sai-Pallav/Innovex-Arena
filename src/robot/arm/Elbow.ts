@@ -7,36 +7,36 @@ import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
  * Centralized dimensions, clearances, and angular limits.
  */
 export const ELBOW_CONFIG = {
-  // Transverse Axis & Core Dimensions (meters)
-  hingeRadius: 0.032,           // Central hinge core outer radius
-  hingeWidth: 0.076,            // Total transverse span along X-axis
-  coreRadius: 0.027,            // Inner cylindrical core radius
-  knuckleWidth: 0.015,          // Width of individual upper clevis knuckles
+  // Transverse Axis & Core Dimensions (meters) - Calibrated to arm width
+  hingeRadius: 0.029,           // Central hinge core outer radius
+  hingeWidth: 0.066,            // Total transverse span along X-axis
+  coreRadius: 0.025,            // Inner cylindrical core radius
+  knuckleWidth: 0.013,          // Width of individual upper clevis knuckles
   clevisGap: 0.0015,            // Clearance between interlocking knuckles
-  centerKnuckleWidth: 0.028,    // Width of lower center knuckle (rotates with forearm)
+  centerKnuckleWidth: 0.024,    // Width of lower center knuckle (rotates with forearm)
   
   // Central Hinge Pin (Axle)
-  axlePinRadius: 0.0135,        // Central axle pin radius
-  axleBoreRadius: 0.0060,       // Hollow core bore radius
-  axlePinLength: 0.082,         // Total length of central pin spanning side to side
+  axlePinRadius: 0.0120,        // Central axle pin radius
+  axleBoreRadius: 0.0055,       // Hollow core bore radius
+  axlePinLength: 0.070,         // Total length of central pin spanning side to side
   
   // Dual Side Rotational Discs
-  discOuterRadius: 0.0345,      // Outer beveled ring radius
-  discThickness: 0.0065,        // Thickness of side cover
-  discOffsetX: 0.0385,          // Lateral & medial X offsets from joint center
-  emissiveRingRadius: 0.0235,   // Purple accent ring radius
-  emissiveRingTube: 0.0020,     // Purple accent ring tube thickness
-  innerCapRadius: 0.0125,       // Recessed central metallic hub cap radius
+  discOuterRadius: 0.0310,      // Outer beveled ring radius flush with arm flanks
+  discThickness: 0.0055,        // Thickness of side cover
+  discOffsetX: 0.0330,          // Lateral & medial X offsets from joint center
+  emissiveRingRadius: 0.0210,   // Purple accent ring radius
+  emissiveRingTube: 0.0016,     // Purple accent ring tube thickness
+  innerCapRadius: 0.0110,       // Recessed central metallic hub cap radius
   
   // Upper Joint Housing (Stationary with Upper Arm)
-  upperHousingRadius: 0.0355,   // Upper mechanical collar radius
-  upperHousingHeight: 0.028,    // Vertical height extending into upper arm socket
-  upperHousingOffsetY: 0.016,   // Center Y position relative to elbow origin
+  upperHousingRadius: 0.0335,   // Upper mechanical collar radius
+  upperHousingHeight: 0.026,    // Vertical height extending into upper arm socket
+  upperHousingOffsetY: 0.015,   // Center Y position relative to elbow origin
   
   // Lower Joint Housing (Articulates on forearmPivot with Forearm)
-  lowerHousingRadius: 0.0340,   // Lower mechanical collar radius
-  lowerHousingHeight: 0.026,    // Vertical height extending into forearm gauntlet
-  lowerHousingOffsetY: -0.014,  // Center Y position relative to forearm pivot
+  lowerHousingRadius: 0.0325,   // Lower mechanical collar radius
+  lowerHousingHeight: 0.024,    // Vertical height extending into forearm gauntlet
+  lowerHousingOffsetY: -0.013,  // Center Y position relative to forearm pivot
   
   // Angular Limits (radians)
   // Flexion is negative rotation around X-axis (-X)

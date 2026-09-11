@@ -98,7 +98,18 @@ export function createForearm(
     }
 
     for (let iy = 0; iy < heightSegments; iy++) {
+      const vMid = (iy + 0.5) / heightSegments;
       for (let ix = 0; ix < radialSegments; ix++) {
+        const uMid = (ix + 0.5) / radialSegments;
+        const ang = uMid * Math.PI * 2;
+        const sinMid = Math.sin(ang);
+
+        // Open structural side windows exposing internal spaceframe & actuators (Blueprint Panel 5)
+        const isSideWindow = vMid > 0.18 && vMid < 0.82 && Math.abs(sinMid) > 0.56;
+        if (isSideWindow) {
+          continue;
+        }
+
         const a = iy * (radialSegments + 1) + ix;
         const b = (iy + 1) * (radialSegments + 1) + ix;
         const c = (iy + 1) * (radialSegments + 1) + (ix + 1);
@@ -155,28 +166,28 @@ export function createForearm(
     forearmJointGroup.add(brace);
   }
 
-  // 3. DUAL INVERTED ROLLER-SCREW LINEAR ACTUATORS
-  // Parallel mechanical pushrod cylinders driving wrist pitch & yaw
+  // 3. DUAL INVERTED ROLLER-SCREW LINEAR ACTUATORS (Blueprint Panel 5)
+  // Parallel mechanical pushrod cylinders driving wrist pitch & yaw, centered in open windows
   for (let a = -1; a <= 1; a += 2) {
     // Actuator Pressure Cylinder (Dark gunmetal)
-    const actCylGeo = new THREE.CylinderGeometry(0.0060, 0.0060, 0.078, 16);
+    const actCylGeo = new THREE.CylinderGeometry(0.0062, 0.0062, 0.078, 16);
     const actCyl = new THREE.Mesh(actCylGeo, materials.joint);
-    actCyl.position.set(a * 0.013, -0.070, 0.006);
+    actCyl.position.set(a * 0.022, -0.070, 0.000);
     actCyl.castShadow = true;
     forearmJointGroup.add(actCyl);
 
     // Chrome telescopic pushrod shaft
-    const rodGeo = new THREE.CylinderGeometry(0.0034, 0.0034, 0.072, 12);
+    const rodGeo = new THREE.CylinderGeometry(0.0036, 0.0036, 0.072, 12);
     const rod = new THREE.Mesh(rodGeo, materials.joint);
-    rod.position.set(a * 0.013, -0.130, 0.006);
+    rod.position.set(a * 0.022, -0.130, 0.000);
     rod.castShadow = true;
     forearmJointGroup.add(rod);
 
     // Anodized violet collar ring
-    const collarGeo = new THREE.TorusGeometry(0.0064, 0.0012, 6, 16);
+    const collarGeo = new THREE.TorusGeometry(0.0066, 0.0012, 6, 16);
     const collar = new THREE.Mesh(collarGeo, materials.purpleEmissive);
     collar.rotation.x = Math.PI / 2;
-    collar.position.set(a * 0.013, -0.045, 0.006);
+    collar.position.set(a * 0.022, -0.045, 0.000);
     forearmGroup.add(collar);
     ledMeshes.push(collar);
   }
