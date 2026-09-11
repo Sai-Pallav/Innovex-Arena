@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface FootNodes {
   group: THREE.Group;
@@ -135,13 +136,18 @@ export function createFoot(
   });
   soleGeo.center();
 
+  // Group containing stationary sole chassis, tread pads, and heel thruster
+  const footJointGroup = new THREE.Group();
+  footJointGroup.name = side === -1 ? 'FootJointCore_L' : 'FootJointCore_R';
+  footGroup.add(footJointGroup);
+
   const soleChassis = new THREE.Mesh(soleGeo, materials.joint);
   soleChassis.name = side === -1 ? 'FootSole_L' : 'FootSole_R';
   soleChassis.rotation.x = Math.PI / 2;
   soleChassis.position.set(0, -cfg.height + cfg.soleThickness * 0.5, (cfg.toeOffset + cfg.heelOffset) * 0.5);
   soleChassis.castShadow = true;
   soleChassis.receiveShadow = true;
-  footGroup.add(soleChassis);
+  footJointGroup.add(soleChassis);
 
   // ==========================================
   // 2. SEGMENTED TREAD PADS (High-grip textured sole elements)
@@ -155,7 +161,7 @@ export function createFoot(
     const pad = new THREE.Mesh(padGeo, materials.joint);
     pad.position.set(0, -cfg.height + 0.0014, padZ);
     pad.castShadow = true;
-    footGroup.add(pad);
+    footJointGroup.add(pad);
     treadPads.push(pad);
   }
 
@@ -191,12 +197,12 @@ export function createFoot(
   });
   underglowGeo.center();
 
-  const underglowStrip = new THREE.Mesh(underglowGeo, materials.purpleEmissive);
-  underglowStrip.name = side === -1 ? 'FootUnderglow_L' : 'FootUnderglow_R';
-  underglowStrip.rotation.x = Math.PI / 2;
-  underglowStrip.position.set(0, -cfg.height + 0.002, (cfg.toeOffset + cfg.heelOffset) * 0.5);
-  footGroup.add(underglowStrip);
-  ledMeshes.push(underglowStrip);
+  const tempFootLeds = new THREE.Group();
+
+  const underglowStripRaw = new THREE.Mesh(underglowGeo, materials.purpleEmissive);
+  underglowStripRaw.rotation.x = Math.PI / 2;
+  underglowStripRaw.position.set(0, -cfg.height + 0.002, (cfg.toeOffset + cfg.heelOffset) * 0.5);
+  tempFootLeds.add(underglowStripRaw);
 
   // Soft purple bloom ground reflection mesh
   const ugBloomGeo = new THREE.PlaneGeometry(cfg.width * 1.3, cfg.length * 1.15);
@@ -287,25 +293,32 @@ export function createFoot(
   heelThruster.rotation.x = Math.PI / 2;
   heelThruster.position.set(0, -cfg.height + 0.016, cfg.heelOffset - 0.004);
   heelThruster.castShadow = true;
-  footGroup.add(heelThruster);
+  footJointGroup.add(heelThruster);
+
+  // Merge static joint sub-meshes in footJointGroup
+  const mergedSole = mergeGroupMeshesByMaterial(footJointGroup, materials.joint, side === -1 ? 'FootJointMesh_L' : 'FootJointMesh_R', true) || soleChassis;
 
   // Thruster interior purple glow ring
   const nozzleGlowGeo = new THREE.TorusGeometry(cfg.heelThruster.radius * 0.65, 0.0016, 8, 16);
   const nozzleGlow = new THREE.Mesh(nozzleGlowGeo, materials.purpleEmissive);
   nozzleGlow.position.set(0, -cfg.height + 0.016, cfg.heelOffset - 0.010);
-  footGroup.add(nozzleGlow);
-  ledMeshes.push(nozzleGlow);
+  tempFootLeds.add(nozzleGlow);
+
+  const mergedFootLeds = mergeGroupMeshesByMaterial(tempFootLeds, materials.purpleEmissive, side === -1 ? 'FootLeds_Merged_L' : 'FootLeds_Merged_R', false, false) || underglowStripRaw;
+  mergedFootLeds.name = side === -1 ? 'FootUnderglow_L' : 'FootUnderglow_R';
+  footGroup.add(mergedFootLeds);
+  ledMeshes.push(mergedFootLeds);
 
   return {
     group: footGroup,
-    soleChassis,
+    soleChassis: mergedSole,
     dorsalArmor,
     toePivot,
     toeArmor,
     heelArmor,
-    heelThruster,
+    heelThruster: mergedSole,
     treadPads,
-    underglowStrip,
+    underglowStrip: mergedFootLeds,
     ledMeshes,
   };
 }

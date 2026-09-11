@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface ShinNodes {
   group: THREE.Group;
@@ -133,6 +134,11 @@ export function createShin(
   const ledMeshes: THREE.Mesh[] = [];
   const calfVents: THREE.Mesh[] = [];
 
+  // Group containing stationary tibia core, fibula, vent louvers, and lower collar
+  const shinJointGroup = new THREE.Group();
+  shinJointGroup.name = side === -1 ? 'ShinJointCore_L' : 'ShinJointCore_R';
+  shinGroup.add(shinJointGroup);
+
   // ==========================================
   // 1. CENTRAL TIBIA SKELETON (Dark Titanium Core)
   // ==========================================
@@ -147,7 +153,7 @@ export function createShin(
   tibiaSkeleton.position.set(0, -cfg.length * 0.5, 0);
   tibiaSkeleton.castShadow = true;
   tibiaSkeleton.receiveShadow = true;
-  shinGroup.add(tibiaSkeleton);
+  shinJointGroup.add(tibiaSkeleton);
 
   // Lateral Fibula Strut
   const fibulaGeo = new THREE.CylinderGeometry(0.0045, 0.0035, cfg.length * 0.78, 12);
@@ -155,7 +161,7 @@ export function createShin(
   fibulaStrut.name = side === -1 ? 'FibulaStrut_L' : 'FibulaStrut_R';
   fibulaStrut.position.set(side * 0.024, -cfg.length * 0.48, -0.004);
   fibulaStrut.castShadow = true;
-  shinGroup.add(fibulaStrut);
+  shinJointGroup.add(fibulaStrut);
 
   // ==========================================
   // 2. SCULPTED ANTERIOR SHIN KEEL ARMOR PLATE
@@ -210,6 +216,8 @@ export function createShin(
   // 5. CALF COOLING VENTS & MICRO-THRUSTER LOUVERS
   // ==========================================
   const ventCount = cfg.posteriorCalf.ventCount;
+  const ventGlowGroup = new THREE.Group();
+
   for (let i = 0; i < ventCount; i++) {
     const yOff = -cfg.length * 0.30 - i * 0.018;
 
@@ -219,15 +227,20 @@ export function createShin(
     louver.position.set(0, yOff, -0.048);
     louver.rotation.x = -0.28;
     louver.castShadow = true;
-    shinGroup.add(louver);
+    shinJointGroup.add(louver);
     calfVents.push(louver);
 
     // Internal violet glow slit inside each louver
     const glowGeo = new THREE.BoxGeometry(cfg.posteriorCalf.ventWidth * 0.75, 0.0016, 0.002);
     const glowMesh = new THREE.Mesh(glowGeo, materials.purpleEmissive);
     glowMesh.position.set(0, yOff - 0.001, -0.046);
-    shinGroup.add(glowMesh);
-    ledMeshes.push(glowMesh);
+    ventGlowGroup.add(glowMesh);
+  }
+
+  const mergedVentGlow = mergeGroupMeshesByMaterial(ventGlowGroup, materials.purpleEmissive, side === -1 ? 'CalfVentGlows_L' : 'CalfVentGlows_R', false);
+  if (mergedVentGlow) {
+    shinGroup.add(mergedVentGlow);
+    ledMeshes.push(mergedVentGlow);
   }
 
   // ==========================================
@@ -237,7 +250,10 @@ export function createShin(
   const lowerCollar = new THREE.Mesh(collarGeo, materials.joint);
   lowerCollar.position.set(0, -cfg.length * 0.94, 0);
   lowerCollar.castShadow = true;
-  shinGroup.add(lowerCollar);
+  shinJointGroup.add(lowerCollar);
+
+  // Merge static joint sub-meshes in shinJointGroup
+  const mergedTibia = mergeGroupMeshesByMaterial(shinJointGroup, materials.joint, side === -1 ? 'ShinJointMesh_L' : 'ShinJointMesh_R', true) || tibiaSkeleton;
 
   // Concentric accent ring on lower ankle collar
   const collarRingGeo = new THREE.TorusGeometry(0.025, 0.0016, 8, 24);
@@ -257,8 +273,8 @@ export function createShin(
 
   return {
     group: shinGroup,
-    tibiaSkeleton,
-    fibulaStrut,
+    tibiaSkeleton: mergedTibia,
+    fibulaStrut: mergedTibia,
     anteriorKeelArmor,
     posteriorCalfArmor,
     calfVents,

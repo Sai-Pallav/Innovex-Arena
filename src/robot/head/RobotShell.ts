@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { ROBOT_CONFIG, ROBOT_ACCENT } from '../config';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface ShellNodes {
   group: THREE.Group;
@@ -103,12 +104,14 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
     return geo;
   }
 
+  const armorShellGroup = new THREE.Group();
+
   const crownGeo = createCrownGeometry();
   const crown = new THREE.Mesh(crownGeo, materials.armorDoubleSide);
   crown.name = 'Crown';
   crown.castShadow = true;
   crown.receiveShadow = true;
-  group.add(crown);
+  armorShellGroup.add(crown);
 
   // 2. Forehead Brow Trim / Visor Cowl Gasket
   // Recessed dark titanium trim tracing the sweeping brow arch above visor
@@ -174,7 +177,7 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
     templeMesh.rotation.y = side * (Math.PI / 2) + side * 0.04;
     templeMesh.castShadow = true;
     templeMesh.receiveShadow = true;
-    group.add(templeMesh);
+    armorShellGroup.add(templeMesh);
 
     if (side === -1) leftTemple = templeMesh;
     else rightTemple = templeMesh;
@@ -196,7 +199,15 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
   rearShell.scale.set(0.95, 1.02, 0.96);
   rearShell.castShadow = true;
   rearShell.receiveShadow = true;
-  group.add(rearShell);
+  armorShellGroup.add(rearShell);
+
+  // Merge outer helmet ceramic armor pieces
+  const mergedHelmetArmor = mergeGroupMeshesByMaterial(armorShellGroup, materials.armorDoubleSide, 'HelmetArmor_Merged', false);
+  if (mergedHelmetArmor) {
+    mergedHelmetArmor.castShadow = true;
+    mergedHelmetArmor.receiveShadow = true;
+    group.add(mergedHelmetArmor);
+  }
 
   // 5. Rear Nape Purple LED Accent Bar
   const napeLEDGroup = new THREE.Group();

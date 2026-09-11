@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { TORSO_CONFIG } from './TorsoConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface ShoulderMountNodes {
   group: THREE.Group;
@@ -331,6 +332,8 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
 
   const ledMeshes: THREE.Mesh[] = [];
 
+  const frameJointGroup = new THREE.Group();
+
   // Central dark spinal column
   const spineGeo = new THREE.CylinderGeometry(0.068, 0.060, 0.32, 24);
   const frameSpine = new THREE.Mesh(spineGeo, materials.joint);
@@ -339,7 +342,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   frameSpine.scale.set(1.08, 1.0, 0.88);
   frameSpine.castShadow = true;
   frameSpine.receiveShadow = true;
-  group.add(frameSpine);
+  frameJointGroup.add(frameSpine);
 
   // Transverse Clavicle Structural Beams (Connecting center spine to shoulder sockets)
   const clavicleBeamGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.170, 14);
@@ -347,12 +350,12 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const frameClavicleLeft = new THREE.Mesh(clavicleBeamGeo, materials.joint);
   frameClavicleLeft.rotation.z = Math.PI / 2;
   frameClavicleLeft.position.set(-0.110, 0.065, 0.008);
-  group.add(frameClavicleLeft);
+  frameJointGroup.add(frameClavicleLeft);
 
   const frameClavicleRight = new THREE.Mesh(clavicleBeamGeo, materials.joint);
   frameClavicleRight.rotation.z = Math.PI / 2;
   frameClavicleRight.position.set(0.110, 0.065, 0.008);
-  group.add(frameClavicleRight);
+  frameJointGroup.add(frameClavicleRight);
 
   // Recessed White Ceramic Gorget Socket Bezel nestled inside scooped neckline
   const gorgetShape = new THREE.Shape();
@@ -390,7 +393,14 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   neckCollarSleeve.position.set(0, TORSO_CONFIG.chest.collarY - 0.006, TORSO_CONFIG.chest.collarZ);
   neckCollarSleeve.scale.set(1.0, 1.0, gRz / gRx);
   neckCollarSleeve.castShadow = true;
-  group.add(neckCollarSleeve);
+  frameJointGroup.add(neckCollarSleeve);
+
+  const mergedFrameJoint = mergeGroupMeshesByMaterial(frameJointGroup, materials.joint, 'UpperChestFrameJoint_Merged', false);
+  if (mergedFrameJoint) {
+    mergedFrameJoint.castShadow = true;
+    mergedFrameJoint.receiveShadow = true;
+    group.add(mergedFrameJoint);
+  }
 
   // Sculpted White Upper Back Armor (Reference Sheet: "BACK VIEW")
   // Trapezius/scapular plate with aerodynamic curved neckline cupping collar cleanly
@@ -438,14 +448,14 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   lowerFrame.name = 'LowerChestFrame';
   group.add(lowerFrame);
 
+  const tempLower = new THREE.Group();
+
   // 1. Sternal-Spinal chassis mounting core (safely recessed behind armor)
   const chassisBlockGeo = new THREE.BoxGeometry(0.092, 0.036, 0.058);
   const chassisBlock = new THREE.Mesh(chassisBlockGeo, materials.joint);
   chassisBlock.name = 'SubSternalChassis';
   chassisBlock.position.set(0, -0.096, -0.008);
-  chassisBlock.castShadow = true;
-  chassisBlock.receiveShadow = true;
-  lowerFrame.add(chassisBlock);
+  tempLower.add(chassisBlock);
 
   // 2. Central vertebral gimbal socket linking down into upper abdomen
   const gimbalSocketGeo = new THREE.CylinderGeometry(0.048, 0.044, 0.024, 32);
@@ -453,8 +463,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   gimbalSocket.name = 'SpineGimbalSocket';
   gimbalSocket.position.set(0, -0.110, -0.004);
   gimbalSocket.scale.set(1.06, 1.0, 0.88);
-  gimbalSocket.castShadow = true;
-  lowerFrame.add(gimbalSocket);
+  tempLower.add(gimbalSocket);
 
   // 3. Bilateral sub-pectoral diagonal bracing trusses (Left & Right)
   for (const side of [-1, 1]) {
@@ -464,17 +473,15 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
     strut.position.set(side * 0.046, -0.092, 0.018);
     strut.rotation.z = side * 0.28;
     strut.rotation.x = -0.15;
-    strut.castShadow = true;
-    lowerFrame.add(strut);
+    tempLower.add(strut);
 
     // Mechanical pivot knuckle at base of strut
     const knuckleGeo = new THREE.SphereGeometry(0.0065, 12, 10);
     const knuckle = new THREE.Mesh(knuckleGeo, materials.joint);
     knuckle.position.set(side * 0.052, -0.112, 0.016);
-    lowerFrame.add(knuckle);
+    tempLower.add(knuckle);
 
     // 4. Subtle structural mounting brackets connecting chest -> abdomen (Priority 1)
-    // Visually clamps the lower chest frame down into the top shoulders of Segment 01
     const bracketShape = new THREE.Shape();
     bracketShape.moveTo(-0.006, 0.014);
     bracketShape.lineTo(0.006, 0.014);
@@ -497,10 +504,16 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
     bracket.position.set(side * 0.060, -0.110, 0.026);
     bracket.rotation.z = -side * 0.12;
     bracket.rotation.x = -0.08;
-    bracket.castShadow = true;
-    bracket.receiveShadow = true;
-    lowerFrame.add(bracket);
+    tempLower.add(bracket);
   }
+
+  const mergedLower = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerChestFrame_Merged')!;
+  tempLower.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  lowerFrame.add(mergedLower);
 
   return {
     group,
@@ -540,15 +553,14 @@ export function createShoulderMount(
 
   const ledMeshes: THREE.Mesh[] = [];
 
+  const tempMount = new THREE.Group();
+
   // 1. Heavy-duty cast titanium clavicle trunnion sleeve anchoring inward into chest frame
-  // Bridges the horizontal span between lateral chest armor and the shoulder joint
   const trunnionGeo = new THREE.CylinderGeometry(0.046, 0.052, 0.044, 24);
   const trunnionSleeve = new THREE.Mesh(trunnionGeo, materials.joint);
   trunnionSleeve.rotation.z = Math.PI / 2;
   trunnionSleeve.position.set(-side * 0.022, 0, 0);
-  trunnionSleeve.castShadow = true;
-  trunnionSleeve.receiveShadow = true;
-  group.add(trunnionSleeve);
+  tempMount.add(trunnionSleeve);
 
   // 2. Structural reinforcement gusset ribs anchoring sleeve to chest frame
   for (let g = 0; g < 3; g++) {
@@ -557,8 +569,7 @@ export function createShoulderMount(
     const gusset = new THREE.Mesh(gussetGeo, materials.joint);
     gusset.position.set(-side * 0.024, Math.sin(angle) * 0.038, Math.cos(angle) * 0.038);
     gusset.rotation.x = angle;
-    gusset.castShadow = true;
-    group.add(gusset);
+    tempMount.add(gusset);
   }
 
   // 3. Heavy-Duty Circular Mounting Flange with 6 Hex Fasteners
@@ -566,8 +577,7 @@ export function createShoulderMount(
   const mountFlange = new THREE.Mesh(flangeGeo, materials.joint);
   mountFlange.rotation.z = Math.PI / 2;
   mountFlange.position.set(-side * 0.004, 0, 0);
-  mountFlange.castShadow = true;
-  group.add(mountFlange);
+  tempMount.add(mountFlange);
 
   for (let b = 0; b < 6; b++) {
     const angle = (b / 6) * Math.PI * 2;
@@ -579,7 +589,7 @@ export function createShoulderMount(
       Math.sin(angle) * 0.044,
       Math.cos(angle) * 0.044
     );
-    group.add(bolt);
+    tempMount.add(bolt);
   }
 
   // 4. Dark titanium mechanical rotary socket cylinder
@@ -588,16 +598,28 @@ export function createShoulderMount(
   rotarySocket.name = side === -1 ? 'SocketLeft' : 'SocketRight';
   rotarySocket.rotation.z = Math.PI / 2;
   rotarySocket.position.set(-side * 0.002, 0, 0);
-  rotarySocket.castShadow = true;
-  rotarySocket.receiveShadow = true;
-  group.add(rotarySocket);
+  tempMount.add(rotarySocket);
 
   // 5. Socket Outer Rim Collar
   const rimGeo = new THREE.TorusGeometry(0.048, 0.0035, 8, 24);
   const socketRim = new THREE.Mesh(rimGeo, materials.joint);
   socketRim.rotation.y = Math.PI / 2;
   socketRim.position.set(-side * 0.002, 0, 0);
-  group.add(socketRim);
+  tempMount.add(socketRim);
+
+  // 7. Upper Actuator Clevis Anchor (Mates with shoulder damper strut)
+  const actBracketGeo = new THREE.BoxGeometry(0.012, 0.018, 0.014);
+  const actBracket = new THREE.Mesh(actBracketGeo, materials.joint);
+  actBracket.position.set(-side * 0.010, 0.044, 0.012);
+  tempMount.add(actBracket);
+
+  const mountMerged = mergeGroupMeshesByMaterial(tempMount, materials.joint, 'ShoulderMount_Merged')!;
+  tempMount.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  group.add(mountMerged);
 
   // 6. Interior bearing race ring & Purple Accent Ring
   const ringGeo = new THREE.TorusGeometry(0.038, 0.0020, 8, 24);
@@ -608,13 +630,6 @@ export function createShoulderMount(
   group.add(accentRing);
   ledMeshes.push(accentRing);
 
-  // 7. Upper Actuator Clevis Anchor (Mates with shoulder damper strut)
-  const actBracketGeo = new THREE.BoxGeometry(0.012, 0.018, 0.014);
-  const actBracket = new THREE.Mesh(actBracketGeo, materials.joint);
-  actBracket.position.set(-side * 0.010, 0.044, 0.012);
-  actBracket.castShadow = true;
-  group.add(actBracket);
-
   // White Armor Clavicle Connection Mantle (Removed per user request to remove white shoulder parts)
   const armorBridge = new THREE.Mesh();
   armorBridge.name = side === -1 ? 'ArmorBridgeLeft' : 'ArmorBridgeRight';
@@ -623,13 +638,14 @@ export function createShoulderMount(
 
   return {
     group,
-    socketRim,
-    rotarySocket,
+    socketRim: mountMerged,
+    rotarySocket: mountMerged,
     accentRing,
     armorBridge,
     ledMeshes,
   };
 }
+
 
 /**
  * 8. COMPLETE MODULAR CHEST ASSEMBLY ROOT
@@ -663,9 +679,20 @@ export function createChestAssembly(materials: RobotMaterialPalette): ChestAssem
   chestArmorGroup.name = 'ChestArmor';
   chestGroup.add(chestArmorGroup);
 
-  // A. Under-shell structural armor
+  // A. Under-shell structural armor & Flank Armor Cowls
   const mainShell = createChestMainShell(materials);
-  chestArmorGroup.add(mainShell);
+  const leftFlankArmor = createChestFlankArmor(-1, materials);
+  const rightFlankArmor = createChestFlankArmor(1, materials);
+
+  const flankArmorTemp = new THREE.Group();
+  flankArmorTemp.add(mainShell);
+  flankArmorTemp.add(leftFlankArmor);
+  flankArmorTemp.add(rightFlankArmor);
+
+  const mergedFlanks = mergeGroupMeshesByMaterial(flankArmorTemp, materials.armor, 'ChestFlanks_Merged', false) || mainShell;
+  mergedFlanks.castShadow = true;
+  mergedFlanks.receiveShadow = true;
+  chestArmorGroup.add(mergedFlanks);
 
   // B. Central Chest Plate (Hero Breastplate)
   const { mesh: centerPlate, frontZ } = createCentralChestPlate(materials);
@@ -687,13 +714,6 @@ export function createChestAssembly(materials: RobotMaterialPalette): ChestAssem
   chestArmorGroup.add(rightSide.panel);
   chestArmorGroup.add(rightSide.lightStrip);
   ledMeshes.push(rightSide.lightStrip);
-
-  // E. Left & Right Flank Armor Cowls
-  const leftFlankArmor = createChestFlankArmor(-1, materials);
-  chestArmorGroup.add(leftFlankArmor);
-
-  const rightFlankArmor = createChestFlankArmor(1, materials);
-  chestArmorGroup.add(rightFlankArmor);
 
   // Subtle localized purple point light illuminating chest armor seams & logo
   const chestGlow = new THREE.PointLight(materials.purpleEmissive.color, 0.45, 0.48);

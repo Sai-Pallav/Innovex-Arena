@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface ThighDamperNodes {
   group: THREE.Group;
@@ -211,9 +212,16 @@ export function createThigh(
   const cfg = LEG_CONFIG.thigh;
   const ledMeshes: THREE.Mesh[] = [];
 
+  // Group containing all static internal joint mechanism parts
+  const internalMechanismGroup = new THREE.Group();
+  internalMechanismGroup.name = side === -1 ? 'ThighInternal_L' : 'ThighInternal_R';
+  thighGroup.add(internalMechanismGroup);
+
   // ==========================================
   // 1. PROXIMAL TROCHANTER ARMOR HOOD (Caps the Hip Joint - Eliminates View-Through Gap)
   // ==========================================
+  const staticArmorGroup = new THREE.Group();
+
   const hoodGeo = createTrochanterHoodGeometry(
     cfg.trochanterHood.radius,
     cfg.trochanterHood.height,
@@ -223,16 +231,14 @@ export function createThigh(
   trochanterHood.name = side === -1 ? 'TrochanterHood_L' : 'TrochanterHood_R';
   trochanterHood.position.set(0, 0.008, 0.016);
   trochanterHood.rotation.x = -0.10;
-  trochanterHood.castShadow = true;
-  trochanterHood.receiveShadow = true;
-  thighGroup.add(trochanterHood);
+  staticArmorGroup.add(trochanterHood);
 
   // Trochanter secondary dark titanium flange ring
   const trochanterRingGeo = new THREE.TorusGeometry(cfg.trochanterHood.radius * 0.95, 0.0028, 12, 32);
   const trochanterRing = new THREE.Mesh(trochanterRingGeo, materials.joint);
   trochanterRing.rotation.x = Math.PI / 2;
   trochanterRing.position.set(0, 0.012, 0.010);
-  thighGroup.add(trochanterRing);
+  internalMechanismGroup.add(trochanterRing);
 
   // ==========================================
   // 2. STRUCTURAL FEMUR CHASSIS (Dark Titanium Core)
@@ -248,7 +254,7 @@ export function createThigh(
   femurSkeleton.position.set(0, -cfg.length * 0.48, 0);
   femurSkeleton.castShadow = true;
   femurSkeleton.receiveShadow = true;
-  thighGroup.add(femurSkeleton);
+  internalMechanismGroup.add(femurSkeleton);
 
   // CNC Reinforcement Bulkheads along the femur skeleton
   for (const factor of [0.15, 0.35, 0.58, 0.82]) {
@@ -261,7 +267,7 @@ export function createThigh(
     const ring = new THREE.Mesh(ringGeo, materials.joint);
     ring.position.set(0, -cfg.length * factor, 0);
     ring.castShadow = true;
-    thighGroup.add(ring);
+    internalMechanismGroup.add(ring);
   }
 
   // ==========================================
@@ -297,17 +303,17 @@ export function createThigh(
     bar.position.set(0, i * 0.0022, 0.0005);
     intakeGroup.add(bar);
   }
-  thighGroup.add(intakeGroup);
+  internalMechanismGroup.add(intakeGroup);
 
   // Recessed hydraulic anchor clevises receiving the hip assist struts
   const clevisGeo = new THREE.BoxGeometry(0.010, 0.014, 0.009);
   const frontClevis = new THREE.Mesh(clevisGeo, materials.joint);
   frontClevis.position.set(0, -0.046, 0.031);
-  thighGroup.add(frontClevis);
+  internalMechanismGroup.add(frontClevis);
 
   const latClevis = new THREE.Mesh(clevisGeo, materials.joint);
   latClevis.position.set(side * 0.028, -0.048, -0.018);
-  thighGroup.add(latClevis);
+  internalMechanismGroup.add(latClevis);
 
   // ==========================================
   // 4. SCULPTED LATERAL ARMOR COWL (Vastus Lateralis)
@@ -332,7 +338,7 @@ export function createThigh(
     const louver = new THREE.Mesh(louverGeo, materials.joint);
     louver.position.set(side * 0.028, -cfg.length * (0.34 + i * 0.06), 0.002);
     louver.rotation.z = side * 0.15;
-    thighGroup.add(louver);
+    internalMechanismGroup.add(louver);
   }
 
   // ==========================================
@@ -379,9 +385,7 @@ export function createThigh(
   medialArmor.name = side === -1 ? 'ThighMedialArmor_L' : 'ThighMedialArmor_R';
   medialArmor.position.set(-side * 0.036, -cfg.length * 0.46, 0.002);
   medialArmor.rotation.y = -side * (Math.PI / 2);
-  medialArmor.castShadow = true;
-  medialArmor.receiveShadow = true;
-  thighGroup.add(medialArmor);
+  staticArmorGroup.add(medialArmor);
 
   // ==========================================
   // 7. POSTERIOR HAMSTRING ARMOR & HYDRAULIC DAMPER
@@ -405,9 +409,10 @@ export function createThigh(
   const posteriorPlate = new THREE.Mesh(postGeo, materials.armor);
   posteriorPlate.name = side === -1 ? 'ThighPosteriorPlate_L' : 'ThighPosteriorPlate_R';
   posteriorPlate.position.set(0, -cfg.length * 0.47, -0.028);
-  posteriorPlate.castShadow = true;
-  posteriorPlate.receiveShadow = true;
-  thighGroup.add(posteriorPlate);
+  staticArmorGroup.add(posteriorPlate);
+
+  const mergedStaticArmor = mergeGroupMeshesByMaterial(staticArmorGroup, materials.armor, side === -1 ? 'ThighStaticArmor_L' : 'ThighStaticArmor_R', false, true) || trochanterHood;
+  thighGroup.add(mergedStaticArmor);
 
   // Telescoping rear hamstring damper
   const dCfg = cfg.rearDamper;
@@ -435,12 +440,15 @@ export function createThigh(
   dPiston.position.set(0, -dCylLen - dPistLen * 0.5 + 0.004, 0);
   dPiston.castShadow = true;
   damperGroup.add(dPiston);
-  thighGroup.add(damperGroup);
+  internalMechanismGroup.add(damperGroup);
+
+  // Merge static joint sub-meshes in internal mechanism (internal so castShadow = false)
+  const mergedFemur = mergeGroupMeshesByMaterial(internalMechanismGroup, materials.joint, side === -1 ? 'ThighMechanism_L' : 'ThighMechanism_R', true, false) || femurSkeleton;
 
   const rearDamper: ThighDamperNodes = {
     group: damperGroup,
-    cylinder: dCylinder,
-    piston: dPiston,
+    cylinder: mergedFemur,
+    piston: mergedFemur,
   };
 
   // ==========================================
@@ -460,7 +468,7 @@ export function createThigh(
 
   return {
     group: thighGroup,
-    femurSkeleton,
+    femurSkeleton: mergedFemur,
     trochanterHood,
     anteriorArmor,
     lateralArmor,

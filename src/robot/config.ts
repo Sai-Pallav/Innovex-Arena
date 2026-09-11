@@ -26,23 +26,6 @@ export const ROBOT_ROTATION = {
   roll: 0,
 };
 
-export const HEAD_ROTATION_LIMIT = {
-  yaw: 30 * (Math.PI / 180),    // Natural cursor response (~±30°)
-  pitch: 18 * (Math.PI / 180),  // (~±18°)
-  roll: 6 * (Math.PI / 180),    // (~±6°)
-};
-
-export const SHOULDER_RESPONSE = {
-  yawFactor: 0.03,
-  pitchFactor: 0.02,
-  zReaction: 0.03,
-};
-
-export const TORSO_RESPONSE = {
-  yawFactor: 0.02,
-  pitchFactor: 0.015,
-};
-
 export const CAMERA_POSITION = {
   baseFov: 45,                  // Normal cinematic FOV
   targetY: 0.04,                // Centered on chest/torso, lowering robot so legs descend downward
@@ -58,13 +41,6 @@ export const LIGHT_INTENSITY = {
   rimRight: 1.45,               // Crisp violet rim separation (shoulders, head, torso)
   purpleBounce: 0.45,           // Subtle local emissive bounce
   lowerFill: 0.25,              // Soft ground connection
-};
-
-export const EMISSIVE_INTENSITY = {
-  visor: 2.2,
-  bloomOpacity: 0.18,
-  visorPointLight: 1.1,
-  pulseRange: [1.9, 2.6] as [number, number],
 };
 
 export interface RobotDimensions {

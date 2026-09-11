@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface NeckNodes {
   group: THREE.Group;
@@ -23,13 +24,16 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   // Base position of neck (joins torso collar to head base)
   group.position.set(0, 0.145, -0.005);
 
+  const neckJointGroup = new THREE.Group();
+  const neckSpacerGroup = new THREE.Group();
+
   // 1. Central Dark Structural Shaft (Part 10)
   const shaftGeo = new THREE.CylinderGeometry(0.040, 0.044, 0.22, 32);
   const centralShaft = new THREE.Mesh(shaftGeo, materials.joint);
   centralShaft.name = 'NeckCentralShaft';
   centralShaft.position.set(0, 0.095, 0);
   centralShaft.castShadow = true;
-  group.add(centralShaft);
+  neckJointGroup.add(centralShaft);
 
   // 2. Base Collar / Pedestal Mount (Part 10: Base collar)
   const baseCollarGeo = new THREE.CylinderGeometry(0.062, 0.074, 0.024, 36);
@@ -38,14 +42,14 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   baseCollar.position.set(0, 0.010, 0);
   baseCollar.castShadow = true;
   baseCollar.receiveShadow = true;
-  group.add(baseCollar);
+  neckJointGroup.add(baseCollar);
 
   // Rounded rim on base collar
   const baseRimGeo = new THREE.TorusGeometry(0.073, 0.004, 14, 36);
   const baseRim = new THREE.Mesh(baseRimGeo, materials.joint);
   baseRim.rotation.x = Math.PI / 2;
   baseRim.position.set(0, 0.004, 0);
-  group.add(baseRim);
+  neckJointGroup.add(baseRim);
 
   // 3. Stacked Telescoping Neck Collar Rings (Part 10: Ring 01, 02, 03, 04)
   const rings: THREE.Mesh[] = [];
@@ -66,7 +70,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     ringMesh.position.set(0, spec.y, 0);
     ringMesh.castShadow = true;
     ringMesh.receiveShadow = true;
-    group.add(ringMesh);
+    neckJointGroup.add(ringMesh);
     rings.push(ringMesh);
 
     // Beveled highlight rim around the upper edge of each collar ring
@@ -74,14 +78,14 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     const rimMesh = new THREE.Mesh(rimGeo, materials.joint);
     rimMesh.rotation.x = Math.PI / 2;
     rimMesh.position.set(0, spec.y + spec.height * 0.44, 0);
-    group.add(rimMesh);
+    neckJointGroup.add(rimMesh);
 
     // Dark recessed gasket spacer between rings
     if (i < ringSpecs.length - 1) {
       const spacerGeo = new THREE.CylinderGeometry(spec.radius * 0.86, spec.radius * 0.86, 0.008, 28);
       const spacer = new THREE.Mesh(spacerGeo, materials.jointDoubleSide);
       spacer.position.set(0, spec.y + spec.height * 0.5 + 0.004, 0);
-      group.add(spacer);
+      neckSpacerGroup.add(spacer);
     }
   }
 
@@ -93,14 +97,14 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     pistonBase.rotation.z = side * -0.14;
     pistonBase.rotation.x = 0.08;
     pistonBase.castShadow = true;
-    group.add(pistonBase);
+    neckJointGroup.add(pistonBase);
 
     const rodGeo = new THREE.CylinderGeometry(0.0035, 0.0035, 0.060, 14);
     const rod = new THREE.Mesh(rodGeo, materials.joint);
     rod.position.set(side * 0.032, 0.088, -0.008);
     rod.rotation.z = side * -0.14;
     rod.rotation.x = 0.08;
-    group.add(rod);
+    neckJointGroup.add(rod);
   }
 
   // 5. Cervical Upper Connector (Part 10: Upper connector linking to skull)
@@ -109,7 +113,21 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   cervicalConnector.name = 'NeckCervicalConnector';
   cervicalConnector.position.set(0, 0.150, -0.005);
   cervicalConnector.rotation.x = 0.05;
-  group.add(cervicalConnector);
+  neckJointGroup.add(cervicalConnector);
+
+  // Merge static joint structure of neck
+  const mergedNeckJoint = mergeGroupMeshesByMaterial(neckJointGroup, materials.joint, 'NeckStructure_Merged', false);
+  if (mergedNeckJoint) {
+    mergedNeckJoint.castShadow = true;
+    mergedNeckJoint.receiveShadow = true;
+    group.add(mergedNeckJoint);
+  }
+
+  // Merge spacer gaskets
+  const mergedSpacers = mergeGroupMeshesByMaterial(neckSpacerGroup, materials.jointDoubleSide, 'NeckSpacers_Merged', false);
+  if (mergedSpacers) {
+    group.add(mergedSpacers);
+  }
 
   return {
     group,

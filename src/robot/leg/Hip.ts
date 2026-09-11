@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface HipActuatorNodes {
   group: THREE.Group;
@@ -88,12 +89,14 @@ function createHipActuator(
   lowerMount.rotation.x = Math.PI / 2;
   group.add(lowerMount);
 
+  const mergedMesh = mergeGroupMeshesByMaterial(group, materials.joint, `${namePrefix}JointMesh`, true) || cylinder;
+
   return {
     group,
-    cylinder,
-    piston,
-    upperMount,
-    lowerMount,
+    cylinder: mergedMesh,
+    piston: mergedMesh,
+    upperMount: mergedMesh,
+    lowerMount: mergedMesh,
   };
 }
 
@@ -119,6 +122,10 @@ export function createHip(
   // ==========================================
   // 1. STRUCTURAL GIMBAL HOUSING & UPPER MOUNTING FLANGE
   // ==========================================
+  const housingGroup = new THREE.Group();
+  housingGroup.name = side === -1 ? 'HipHousing_L' : 'HipHousing_R';
+  hipGroup.add(housingGroup);
+
   const gimbalGeo = new THREE.CylinderGeometry(
     cfg.collarRadius * 1.04,
     cfg.collarRadius * 0.94,
@@ -130,14 +137,14 @@ export function createHip(
   gimbalHousing.position.set(0, -0.006, 0);
   gimbalHousing.castShadow = true;
   gimbalHousing.receiveShadow = true;
-  hipGroup.add(gimbalHousing);
+  housingGroup.add(gimbalHousing);
 
   // Upper bearing race ring
   const upperRingGeo = new THREE.TorusGeometry(cfg.collarRadius * 1.05, 0.0024, 12, 32);
   const upperRing = new THREE.Mesh(upperRingGeo, materials.joint);
   upperRing.rotation.x = Math.PI / 2;
   upperRing.position.y = -0.002;
-  hipGroup.add(upperRing);
+  housingGroup.add(upperRing);
 
   // ==========================================
   // 2. FLARED CONICAL SOCKET SKIRT (Completely seals upper joint gap)
@@ -155,7 +162,7 @@ export function createHip(
   socketSkirt.position.set(0, -0.016, 0);
   socketSkirt.castShadow = true;
   socketSkirt.receiveShadow = true;
-  hipGroup.add(socketSkirt);
+  housingGroup.add(socketSkirt);
 
   // Stepped lower collar seal ring
   const lowerSealGeo = new THREE.CylinderGeometry(
@@ -167,7 +174,7 @@ export function createHip(
   const lowerSeal = new THREE.Mesh(lowerSealGeo, materials.joint);
   lowerSeal.position.set(0, -0.024, 0);
   lowerSeal.castShadow = true;
-  hipGroup.add(lowerSeal);
+  housingGroup.add(lowerSeal);
 
   // ==========================================
   // 3. INTERNAL TITANIUM MULTIAXIAL SWIVEL BEARING BALL
@@ -178,7 +185,9 @@ export function createHip(
   swivelBall.position.set(0, -0.014, 0);
   swivelBall.castShadow = true;
   swivelBall.receiveShadow = true;
-  hipGroup.add(swivelBall);
+  housingGroup.add(swivelBall);
+
+  const mergedHousing = mergeGroupMeshesByMaterial(housingGroup, materials.joint, side === -1 ? 'HipHousingJoint_L' : 'HipHousingJoint_R', true) || gimbalHousing;
 
   // ==========================================
   // 4. CONCENTRIC PURPLE EMISSIVE ACCENT RING
@@ -228,6 +237,8 @@ export function createHip(
     thighMount.add(bolt);
   }
 
+  const mergedThighMount = mergeGroupMeshesByMaterial(thighMount, materials.joint, side === -1 ? 'ThighMountJoint_L' : 'ThighMountJoint_R', true) || interlockingCollar;
+
   // ==========================================
   // 6. DUAL HEAVY HYDRAULIC ASSIST STRUTS
   // ==========================================
@@ -245,12 +256,12 @@ export function createHip(
 
   return {
     group: hipGroup,
-    gimbalHousing,
-    socketSkirt,
-    swivelBall,
+    gimbalHousing: mergedHousing,
+    socketSkirt: mergedHousing,
+    swivelBall: mergedHousing,
     accentRing,
     thighMount,
-    interlockingCollar,
+    interlockingCollar: mergedThighMount,
     actuatorFront,
     actuatorLateral,
     ledMeshes,

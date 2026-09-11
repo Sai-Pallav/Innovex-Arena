@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { getVisorSurfacePoint } from './RobotVisor';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface JawNodes {
   group: THREE.Group;
@@ -117,6 +118,8 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   jawShell.receiveShadow = true;
   group.add(jawShell);
 
+  const jawJointGroup = new THREE.Group();
+
   // 2. Lower Dark Titanium Sub-Chin Undercut Chamfer Trim
   const underBevelGeo = new THREE.BoxGeometry(0.038, 0.007, 0.020);
   const chinUnderBevel = new THREE.Mesh(underBevelGeo, materials.joint);
@@ -124,7 +127,7 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   chinUnderBevel.position.set(0, -0.116, 0.132);
   chinUnderBevel.rotation.x = 0.32;
   chinUnderBevel.castShadow = true;
-  group.add(chinUnderBevel);
+  jawJointGroup.add(chinUnderBevel);
 
   // 3. Dark Titanium Submental Intake Vent (Recessed neatly underneath chin)
   const ventGeo = new THREE.CylinderGeometry(0.018, 0.024, 0.016, 24);
@@ -133,7 +136,7 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   submentalVent.position.set(0, -0.122, 0.096);
   submentalVent.rotation.x = 0.20;
   submentalVent.castShadow = true;
-  group.add(submentalVent);
+  jawJointGroup.add(submentalVent);
 
   // 4. Dark Titanium Neck Socket Gorget Collar (Underneath the jaw)
   const socketGeo = new THREE.CylinderGeometry(0.054, 0.050, 0.020, 32);
@@ -142,7 +145,14 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   neckSocket.position.set(0, -0.124, 0.010);
   neckSocket.castShadow = true;
   neckSocket.receiveShadow = true;
-  group.add(neckSocket);
+  jawJointGroup.add(neckSocket);
+
+  const mergedJawJoint = mergeGroupMeshesByMaterial(jawJointGroup, materials.joint, 'JawJoint_Merged', false);
+  if (mergedJawJoint) {
+    mergedJawJoint.castShadow = true;
+    mergedJawJoint.receiveShadow = true;
+    group.add(mergedJawJoint);
+  }
 
   return {
     group,

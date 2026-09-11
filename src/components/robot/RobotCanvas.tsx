@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { RobotScene } from '../../robot/scene/RobotScene';
 import { DebugStats } from '../../robot/arm/DebugManager';
-import { Sparkles, Eye, Shield, RefreshCw, Cpu, Activity, Layers } from 'lucide-react';
+import { Cpu, Activity, Layers } from 'lucide-react';
 
 interface RobotCanvasProps {
   className?: string;
@@ -12,11 +12,9 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
   const sceneRef = useRef<RobotScene | null>(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [modelSource, setModelSource] = useState<'glb' | 'procedural'>('procedural');
   const [isWireframe, setIsWireframe] = useState(false);
   const [isExploded, setIsExploded] = useState(false);
   const [debugStats, setDebugStats] = useState<DebugStats | null>(null);
-  const [isInteractive, setIsInteractive] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -25,9 +23,8 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
     const scene = new RobotScene({
       container: containerRef.current,
       // Load procedural engine directly with full MeshPhysicalMaterial clearcoat & bloom
-      onLoaded: (source) => {
+      onLoaded: () => {
         setIsLoading(false);
-        setModelSource(source);
       },
       onError: (err) => {
         console.error('Robot initialization error:', err);

@@ -5,13 +5,18 @@ export interface DebugStats {
   armTriangleCount: number;
   vertexCount: number;
   meshCount: number;
+  drawCallEstimate: number;
+  geometryCount: number;
+  instancedMeshCount: number;
+  materialCount: number;
 }
 
 /**
- * Developer Debug Mode Manager adhering to Section 9:
+ * Developer Debug Mode Manager adhering to Section 9 & 12:
  * - Wireframe overlay toggle
  * - Joint pivot axes visualization (THREE.AxesHelper)
  * - Polygon / Triangle count measurement
+ * - Diagnostic profiling (mesh count, draw call estimate, geometry count, material count)
  * - toggleDebugMode()
  */
 export class DebugManager {
@@ -25,20 +30,39 @@ export class DebugManager {
   }
 
   /**
-   * Calculates total triangle, vertex, and mesh count in the robot model and per-arm.
+   * Calculates total triangle, vertex, and mesh count in the robot model and per-arm,
+   * along with diagnostic draw call estimates and geometry/material uniqueness.
    */
   public getStats(): DebugStats {
     let triangleCount = 0;
     let armTriangleCount = 0;
     let vertexCount = 0;
     let meshCount = 0;
+    let instancedMeshCount = 0;
+    let shadowCasters = 0;
+    const geometries = new Set<string | number>();
+    const materials = new Set<string | number>();
 
     this.targetGroup.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         meshCount++;
+        if ((child as any).isInstancedMesh) {
+          instancedMeshCount++;
+        }
+        if (mesh.castShadow) {
+          shadowCasters++;
+        }
+        if (mesh.material) {
+          if (Array.isArray(mesh.material)) {
+            mesh.material.forEach((m) => materials.add(m.uuid));
+          } else {
+            materials.add(mesh.material.uuid);
+          }
+        }
         const geo = mesh.geometry;
         if (geo) {
+          geometries.add(geo.id);
           let count = 0;
           if (geo.index) {
             count = geo.index.count / 3;
@@ -67,12 +91,34 @@ export class DebugManager {
       }
     });
 
+    // Draw call estimate: camera visible mesh pass + directional shadow map pass
+    const drawCallEstimate = meshCount + shadowCasters;
+
     return {
       triangleCount: Math.round(triangleCount),
       armTriangleCount: Math.round(armTriangleCount),
       vertexCount,
       meshCount,
+      drawCallEstimate,
+      geometryCount: geometries.size,
+      instancedMeshCount,
+      materialCount: materials.size,
     };
+  }
+
+  /**
+   * Diagnostic utility to print model metrics to console table on demand (development-only).
+   */
+  public printDiagnostics(): void {
+    const stats = this.getStats();
+    console.table({
+      'Mesh Count': stats.meshCount,
+      'Draw-Call Estimate': stats.drawCallEstimate,
+      'Geometry Count': stats.geometryCount,
+      'InstancedMesh Count': stats.instancedMeshCount,
+      'Triangle Count': stats.triangleCount,
+      'Material Count': stats.materialCount,
+    });
   }
 
   /**

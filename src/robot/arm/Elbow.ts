@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 /**
  * PRODUCTION-GRADE ROBOT ELBOW CONFIGURATION
@@ -113,9 +114,6 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   const connector = new THREE.Mesh(connectorGeo, materials.joint);
   connector.name = 'UpperArmConnector';
   connector.position.set(0, ELBOW_CONFIG.upperHousingOffsetY + 0.004, 0);
-  connector.castShadow = true;
-  connector.receiveShadow = true;
-  upperGroup.add(connector);
 
   // Beveled collar rim transition
   const rimGeo = new THREE.TorusGeometry(
@@ -127,7 +125,6 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   const collarRim = new THREE.Mesh(rimGeo, materials.joint);
   collarRim.rotation.x = Math.PI / 2;
   collarRim.position.set(0, ELBOW_CONFIG.upperHousingOffsetY + ELBOW_CONFIG.upperHousingHeight * 0.5, 0);
-  upperGroup.add(collarRim);
 
   // Dual downward-reaching clevis knuckles (Left and Right along X)
   const knuckleRadius = ELBOW_CONFIG.hingeRadius * 0.96;
@@ -146,17 +143,11 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   const leftKnuckle = new THREE.Mesh(knuckleGeo, materials.joint);
   leftKnuckle.name = 'UpperClevisKnuckle_Left';
   leftKnuckle.position.set(leftKnuckleX, 0, 0);
-  leftKnuckle.castShadow = true;
-  leftKnuckle.receiveShadow = true;
-  upperGroup.add(leftKnuckle);
 
   // Right clevis knuckle with chamfers
   const rightKnuckle = new THREE.Mesh(knuckleGeo, materials.joint);
   rightKnuckle.name = 'UpperClevisKnuckle_Right';
   rightKnuckle.position.set(rightKnuckleX, 0, 0);
-  rightKnuckle.castShadow = true;
-  rightKnuckle.receiveShadow = true;
-  upperGroup.add(rightKnuckle);
 
   // Structural vertical support brackets connecting collar to each knuckle
   const bracketGeo = new THREE.BoxGeometry(
@@ -167,13 +158,9 @@ function createUpperHousing(materials: RobotMaterialPalette): {
 
   const leftBracket = new THREE.Mesh(bracketGeo, materials.joint);
   leftBracket.position.set(leftKnuckleX, (ELBOW_CONFIG.upperHousingOffsetY + 0.004) * 0.5, -0.002);
-  leftBracket.castShadow = true;
-  upperGroup.add(leftBracket);
 
   const rightBracket = new THREE.Mesh(bracketGeo, materials.joint);
   rightBracket.position.set(rightKnuckleX, (ELBOW_CONFIG.upperHousingOffsetY + 0.004) * 0.5, -0.002);
-  rightBracket.castShadow = true;
-  upperGroup.add(rightBracket);
 
   // Posterior mechanical spine rib joining the two brackets
   const ribGeo = new THREE.BoxGeometry(
@@ -183,20 +170,34 @@ function createUpperHousing(materials: RobotMaterialPalette): {
   );
   const spineRib = new THREE.Mesh(ribGeo, materials.joint);
   spineRib.position.set(0, ELBOW_CONFIG.upperHousingOffsetY * 0.7, -knuckleRadius * 0.72);
-  spineRib.castShadow = true;
-  upperGroup.add(spineRib);
 
   // Upper Actuator Anchor Lug (Receives top of hydraulic flexion ram)
   const lugGeo = new THREE.BoxGeometry(0.010, 0.012, 0.012);
   const upperLug = new THREE.Mesh(lugGeo, materials.joint);
   upperLug.position.set(0, ELBOW_CONFIG.upperHousingOffsetY * 0.6, -knuckleRadius * 0.92);
-  upperLug.castShadow = true;
-  upperGroup.add(upperLug);
+
+  const tempUpper = new THREE.Group();
+  tempUpper.add(connector);
+  tempUpper.add(collarRim);
+  tempUpper.add(leftKnuckle);
+  tempUpper.add(rightKnuckle);
+  tempUpper.add(leftBracket);
+  tempUpper.add(rightBracket);
+  tempUpper.add(spineRib);
+  tempUpper.add(upperLug);
+
+  const upperMerged = mergeGroupMeshesByMaterial(tempUpper, materials.joint, 'UpperHousing_Joint')!;
+  tempUpper.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  upperGroup.add(upperMerged);
 
   return {
     group: upperGroup,
-    connector,
-    upperClevisMesh: leftKnuckle,
+    connector: upperMerged,
+    upperClevisMesh: upperMerged,
   };
 }
 
@@ -223,9 +224,6 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
 
   const barrelMesh = new THREE.Mesh(barrelGeo, materials.joint);
   barrelMesh.name = 'CentralHingeBarrel';
-  barrelMesh.castShadow = true;
-  barrelMesh.receiveShadow = true;
-  coreGroup.add(barrelMesh);
 
   // Precision Spur Gear Sector (10 radial teeth on anterior face showing mechanical drive)
   const gearSector = new THREE.Group();
@@ -242,7 +240,6 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
     tooth.rotation.x = angle;
     gearSector.add(tooth);
   }
-  coreGroup.add(gearSector);
 
   // Concentric bearing spacer rings on either side of the knuckles
   const spacerGeo = new THREE.TorusGeometry(
@@ -255,11 +252,23 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
 
   const leftSpacer = new THREE.Mesh(spacerGeo, materials.joint);
   leftSpacer.position.set(-ELBOW_CONFIG.centerKnuckleWidth * 0.5, 0, 0);
-  coreGroup.add(leftSpacer);
 
   const rightSpacer = new THREE.Mesh(spacerGeo, materials.joint);
   rightSpacer.position.set(ELBOW_CONFIG.centerKnuckleWidth * 0.5, 0, 0);
-  coreGroup.add(rightSpacer);
+
+  const tempCore = new THREE.Group();
+  tempCore.add(barrelMesh);
+  tempCore.add(gearSector);
+  tempCore.add(leftSpacer);
+  tempCore.add(rightSpacer);
+
+  const coreMerged = mergeGroupMeshesByMaterial(tempCore, materials.joint, 'CentralHingeBarrel_Merged')!;
+  tempCore.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  coreGroup.add(coreMerged);
 
   // Central Hinge Pin / Axle ("Central Hinge Pin" in exploded view)
   const pinGroup = new THREE.Group();
@@ -276,8 +285,6 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
 
   const shaftMesh = new THREE.Mesh(shaftGeo, materials.joint);
   shaftMesh.name = 'AxlePinShaft';
-  shaftMesh.castShadow = true;
-  pinGroup.add(shaftMesh);
 
   // Stepped shoulder sleeves near outer ends
   const shoulderGeo = new THREE.CylinderGeometry(
@@ -290,13 +297,24 @@ function createCentralHingeCore(materials: RobotMaterialPalette): {
 
   const leftShoulder = new THREE.Mesh(shoulderGeo, materials.joint);
   leftShoulder.position.set(-ELBOW_CONFIG.discOffsetX * 0.88, 0, 0);
-  pinGroup.add(leftShoulder);
 
   const rightShoulder = new THREE.Mesh(shoulderGeo, materials.joint);
   rightShoulder.position.set(ELBOW_CONFIG.discOffsetX * 0.88, 0, 0);
-  pinGroup.add(rightShoulder);
 
-  return { coreGroup, pinGroup, barrelMesh };
+  const tempPin = new THREE.Group();
+  tempPin.add(shaftMesh);
+  tempPin.add(leftShoulder);
+  tempPin.add(rightShoulder);
+
+  const pinMerged = mergeGroupMeshesByMaterial(tempPin, materials.joint, 'AxlePinShaft_Merged')!;
+  tempPin.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  pinGroup.add(pinMerged);
+
+  return { coreGroup, pinGroup, barrelMesh: coreMerged };
 }
 
 /**
@@ -341,9 +359,6 @@ function createRotationalDisc(
 
   const outerDisc = new THREE.Mesh(outerDiscGeo, materials.joint);
   outerDisc.name = `${discName}_OuterHousing`;
-  outerDisc.castShadow = true;
-  outerDisc.receiveShadow = true;
-  outerBezel.add(outerDisc);
 
   // Beveled outer rim
   const beveledRimGeo = new THREE.TorusGeometry(
@@ -355,9 +370,11 @@ function createRotationalDisc(
   beveledRimGeo.rotateY(Math.PI / 2);
   const beveledRim = new THREE.Mesh(beveledRimGeo, materials.joint);
   beveledRim.position.set(sign * (ELBOW_CONFIG.discThickness * 0.35), 0, 0);
-  outerBezel.add(beveledRim);
 
   // 6 Perimeter Titanium Hex Socket Cap Screws
+  const tempBezel = new THREE.Group();
+  tempBezel.add(outerDisc);
+  tempBezel.add(beveledRim);
   for (let b = 0; b < 6; b++) {
     const angle = (b / 6) * Math.PI * 2;
     const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.0024, 6);
@@ -368,8 +385,16 @@ function createRotationalDisc(
       Math.sin(angle) * (ELBOW_CONFIG.discOuterRadius * 0.82),
       Math.cos(angle) * (ELBOW_CONFIG.discOuterRadius * 0.82)
     );
-    outerBezel.add(bolt);
+    tempBezel.add(bolt);
   }
+
+  const bezelMerged = mergeGroupMeshesByMaterial(tempBezel, materials.joint, `${discName}_OuterBezel_Merged`)!;
+  tempBezel.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  outerBezel.add(bezelMerged);
 
   // B. Roller Bearing Race Group (Exploded Level)
   const bearingRace = new THREE.Group();
@@ -385,8 +410,9 @@ function createRotationalDisc(
   raceRingGeo.rotateY(Math.PI / 2);
   const raceRing = new THREE.Mesh(raceRingGeo, materials.joint);
   raceRing.position.set(sign * (ELBOW_CONFIG.discThickness * 0.28), 0, 0);
-  bearingRace.add(raceRing);
 
+  const tempRace = new THREE.Group();
+  tempRace.add(raceRing);
   // 10 micro-roller bearing cylinders around the race
   for (let r = 0; r < 10; r++) {
     const angle = (r / 10) * Math.PI * 2;
@@ -398,8 +424,16 @@ function createRotationalDisc(
       Math.sin(angle) * (ELBOW_CONFIG.emissiveRingRadius * 1.08),
       Math.cos(angle) * (ELBOW_CONFIG.emissiveRingRadius * 1.08)
     );
-    bearingRace.add(roller);
+    tempRace.add(roller);
   }
+
+  const raceMerged = mergeGroupMeshesByMaterial(tempRace, materials.joint, `${discName}_BearingRace_Merged`)!;
+  tempRace.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  bearingRace.add(raceMerged);
 
   // C. Signature Circular Purple Emissive Accent Ring
   const accentGeo = new THREE.TorusGeometry(
@@ -443,14 +477,23 @@ function createRotationalDisc(
 
   const hubCap = new THREE.Mesh(capGeo, materials.joint);
   hubCap.position.set(sign * (ELBOW_CONFIG.discThickness * 0.50), 0, 0);
-  hubCapGroup.add(hubCap);
 
   // Central Hex/Circular Bore Dimple
   const boreGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0030, 6);
   boreGeo.rotateZ(Math.PI / 2);
   const centerBore = new THREE.Mesh(boreGeo, materials.joint);
   centerBore.position.set(sign * (ELBOW_CONFIG.discThickness * 0.56), 0, 0);
-  hubCapGroup.add(centerBore);
+
+  const tempHub = new THREE.Group();
+  tempHub.add(hubCap);
+  tempHub.add(centerBore);
+  const hubMerged = mergeGroupMeshesByMaterial(tempHub, materials.joint, `${discName}_HubCap_Merged`)!;
+  tempHub.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  hubCapGroup.add(hubMerged);
 
   // Core purple LED jewel dot
   const jewelGeo = new THREE.SphereGeometry(0.0025, 8, 8);
@@ -467,7 +510,7 @@ function createRotationalDisc(
     hubCap: hubCapGroup,
   };
 
-  return { discGroup, discNodes, accentRing, outerDisc };
+  return { discGroup, discNodes, accentRing, outerDisc: bezelMerged };
 }
 
 /**
@@ -495,9 +538,6 @@ function createLowerHousing(materials: RobotMaterialPalette): {
   const lowerKnuckle = new THREE.Mesh(knuckleGeo, materials.joint);
   lowerKnuckle.name = 'LowerClevisKnuckle';
   lowerKnuckle.position.set(0, 0, 0);
-  lowerKnuckle.castShadow = true;
-  lowerKnuckle.receiveShadow = true;
-  lowerGroup.add(lowerKnuckle);
 
   // Downward mechanical stem / saddle inserting into forearm gauntlet
   const stemGeo = new THREE.CylinderGeometry(
@@ -509,15 +549,11 @@ function createLowerHousing(materials: RobotMaterialPalette): {
   const stemMesh = new THREE.Mesh(stemGeo, materials.joint);
   stemMesh.name = 'LowerJointStem';
   stemMesh.position.set(0, ELBOW_CONFIG.lowerHousingOffsetY, 0);
-  stemMesh.castShadow = true;
-  stemMesh.receiveShadow = true;
-  lowerGroup.add(stemMesh);
 
   // Anterior recessed servo wire conduit / mechanical groove
   const conduitGeo = new THREE.BoxGeometry(0.014, ELBOW_CONFIG.lowerHousingHeight * 0.85, 0.005);
   const conduitMesh = new THREE.Mesh(conduitGeo, materials.joint);
   conduitMesh.position.set(0, ELBOW_CONFIG.lowerHousingOffsetY, ELBOW_CONFIG.lowerHousingRadius * 0.85);
-  lowerGroup.add(conduitMesh);
 
   // Posterior reinforcement strut linking knuckle to gauntlet mount
   const strutGeo = new THREE.BoxGeometry(
@@ -527,19 +563,30 @@ function createLowerHousing(materials: RobotMaterialPalette): {
   );
   const strutMesh = new THREE.Mesh(strutGeo, materials.joint);
   strutMesh.position.set(0, ELBOW_CONFIG.lowerHousingOffsetY * 0.6, -knuckleRadius * 0.55);
-  strutMesh.castShadow = true;
-  lowerGroup.add(strutMesh);
 
   // Lower Actuator Anchor Lug (Receives bottom rod of hydraulic flexion ram)
   const lowerLugGeo = new THREE.BoxGeometry(0.010, 0.012, 0.012);
   const lowerLug = new THREE.Mesh(lowerLugGeo, materials.joint);
   lowerLug.position.set(0, -0.016, -knuckleRadius * 0.75);
-  lowerLug.castShadow = true;
-  lowerGroup.add(lowerLug);
+
+  const tempLower = new THREE.Group();
+  tempLower.add(lowerKnuckle);
+  tempLower.add(stemMesh);
+  tempLower.add(conduitMesh);
+  tempLower.add(strutMesh);
+  tempLower.add(lowerLug);
+
+  const lowerMerged = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerHousing_Merged')!;
+  tempLower.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  lowerGroup.add(lowerMerged);
 
   return {
     group: lowerGroup,
-    lowerClevisMesh: lowerKnuckle,
+    lowerClevisMesh: lowerMerged,
   };
 }
 
@@ -666,6 +713,7 @@ export function createElbow(
   elbowGroup.add(olecranonMesh);
 
   // 6. Anterior Cybernetic Conduits across Flexion Fold
+  const tempCables = new THREE.Group();
   for (let c = -1; c <= 1; c += 2) {
     const cableCurve = new THREE.CatmullRomCurve3([
       new THREE.Vector3(c * 0.014, 0.018, 0.024),
@@ -674,8 +722,15 @@ export function createElbow(
     ]);
     const cableGeo = new THREE.TubeGeometry(cableCurve, 10, 0.0018, 6, false);
     const cable = new THREE.Mesh(cableGeo, materials.joint);
-    elbowGroup.add(cable);
+    tempCables.add(cable);
   }
+  const mergedCables = mergeGroupMeshesByMaterial(tempCables, materials.joint, 'ElbowCables_Merged')!;
+  tempCables.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  elbowGroup.add(mergedCables);
 
   // 7. DEDICATED FOREARM ROTATION PIVOT (The Hinge Axis at [0, 0, 0])
   const forearmPivot = new THREE.Group();

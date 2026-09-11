@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface AchillesDamperNodes {
   group: THREE.Group;
@@ -38,6 +39,11 @@ export function createAnkle(
   const cfg = LEG_CONFIG.ankle;
   const ledMeshes: THREE.Mesh[] = [];
 
+  // Group containing stationary spherical core, clevis, malleolus discs, and damper
+  const ankleJointGroup = new THREE.Group();
+  ankleJointGroup.name = side === -1 ? 'AnkleJointCore_L' : 'AnkleJointCore_R';
+  ankleGroup.add(ankleJointGroup);
+
   // ==========================================
   // 1. CENTRAL MULTIAXIAL SPHERICAL BEARING
   // ==========================================
@@ -45,7 +51,7 @@ export function createAnkle(
   const sphericalCore = new THREE.Mesh(sphereGeo, materials.joint);
   sphericalCore.name = side === -1 ? 'AnkleBall_L' : 'AnkleBall_R';
   sphericalCore.castShadow = true;
-  ankleGroup.add(sphericalCore);
+  ankleJointGroup.add(sphericalCore);
 
   // Structural dark titanium clevis yoke clasping the spherical core
   const clevisShape = new THREE.Shape();
@@ -69,7 +75,7 @@ export function createAnkle(
   const clevisHousing = new THREE.Mesh(clevisGeo, materials.joint);
   clevisHousing.name = side === -1 ? 'AnkleClevis_L' : 'AnkleClevis_R';
   clevisHousing.castShadow = true;
-  ankleGroup.add(clevisHousing);
+  ankleJointGroup.add(clevisHousing);
 
   // ==========================================
   // 2. MALLEOLUS DISCS (Lateral & Medial Ankle Bones)
@@ -89,7 +95,7 @@ export function createAnkle(
   malleolusLateral.rotation.z = Math.PI / 2;
   malleolusLateral.position.x = side * (discSpacing * 0.5);
   malleolusLateral.castShadow = true;
-  ankleGroup.add(malleolusLateral);
+  ankleJointGroup.add(malleolusLateral);
 
   // Medial malleolus disc
   const malleolusMedial = new THREE.Mesh(discGeo, materials.joint);
@@ -97,7 +103,7 @@ export function createAnkle(
   malleolusMedial.rotation.z = Math.PI / 2;
   malleolusMedial.position.x = -side * (discSpacing * 0.5);
   malleolusMedial.castShadow = true;
-  ankleGroup.add(malleolusMedial);
+  ankleJointGroup.add(malleolusMedial);
 
   // Concentric purple emissive rings on lateral and medial malleolus
   const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0016, 8, 24);
@@ -117,6 +123,7 @@ export function createAnkle(
   ledMeshes.push(accentRingMedial);
 
   // White ceramic outer accent caps on the malleolus discs
+  const malleolusCapGroup = new THREE.Group();
   const capGeo = new THREE.CylinderGeometry(
     cfg.malleolusDiscRadius * 0.72,
     cfg.malleolusDiscRadius * 0.68,
@@ -126,12 +133,17 @@ export function createAnkle(
   const capLat = new THREE.Mesh(capGeo, materials.armor);
   capLat.rotation.z = Math.PI / 2;
   capLat.position.x = side * (discSpacing * 0.5 + cfg.malleolusDiscWidth * 0.5 + 0.0025);
-  ankleGroup.add(capLat);
+  malleolusCapGroup.add(capLat);
 
   const capMed = new THREE.Mesh(capGeo, materials.armor);
   capMed.rotation.z = Math.PI / 2;
   capMed.position.x = -side * (discSpacing * 0.5 + cfg.malleolusDiscWidth * 0.5 + 0.0025);
-  ankleGroup.add(capMed);
+  malleolusCapGroup.add(capMed);
+
+  const mergedAnkleCaps = mergeGroupMeshesByMaterial(malleolusCapGroup, materials.armor, side === -1 ? 'AnkleCaps_L' : 'AnkleCaps_R', false);
+  if (mergedAnkleCaps) {
+    ankleGroup.add(mergedAnkleCaps);
+  }
 
   // ==========================================
   // 3. POSTERIOR ACHILLES HYDRAULIC DAMPER
@@ -163,7 +175,10 @@ export function createAnkle(
   piston.castShadow = true;
   damperGroup.add(piston);
 
-  ankleGroup.add(damperGroup);
+  ankleJointGroup.add(damperGroup);
+
+  // Merge static joint sub-meshes in ankleJointGroup
+  const mergedAnkle = mergeGroupMeshesByMaterial(ankleJointGroup, materials.joint, side === -1 ? 'AnkleJointMesh_L' : 'AnkleJointMesh_R', true) || sphericalCore;
 
   // ==========================================
   // 4. FOOT PIVOT (Pitch, Yaw, Roll Articulation)
@@ -175,16 +190,16 @@ export function createAnkle(
 
   return {
     group: ankleGroup,
-    sphericalCore,
-    clevisHousing,
-    malleolusLateral,
-    malleolusMedial,
+    sphericalCore: mergedAnkle,
+    clevisHousing: mergedAnkle,
+    malleolusLateral: mergedAnkle,
+    malleolusMedial: mergedAnkle,
     accentRingLateral,
     accentRingMedial,
     achillesDamper: {
       group: damperGroup,
-      cylinder,
-      piston,
+      cylinder: mergedAnkle,
+      piston: mergedAnkle,
     },
     footPivot,
     ledMeshes,

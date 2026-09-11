@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ROBOT_CONFIG, ROBOT_ACCENT, ROBOT_ROTATION } from '../config';
+import { ROBOT_ROTATION } from '../config';
 import { createRobotMaterials } from '../materials/RobotMaterials';
 import { createRobotHead } from '../head/RobotHead';
 import { createRobotArm, RobotArmNodes } from '../arm/RobotArm';
@@ -62,23 +62,12 @@ export function createProceduralRobot(): RobotNodes {
   root.rotation.x = ROBOT_ROTATION.pitch;
   root.rotation.z = ROBOT_ROTATION.roll;
 
-  const cfg = ROBOT_CONFIG;
   const ledMeshes: THREE.Mesh[] = [];
 
   // ==========================================
   // 1. UNIFIED PBR MATERIALS (Part 5, 13, 14, 15)
   // ==========================================
   const materials = createRobotMaterials();
-  const armorMat = materials.armor;
-  const jointMat = materials.joint;
-  const visorMat = materials.visor;
-  const eyeGlowMat = materials.purpleEmissive;
-  const eyeCoreGlowMat = materials.whiteCoreEmissive;
-  const eyeBloomMat = materials.purpleBloom;
-  const earRingGlowMat = materials.purpleEmissive;
-  const earRingCoreMat = materials.whiteCoreEmissive;
-  const chestGlowMat = materials.purpleEmissive;
-  const accentGlowMat = materials.purpleEmissive;
 
   // ==========================================
   // 2. MODULAR PROCEDURAL ROBOT TORSO
@@ -107,10 +96,10 @@ export function createProceduralRobot(): RobotNodes {
   const earRingRightMesh = headAssembly.rightSideModule.emissiveRing;
 
   // Reference eye nodes for controller
-  const eyeLeft = new THREE.Mesh(new THREE.BufferGeometry(), materials.purpleEmissive);
+  const eyeLeft = new THREE.Group() as unknown as THREE.Mesh;
   eyeLeft.name = 'EyeLeft';
   eyeTrackingGroup.add(eyeLeft);
-  const eyeRight = new THREE.Mesh(new THREE.BufferGeometry(), materials.purpleEmissive);
+  const eyeRight = new THREE.Group() as unknown as THREE.Mesh;
   eyeRight.name = 'EyeRight';
   eyeTrackingGroup.add(eyeRight);
 
@@ -201,13 +190,13 @@ export function createProceduralRobot(): RobotNodes {
     rightLegNodes: rightLeg,
     ledMeshes,
     materials: {
-      armor: armorMat,
-      joint: jointMat,
-      visor: visorMat,
-      eyeGlow: eyeGlowMat,
-      earRingGlow: earRingGlowMat,
-      chestGlow: chestGlowMat,
-      accentGlow: accentGlowMat,
+      armor: materials.armor,
+      joint: materials.joint,
+      visor: materials.visor,
+      eyeGlow: materials.purpleEmissive,
+      earRingGlow: materials.purpleEmissive,
+      chestGlow: materials.purpleEmissive,
+      accentGlow: materials.purpleEmissive,
     },
   };
 }

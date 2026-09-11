@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface WristNodes {
   group: THREE.Group;
@@ -54,6 +55,8 @@ export function createWrist(
   swivelCollar.receiveShadow = true;
   wristGroup.add(swivelCollar);
 
+  const wristStaticMechanics = new THREE.Group();
+
   // Concentric Ribbed Mechanical Rings (Layered dark metal detailing)
   for (const wY of [-0.002, -0.009]) {
     const wRingGeo = new THREE.TorusGeometry(0.041, 0.0025, 10, 32);
@@ -61,18 +64,18 @@ export function createWrist(
     wRing.rotation.x = Math.PI / 2;
     wRing.position.set(0, wY, 0);
     wRing.castShadow = true;
-    wristGroup.add(wRing);
+    wristStaticMechanics.add(wRing);
     ribbedRings.push(wRing);
   }
 
+  const tempWristAccents = new THREE.Group();
+
   // Signature Purple Emissive Accent Ring (Concentric glowing band around swivel collar)
   const accentGeo = new THREE.TorusGeometry(0.0418, 0.0018, 10, 36);
-  const accentRing = new THREE.Mesh(accentGeo, materials.purpleEmissive);
-  accentRing.name = 'WristAccentRing';
-  accentRing.rotation.x = Math.PI / 2;
-  accentRing.position.set(0, -0.006, 0);
-  wristGroup.add(accentRing);
-  ledMeshes.push(accentRing);
+  const accentRingRaw = new THREE.Mesh(accentGeo, materials.purpleEmissive);
+  accentRingRaw.rotation.x = Math.PI / 2;
+  accentRingRaw.position.set(0, -0.006, 0);
+  tempWristAccents.add(accentRingRaw);
 
   // ==============================================================
   // 2. ROTARY CORE & HARMONIC DRIVE BEARING RACE
@@ -83,7 +86,7 @@ export function createWrist(
   rotaryCore.position.set(0, -0.012, 0);
   rotaryCore.castShadow = true;
   rotaryCore.receiveShadow = true;
-  wristGroup.add(rotaryCore);
+  wristStaticMechanics.add(rotaryCore);
 
   // Perimeter micro-stator spline teeth around harmonic drive
   const splineCount = 14;
@@ -98,7 +101,7 @@ export function createWrist(
     );
     tooth.rotation.y = -angle;
     tooth.castShadow = true;
-    wristGroup.add(tooth);
+    wristStaticMechanics.add(tooth);
   }
 
   // ==============================================================
@@ -111,7 +114,7 @@ export function createWrist(
   pivotPin.position.set(0, -0.014, 0);
   pivotPin.castShadow = true;
   pivotPin.receiveShadow = true;
-  wristGroup.add(pivotPin);
+  wristStaticMechanics.add(pivotPin);
 
   // Machined Titanium Flange Caps at pin ends
   for (const s of [-1, 1]) {
@@ -120,7 +123,7 @@ export function createWrist(
     endCap.rotation.z = Math.PI / 2;
     endCap.position.set(s * 0.0245, -0.014, 0);
     endCap.castShadow = true;
-    wristGroup.add(endCap);
+    wristStaticMechanics.add(endCap);
   }
 
   // ==============================================================
@@ -170,15 +173,27 @@ export function createWrist(
   distalSocket.position.set(0, -0.024, 0);
   distalSocket.castShadow = true;
   distalSocket.receiveShadow = true;
-  wristGroup.add(distalSocket);
+  wristStaticMechanics.add(distalSocket);
+
+  // Merge static mechanical components of the wrist
+  const mergedWristMechanics = mergeGroupMeshesByMaterial(wristStaticMechanics, materials.joint, 'WristCoreMechanics_Merged', false);
+  if (mergedWristMechanics) {
+    mergedWristMechanics.castShadow = true;
+    mergedWristMechanics.receiveShadow = true;
+    wristGroup.add(mergedWristMechanics);
+  }
 
   // Concentric purple accent ring at carpal socket interface
   const carpalAccentGeo = new THREE.TorusGeometry(0.024, 0.0014, 8, 24);
   const carpalAccent = new THREE.Mesh(carpalAccentGeo, materials.purpleEmissive);
   carpalAccent.rotation.x = Math.PI / 2;
   carpalAccent.position.set(0, -0.024, 0);
-  wristGroup.add(carpalAccent);
-  ledMeshes.push(carpalAccent);
+  tempWristAccents.add(carpalAccent);
+
+  const accentRing = mergeGroupMeshesByMaterial(tempWristAccents, materials.purpleEmissive, 'WristAccentRing', false, false) || accentRingRaw;
+  accentRing.name = 'WristAccentRing';
+  wristGroup.add(accentRing);
+  ledMeshes.push(accentRing);
 
   // ==============================================================
   // 5. OUTER SHELL: SCULPTED WHITE CERAMIC STYLOID COWLS

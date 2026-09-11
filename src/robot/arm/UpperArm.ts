@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface UpperArmNodes {
   group: THREE.Group;
@@ -42,20 +43,22 @@ export function createUpperArm(
   // 1. UPPER ROTARY CONNECTOR COLLAR & FLANGE INTERFACE (Shoulder Contact)
   // Mates flush with shoulder.upperArmConnector seating flange at y = 0
   // ==============================================================
+  const armatureJointGroup = new THREE.Group();
+
   const collarGeo = new THREE.CylinderGeometry(0.0380, 0.0360, 0.014, 32);
   const upperCollar = new THREE.Mesh(collarGeo, materials.joint);
   upperCollar.name = 'UpperArmShoulderCollar';
   upperCollar.position.set(0, -0.007, 0);
   upperCollar.castShadow = true;
   upperCollar.receiveShadow = true;
-  upperArmGroup.add(upperCollar);
+  armatureJointGroup.add(upperCollar);
 
   // Beveled collar trim ring flush against shoulder flange
   const collarRimGeo = new THREE.TorusGeometry(0.0382, 0.0018, 8, 32);
   const collarRim = new THREE.Mesh(collarRimGeo, materials.joint);
   collarRim.rotation.x = Math.PI / 2;
   collarRim.position.set(0, -0.001, 0);
-  upperArmGroup.add(collarRim);
+  armatureJointGroup.add(collarRim);
 
   // ==============================================================
   // 2. STRUCTURAL DARK TITANIUM ARMATURE CORE (Internal Bone Chassis)
@@ -67,7 +70,7 @@ export function createUpperArm(
   armatureCore.position.set(0, -0.090, 0);
   armatureCore.castShadow = true;
   armatureCore.receiveShadow = true;
-  upperArmGroup.add(armatureCore);
+  armatureJointGroup.add(armatureCore);
 
   // Internal mechanical reinforcement rings along bone shaft
   for (let r = 0; r < 2; r++) {
@@ -75,7 +78,7 @@ export function createUpperArm(
     const ringMesh = new THREE.Mesh(ringGeo, materials.joint);
     ringMesh.rotation.x = Math.PI / 2;
     ringMesh.position.set(0, -0.050 - r * 0.065, 0);
-    upperArmGroup.add(ringMesh);
+    armatureJointGroup.add(ringMesh);
   }
 
   // ==============================================================
@@ -216,26 +219,28 @@ export function createUpperArm(
   // 4. ANATOMICAL PROXIMAL SHOULDER SOCKET RIM & SLEEVE (Proper Contact)
   // Perfectly mates with the shoulder connector lower seating flange at y = 0
   // ==============================================================
+  const bicepJointGroup = new THREE.Group();
+
   const topRimGeo = new THREE.TorusGeometry(0.0386, 0.0020, 8, 32);
   const topSocketRim = new THREE.Mesh(topRimGeo, materials.joint);
   topSocketRim.name = 'BicepTopSocketRim';
   topSocketRim.rotation.x = Math.PI / 2;
   topSocketRim.position.set(0, 0.086, 0);
   topSocketRim.castShadow = true;
-  bicepSubGroup.add(topSocketRim);
+  bicepJointGroup.add(topSocketRim);
 
   // Inner titanium socket sleeve inserting upward into connector
   const topSleeveGeo = new THREE.CylinderGeometry(0.0360, 0.0375, 0.014, 28);
   const topSleeve = new THREE.Mesh(topSleeveGeo, materials.joint);
   topSleeve.position.set(0, 0.080, 0);
-  bicepSubGroup.add(topSleeve);
+  bicepJointGroup.add(topSleeve);
 
   // Twin cybernetic conduit entry ports on proximal rim
   for (let c = -1; c <= 1; c += 2) {
     const portGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.0035, 12);
     const port = new THREE.Mesh(portGeo, materials.joint);
     port.position.set(-side * 0.012, 0.087, c * 0.015);
-    bicepSubGroup.add(port);
+    bicepJointGroup.add(port);
   }
 
   // ==============================================================
@@ -248,14 +253,14 @@ export function createUpperArm(
   elbowSocketCuff.position.set(0, -0.076, 0);
   elbowSocketCuff.castShadow = true;
   elbowSocketCuff.receiveShadow = true;
-  bicepSubGroup.add(elbowSocketCuff);
+  bicepJointGroup.add(elbowSocketCuff);
 
   // Beveled trim collar seated around the lower cuff
   const cuffTrimGeo = new THREE.TorusGeometry(0.0355, 0.0016, 6, 28);
   const cuffTrim = new THREE.Mesh(cuffTrimGeo, materials.joint);
   cuffTrim.rotation.x = Math.PI / 2;
   cuffTrim.position.set(0, -0.070, 0);
-  bicepSubGroup.add(cuffTrim);
+  bicepJointGroup.add(cuffTrim);
 
   // ==============================================================
   // 6. CONFORMAL CYBERNETIC LIGHT CHANNEL & VIOLET LED STRIP
@@ -295,7 +300,7 @@ export function createUpperArm(
   const channelCasing = new THREE.Mesh(casingGeo, materials.joint);
   channelCasing.name = 'BicepLightChannelCasing';
   channelCasing.castShadow = true;
-  bicepSubGroup.add(channelCasing);
+  bicepJointGroup.add(channelCasing);
 
   // 2. Luminous violet LED neon strip (elevated and vibrant)
   const ledCurve = new THREE.CatmullRomCurve3(curvePoints);
@@ -312,7 +317,7 @@ export function createUpperArm(
     const capGeo = new THREE.SphereGeometry(0.0018, 8, 8);
     const capMesh = new THREE.Mesh(capGeo, materials.joint);
     capMesh.position.copy(p);
-    bicepSubGroup.add(capMesh);
+    bicepJointGroup.add(capMesh);
   });
 
   // Backward-compatible panelSeam alias (conformal subtle rear-medial seam)
@@ -327,7 +332,15 @@ export function createUpperArm(
   const seamGeo = new THREE.TubeGeometry(seamCurve, 20, 0.0009, 6, false);
   const panelSeam = new THREE.Mesh(seamGeo, materials.joint);
   panelSeam.name = 'BicepPanelSeam';
-  bicepSubGroup.add(panelSeam);
+  bicepJointGroup.add(panelSeam);
+
+  // Merge static joint details of the bicep
+  const mergedBicepJoint = mergeGroupMeshesByMaterial(bicepJointGroup, materials.joint, 'BicepJoint_Merged', false);
+  if (mergedBicepJoint) {
+    mergedBicepJoint.castShadow = true;
+    mergedBicepJoint.receiveShadow = true;
+    bicepSubGroup.add(mergedBicepJoint);
+  }
 
   // ==============================================================
   // 7. POSTERIOR TRICEP MECHANICAL ACTUATOR ROD
@@ -338,7 +351,7 @@ export function createUpperArm(
   tricepActuator.name = 'TricepActuatorCylinder';
   tricepActuator.position.set(0, -0.084, -0.033);
   tricepActuator.castShadow = true;
-  upperArmGroup.add(tricepActuator);
+  armatureJointGroup.add(tricepActuator);
 
   // Anodized violet collar ring on tricep actuator
   const tricepCollarGeo = new THREE.TorusGeometry(0.0060, 0.0012, 6, 16);
@@ -354,7 +367,15 @@ export function createUpperArm(
   tricepPiston.name = 'TricepPistonRod';
   tricepPiston.position.set(0, -0.106, -0.033);
   tricepPiston.castShadow = true;
-  upperArmGroup.add(tricepPiston);
+  armatureJointGroup.add(tricepPiston);
+
+  // Merge static armature components
+  const mergedArmature = mergeGroupMeshesByMaterial(armatureJointGroup, materials.joint, 'UpperArmArmature_Merged', false);
+  if (mergedArmature) {
+    mergedArmature.castShadow = true;
+    mergedArmature.receiveShadow = true;
+    upperArmGroup.add(mergedArmature);
+  }
 
   return {
     group: upperArmGroup,

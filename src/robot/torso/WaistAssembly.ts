@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { TORSO_CONFIG } from './TorsoConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface HipConnectionNodes {
   group: THREE.Group;
@@ -157,12 +158,14 @@ export function createSingleHipConnection(
   });
   bracketGeo.center();
 
+  const hipJointGroup = new THREE.Group();
+
   const bracketArm = new THREE.Mesh(bracketGeo, materials.joint);
   bracketArm.name = side === -1 ? 'HipBracket_L' : 'HipBracket_R';
   bracketArm.position.set(0, 0.010, 0);
   bracketArm.castShadow = true;
   bracketArm.receiveShadow = true;
-  group.add(bracketArm);
+  hipJointGroup.add(bracketArm);
 
   // 2. Pelvic Hip Receiving Socket Collar (Dark Titanium Dual-Bearing Mechanism)
   const collarGeo = new THREE.CylinderGeometry(
@@ -176,14 +179,21 @@ export function createSingleHipConnection(
   rotaryHub.position.set(0, 0.004, 0);
   rotaryHub.castShadow = true;
   rotaryHub.receiveShadow = true;
-  group.add(rotaryHub);
+  hipJointGroup.add(rotaryHub);
 
   // Outer stepped bearing bevel ring
   const bearingRingGeo = new THREE.TorusGeometry(cfg.hubRadius * 1.08, 0.0018, 8, 32);
   const bearingRing = new THREE.Mesh(bearingRingGeo, materials.joint);
   bearingRing.rotation.x = Math.PI / 2;
   bearingRing.position.set(0, 0.009, 0);
-  group.add(bearingRing);
+  hipJointGroup.add(bearingRing);
+
+  const hipJointMerged = mergeGroupMeshesByMaterial(hipJointGroup, materials.joint, `${group.name}_JointMerged`, false);
+  if (hipJointMerged) {
+    hipJointMerged.castShadow = true;
+    hipJointMerged.receiveShadow = true;
+    group.add(hipJointMerged);
+  }
 
   // 3. Concentric Purple Emissive Accent Ring inside Socket Collar
   const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0018, 8, 32);
@@ -281,50 +291,57 @@ export function createSingleWaistActuator(
   const uMountGeo = new THREE.CylinderGeometry(cfg.cylinderRadius * 1.35, cfg.cylinderRadius * 1.35, 0.006, 16);
   const upperMount = new THREE.Mesh(uMountGeo, materials.joint);
   upperMount.rotation.x = Math.PI / 2;
-  group.add(upperMount);
 
   // Upper pivot pin
   const pinGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.014, 12);
   const upperPin = new THREE.Mesh(pinGeo, materials.joint);
   upperPin.rotation.z = Math.PI / 2;
-  group.add(upperPin);
 
   // 2. Outer cylinder barrel (dark titanium)
   const cylLen = len * 0.55;
   const cylGeo = new THREE.CylinderGeometry(cfg.cylinderRadius, cfg.cylinderRadius, cylLen, 18);
   const cylinder = new THREE.Mesh(cylGeo, materials.joint);
   cylinder.position.set(0, -cylLen * 0.5, 0);
-  cylinder.castShadow = true;
-  cylinder.receiveShadow = true;
-  group.add(cylinder);
 
   // Cylinder end collar gasket
   const collarGeo = new THREE.CylinderGeometry(cfg.cylinderRadius * 1.15, cfg.cylinderRadius * 1.15, 0.003, 18);
   const collar = new THREE.Mesh(collarGeo, materials.joint);
   collar.position.set(0, -cylLen + 0.0015, 0);
-  group.add(collar);
 
   // 3. Telescoping Piston Rod (Polished metallic)
   const pistLen = len * 0.50;
   const pistGeo = new THREE.CylinderGeometry(cfg.pistonRadius, cfg.pistonRadius, pistLen, 16);
   const piston = new THREE.Mesh(pistGeo, materials.joint);
   piston.position.set(0, -cylLen - pistLen * 0.5 + 0.004, 0);
-  piston.castShadow = true;
-  group.add(piston);
 
   // 4. Lower Rod-end eyelet & clevis
   const lMountGeo = new THREE.CylinderGeometry(cfg.pistonRadius * 1.45, cfg.pistonRadius * 1.45, 0.005, 14);
   const lowerMount = new THREE.Mesh(lMountGeo, materials.joint);
   lowerMount.position.set(0, -len, 0);
   lowerMount.rotation.x = Math.PI / 2;
-  group.add(lowerMount);
+
+  const tempActuator = new THREE.Group();
+  tempActuator.add(upperMount);
+  tempActuator.add(upperPin);
+  tempActuator.add(cylinder);
+  tempActuator.add(collar);
+  tempActuator.add(piston);
+  tempActuator.add(lowerMount);
+
+  const actMerged = mergeGroupMeshesByMaterial(tempActuator, materials.joint, `${group.name}_Merged`)!;
+  tempActuator.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  group.add(actMerged);
 
   return {
     group,
-    cylinder,
-    piston,
-    upperMount,
-    lowerMount,
+    cylinder: actMerged,
+    piston: actMerged,
+    upperMount: actMerged,
+    lowerMount: actMerged,
   };
 }
 
@@ -351,25 +368,33 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
   // ==========================================
   // 1. UPPER WAIST COLLAR
   // ==========================================
+  // 1. CENTRAL MECHANICAL WAIST CORE & COLLARS
+  // ==========================================
+  const waistCoreGroup = new THREE.Group();
+  waistCoreGroup.name = 'WaistCore';
+  waistPivot.add(waistCoreGroup);
+
+  const tempWaistCore = new THREE.Group();
+
+  // Upper Waist Collar
   const urx = cfg.upperWaistRing.radiusX;
   const urz = cfg.upperWaistRing.radiusZ;
   const uGeo = createWaistCollarGeometry(urx, urz, cfg.upperWaistRing.height, 0.022);
-
   const upperWaistRing = new THREE.Mesh(uGeo, materials.joint);
   upperWaistRing.name = 'UpperWaistCollar';
   upperWaistRing.position.set(0, cfg.upperWaistRing.yOffset, -0.004);
   upperWaistRing.rotation.x = Math.PI / 2;
-  upperWaistRing.castShadow = true;
-  upperWaistRing.receiveShadow = true;
-  waistPivot.add(upperWaistRing);
+  tempWaistCore.add(upperWaistRing);
 
-  // ==========================================
-  // 2. CENTRAL MECHANICAL WAIST CORE & ROTATIONAL BEARING RACE
-  // ==========================================
-  const waistCoreGroup = new THREE.Group();
-  waistCoreGroup.name = 'WaistCore';
-  waistCoreGroup.position.set(0, cfg.waistCore.yOffset, -0.004);
-  waistPivot.add(waistCoreGroup);
+  // Lower Waist Collar
+  const lrx = cfg.lowerWaistRing.radiusX;
+  const lrz = cfg.lowerWaistRing.radiusZ;
+  const lGeo = createWaistCollarGeometry(lrx, lrz, cfg.lowerWaistRing.height, 0.024);
+  const lowerWaistRing = new THREE.Mesh(lGeo, materials.joint);
+  lowerWaistRing.name = 'LowerWaistCollar';
+  lowerWaistRing.position.set(0, cfg.lowerWaistRing.yOffset, -0.004);
+  lowerWaistRing.rotation.x = Math.PI / 2;
+  tempWaistCore.add(lowerWaistRing);
 
   // Stepped Conical Outer Housing (Smooth 36 segments)
   const coreHousingGeo = new THREE.CylinderGeometry(
@@ -380,23 +405,20 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
   );
   const waistCoreHousing = new THREE.Mesh(coreHousingGeo, materials.joint);
   waistCoreHousing.name = 'WaistCoreHousing';
+  waistCoreHousing.position.set(0, cfg.waistCore.yOffset, -0.004);
   waistCoreHousing.scale.set(1.04, 1.0, 0.88);
-  waistCoreHousing.castShadow = true;
-  waistCoreHousing.receiveShadow = true;
-  waistCoreGroup.add(waistCoreHousing);
+  tempWaistCore.add(waistCoreHousing);
 
   // Rotational Mechanical Bearing Ring
   const rotRingGeo = new THREE.TorusGeometry(cfg.waistCore.upperRadius * 1.05, 0.0040, 12, 36);
   const rotationalRing = new THREE.Mesh(rotRingGeo, materials.joint);
   rotationalRing.name = 'WaistRotationalRing';
+  rotationalRing.position.set(0, cfg.waistCore.yOffset, -0.004);
   rotationalRing.rotation.x = Math.PI / 2;
   rotationalRing.scale.set(1.04, 0.88, 1.0);
-  rotationalRing.castShadow = true;
-  rotationalRing.receiveShadow = true;
-  waistCoreGroup.add(rotationalRing);
+  tempWaistCore.add(rotationalRing);
 
   // 18 Radial Stator Teeth around the rotational bearing ring
-  const statorTeeth: THREE.Mesh[] = [];
   const toothCount = 18;
   const statorR = cfg.waistCore.upperRadius * 1.05;
   for (let i = 0; i < toothCount; i++) {
@@ -405,24 +427,11 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     const tooth = new THREE.Mesh(toothGeo, materials.joint);
     tooth.position.set(
       Math.cos(angle) * statorR * 1.04,
-      0,
-      Math.sin(angle) * statorR * 0.88
+      cfg.waistCore.yOffset,
+      -0.004 + Math.sin(angle) * statorR * 0.88
     );
     tooth.rotation.y = -angle;
-    tooth.castShadow = true;
-    waistCoreGroup.add(tooth);
-    statorTeeth.push(tooth);
-  }
-
-  // Dual Purple Emissive Core Accent Rings flanking the rotational bearing race
-  for (const yOff of [0.005, -0.005]) {
-    const accentRaceGeo = new THREE.TorusGeometry(cfg.waistCore.upperRadius * 1.02, 0.0015, 8, 36);
-    const accentRace = new THREE.Mesh(accentRaceGeo, materials.purpleEmissive);
-    accentRace.rotation.x = Math.PI / 2;
-    accentRace.position.y = yOff;
-    accentRace.scale.set(1.04, 0.88, 1.0);
-    waistCoreGroup.add(accentRace);
-    ledMeshes.push(accentRace);
+    tempWaistCore.add(tooth);
   }
 
   // Vertical Mechanical Struts bridging upper collar to lower collar
@@ -432,9 +441,8 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     const sz = Math.sin(angle) * (cfg.waistCore.upperRadius * 0.82);
     const strutGeo = new THREE.CylinderGeometry(0.0035, 0.0035, cfg.waistCore.height * 1.15, 12);
     const strut = new THREE.Mesh(strutGeo, materials.joint);
-    strut.position.set(sx, 0, sz);
-    strut.castShadow = true;
-    waistCoreGroup.add(strut);
+    strut.position.set(sx, cfg.waistCore.yOffset, -0.004 + sz);
+    tempWaistCore.add(strut);
   }
 
   // Central cylindrical inner pass-through spine
@@ -445,23 +453,33 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     24
   );
   const innerBoreMesh = new THREE.Mesh(innerBoreGeo, materials.joint);
-  innerBoreMesh.castShadow = true;
-  waistCoreGroup.add(innerBoreMesh);
+  innerBoreMesh.position.set(0, cfg.waistCore.yOffset, -0.004);
+  tempWaistCore.add(innerBoreMesh);
 
-  // ==========================================
-  // 3. LOWER WAIST COLLAR
-  // ==========================================
-  const lrx = cfg.lowerWaistRing.radiusX;
-  const lrz = cfg.lowerWaistRing.radiusZ;
-  const lGeo = createWaistCollarGeometry(lrx, lrz, cfg.lowerWaistRing.height, 0.024);
+  const waistCoreMerged = mergeGroupMeshesByMaterial(tempWaistCore, materials.joint, 'WaistCore_Merged', false, true)!;
+  tempWaistCore.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  waistCoreGroup.add(waistCoreMerged);
 
-  const lowerWaistRing = new THREE.Mesh(lGeo, materials.joint);
-  lowerWaistRing.name = 'LowerWaistCollar';
-  lowerWaistRing.position.set(0, cfg.lowerWaistRing.yOffset, -0.004);
-  lowerWaistRing.rotation.x = Math.PI / 2;
-  lowerWaistRing.castShadow = true;
-  lowerWaistRing.receiveShadow = true;
-  waistPivot.add(lowerWaistRing);
+  // Dual Purple Emissive Core Accent Rings flanking the rotational bearing race
+  const accentGroup = new THREE.Group();
+  for (const yOff of [0.005, -0.005]) {
+    const accentRaceGeo = new THREE.TorusGeometry(cfg.waistCore.upperRadius * 1.02, 0.0015, 8, 36);
+    const accentRace = new THREE.Mesh(accentRaceGeo, materials.purpleEmissive);
+    accentRace.rotation.x = Math.PI / 2;
+    accentRace.position.set(0, cfg.waistCore.yOffset + yOff, -0.004);
+    accentRace.scale.set(1.04, 0.88, 1.0);
+    accentGroup.add(accentRace);
+  }
+
+  const mergedWaistAccents = mergeGroupMeshesByMaterial(accentGroup, materials.purpleEmissive, 'WaistCoreAccentRings_Merged', false, false);
+  if (mergedWaistAccents) {
+    waistCoreGroup.add(mergedWaistAccents);
+    ledMeshes.push(mergedWaistAccents);
+  }
 
   // ==========================================
   // 4. DUAL HYDRAULIC STABILIZATION ACTUATORS
@@ -542,18 +560,22 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
   // Recessed dark titanium intake scoop pocket parented inside pelvic plate
   const intakePocketGeo = new THREE.BoxGeometry(0.042, 0.009, 0.008);
-  const pelvicIntakePocket = new THREE.Mesh(intakePocketGeo, materials.joint);
-  pelvicIntakePocket.name = 'PelvicIntakePocket';
-  pelvicIntakePocket.position.set(0, 0.011, 0.005);
-  pelvicPlate.add(pelvicIntakePocket);
+  const intakeGroup = new THREE.Group();
+  const rawIntake = new THREE.Mesh(intakePocketGeo, materials.joint);
+  intakeGroup.add(rawIntake);
 
   // Horizontal titanium radiator grille louvers across intake
   for (const lY of [-0.002, 0.002]) {
     const louverGeo = new THREE.BoxGeometry(0.038, 0.0008, 0.006);
     const louver = new THREE.Mesh(louverGeo, materials.joint);
     louver.position.set(0, lY, 0.002);
-    pelvicIntakePocket.add(louver);
+    intakeGroup.add(louver);
   }
+
+  const pelvicIntakePocket = mergeGroupMeshesByMaterial(intakeGroup, materials.joint, 'PelvicIntake_Merged', false)!;
+  pelvicIntakePocket.name = 'PelvicIntakePocket';
+  pelvicIntakePocket.position.set(0, 0.011, 0.005);
+  pelvicPlate.add(pelvicIntakePocket);
 
   // Signature horizontal violet emissive LED slit nested inside intake
   const pelvicLightGeo = new THREE.BoxGeometry(0.036, 0.0022, 0.003);
@@ -609,20 +631,24 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
   // Sub-Pelvic Mechanical Cradle (Dark Titanium Frame connecting lower waist to hips)
   const cradleGeo = new THREE.CylinderGeometry(0.046, 0.038, 0.036, 28);
-  const subPelvisCradle = new THREE.Mesh(cradleGeo, materials.joint);
-  subPelvisCradle.name = 'SubPelvisCradle';
-  subPelvisCradle.position.set(0, -0.262, 0.010);
-  subPelvisCradle.scale.set(1.15, 1.0, 0.85);
-  subPelvisCradle.castShadow = true;
-  hipConnectionGroup.add(subPelvisCradle);
+  const cradleGroup = new THREE.Group();
+  const rawCradle = new THREE.Mesh(cradleGeo, materials.joint);
+  rawCradle.scale.set(1.15, 1.0, 0.85);
+  cradleGroup.add(rawCradle);
 
   // Additional CNC ribbing details on sub-pelvis cradle
   for (let i = 0; i < 3; i++) {
     const ribGeo = new THREE.BoxGeometry(0.042 - i * 0.006, 0.003, 0.006);
     const rib = new THREE.Mesh(ribGeo, materials.joint);
     rib.position.set(0, -0.008 - i * 0.008, 0.026);
-    subPelvisCradle.add(rib);
+    cradleGroup.add(rib);
   }
+
+  const subPelvisCradle = mergeGroupMeshesByMaterial(cradleGroup, materials.joint, 'SubPelvisCradle_Merged', false)!;
+  subPelvisCradle.name = 'SubPelvisCradle';
+  subPelvisCradle.position.set(0, -0.262, 0.010);
+  subPelvisCradle.castShadow = true;
+  hipConnectionGroup.add(subPelvisCradle);
 
   return {
     group: waistGroup,
@@ -630,8 +656,8 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
     upperWaistRing,
     waistCore: waistCoreGroup,
     waistCoreHousing,
-    rotationalRing,
-    statorTeeth,
+    rotationalRing: waistCoreMerged,
+    statorTeeth: [waistCoreMerged],
     lowerWaistRing,
     leftActuator,
     rightActuator,

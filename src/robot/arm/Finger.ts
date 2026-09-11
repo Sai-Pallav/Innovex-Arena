@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface FingerSegmentNodes {
   group: THREE.Group;
@@ -291,6 +292,15 @@ export function createFinger(
   proximalGroup.name = 'Proximal';
   fingerGroup.add(proximalGroup);
 
+  // Helper to dispose temporary sub-geometries
+  const disposeTemp = (g: THREE.Group) => {
+    g.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+        (child as THREE.Mesh).geometry.dispose();
+      }
+    });
+  };
+
   // Knuckle socket collar linking proximal phalanx to palm's MCP hinge
   const socketGeo = new THREE.CylinderGeometry(
     spec.proximalRadius * 0.95,
@@ -300,8 +310,6 @@ export function createFinger(
   );
   const socketMesh = new THREE.Mesh(socketGeo, materials.joint);
   socketMesh.position.set(0, 0.001, 0);
-  socketMesh.castShadow = true;
-  proximalGroup.add(socketMesh);
 
   // Slender internal titanium structural bone (enclosed within shell)
   const pBoneGeo = new THREE.CylinderGeometry(
@@ -312,8 +320,6 @@ export function createFinger(
   );
   const pBoneMesh = new THREE.Mesh(pBoneGeo, materials.joint);
   pBoneMesh.position.set(0, -spec.proximalLength * 0.5, 0);
-  pBoneMesh.castShadow = true;
-  proximalGroup.add(pBoneMesh);
 
   // 3D Volumetric sculpted ceramic exoskeleton shell
   const pArmorWidth = spec.proximalRadius * 2.0;
@@ -321,7 +327,6 @@ export function createFinger(
   const pArmorDepth = spec.proximalRadius * 1.80;
   const pArmorMesh = createSculptedPhalanxShell(pArmorWidth, pArmorLength, pArmorDepth, materials.armor);
   pArmorMesh.position.set(0, -spec.proximalLength * 0.02, 0);
-  proximalGroup.add(pArmorMesh);
 
   // Palmar dark tactile friction grip pad (-Z face)
   const pPadMesh = createPalmarGripPad(
@@ -331,7 +336,6 @@ export function createFinger(
     materials.joint
   );
   pPadMesh.position.set(0, -spec.proximalLength * 0.50, -pArmorDepth * 0.26);
-  proximalGroup.add(pPadMesh);
 
   // PIP Hinge Assembly at distal end of proximal segment
   const pipHinge = createHingeAssembly(
@@ -341,7 +345,20 @@ export function createFinger(
     materials.armor
   );
   pipHinge.pin.position.set(0, -spec.proximalLength, 0);
-  proximalGroup.add(pipHinge.pin);
+
+  const tempProximal = new THREE.Group();
+  tempProximal.add(socketMesh);
+  tempProximal.add(pBoneMesh);
+  tempProximal.add(pArmorMesh);
+  tempProximal.add(pPadMesh);
+  tempProximal.add(pipHinge.pin);
+
+  const pMergedJoint = mergeGroupMeshesByMaterial(tempProximal, materials.joint, `${spec.name}_Proximal_Joint`, false, false)!;
+  const pMergedArmor = mergeGroupMeshesByMaterial(tempProximal, materials.armor, `${spec.name}_Proximal_Armor`, false, true)!;
+  disposeTemp(tempProximal);
+
+  proximalGroup.add(pMergedJoint);
+  proximalGroup.add(pMergedArmor);
 
   // ==========================================
   // 2. MIDDLE SEGMENT (Intermediate Phalanx)
@@ -360,8 +377,6 @@ export function createFinger(
   );
   const mBoneMesh = new THREE.Mesh(mBoneGeo, materials.joint);
   mBoneMesh.position.set(0, -spec.middleLength * 0.5, 0);
-  mBoneMesh.castShadow = true;
-  middleGroup.add(mBoneMesh);
 
   // 3D Volumetric sculpted ceramic exoskeleton shell
   const mArmorWidth = spec.middleRadius * 2.0;
@@ -369,7 +384,6 @@ export function createFinger(
   const mArmorDepth = spec.middleRadius * 1.80;
   const mArmorMesh = createSculptedPhalanxShell(mArmorWidth, mArmorLength, mArmorDepth, materials.armor);
   mArmorMesh.position.set(0, -spec.middleLength * 0.02, 0);
-  middleGroup.add(mArmorMesh);
 
   // Palmar dark tactile friction grip pad
   const mPadMesh = createPalmarGripPad(
@@ -379,7 +393,6 @@ export function createFinger(
     materials.joint
   );
   mPadMesh.position.set(0, -spec.middleLength * 0.50, -mArmorDepth * 0.26);
-  middleGroup.add(mPadMesh);
 
   // DIP Hinge Assembly at distal end of middle segment
   const dipHinge = createHingeAssembly(
@@ -389,7 +402,19 @@ export function createFinger(
     materials.armor
   );
   dipHinge.pin.position.set(0, -spec.middleLength, 0);
-  middleGroup.add(dipHinge.pin);
+
+  const tempMiddle = new THREE.Group();
+  tempMiddle.add(mBoneMesh);
+  tempMiddle.add(mArmorMesh);
+  tempMiddle.add(mPadMesh);
+  tempMiddle.add(dipHinge.pin);
+
+  const mMergedJoint = mergeGroupMeshesByMaterial(tempMiddle, materials.joint, `${spec.name}_Middle_Joint`, false, false)!;
+  const mMergedArmor = mergeGroupMeshesByMaterial(tempMiddle, materials.armor, `${spec.name}_Middle_Armor`, false, true)!;
+  disposeTemp(tempMiddle);
+
+  middleGroup.add(mMergedJoint);
+  middleGroup.add(mMergedArmor);
 
   // ==========================================
   // 3. DISTAL SEGMENT (Distal Phalanx & Tip)
@@ -408,8 +433,6 @@ export function createFinger(
   );
   const dBoneMesh = new THREE.Mesh(dBoneGeo, materials.joint);
   dBoneMesh.position.set(0, -spec.distalLength * 0.45, 0);
-  dBoneMesh.castShadow = true;
-  distalGroup.add(dBoneMesh);
 
   // Distal ceramic shell with curved aerodynamic fingertip cowl wrapping apex
   const dArmorWidth = spec.distalRadius * 1.95;
@@ -417,7 +440,6 @@ export function createFinger(
   const dArmorDepth = spec.distalRadius * 1.75;
   const dArmorMesh = createSculptedPhalanxShell(dArmorWidth, dArmorLength, dArmorDepth, materials.armor, true);
   dArmorMesh.position.set(0, -spec.distalLength * 0.02, 0);
-  distalGroup.add(dArmorMesh);
 
   // Palmar tactile friction grip pad
   const dPadMesh = createPalmarGripPad(
@@ -427,7 +449,6 @@ export function createFinger(
     materials.joint
   );
   dPadMesh.position.set(0, -spec.distalLength * 0.44, -dArmorDepth * 0.24);
-  distalGroup.add(dPadMesh);
 
   // Precision tactile sensor aperture on palmar face near apex
   const tipGeo = new THREE.CylinderGeometry(
@@ -439,8 +460,19 @@ export function createFinger(
   const tipMesh = new THREE.Mesh(tipGeo, materials.joint);
   tipMesh.position.set(0, -spec.distalLength * 0.90, -dArmorDepth * 0.16);
   tipMesh.rotation.x = Math.PI * 0.25;
-  tipMesh.castShadow = true;
-  distalGroup.add(tipMesh);
+
+  const tempDistal = new THREE.Group();
+  tempDistal.add(dBoneMesh);
+  tempDistal.add(dArmorMesh);
+  tempDistal.add(dPadMesh);
+  tempDistal.add(tipMesh);
+
+  const dMergedJoint = mergeGroupMeshesByMaterial(tempDistal, materials.joint, `${spec.name}_Distal_Joint`, false, false)!;
+  const dMergedArmor = mergeGroupMeshesByMaterial(tempDistal, materials.armor, `${spec.name}_Distal_Armor`, false, true)!;
+  disposeTemp(tempDistal);
+
+  distalGroup.add(dMergedJoint);
+  distalGroup.add(dMergedArmor);
 
   // Progressive anatomical cascading resting flexion:
   // - Relaxed human/robotic hand: fingers curl naturally toward palm (-Z).
@@ -463,27 +495,20 @@ export function createFinger(
     group: fingerGroup,
     proximal: {
       group: proximalGroup,
-      boneMesh: pBoneMesh,
-      armorMesh: pArmorMesh,
-      padMesh: pPadMesh,
-      hingeMesh: pipHinge.pin,
-      hingeCaps: pipHinge.caps,
+      boneMesh: pMergedJoint,
+      armorMesh: pMergedArmor,
     },
     middle: {
       group: middleGroup,
-      boneMesh: mBoneMesh,
-      armorMesh: mArmorMesh,
-      padMesh: mPadMesh,
-      hingeMesh: dipHinge.pin,
-      hingeCaps: dipHinge.caps,
+      boneMesh: mMergedJoint,
+      armorMesh: mMergedArmor,
     },
     distal: {
       group: distalGroup,
-      boneMesh: dBoneMesh,
-      armorMesh: dArmorMesh,
-      padMesh: dPadMesh,
+      boneMesh: dMergedJoint,
+      armorMesh: dMergedArmor,
     },
-    tipMesh,
+    tipMesh: dMergedJoint,
   };
 }
 
@@ -507,11 +532,17 @@ export function createThumb(
   // Natural opposable resting orientation: angled forward (+Z) and medially toward index/palm
   thumbGroup.rotation.set(0.38, -side * 0.48, -side * 0.20);
 
+  const disposeTemp = (g: THREE.Group) => {
+    g.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+        (child as THREE.Mesh).geometry.dispose();
+      }
+    });
+  };
+
   // 1. Thenar Base Swivel Knuckle (Dark core ball)
   const ballGeo = new THREE.SphereGeometry(0.0092, 16, 14);
   const baseBall = new THREE.Mesh(ballGeo, materials.joint);
-  baseBall.castShadow = true;
-  thumbGroup.add(baseBall);
 
   // Sculpted white ceramic thenar protector cowl over base ball
   const thenarCowlGeo = new THREE.SphereGeometry(0.0104, 14, 12, 0, Math.PI * 2, 0, Math.PI * 0.52);
@@ -519,13 +550,20 @@ export function createThumb(
   thenarCowl.position.set(0, 0, 0.0020);
   thenarCowl.scale.set(0.92, 0.96, 0.72);
   thenarCowl.castShadow = true;
+  thenarCowl.receiveShadow = true;
   thumbGroup.add(thenarCowl);
 
   // Dark Swivel Collar Bracket
   const collarGeo = new THREE.CylinderGeometry(0.0078, 0.0078, 0.006, 14);
   const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
   baseCollar.position.set(0, -0.004, 0);
-  thumbGroup.add(baseCollar);
+
+  const tempBase = new THREE.Group();
+  tempBase.add(baseBall);
+  tempBase.add(baseCollar);
+  const baseJoint = mergeGroupMeshesByMaterial(tempBase, materials.joint, 'Thumb_Base_Joint')!;
+  disposeTemp(tempBase);
+  thumbGroup.add(baseJoint);
 
   // 2. Proximal Segment
   const proximalGroup = new THREE.Group();
@@ -537,8 +575,6 @@ export function createThumb(
   const pBoneGeo = new THREE.CylinderGeometry(proxRad * 0.45, proxRad * 0.40, proxLen, 12);
   const pBoneMesh = new THREE.Mesh(pBoneGeo, materials.joint);
   pBoneMesh.position.set(0, -proxLen * 0.5, 0);
-  pBoneMesh.castShadow = true;
-  proximalGroup.add(pBoneMesh);
 
   // 3D Volumetric sculpted ceramic exoskeleton shell
   const pArmorWidth = proxRad * 2.0;
@@ -546,17 +582,27 @@ export function createThumb(
   const pArmorDepth = proxRad * 1.80;
   const pArmor = createSculptedPhalanxShell(pArmorWidth, pArmorLength, pArmorDepth, materials.armor);
   pArmor.position.set(0, -proxLen * 0.02, 0);
-  proximalGroup.add(pArmor);
 
   // Palmar grip pad (-Z)
   const pPadMesh = createPalmarGripPad(pArmorWidth * 0.72, proxLen * 0.70, 0.0018, materials.joint);
   pPadMesh.position.set(0, -proxLen * 0.50, -pArmorDepth * 0.26);
-  proximalGroup.add(pPadMesh);
 
   // Thumb IP Hinge Joint Assembly with ceramic knuckle cowl
   const ipHinge = createHingeAssembly(proxRad * 0.52, pArmorWidth * 0.88, materials.joint, materials.armor);
   ipHinge.pin.position.set(0, -proxLen, 0);
-  proximalGroup.add(ipHinge.pin);
+
+  const tempThumbProx = new THREE.Group();
+  tempThumbProx.add(pBoneMesh);
+  tempThumbProx.add(pArmor);
+  tempThumbProx.add(pPadMesh);
+  tempThumbProx.add(ipHinge.pin);
+
+  const tpMergedJoint = mergeGroupMeshesByMaterial(tempThumbProx, materials.joint, 'Thumb_Proximal_Joint', false, false)!;
+  const tpMergedArmor = mergeGroupMeshesByMaterial(tempThumbProx, materials.armor, 'Thumb_Proximal_Armor', false, true)!;
+  disposeTemp(tempThumbProx);
+
+  proximalGroup.add(tpMergedJoint);
+  proximalGroup.add(tpMergedArmor);
 
   // 3. Distal Segment
   const distalGroup = new THREE.Group();
@@ -569,8 +615,6 @@ export function createThumb(
   const dBoneGeo = new THREE.CylinderGeometry(distRad * 0.40, distRad * 0.26, distLen * 0.85, 12);
   const dBoneMesh = new THREE.Mesh(dBoneGeo, materials.joint);
   dBoneMesh.position.set(0, -distLen * 0.45, 0);
-  dBoneMesh.castShadow = true;
-  distalGroup.add(dBoneMesh);
 
   // Distal ceramic shell with curved aerodynamic fingertip cowl wrapping apex
   const dArmorWidth = distRad * 1.95;
@@ -578,20 +622,29 @@ export function createThumb(
   const dArmorDepth = distRad * 1.75;
   const dArmor = createSculptedPhalanxShell(dArmorWidth, dArmorLength, dArmorDepth, materials.armor, true);
   dArmor.position.set(0, -distLen * 0.02, 0);
-  distalGroup.add(dArmor);
 
   // Palmar pad
   const dPad = createPalmarGripPad(dArmorWidth * 0.68, distLen * 0.62, 0.0015, materials.joint);
   dPad.position.set(0, -distLen * 0.44, -dArmorDepth * 0.24);
-  distalGroup.add(dPad);
 
   // Precision tactile sensor aperture on palmar face near apex
   const tipGeo = new THREE.CylinderGeometry(distRad * 0.40, distRad * 0.30, 0.0016, 14);
   const tipMesh = new THREE.Mesh(tipGeo, materials.joint);
   tipMesh.position.set(0, -distLen * 0.90, -dArmorDepth * 0.16);
   tipMesh.rotation.x = Math.PI * 0.25;
-  tipMesh.castShadow = true;
-  distalGroup.add(tipMesh);
+
+  const tempThumbDist = new THREE.Group();
+  tempThumbDist.add(dBoneMesh);
+  tempThumbDist.add(dArmor);
+  tempThumbDist.add(dPad);
+  tempThumbDist.add(tipMesh);
+
+  const tdMergedJoint = mergeGroupMeshesByMaterial(tempThumbDist, materials.joint, 'Thumb_Distal_Joint', false, false)!;
+  const tdMergedArmor = mergeGroupMeshesByMaterial(tempThumbDist, materials.armor, 'Thumb_Distal_Armor', false, true)!;
+  disposeTemp(tempThumbDist);
+
+  distalGroup.add(tdMergedJoint);
+  distalGroup.add(tdMergedArmor);
 
   // Natural resting thumb flexion curling toward palm
   proximalGroup.rotation.x = 0.32;
@@ -600,22 +653,19 @@ export function createThumb(
 
   return {
     group: thumbGroup,
-    baseBall,
-    baseCollar,
+    baseBall: baseJoint,
+    baseCollar: baseJoint,
     proximal: {
       group: proximalGroup,
-      boneMesh: pBoneMesh,
-      armorMesh: pArmor,
-      padMesh: pPadMesh,
-      hingeMesh: ipHinge.pin,
-      hingeCaps: ipHinge.caps,
+      boneMesh: tpMergedJoint,
+      armorMesh: tpMergedArmor,
     },
     distal: {
       group: distalGroup,
-      boneMesh: dBoneMesh,
-      armorMesh: dArmor,
-      padMesh: dPad,
+      boneMesh: tdMergedJoint,
+      armorMesh: tdMergedArmor,
     },
-    tipMesh,
+    tipMesh: tdMergedJoint,
   };
 }
+

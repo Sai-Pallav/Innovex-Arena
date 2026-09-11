@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface KneeNodes {
   group: THREE.Group;
@@ -86,6 +87,11 @@ export function createKnee(
   const ledMeshes: THREE.Mesh[] = [];
   const statorTeeth: THREE.Mesh[] = [];
 
+  // Group containing stationary rotary condyle discs, axle, flanges, and stator teeth
+  const condyleCoreGroup = new THREE.Group();
+  condyleCoreGroup.name = side === -1 ? 'KneeCondyleCore_L' : 'KneeCondyleCore_R';
+  kneeGroup.add(condyleCoreGroup);
+
   // ==========================================
   // 1. TRANSVERSE HINGE AXLE PIN (Central structural core)
   // ==========================================
@@ -99,7 +105,7 @@ export function createKnee(
   centralPin.name = side === -1 ? 'KneeAxlePin_L' : 'KneeAxlePin_R';
   centralPin.rotation.z = Math.PI / 2;
   centralPin.castShadow = true;
-  kneeGroup.add(centralPin);
+  condyleCoreGroup.add(centralPin);
 
   // Hex end caps for the central axle
   for (const dir of [-1, 1]) {
@@ -112,7 +118,7 @@ export function createKnee(
     const cap = new THREE.Mesh(capGeo, materials.joint);
     cap.rotation.z = Math.PI / 2;
     cap.position.x = dir * (cfg.centralAxleLength * 0.5 + 0.0015);
-    kneeGroup.add(cap);
+    condyleCoreGroup.add(cap);
   }
 
   // ==========================================
@@ -132,7 +138,7 @@ export function createKnee(
   lateralDisc.position.x = side * (cfg.outerDiscSpacing * 0.5);
   lateralDisc.castShadow = true;
   lateralDisc.receiveShadow = true;
-  kneeGroup.add(lateralDisc);
+  condyleCoreGroup.add(lateralDisc);
 
   // Inner (medial) rotary disc
   const medialDisc = new THREE.Mesh(discGeo, materials.joint);
@@ -141,7 +147,7 @@ export function createKnee(
   medialDisc.position.x = -side * (cfg.outerDiscSpacing * 0.5);
   medialDisc.castShadow = true;
   medialDisc.receiveShadow = true;
-  kneeGroup.add(medialDisc);
+  condyleCoreGroup.add(medialDisc);
 
   // Bearing Race Flange on discs
   for (const discX of [side * (cfg.outerDiscSpacing * 0.5), -side * (cfg.outerDiscSpacing * 0.5)]) {
@@ -154,7 +160,7 @@ export function createKnee(
     const flange = new THREE.Mesh(flangeGeo, materials.joint);
     flange.rotation.z = Math.PI / 2;
     flange.position.x = discX;
-    kneeGroup.add(flange);
+    condyleCoreGroup.add(flange);
   }
 
   // Stator teeth around lateral disc perimeter for mechanical intricacy
@@ -169,29 +175,35 @@ export function createKnee(
       Math.sin(angle) * (cfg.discRadius * 1.02)
     );
     tooth.rotation.x = -angle;
-    kneeGroup.add(tooth);
+    condyleCoreGroup.add(tooth);
     statorTeeth.push(tooth);
   }
+
+  const mergedCondyle = mergeGroupMeshesByMaterial(condyleCoreGroup, materials.joint, side === -1 ? 'KneeCondyleMesh_L' : 'KneeCondyleMesh_R', true) || centralPin;
 
   // ==========================================
   // 3. CONCENTRIC PURPLE EMISSIVE ACCENT RINGS
   // ==========================================
-  // Lateral accent ring
+  const kneeAccentGroup = new THREE.Group();
   const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0018, 10, 32);
+
+  // Lateral accent ring
   const accentRingLateral = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRingLateral.name = side === -1 ? 'KneeAccentRingLat_L' : 'KneeAccentRingLat_R';
   accentRingLateral.rotation.y = Math.PI / 2;
   accentRingLateral.position.x = side * (cfg.outerDiscSpacing * 0.5 + cfg.discWidth * 0.5 + 0.001);
-  kneeGroup.add(accentRingLateral);
-  ledMeshes.push(accentRingLateral);
+  kneeAccentGroup.add(accentRingLateral);
 
   // Medial accent ring
   const accentRingMedial = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRingMedial.name = side === -1 ? 'KneeAccentRingMed_L' : 'KneeAccentRingMed_R';
   accentRingMedial.rotation.y = Math.PI / 2;
   accentRingMedial.position.x = -side * (cfg.outerDiscSpacing * 0.5 + cfg.discWidth * 0.5 + 0.001);
-  kneeGroup.add(accentRingMedial);
-  ledMeshes.push(accentRingMedial);
+  kneeAccentGroup.add(accentRingMedial);
+
+  const mergedKneeAccents = mergeGroupMeshesByMaterial(kneeAccentGroup, materials.purpleEmissive, side === -1 ? 'KneeAccents_L' : 'KneeAccents_R', false, false) || accentRingLateral;
+  kneeGroup.add(mergedKneeAccents);
+  ledMeshes.push(mergedKneeAccents);
 
   // ==========================================
   // 4. SCULPTED WHITE CERAMIC OUTER CENTER CAPS
@@ -249,13 +261,13 @@ export function createKnee(
   return {
     group: kneeGroup,
     shinPivot,
-    lateralDisc,
-    medialDisc,
+    lateralDisc: mergedCondyle,
+    medialDisc: mergedCondyle,
     accentRingLateral,
     accentRingMedial,
     patellaShield,
     patellaLed,
-    centralPin,
+    centralPin: mergedCondyle,
     statorTeeth,
     ledMeshes,
   };

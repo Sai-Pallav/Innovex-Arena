@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { TORSO_CONFIG, StomachRingSpec } from './TorsoConfig';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface StomachRingNodes {
   group: THREE.Group;
@@ -136,6 +137,8 @@ function createSegmentMechanism(
   const rx = spec.radiusX;
   const rz = spec.radiusZ;
 
+  const tempMech = new THREE.Group();
+
   // 1. Dark Titanium Vertebral Chassis Collar (Nested safely behind the armor plate)
   const collarGeo = new THREE.CylinderGeometry(
     rx * 0.70,
@@ -147,21 +150,16 @@ function createSegmentMechanism(
   innerCore.name = `InnerChassisCollar0${index + 1}`;
   innerCore.position.set(0, 0, -0.016);
   innerCore.scale.set(1.0, 1.0, (rz * 0.40) / rx);
-  innerCore.castShadow = true;
-  innerCore.receiveShadow = true;
-  mechanismGroup.add(innerCore);
+  tempMech.add(innerCore);
 
   // 2. Central Vertebral Knuckle Sleeve gripping the spine
   const knuckleGeo = new THREE.CylinderGeometry(0.028, 0.026, spec.height * 1.15, 24);
   const knuckleMesh = new THREE.Mesh(knuckleGeo, materials.joint);
   knuckleMesh.name = `SpineKnuckle0${index + 1}`;
   knuckleMesh.position.set(0, 0, -0.020);
-  knuckleMesh.castShadow = true;
-  mechanismGroup.add(knuckleMesh);
+  tempMech.add(knuckleMesh);
 
   // 3. Dual Left and Right Mini-Pistons (Inter-Segment Articulation)
-  // Visibly bridging the gap at the lateral notches between segments
-  const pistons: THREE.Mesh[] = [];
   for (const side of [-1, 1]) {
     const pistonSubGroup = new THREE.Group();
     pistonSubGroup.name = `PistonAssembly_${side === -1 ? 'L' : 'R'}_0${index + 1}`;
@@ -170,14 +168,12 @@ function createSegmentMechanism(
     // Outer hydraulic cylinder casing (dark titanium)
     const sleeveGeo = new THREE.CylinderGeometry(0.0036, 0.0036, spec.height * 0.85, 14);
     const sleeveMesh = new THREE.Mesh(sleeveGeo, materials.joint);
-    sleeveMesh.castShadow = true;
     pistonSubGroup.add(sleeveMesh);
 
     // Inner polished piston rod extending through the gap
     const rodGeo = new THREE.CylinderGeometry(0.0020, 0.0020, spec.height * 1.50, 12);
     const rodMesh = new THREE.Mesh(rodGeo, materials.joint);
     rodMesh.position.set(0, -spec.height * 0.30, 0);
-    rodMesh.castShadow = true;
     pistonSubGroup.add(rodMesh);
 
     // Mounting clevis brackets
@@ -185,18 +181,24 @@ function createSegmentMechanism(
       const mountBracketGeo = new THREE.BoxGeometry(0.007, 0.0035, 0.007);
       const mountBracket = new THREE.Mesh(mountBracketGeo, materials.joint);
       mountBracket.position.set(0, ySign * (spec.height * 0.48), 0);
-      mountBracket.castShadow = true;
       pistonSubGroup.add(mountBracket);
     }
 
-    mechanismGroup.add(pistonSubGroup);
-    pistons.push(sleeveMesh);
+    tempMech.add(pistonSubGroup);
   }
+
+  const mechanismMerged = mergeGroupMeshesByMaterial(tempMech, materials.joint, `Mechanism0${index + 1}_Merged`)!;
+  tempMech.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  mechanismGroup.add(mechanismMerged);
 
   return {
     mechanismGroup,
-    innerCore,
-    pistons,
+    innerCore: mechanismMerged,
+    pistons: [mechanismMerged],
   };
 }
 
@@ -258,28 +260,33 @@ function createUpperConnector(materials: RobotMaterialPalette): THREE.Group {
   const rx = cfg.widthX;
   const rz = cfg.depthZ;
 
+  const tempUpper = new THREE.Group();
+
   // Smooth circular/elliptical dark titanium gimbal collar (32 segments)
   const collarGeo = new THREE.CylinderGeometry(rx * 0.62, rx * 0.68, cfg.height, 32);
   const collar = new THREE.Mesh(collarGeo, materials.joint);
   collar.name = 'UpperConnectorChassis';
   collar.scale.set(1.0, 1.0, (rz * 0.52) / rx);
-  collar.castShadow = true;
-  collar.receiveShadow = true;
-  group.add(collar);
+  tempUpper.add(collar);
 
   // Concentric rotational bearing ring
   const bearingGeo = new THREE.TorusGeometry(rx * 0.52, 0.0028, 10, 32);
   const bearing = new THREE.Mesh(bearingGeo, materials.joint);
   bearing.rotation.x = Math.PI / 2;
   bearing.scale.set(1.0, (rz * 0.52) / rx, 1.0);
-  bearing.castShadow = true;
-  group.add(bearing);
+  tempUpper.add(bearing);
 
   // Central rotational gimbal knuckle
   const gimbalGeo = new THREE.CylinderGeometry(0.032, 0.030, cfg.height * 1.30, 24);
   const gimbal = new THREE.Mesh(gimbalGeo, materials.joint);
-  gimbal.castShadow = true;
-  group.add(gimbal);
+  tempUpper.add(gimbal);
+
+  const upperMerged = mergeGroupMeshesByMaterial(tempUpper, materials.joint, 'UpperConnector_Merged', false);
+  if (upperMerged) {
+    upperMerged.castShadow = true;
+    upperMerged.receiveShadow = true;
+    group.add(upperMerged);
+  }
 
   return group;
 }
@@ -297,19 +304,25 @@ function createLowerConnector(materials: RobotMaterialPalette): THREE.Group {
   const rx = cfg.widthX;
   const rz = cfg.depthZ;
 
+  const tempLower = new THREE.Group();
+
   const collarGeo = new THREE.CylinderGeometry(rx * 0.68, rx * 0.72, cfg.height, 32);
   const chassis = new THREE.Mesh(collarGeo, materials.joint);
   chassis.name = 'LowerConnectorChassis';
   chassis.scale.set(1.0, 1.0, (rz * 0.50) / rx);
-  chassis.castShadow = true;
-  chassis.receiveShadow = true;
-  group.add(chassis);
+  tempLower.add(chassis);
 
   // Central rotational neck sleeve
   const neckGeo = new THREE.CylinderGeometry(0.028, 0.028, cfg.height * 1.25, 24);
   const neck = new THREE.Mesh(neckGeo, materials.joint);
-  neck.castShadow = true;
-  group.add(neck);
+  tempLower.add(neck);
+
+  const lowerMerged = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerConnector_Merged', false);
+  if (lowerMerged) {
+    lowerMerged.castShadow = true;
+    lowerMerged.receiveShadow = true;
+    group.add(lowerMerged);
+  }
 
   return group;
 }
@@ -329,48 +342,37 @@ function createInternalSpine(materials: RobotMaterialPalette): {
   const spineGroup = new THREE.Group();
   spineGroup.name = 'InternalCore';
 
+  const tempSpine = new THREE.Group();
+
   // 1. Central Dark Metallic Spine Column (smooth 32-segment cylinder)
   const spineGeo = new THREE.CylinderGeometry(0.024, 0.022, 0.22, 32);
   const spineCore = new THREE.Mesh(spineGeo, materials.joint);
   spineCore.name = 'SpineCore';
   spineCore.position.set(0, -0.170, -0.020);
-  spineCore.castShadow = true;
-  spineCore.receiveShadow = true;
-  spineGroup.add(spineCore);
+  tempSpine.add(spineCore);
 
   // 2. Vertebrae Discs sitting safely within the inter-segment gaps
-  const vertebraeDiscs: THREE.Mesh[] = [];
   const discLevels = [
-    // Vertebra in Joint 01 (between Seg 01 & Seg 02)
     { y: -0.125, rx: 0.062, rz: 0.030, h: 0.008 },
-    // Vertebra in Joint 02 (between Seg 02 & Seg 03)
     { y: -0.1465, rx: 0.058, rz: 0.028, h: 0.008 },
-    // Vertebra in Joint 03 (between Seg 03 & Seg 04)
     { y: -0.167, rx: 0.054, rz: 0.026, h: 0.008 },
-    // Vertebra in Joint 04 (between Seg 04 & Seg 05)
     { y: -0.1865, rx: 0.050, rz: 0.024, h: 0.008 },
-    // Vertebra in Joint 05 (between Seg 05 & Lower Connector)
     { y: -0.204, rx: 0.046, rz: 0.022, h: 0.008 },
   ];
 
   discLevels.forEach((lvl, i) => {
-    // Smooth elliptical disc with 32 segments, safely recessed
     const dGeo = new THREE.CylinderGeometry(lvl.rx, lvl.rx * 0.98, lvl.h, 32);
     const disc = new THREE.Mesh(dGeo, materials.joint);
     disc.name = `VertebraCollar0${i + 1}`;
     disc.position.set(0, lvl.y, -0.018);
     disc.scale.set(1.0, 1.0, lvl.rz / lvl.rx);
-    disc.castShadow = true;
-    disc.receiveShadow = true;
-    spineGroup.add(disc);
-    vertebraeDiscs.push(disc);
+    tempSpine.add(disc);
 
     // Fluted central mechanical ring around each disc
     const flutedRingGeo = new THREE.CylinderGeometry(0.028, 0.028, lvl.h * 1.15, 24);
     const flutedRing = new THREE.Mesh(flutedRingGeo, materials.joint);
     flutedRing.position.set(0, lvl.y, -0.020);
-    flutedRing.castShadow = true;
-    spineGroup.add(flutedRing);
+    tempSpine.add(flutedRing);
   });
 
   // 3. Posterior Hydraulic Lines running vertically along the spine
@@ -379,14 +381,21 @@ function createInternalSpine(materials: RobotMaterialPalette): {
     const lineMesh = new THREE.Mesh(lineGeo, materials.joint);
     lineMesh.name = `SpineHydraulicLine_${side === -1 ? 'L' : 'R'}`;
     lineMesh.position.set(side * 0.016, -0.160, -0.034);
-    lineMesh.castShadow = true;
-    spineGroup.add(lineMesh);
+    tempSpine.add(lineMesh);
   }
+
+  const spineMerged = mergeGroupMeshesByMaterial(tempSpine, materials.joint, 'InternalSpine_Merged')!;
+  tempSpine.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  spineGroup.add(spineMerged);
 
   return {
     spineGroup,
-    spineCore,
-    vertebraeDiscs,
+    spineCore: spineMerged,
+    vertebraeDiscs: [spineMerged],
   };
 }
 
@@ -406,6 +415,8 @@ function createSideMechanism(
 
   const leds: THREE.Mesh[] = [];
 
+  const tempSide = new THREE.Group();
+
   // Contoured Oblique Flank Guide Rail connecting sub-chest down to waist
   const railHeight = 0.124;
   const railGeo = new THREE.CylinderGeometry(0.004, 0.0035, railHeight, 16);
@@ -413,8 +424,7 @@ function createSideMechanism(
   rail.name = side === -1 ? 'SideSupportRail_L' : 'SideSupportRail_R';
   rail.position.set(side * 0.088, -0.158, 0.004);
   rail.rotation.z = side * 0.08;
-  rail.castShadow = true;
-  group.add(rail);
+  tempSide.add(rail);
 
   // Flush mechanical flank brackets docking into each segment level
   const yLevels = [-0.114, -0.136, -0.157, -0.177, -0.196];
@@ -423,9 +433,16 @@ function createSideMechanism(
     const bracketGeo = new THREE.BoxGeometry(0.008, 0.006, 0.014);
     const bracket = new THREE.Mesh(bracketGeo, materials.joint);
     bracket.position.set(bracketX, y, 0.004);
-    bracket.castShadow = true;
-    group.add(bracket);
+    tempSide.add(bracket);
   });
+
+  const sideMerged = mergeGroupMeshesByMaterial(tempSide, materials.joint, `SideMechanism_${side === -1 ? 'L' : 'R'}_Merged`)!;
+  tempSide.traverse((child) => {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+  });
+  group.add(sideMerged);
 
   return { group, leds };
 }

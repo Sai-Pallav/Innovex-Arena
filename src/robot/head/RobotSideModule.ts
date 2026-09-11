@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { ROBOT_ACCENT } from '../config';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface SideModuleNodes {
   group: THREE.Group;
@@ -42,6 +43,8 @@ export function createRobotSideModule(
   mount.castShadow = true;
   group.add(mount);
 
+  const earJointGroup = new THREE.Group();
+
   // 2. Dark Titanium Stepped Outer Rotary Bezel (Part 7: outer dark-metal ring)
   const outerRingGeo = new THREE.CylinderGeometry(0.038, 0.042, 0.012, 40);
   const outerRing = new THREE.Mesh(outerRingGeo, materials.joint);
@@ -49,21 +52,21 @@ export function createRobotSideModule(
   outerRing.rotation.x = Math.PI / 2;
   outerRing.position.set(0, 0, 0.005);
   outerRing.castShadow = true;
-  group.add(outerRing);
+  earJointGroup.add(outerRing);
 
   // Recessed dark chamber
   const chamberGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.008, 36);
   const chamber = new THREE.Mesh(chamberGeo, materials.joint);
   chamber.rotation.x = Math.PI / 2;
   chamber.position.set(0, 0, 0.010);
-  group.add(chamber);
+  earJointGroup.add(chamber);
 
   // 3. Chamfered Metallic Inner Rim Ring (Part 7: inner metallic ring)
   const innerRingGeo = new THREE.TorusGeometry(0.033, 0.0020, 16, 40);
   const innerRing = new THREE.Mesh(innerRingGeo, materials.joint);
   innerRing.name = 'EarInnerRing';
   innerRing.position.set(0, 0, 0.014);
-  group.add(innerRing);
+  earJointGroup.add(innerRing);
 
   // 4. Glowing Neon Purple Ring (Part 7 & 15: ROBOT_ACCENT)
   const emissiveRingGeo = new THREE.TorusGeometry(0.026, 0.0036, 20, 48);
@@ -85,7 +88,7 @@ export function createRobotSideModule(
   core.name = 'EarCore';
   core.rotation.x = Math.PI / 2;
   core.position.set(0, 0, 0.012);
-  group.add(core);
+  earJointGroup.add(core);
 
   // 6. Central Dark Lens / Aperture Pin (Part 7: central dark lens)
   const centerLensGeo = new THREE.CylinderGeometry(0.003, 0.003, 0.008, 16);
@@ -93,7 +96,14 @@ export function createRobotSideModule(
   centerLens.name = 'EarCenterLens';
   centerLens.rotation.x = Math.PI / 2;
   centerLens.position.set(0, 0, 0.017);
-  group.add(centerLens);
+  earJointGroup.add(centerLens);
+
+  // Merge static joint hardware of the ear module
+  const mergedEarJoint = mergeGroupMeshesByMaterial(earJointGroup, materials.joint, `${group.name}_JointMerged`, false);
+  if (mergedEarJoint) {
+    mergedEarJoint.castShadow = true;
+    group.add(mergedEarJoint);
+  }
 
   // Subtle local point light casting soft purple aura on lateral helmet and shoulder
   const pointLight = new THREE.PointLight(ROBOT_ACCENT, 1.8, 0.45);

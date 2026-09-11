@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface ForearmNodes {
   group: THREE.Group;
@@ -126,13 +127,15 @@ export function createForearm(
   gauntletBody.receiveShadow = true;
   armorGroup.add(gauntletBody);
 
+  const forearmJointGroup = new THREE.Group();
+
   // 2. Internal Dark Titanium Sleeve (Prevents any hollow voids when viewed from any angle)
   const innerSleeveGeo = new THREE.CylinderGeometry(0.042, 0.034, 0.176, 28);
   const innerSleeve = new THREE.Mesh(innerSleeveGeo, materials.joint);
   innerSleeve.name = 'ForearmInternalSleeve';
   innerSleeve.position.set(0, -0.092, 0);
   innerSleeve.castShadow = true;
-  forearmGroup.add(innerSleeve);
+  forearmJointGroup.add(innerSleeve);
 
   // 3. Upper Elbow Socket Transition Collar (Sleek dark titanium cup receiving the lower joint housing)
   const collarGeo = new THREE.CylinderGeometry(0.043, 0.041, 0.016, 32);
@@ -141,14 +144,14 @@ export function createForearm(
   elbowSocketCollar.position.set(0, -0.012, 0);
   elbowSocketCollar.castShadow = true;
   elbowSocketCollar.receiveShadow = true;
-  forearmGroup.add(elbowSocketCollar);
+  forearmJointGroup.add(elbowSocketCollar);
 
   // Smooth trim rim on elbow collar
   const socketRimGeo = new THREE.TorusGeometry(0.042, 0.0022, 10, 32);
   const socketRim = new THREE.Mesh(socketRimGeo, materials.joint);
   socketRim.rotation.x = Math.PI / 2;
   socketRim.position.set(0, -0.005, 0);
-  forearmGroup.add(socketRim);
+  forearmJointGroup.add(socketRim);
 
   // 4. Contoured Brachioradialis Armor Accent Plate (Flush, smoothly chamfered lateral contour)
   const brachioShape = new THREE.Shape();
@@ -189,7 +192,15 @@ export function createForearm(
   const wristSocketGeo = new THREE.CylinderGeometry(0.038, 0.036, 0.018, 28);
   const wristSocket = new THREE.Mesh(wristSocketGeo, materials.joint);
   wristSocket.position.set(0, -0.180, 0);
-  forearmGroup.add(wristSocket);
+  forearmJointGroup.add(wristSocket);
+
+  // Merge static joint elements of the forearm
+  const mergedForearmJoint = mergeGroupMeshesByMaterial(forearmJointGroup, materials.joint, 'ForearmJoint_Merged', false);
+  if (mergedForearmJoint) {
+    mergedForearmJoint.castShadow = true;
+    mergedForearmJoint.receiveShadow = true;
+    forearmGroup.add(mergedForearmJoint);
+  }
 
   // 6. Longitudinal Dark Technical Seam Channel
   const seamGeo = new THREE.BoxGeometry(0.0032, 0.130, 0.006);

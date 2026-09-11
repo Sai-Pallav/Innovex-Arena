@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { createFinger, createThumb, FingerNodes, ThumbNodes, FingerSpec } from './Finger';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
 export interface HandNodes {
   group: THREE.Group;
@@ -247,6 +248,7 @@ export function createHand(
   const knuckles: THREE.Mesh[] = [];
   const knuckleCaps: THREE.Mesh[] = [];
   const palmarPads: THREE.Mesh[] = [];
+  const palmJointGroup = new THREE.Group();
 
   // ==========================================
   // 1. DARK TITANIUM PALM CHASSIS (Wide Athletic Monocoque)
@@ -277,7 +279,7 @@ export function createHand(
   palmChassis.position.set(0, -0.021, -0.002);
   palmChassis.castShadow = true;
   palmChassis.receiveShadow = true;
-  handGroup.add(palmChassis);
+  palmJointGroup.add(palmChassis);
 
   // ==========================================
   // 2. SCULPTED CERAMIC DORSAL SHIELD WITH COMPOUND 3D CAMBER
@@ -302,7 +304,7 @@ export function createHand(
     const bezelGeo = new THREE.BoxGeometry(0.0032, 0.0022, 0.0024);
     const bezel = new THREE.Mesh(bezelGeo, materials.joint);
     bezel.position.set(0, bY, 0.0088);
-    handGroup.add(bezel);
+    palmJointGroup.add(bezel);
   }
 
   // ==========================================
@@ -314,7 +316,7 @@ export function createHand(
   const carpalStem = new THREE.Mesh(carpalStemGeo, materials.joint);
   carpalStem.position.set(0, 0.005, 0.000);
   carpalStem.castShadow = true;
-  handGroup.add(carpalStem);
+  palmJointGroup.add(carpalStem);
 
   // Beveled elliptical carpal cuff collar
   const cuffGeo = new THREE.CylinderGeometry(0.020, 0.022, 0.008, 28);
@@ -322,7 +324,7 @@ export function createHand(
   carpalCuff.scale.set(1.0, 1.0, 0.76);
   carpalCuff.position.set(0, -0.002, 0.001);
   carpalCuff.castShadow = true;
-  handGroup.add(carpalCuff);
+  palmJointGroup.add(carpalCuff);
 
   // Concentric mechanical transition trim ring
   const carpalTrimGeo = new THREE.TorusGeometry(0.0195, 0.0014, 8, 28);
@@ -330,26 +332,26 @@ export function createHand(
   carpalTrim.scale.set(1.0, 0.76, 1.0);
   carpalTrim.rotation.x = Math.PI / 2;
   carpalTrim.position.set(0, -0.001, 0.001);
-  handGroup.add(carpalTrim);
+  palmJointGroup.add(carpalTrim);
 
   // ==========================================
   // 5. SEGMENTED DARK PALMAR TRACTION GRIP PADS (-Z Face)
   // ==========================================
+  const palmarPadsTemp = new THREE.Group();
+
   // A. Thenar Eminence Pad (Medial thumb base cushion)
   const thenarGeo = new THREE.BoxGeometry(0.013, 0.018, 0.0030);
   const thenarPad = new THREE.Mesh(thenarGeo, materials.joint);
   thenarPad.position.set(-side * 0.010, -0.018, -0.0095);
   thenarPad.rotation.z = -side * 0.14;
-  handGroup.add(thenarPad);
-  palmarPads.push(thenarPad);
+  palmarPadsTemp.add(thenarPad);
 
   // B. Hypothenar Eminence Pad (Lateral palm runner)
   const hypoGeo = new THREE.BoxGeometry(0.011, 0.022, 0.0030);
   const hypoPad = new THREE.Mesh(hypoGeo, materials.joint);
   hypoPad.position.set(side * 0.011, -0.021, -0.0095);
   hypoPad.rotation.z = side * 0.06;
-  handGroup.add(hypoPad);
-  palmarPads.push(hypoPad);
+  palmarPadsTemp.add(hypoPad);
 
   // C. Metacarpal Grip Cushion Tiles (Under each knuckle base)
   ANATOMICAL_FINGER_SPECS.forEach((spec) => {
@@ -357,13 +359,20 @@ export function createHand(
     const mcpPadGeo = new THREE.BoxGeometry(0.0075, 0.0075, 0.0026);
     const mcpPad = new THREE.Mesh(mcpPadGeo, materials.joint);
     mcpPad.position.set(posX, spec.offsetY + 0.009, -0.0095);
-    handGroup.add(mcpPad);
-    palmarPads.push(mcpPad);
+    palmarPadsTemp.add(mcpPad);
   });
+
+  const mergedPalmarPads = mergeGroupMeshesByMaterial(palmarPadsTemp, materials.joint, 'PalmarPads_Merged', false);
+  if (mergedPalmarPads) {
+    handGroup.add(mergedPalmarPads);
+    palmarPads.push(mergedPalmarPads);
+  }
 
   // ==========================================
   // 6. MCP KNUCKLE HINGES & SCULPTED PROTECTOR HOODS (True Anatomical Arch)
   // ==========================================
+  const knuckleCapsTemp = new THREE.Group();
+
   ANATOMICAL_FINGER_SPECS.forEach((spec) => {
     const posX = side * spec.spreadX;
 
@@ -375,7 +384,7 @@ export function createHand(
     knuckleMesh.rotation.z = Math.PI / 2;
     knuckleMesh.position.set(posX, spec.offsetY, spec.offsetZ);
     knuckleMesh.castShadow = true;
-    handGroup.add(knuckleMesh);
+    palmJointGroup.add(knuckleMesh);
     knuckles.push(knuckleMesh);
 
     // Flush lateral micro-bolt caps on MCP hinge pin ends
@@ -384,7 +393,7 @@ export function createHand(
       const capEndMesh = new THREE.Mesh(capEndGeo, materials.joint);
       capEndMesh.rotation.z = Math.PI / 2;
       capEndMesh.position.set(posX + bEnd * (pinLen * 0.5 + 0.0002), spec.offsetY, spec.offsetZ);
-      handGroup.add(capEndMesh);
+      palmJointGroup.add(capEndMesh);
     }
 
     // Sculpted ceramic knuckle protector cowl over dorsal face (+Z)
@@ -405,9 +414,23 @@ export function createHand(
     capMesh.rotation.x = -Math.PI * 0.28;
     capMesh.position.set(posX, spec.offsetY + 0.0015, spec.offsetZ + spec.proximalRadius * 0.32);
     capMesh.castShadow = true;
-    handGroup.add(capMesh);
-    knuckleCaps.push(capMesh);
+    knuckleCapsTemp.add(capMesh);
   });
+
+  const mergedKnuckleCaps = mergeGroupMeshesByMaterial(knuckleCapsTemp, materials.armor, 'KnuckleCaps_Merged', false);
+  if (mergedKnuckleCaps) {
+    mergedKnuckleCaps.castShadow = true;
+    handGroup.add(mergedKnuckleCaps);
+    knuckleCaps.push(mergedKnuckleCaps);
+  }
+
+  // Merge static titanium palm skeleton / chassis components
+  const mergedPalmJoint = mergeGroupMeshesByMaterial(palmJointGroup, materials.joint, 'PalmJoint_Merged', false);
+  if (mergedPalmJoint) {
+    mergedPalmJoint.castShadow = true;
+    mergedPalmJoint.receiveShadow = true;
+    handGroup.add(mergedPalmJoint);
+  }
 
   // ==========================================
   // 7. STREAMLINED OPPOSABLE THUMB ASSEMBLY

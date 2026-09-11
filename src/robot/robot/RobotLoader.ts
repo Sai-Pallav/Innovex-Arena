@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { createProceduralRobot, RobotNodes } from './RobotProceduralFactory';
-import { ROBOT_CONFIG } from '../config';
+import { createRobotMaterials } from '../materials/RobotMaterials';
 
 export interface LoadRobotResult {
   nodes: RobotNodes;
@@ -26,7 +26,6 @@ export async function loadRobotModel(url?: string): Promise<LoadRobotResult> {
     console.info('[RobotLoader] Successfully loaded GLB asset from:', url);
 
     const scene = gltf.scene;
-    const cfg = ROBOT_CONFIG;
     const ledMeshes: THREE.Mesh[] = [];
 
     // Helper to find nodes by regex
@@ -110,6 +109,7 @@ export async function loadRobotModel(url?: string): Promise<LoadRobotResult> {
       gltf.animations.forEach((clip) => mixer?.clipAction(clip).play());
     }
 
+    const mats = createRobotMaterials();
     const nodes: RobotNodes = {
       root,
       torso,
@@ -137,13 +137,13 @@ export async function loadRobotModel(url?: string): Promise<LoadRobotResult> {
       rightFoot,
       ledMeshes,
       materials: {
-        armor: new THREE.MeshPhysicalMaterial({ color: cfg.colors.armorWhite }),
-        joint: new THREE.MeshPhysicalMaterial({ color: cfg.colors.jointDark }),
-        visor: new THREE.MeshPhysicalMaterial({ color: cfg.colors.visorGlass }),
-        eyeGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
-        earRingGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
-        chestGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
-        accentGlow: new THREE.MeshStandardMaterial({ color: cfg.colors.accentPurple }),
+        armor: mats.armor,
+        joint: mats.joint,
+        visor: mats.visor,
+        eyeGlow: mats.purpleEmissive,
+        earRingGlow: mats.purpleEmissive,
+        chestGlow: mats.purpleEmissive,
+        accentGlow: mats.purpleEmissive,
       },
     };
 
