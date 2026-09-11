@@ -119,6 +119,12 @@ export function createForearm(
     rod.castShadow = true;
     forearmJointGroup.add(rod);
 
+    // Precision Brass Guide Bushing & Wiper Seal Collar
+    const bushingGeo = new THREE.CylinderGeometry(0.0052, 0.0052, 0.006, 12);
+    const bushing = new THREE.Mesh(bushingGeo, materials.joint);
+    bushing.position.set(a * 0.021, -0.108, 0.000);
+    forearmJointGroup.add(bushing);
+
     // Anodized Violet Sensor Ring on barrel mouth
     const collarGeo = new THREE.TorusGeometry(0.0070, 0.0012, 6, 16);
     const collar = new THREE.Mesh(collarGeo, materials.purpleEmissive);

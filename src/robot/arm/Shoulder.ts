@@ -159,20 +159,23 @@ export function createShoulder(
   shoulderArmor.receiveShadow = true;
   armorGroup.add(shoulderArmor);
 
-  // Beveled armor rim trim
-  const pauldronRimGeo = new THREE.TorusGeometry(0.066, 0.0025, 8, 32);
-  const pauldronRim = new THREE.Mesh(pauldronRimGeo, materials.joint);
-  pauldronRim.rotation.x = Math.PI / 2;
-  pauldronRim.position.set(0, -0.016, 0);
-  armorGroup.add(pauldronRim);
-
-  // Pauldron signature purple accent slit
-  const pauldronAccentGeo = new THREE.TorusGeometry(0.060, 0.0016, 6, 28, Math.PI * 0.65);
+  // Pauldron signature purple accent slit embedded directly flush into the armor shell
+  const pauldronAccentGeo = new THREE.TorusGeometry(0.063, 0.0016, 6, 28, Math.PI * 0.45);
   const pauldronAccent = new THREE.Mesh(pauldronAccentGeo, materials.purpleEmissive);
-  pauldronAccent.rotation.z = side * 0.22;
-  pauldronAccent.position.set(side * 0.004, 0.012, 0.024);
-  armorGroup.add(pauldronAccent);
+  pauldronAccent.rotation.x = Math.PI * 0.42;
+  pauldronAccent.rotation.z = side * 0.12;
+  pauldronAccent.position.set(side * 0.006, 0.018, 0.024);
+  shoulderArmor.add(pauldronAccent);
   ledMeshes.push(pauldronAccent);
+
+  // Posterior Heat Exhaust Louvers on Pauldron Crown
+  for (let l = 0; l < 3; l++) {
+    const louverGeo = new THREE.BoxGeometry(0.016, 0.0024, 0.005);
+    const louver = new THREE.Mesh(louverGeo, materials.joint);
+    louver.position.set(-side * 0.006, 0.024 + l * 0.007, -0.042);
+    louver.rotation.x = -Math.PI / 4;
+    shoulderArmor.add(louver);
+  }
 
   // Visible Armor Mounting Standoff Brackets (showing armor is bolted to frame)
   for (const bAngle of [-0.6, 0.8, 2.3]) {

@@ -179,12 +179,26 @@ export function createUpperArm(
   tricepPiston.castShadow = true;
   armatureJointGroup.add(tricepPiston);
 
-  // C. Central Spinal Cable Conduits
+  // C. Central Spinal Cable Conduits & Stainless Hydraulic Lines
   for (let c = -1; c <= 1; c += 2) {
     const conduitGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.144, 8);
     const conduit = new THREE.Mesh(conduitGeo, materials.joint);
     conduit.position.set(c * 0.008, -0.090, 0.016);
     armatureJointGroup.add(conduit);
+
+    // Hard hydraulic fluid lines running along side rails
+    const hydroLineGeo = new THREE.CylinderGeometry(0.0016, 0.0016, 0.140, 8);
+    const hydroLine = new THREE.Mesh(hydroLineGeo, materials.joint);
+    hydroLine.position.set(c * 0.022, -0.090, -0.008);
+    armatureJointGroup.add(hydroLine);
+
+    // Conduit retainer brackets / clamps
+    for (let k = 0; k < 3; k++) {
+      const clampGeo = new THREE.BoxGeometry(0.004, 0.003, 0.006);
+      const clamp = new THREE.Mesh(clampGeo, materials.joint);
+      clamp.position.set(c * 0.022, -0.050 - k * 0.040, -0.008);
+      armatureJointGroup.add(clamp);
+    }
   }
 
   // Merge static mechanical skeleton elements

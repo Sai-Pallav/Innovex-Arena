@@ -376,7 +376,7 @@ function createRotationalDisc(
   const beveledRim = new THREE.Mesh(beveledRimGeo, materials.joint);
   beveledRim.position.set(sign * (ELBOW_CONFIG.discThickness * 0.35), 0, 0);
 
-  // 6 Perimeter Hex Socket Fasteners
+  // 6 Perimeter Hex Socket Fasteners + 6 Radial Calibration Index Notches
   const tempBezel = new THREE.Group();
   tempBezel.add(outerDisc);
   tempBezel.add(beveledRim);
@@ -391,6 +391,18 @@ function createRotationalDisc(
       Math.cos(angle) * (ELBOW_CONFIG.discOuterRadius * 0.82)
     );
     tempBezel.add(bolt);
+
+    // Radial calibration indexing notches between bolts
+    const tickAngle = angle + Math.PI / 6;
+    const tickGeo = new THREE.BoxGeometry(0.0012, 0.0040, 0.0016);
+    const tick = new THREE.Mesh(tickGeo, materials.joint);
+    tick.position.set(
+      sign * (ELBOW_CONFIG.discThickness * 0.49),
+      Math.sin(tickAngle) * (ELBOW_CONFIG.discOuterRadius * 0.88),
+      Math.cos(tickAngle) * (ELBOW_CONFIG.discOuterRadius * 0.88)
+    );
+    tick.rotation.x = tickAngle;
+    tempBezel.add(tick);
   }
 
   const bezelMerged = mergeGroupMeshesByMaterial(tempBezel, materials.joint, `${discName}_OuterBezel_Merged`)!;
@@ -616,6 +628,22 @@ function createHydraulicRam(materials: RobotMaterialPalette): {
   const eyelet = new THREE.Mesh(eyeletGeo, materials.joint);
   eyelet.position.set(0, -0.030, 0);
   ramGroup.add(eyelet);
+
+  // Hydraulic Banjo Fitting & High-Pressure Fluid Hose
+  const banjoGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.0045, 12);
+  banjoGeo.rotateZ(Math.PI / 2);
+  const banjo = new THREE.Mesh(banjoGeo, materials.joint);
+  banjo.position.set(0.008, 0.016, 0);
+  ramGroup.add(banjo);
+
+  const hoseCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(0.008, 0.016, 0),
+    new THREE.Vector3(0.012, 0.026, 0.006),
+    new THREE.Vector3(0.006, 0.036, 0.010),
+  ]);
+  const hoseGeo = new THREE.TubeGeometry(hoseCurve, 8, 0.0014, 6, false);
+  const hose = new THREE.Mesh(hoseGeo, materials.joint);
+  ramGroup.add(hose);
 
   return { group: ramGroup, ramCylinder, ramPiston };
 }
