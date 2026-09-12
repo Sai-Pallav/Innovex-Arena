@@ -120,6 +120,7 @@ export class RobotScene {
       this.debugManager = new DebugManager(result.nodes.root);
 
       this.isReady = true;
+      (window as any).__robotScene = this;
       if (options.onLoaded) {
         options.onLoaded(this.modelSource);
       }

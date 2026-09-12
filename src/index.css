@@ -594,3 +594,71 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================
+   CONTACT PAGE — ATMOSPHERIC LAYER ANIMATIONS
+   Very slow, low-amplitude, organic motion.
+   Respects prefers-reduced-motion (overridden to 0.01ms above).
+
+   Amplitude deliberately smaller than previous pass:
+   • Primary breath: 6px vertical drift (was 8px), opacity 0.88–1.0
+   • Secondary drift: 5px horizontal (was 6px), async phase offset
+   • Near particles: 4px vertical float (was 5px)
+
+   All three use ease-in-out so the motion is barely perceptible
+   at any single frame — only noticeable over multiple seconds.
+   ============================================================ */
+
+/* Primary field: very slow vertical breath — feels like deep respiration */
+@keyframes contactFieldBreath {
+  0%, 100% { opacity: 1.00; transform: translateY(0px)   scale(1.000); }
+  50%       { opacity: 0.88; transform: translateY(-6px)  scale(1.015); }
+}
+
+/* Secondary field: horizontal axis drift — perpendicular to primary */
+@keyframes contactFieldDrift {
+  0%        { opacity: 1.00;  transform: translateX(0px)  scale(1.000); }
+  38%       { opacity: 0.88;  transform: translateX(5px)  scale(1.008); }
+  72%       { opacity: 0.92;  transform: translateX(-3px) scale(1.004); }
+  100%      { opacity: 1.00;  transform: translateX(0px)  scale(1.000); }
+}
+
+/* Near particles: barely perceptible vertical float */
+@keyframes contactParticleFloat {
+  0%, 100% { transform: translateY(0px);  }
+  50%       { transform: translateY(-4px); }
+}
+
+.contact-layer-primary {
+  animation: contactFieldBreath 20s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.contact-layer-secondary {
+  animation: contactFieldDrift 25s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.contact-layer-particles-near {
+  animation: contactParticleFloat 30s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* ============================================================
+   SERVICES PAGE — SECONDARY LOWER FIELD ANIMATION
+   Independent 28s drift on a perpendicular axis to L03a so the
+   two primary fields never move in sync. Lower amplitude than
+   the contact breath — this is a carry-through field, not the
+   focal zone.
+   ============================================================ */
+@keyframes svcLowerDrift {
+  0%   { opacity: 1.00; transform: translateX(0px)   scale(1.000); }
+  30%  { opacity: 0.90; transform: translateX(-4px)  scale(1.006); }
+  65%  { opacity: 0.94; transform: translateX(3px)   scale(1.003); }
+  100% { opacity: 1.00; transform: translateX(0px)   scale(1.000); }
+}
+
+.svc-layer-lower {
+  animation: svcLowerDrift 28s ease-in-out infinite;
+  will-change: transform, opacity;
+}

@@ -30,6 +30,7 @@ import { Button } from '../components/ui/Button';
 import { CyberCard } from '../components/ui/CyberCard';
 import { LearningModesSection } from '../components/modules/LearningModesSection';
 import { useScrollReveal } from '../hooks/useScrollReveal';
+import { ServicesAtmosphere } from '../components/layout/ServicesAtmosphere';
 
 const getPillarIcon = (iconName: string, glow: 'cyan' | 'purple') => {
   const iconColor = glow === 'cyan' ? 'text-[#b7a4fb]' : 'text-[#e59cff]';
@@ -102,7 +103,7 @@ const ServicePillarSection: React.FC<ServicePillarSectionProps> = ({ section, gl
     <section id={section.id} className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 scroll-mt-28">
       {/* 100% STATIC TITLE & DESCRIPTION - DOES NOT MOVE DURING REVEAL */}
       <div className="text-center space-y-1.5 max-w-2xl mx-auto">
-        <h2 className="font-rebond font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+        <h2 className="font-rebond font-medium text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
           {section.title}
         </h2>
         <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">
@@ -138,12 +139,12 @@ const ServicePillarSection: React.FC<ServicePillarSectionProps> = ({ section, gl
             >
               <div className="flex-1 flex flex-col">
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center mb-3.5 group-hover:scale-110 transition-all duration-300 bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)]"
+                  className="w-10 h-10 rounded-[5px] flex items-center justify-center mb-3.5 group-hover:scale-110 transition-all duration-300 bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)]"
                 >
                   {getPillarIcon(item.iconName, glow)}
                 </div>
                 <h3
-                  className="font-rebond text-base sm:text-lg font-semibold text-white group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1.5 leading-snug min-h-[1.75rem]"
+                  className="font-rebond text-base sm:text-lg font-medium text-white group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1.5 leading-snug min-h-[1.75rem]"
                 >
                   {item.title}
                 </h3>
@@ -179,7 +180,7 @@ const PastEventsSection: React.FC = () => {
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 scroll-mt-28">
       {/* STATIC TITLE & DESCRIPTION */}
       <div className="text-center space-y-1.5 max-w-2xl mx-auto">
-        <h2 className="font-rebond font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+        <h2 className="font-rebond font-medium text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
           Past <span className="cosmic-text-gradient">Workshops & Events</span>
         </h2>
         <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">
@@ -208,12 +209,12 @@ const PastEventsSection: React.FC = () => {
             >
               <div className="flex-1 flex flex-col justify-between space-y-3">
                 <div>
-                  <h3 className="font-rebond text-base font-semibold text-white group-hover:text-[#b7a4fb] transition-colors duration-200 line-clamp-2 min-h-[2.75rem] sm:min-h-[3rem] mb-1">
+                  <h3 className="font-rebond text-base font-medium text-white group-hover:text-[#b7a4fb] transition-colors duration-200 line-clamp-2 min-h-[2.75rem] sm:min-h-[3rem] mb-1">
                     {evt.title}
                   </h3>
                 </div>
 
-                <div className="p-3 rounded-[10px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-all duration-300 space-y-2 text-xs text-[#9b96b0] min-h-[5.5rem] flex flex-col justify-center">
+                <div className="p-3 rounded-[16px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-all duration-300 space-y-2 text-xs text-[#9b96b0] min-h-[5.5rem] flex flex-col justify-center">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
                     <span className="text-[#f4f0ff]">{evt.date}</span>
@@ -239,14 +240,13 @@ const PastEventsSection: React.FC = () => {
 export const ServicesPage: React.FC = () => {
   return (
     <div className="relative pb-20">
-      {/* Ambient Backdrop Spotlight matching HomePage */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[650px] ultraviolet-hero-bloom pointer-events-none -z-10" />
+      <ServicesAtmosphere />
 
       <div className="pt-20 sm:pt-24 lg:pt-24 space-y-20 sm:space-y-28">
         {/* 1. HERO */}
         <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-3.5 sm:space-y-4 animate-fade-up">
           <div className="space-y-1.5">
-            <h1 className="font-rebond font-bold text-3xl sm:text-5xl lg:text-[3.6rem] tracking-tight text-white leading-[1.14]">
+            <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-[3.6rem] tracking-tight text-white leading-[1.14]">
               Our <span className="cosmic-text-gradient">Services</span>
             </h1>
             <p className="text-xs sm:text-sm text-[#9b96b0] max-w-2xl mx-auto leading-relaxed font-normal">
@@ -278,7 +278,7 @@ export const ServicesPage: React.FC = () => {
             <div className="aurora-divider-line absolute top-0 left-0 right-0" />
             <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
             
-            <h2 className="font-rebond font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
+            <h2 className="font-rebond font-medium text-2xl sm:text-3xl lg:text-4xl text-white tracking-tight">
               Ready to <span className="cosmic-text-gradient">Get Started?</span>
             </h2>
             <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">

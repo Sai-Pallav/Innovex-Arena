@@ -93,7 +93,7 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
           <button
             type="button"
             onClick={() => handleTypeChange('online-demo')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 ${
               bookingType === 'online-demo'
                 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -105,7 +105,7 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
           <button
             type="button"
             onClick={() => handleTypeChange('campus-tour')}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-semibold transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 ${
               bookingType === 'campus-tour'
                 ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30 shadow-sm'
                 : 'text-slate-400 hover:text-white'
@@ -122,14 +122,14 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
             <>
               <Laptop className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
               <div className="leading-relaxed">
-                <span className="font-semibold text-white">Live Online Interactive Session:</span> Join an active cohort on Google Meet / Discord, test-drive our cloud code sandbox, and interact directly with the lead instructor.
+                <span className="font-medium text-white">Live Online Interactive Session:</span> Join an active cohort on Google Meet / Discord, test-drive our cloud code sandbox, and interact directly with the lead instructor.
               </div>
             </>
           ) : (
             <>
               <MapPin className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
               <div className="leading-relaxed">
-                <span className="font-semibold text-white">In-Person Campus Lab Visit:</span> Tour our dedicated RTX GPU workstations, inspect high-speed gigabit setup, sit in on an active sprint, and speak 1-on-1 with senior faculty.
+                <span className="font-medium text-white">In-Person Campus Lab Visit:</span> Tour our dedicated RTX GPU workstations, inspect high-speed gigabit setup, sit in on an active sprint, and speak 1-on-1 with senior faculty.
               </div>
             </>
           )}

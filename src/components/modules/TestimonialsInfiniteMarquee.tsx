@@ -142,7 +142,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
     <div className="relative w-full space-y-8 select-none">
       {/* Section Header with Clean Centered Title (Pause Button & Label Removed) */}
       <div className="text-center space-y-2 max-w-2xl mx-auto px-4 sm:px-6">
-        <h2 className="font-heading font-semibold text-2xl sm:text-3xl lg:text-4xl text-white tracking-[-0.015em]">
+        <h2 className="font-heading font-medium text-2xl sm:text-3xl lg:text-4xl text-white tracking-[-0.015em]">
           {title.includes('Community Says') ? (
             <>
               What Our{' '}
@@ -245,14 +245,14 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
                     <div className="mt-auto pt-4 border-t border-white/[0.06] flex items-center gap-3">
                       {/* Avatar Circle with Initial */}
                       <div
-                        className="w-8 h-8 rounded-full flex items-center justify-center font-heading text-xs font-semibold text-white shrink-0 bg-white/[0.06] border border-white/[0.12]"
+                        className="w-8 h-8 rounded-full flex items-center justify-center font-heading text-xs font-medium text-white shrink-0 bg-white/[0.06] border border-white/[0.12]"
                       >
                         {testimonial.name.charAt(0)}
                       </div>
 
                       {/* Author Details */}
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-heading text-xs sm:text-[13px] font-semibold text-[#ffffff] truncate">
+                        <h4 className="font-heading text-xs sm:text-[13px] font-medium text-[#ffffff] truncate">
                           {testimonial.name}
                         </h4>
                         <div className="flex items-center gap-1.5 flex-wrap">

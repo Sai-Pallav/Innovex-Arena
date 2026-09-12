@@ -94,7 +94,7 @@ export const LearningModesSection: React.FC = () => {
     <section id="classes" className="relative px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-16 sm:space-y-20">
       {/* 1. SECTION HEADER */}
       <div className="text-center space-y-3 max-w-3xl mx-auto">
-        <h2 className="font-rebond font-bold text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight leading-tight">
+        <h2 className="font-rebond font-medium text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight leading-tight">
           Master Tech Your Way: <br className="hidden sm:inline" />
           <span className="cosmic-text-gradient">
             Online, Offline Campus, or Hybrid
@@ -110,9 +110,9 @@ export const LearningModesSection: React.FC = () => {
         <div className="inline-flex p-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] backdrop-blur-md gap-1.5 max-w-full overflow-x-auto no-scrollbar">
           <button
             onClick={() => setActiveTab('all')}
-            className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+            className={`px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
               activeTab === 'all'
-                ? 'bg-white/[0.08] text-white font-bold border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
+                ? 'bg-white/[0.08] text-white font-medium border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
                 : 'text-[#9b96b0] border border-transparent hover:text-white hover:bg-white/[0.04]'
             }`}
           >
@@ -120,9 +120,9 @@ export const LearningModesSection: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('online')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
               activeTab === 'online'
-                ? 'bg-white/[0.08] text-white font-bold border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
+                ? 'bg-white/[0.08] text-white font-medium border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
                 : 'text-[#9b96b0] border border-transparent hover:text-white hover:bg-white/[0.04]'
             }`}
           >
@@ -131,9 +131,9 @@ export const LearningModesSection: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('offline')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
               activeTab === 'offline'
-                ? 'bg-white/[0.08] text-white font-bold border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
+                ? 'bg-white/[0.08] text-white font-medium border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
                 : 'text-[#9b96b0] border border-transparent hover:text-white hover:bg-white/[0.04]'
             }`}
           >
@@ -142,9 +142,9 @@ export const LearningModesSection: React.FC = () => {
           </button>
           <button
             onClick={() => setActiveTab('hybrid')}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 cursor-pointer ${
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium whitespace-nowrap transition-all duration-200 cursor-pointer ${
               activeTab === 'hybrid'
-                ? 'bg-white/[0.08] text-white font-bold border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
+                ? 'bg-white/[0.08] text-white font-medium border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
                 : 'text-[#9b96b0] border border-transparent hover:text-white hover:bg-white/[0.04]'
             }`}
           >
@@ -170,7 +170,7 @@ export const LearningModesSection: React.FC = () => {
               {/* Badge & Icon Header */}
               <div className="flex items-center justify-between gap-3">
                 <span
-                  className="px-3 py-0.5 rounded-full text-[10px] font-mono uppercase font-semibold tracking-wider bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]"
+                  className="px-3 py-0.5 rounded-full text-[10px] font-mono uppercase font-medium tracking-wider bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]"
                 >
                   {mode.badge}
                 </span>
@@ -186,7 +186,7 @@ export const LearningModesSection: React.FC = () => {
 
               {/* Title & Tagline */}
               <div>
-                <h3 className="font-rebond text-xl sm:text-2xl font-bold mb-1.5 transition-colors duration-200 min-h-[2rem] text-white group-hover:text-[#b7a4fb]">
+                <h3 className="font-rebond text-xl sm:text-2xl font-medium mb-1.5 transition-colors duration-200 min-h-[2rem] text-white group-hover:text-[#b7a4fb]">
                   {mode.title}
                 </h3>
                 <p className="text-xs sm:text-sm text-[#b7a4fb] font-medium leading-snug min-h-[2.5rem]">
@@ -270,7 +270,7 @@ export const LearningModesSection: React.FC = () => {
                 <ShieldCheck className="w-4 h-4 text-[#b7a4fb]" />
                 Zero Compromise Standard
               </span>
-              <h3 className="font-rebond text-xl sm:text-2xl font-bold text-white tracking-tight">
+              <h3 className="font-rebond text-xl sm:text-2xl font-medium text-white tracking-tight">
                 Guaranteed In Every Mode Without Exception
               </h3>
             </div>
@@ -286,10 +286,10 @@ export const LearningModesSection: React.FC = () => {
                 className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.08] hover:border-[#9382ff]/30 transition-colors space-y-2 flex flex-col justify-between"
               >
                 <div className="space-y-1.5">
-                  <div className="text-xs font-semibold text-[#b7a4fb] font-mono tracking-tight">
+                  <div className="text-xs font-medium text-[#b7a4fb] font-mono tracking-tight">
                     {pillar.metric}
                   </div>
-                  <h4 className="font-rebond text-sm font-semibold text-white">
+                  <h4 className="font-rebond text-sm font-medium text-white">
                     {pillar.title}
                   </h4>
                   <p className="text-xs text-[#9b96b0] leading-relaxed">
@@ -306,7 +306,7 @@ export const LearningModesSection: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1">
-            <h3 className="font-rebond text-xl sm:text-3xl font-bold text-white tracking-tight">
+            <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
               Side-by-Side Mode Breakdown
             </h3>
             <p className="text-xs sm:text-sm text-[#9b96b0]">
@@ -329,22 +329,22 @@ export const LearningModesSection: React.FC = () => {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/[0.08] bg-white/[0.02]">
-                  <th className="p-4 text-xs font-rebond font-semibold text-[#9b96b0] uppercase tracking-wider w-1/4">
+                  <th className="p-4 text-xs font-rebond font-medium text-[#9b96b0] uppercase tracking-wider w-1/4">
                     Dimension
                   </th>
-                  <th className="p-4 text-xs font-rebond font-bold text-[#b7a4fb] w-1/4 bg-white/[0.02]">
+                  <th className="p-4 text-xs font-rebond font-medium text-[#b7a4fb] w-1/4 bg-white/[0.02]">
                     <div className="flex items-center gap-1.5">
                       <Video className="w-3.5 h-3.5 text-[#b7a4fb]" />
                       100% Live Online
                     </div>
                   </th>
-                  <th className="p-4 text-xs font-rebond font-bold text-[#ba9cff] w-1/4 bg-white/[0.02]">
+                  <th className="p-4 text-xs font-rebond font-medium text-[#ba9cff] w-1/4 bg-white/[0.02]">
                     <div className="flex items-center gap-1.5">
                       <Building2 className="w-3.5 h-3.5 text-[#ba9cff]" />
                       In-Person Campus Lab
                     </div>
                   </th>
-                  <th className="p-4 text-xs font-rebond font-bold text-[#b7a4fb] w-1/4 bg-white/[0.02]">
+                  <th className="p-4 text-xs font-rebond font-medium text-[#b7a4fb] w-1/4 bg-white/[0.02]">
                     <div className="flex items-center gap-1.5">
                       <Layers className="w-3.5 h-3.5 text-[#b7a4fb]" />
                       Hybrid Flex Track
@@ -360,7 +360,7 @@ export const LearningModesSection: React.FC = () => {
                       row.importance === 'high' ? 'bg-white/[0.01]' : ''
                     }`}
                   >
-                    <td className="p-4 font-semibold text-white flex items-center gap-2">
+                    <td className="p-4 font-medium text-white flex items-center gap-2">
                       {row.dimension}
                       {row.importance === 'high' && (
                         <span className="px-2 py-0.5 rounded-full text-[9px] font-mono bg-white/[0.04] text-[#b7a4fb] border border-white/[0.1]">
@@ -398,11 +398,11 @@ export const LearningModesSection: React.FC = () => {
               <span className="p-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb]">
                 <Compass className="w-4 h-4" />
               </span>
-              <span className="text-xs font-mono uppercase tracking-widest text-[#b7a4fb] font-semibold">
+              <span className="text-xs font-mono uppercase tracking-widest text-[#b7a4fb] font-medium">
                 Interactive Self-Assessment
               </span>
             </div>
-            <h3 className="font-rebond text-xl sm:text-2xl font-bold text-white tracking-tight">
+            <h3 className="font-rebond text-xl sm:text-2xl font-medium text-white tracking-tight">
               Not Sure Which Format Fits You? Take the 10-Second Test
             </h3>
             <p className="text-xs sm:text-sm text-[#9b96b0] max-w-2xl">
@@ -413,7 +413,7 @@ export const LearningModesSection: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
             {/* Question 1: Schedule */}
             <div className="space-y-2.5">
-              <label className="text-xs font-semibold text-[#9b96b0] flex items-center gap-1.5">
+              <label className="text-xs font-medium text-[#9b96b0] flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-[#b7a4fb]" />
                 1. What is your current daily availability?
               </label>
@@ -442,7 +442,7 @@ export const LearningModesSection: React.FC = () => {
 
             {/* Question 2: Learning Style */}
             <div className="space-y-2.5">
-              <label className="text-xs font-semibold text-[#9b96b0] flex items-center gap-1.5">
+              <label className="text-xs font-medium text-[#9b96b0] flex items-center gap-1.5">
                 <Laptop className="w-3.5 h-3.5 text-[#ba9cff]" />
                 2. Where do you focus and retain information best?
               </label>
@@ -476,7 +476,7 @@ export const LearningModesSection: React.FC = () => {
               <span className="inline-block px-3 py-0.5 rounded-full text-[10px] font-mono font-medium bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
                 {recommendation.badge}
               </span>
-              <h4 className="font-rebond text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <h4 className="font-rebond text-base sm:text-lg font-medium text-white flex items-center gap-2">
                 Your Best Fit: <span className="cosmic-text-gradient">{recommendation.mode}</span>
               </h4>
               <p className="text-xs text-[#9b96b0] max-w-xl">
@@ -501,7 +501,7 @@ export const LearningModesSection: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1">
-            <h3 className="font-rebond text-xl sm:text-3xl font-bold text-white tracking-tight">
+            <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
               Our Physical Campus Innovation Labs
             </h3>
             <p className="text-xs sm:text-sm text-[#9b96b0]">
@@ -524,7 +524,7 @@ export const LearningModesSection: React.FC = () => {
             <CyberCard key={hub.id} glow="purple" className="p-5 sm:p-6 flex flex-col justify-between">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="px-3 py-0.5 rounded-full text-[10px] font-mono uppercase bg-white/[0.04] border border-white/[0.12] text-[#ba9cff] font-semibold">
+                  <span className="px-3 py-0.5 rounded-full text-[10px] font-mono uppercase bg-white/[0.04] border border-white/[0.12] text-[#ba9cff] font-medium">
                     {hub.city} Hub
                   </span>
                   <span className="text-[11px] text-emerald-400 font-mono flex items-center gap-1.5">
@@ -534,7 +534,7 @@ export const LearningModesSection: React.FC = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-rebond text-lg font-bold text-white">
+                  <h4 className="font-rebond text-lg font-medium text-white">
                     {hub.city} — {hub.area}
                   </h4>
                   <p className="text-xs text-[#9b96b0] mt-1 leading-relaxed">
@@ -592,7 +592,7 @@ export const LearningModesSection: React.FC = () => {
       {/* 8. ALUMNI VOICES: ONLINE VS OFFLINE PERSPECTIVES */}
       <div className="space-y-6">
         <div className="text-center space-y-1.5">
-          <h3 className="font-rebond text-xl sm:text-3xl font-bold text-white tracking-tight">
+          <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
             How Students Excelled in Both Formats
           </h3>
           <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto">
@@ -616,11 +616,11 @@ export const LearningModesSection: React.FC = () => {
               </div>
 
               <div className="pt-3 border-t border-white/[0.06] flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.12] flex items-center justify-center font-rebond text-xs font-bold text-white shrink-0">
+                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.12] flex items-center justify-center font-rebond text-xs font-medium text-white shrink-0">
                   {item.avatarInitial}
                 </div>
                 <div>
-                  <h4 className="font-rebond text-xs font-semibold text-white">{item.name}</h4>
+                  <h4 className="font-rebond text-xs font-medium text-white">{item.name}</h4>
                   <p className="text-[10px] text-[#9b96b0]">{item.role}</p>
                 </div>
               </div>
@@ -632,7 +632,7 @@ export const LearningModesSection: React.FC = () => {
       {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION) */}
       <div className="space-y-6 max-w-4xl mx-auto">
         <div className="text-center space-y-1.5">
-          <h3 className="font-rebond text-xl sm:text-3xl font-bold text-white tracking-tight">
+          <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
             Frequently Asked Questions About Class Formats
           </h3>
           <p className="text-xs sm:text-sm text-[#9b96b0]">
@@ -661,7 +661,7 @@ export const LearningModesSection: React.FC = () => {
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono bg-white/[0.04] text-[#9b96b0] border border-white/[0.08]">
                       {faq.category}
                     </span>
-                    <span className="font-rebond text-xs sm:text-sm font-semibold text-white">
+                    <span className="font-rebond text-xs sm:text-sm font-medium text-white">
                       {faq.question}
                     </span>
                   </div>
@@ -688,7 +688,7 @@ export const LearningModesSection: React.FC = () => {
         <div className="aurora-divider-line absolute top-0 left-0 right-0" />
         <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
 
-        <h4 className="font-rebond text-lg sm:text-2xl font-bold text-white tracking-tight">
+        <h4 className="font-rebond text-lg sm:text-2xl font-medium text-white tracking-tight">
           Still Undecided? Talk 1-on-1 with our Academic Directors
         </h4>
         <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">

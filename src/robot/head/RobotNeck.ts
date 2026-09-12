@@ -36,7 +36,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   neckJointGroup.add(centralShaft);
 
   // 2. Base Collar / Pedestal Mount (Part 10: Base collar)
-  const baseCollarGeo = new THREE.CylinderGeometry(0.062, 0.074, 0.024, 36);
+  const baseCollarGeo = new THREE.CylinderGeometry(0.060, 0.070, 0.024, 36);
   const baseCollar = new THREE.Mesh(baseCollarGeo, materials.joint);
   baseCollar.name = 'NeckBaseCollar';
   baseCollar.position.set(0, 0.010, 0);
@@ -44,20 +44,15 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   baseCollar.receiveShadow = true;
   neckJointGroup.add(baseCollar);
 
-  // Rounded rim on base collar
-  const baseRimGeo = new THREE.TorusGeometry(0.073, 0.004, 14, 36);
-  const baseRim = new THREE.Mesh(baseRimGeo, materials.joint);
-  baseRim.rotation.x = Math.PI / 2;
-  baseRim.position.set(0, 0.004, 0);
-  neckJointGroup.add(baseRim);
+  // Rounded base rim removed per user request ("remove the ring on the neck")
 
   // 3. Stacked Telescoping Neck Collar Rings (Part 10: Ring 01, 02, 03, 04)
   const rings: THREE.Mesh[] = [];
   const ringSpecs = [
-    { radius: 0.058, height: 0.026, y: 0.038 },
-    { radius: 0.054, height: 0.026, y: 0.068 },
-    { radius: 0.050, height: 0.024, y: 0.098 },
-    { radius: 0.046, height: 0.022, y: 0.126 },
+    { radius: 0.054, height: 0.022, y: 0.038 },
+    { radius: 0.050, height: 0.022, y: 0.064 },
+    { radius: 0.046, height: 0.020, y: 0.090 },
+    { radius: 0.042, height: 0.018, y: 0.114 },
   ];
 
   for (let i = 0; i < ringSpecs.length; i++) {
@@ -73,8 +68,8 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     neckJointGroup.add(ringMesh);
     rings.push(ringMesh);
 
-    // Beveled highlight rim around the upper edge of each collar ring
-    const rimGeo = new THREE.TorusGeometry(spec.radius, 0.0032, 12, 36);
+    // Subtle aerospace beveled highlight rim around the upper edge of each collar ring
+    const rimGeo = new THREE.TorusGeometry(spec.radius, 0.0016, 8, 36);
     const rimMesh = new THREE.Mesh(rimGeo, materials.joint);
     rimMesh.rotation.x = Math.PI / 2;
     rimMesh.position.set(0, spec.y + spec.height * 0.44, 0);
@@ -87,6 +82,26 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
       spacer.position.set(0, spec.y + spec.height * 0.5 + 0.004, 0);
       neckSpacerGroup.add(spacer);
     }
+  }
+
+  // 3b. Vertical Structural Mechanical Fluting Ribs (Reference Image 2)
+  const ribCount = 14;
+  const ribRadius = 0.048;
+  const ribGeo = new THREE.BoxGeometry(0.0030, 0.096, 0.0055);
+  for (let i = 0; i < ribCount; i++) {
+    const angle = (i / ribCount) * Math.PI * 2;
+    // Skip front center to keep the central purple slit clear
+    if (Math.abs(angle) < 0.18 || Math.abs(angle - Math.PI * 2) < 0.18) continue;
+    const rib = new THREE.Mesh(ribGeo, materials.joint);
+    rib.position.set(
+      Math.sin(angle) * ribRadius,
+      0.076,
+      Math.cos(angle) * ribRadius * 0.95
+    );
+    rib.rotation.y = angle;
+    rib.castShadow = true;
+    rib.receiveShadow = true;
+    neckJointGroup.add(rib);
   }
 
   // 4. Lateral Cervical Hydraulic Struts (Left & Right sternocleidomastoid pistons)

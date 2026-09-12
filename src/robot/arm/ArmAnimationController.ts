@@ -50,6 +50,8 @@ export class ArmAnimationController {
   private rightBaseCycloidalPos: THREE.Vector3;
   private leftBaseFaceplatePos: THREE.Vector3;
   private rightBaseFaceplatePos: THREE.Vector3;
+  private leftBaseAccentRingPos: THREE.Vector3;
+  private rightBaseAccentRingPos: THREE.Vector3;
   private leftBaseDamperPistonPos: THREE.Vector3;
   private rightBaseDamperPistonPos: THREE.Vector3;
   private leftBaseBicepSubGroupPos: THREE.Vector3;
@@ -121,6 +123,8 @@ export class ArmAnimationController {
     this.rightBaseCycloidalPos = (rightArm.shoulder.cycloidalDrive || rightArm.shoulder.jointGroup).position.clone();
     this.leftBaseFaceplatePos = (leftArm.shoulder.faceplateHub || leftArm.shoulder.jointGroup).position.clone();
     this.rightBaseFaceplatePos = (rightArm.shoulder.faceplateHub || rightArm.shoulder.jointGroup).position.clone();
+    this.leftBaseAccentRingPos = (leftArm.shoulder.accentRing || leftArm.shoulder.jointGroup).position.clone();
+    this.rightBaseAccentRingPos = (rightArm.shoulder.accentRing || rightArm.shoulder.jointGroup).position.clone();
     this.leftBaseDamperPistonPos = (leftArm.shoulder.damperPiston || leftArm.shoulder.jointGroup).position.clone();
     this.rightBaseDamperPistonPos = (rightArm.shoulder.damperPiston || rightArm.shoulder.jointGroup).position.clone();
     this.leftBaseBicepSubGroupPos = leftArm.upperArm.bicepSubGroup.position.clone();
@@ -354,51 +358,59 @@ export class ArmAnimationController {
 
     const baseDorsal = isLeft ? this.leftBaseDorsalPos : this.rightBaseDorsalPos;
 
-    // 1. SHOULDER & BICEP MULTI-STAGE MECHANICAL OPEN VIEW (CAD Hierarchy)
-    // Stage A: Structural Gimbal Yoke lifts upward and separates outward
+    // 1. SHOULDER & BICEP MULTI-STAGE MECHANICAL OPEN VIEW (CAD Engineering Hierarchy)
+    // Stage A: Shoulder Pauldron Armor Shell lifts upward & out to reveal internal mechanism
+    arm.shoulder.armorGroup.position.set(
+      baseShoulderArmor.x + side * exp * 0.012,
+      baseShoulderArmor.y + exp * 0.024,
+      baseShoulderArmor.z + exp * 0.006
+    );
+
+    // Stage B: Structural Gimbal Yoke lifts smoothly within armor (never punches through top!)
     if (arm.shoulder.gimbalYoke) {
       const baseYoke = isLeft ? this.leftBaseGimbalYokePos : this.rightBaseGimbalYokePos;
       arm.shoulder.gimbalYoke.position.set(
-        baseYoke.x + side * exp * 0.024,
-        baseYoke.y + exp * 0.038,
-        baseYoke.z + exp * 0.018
+        baseYoke.x + side * exp * 0.008,
+        baseYoke.y + exp * 0.016,
+        baseYoke.z + exp * 0.004
       );
     }
 
-    // Stage B: Hydraulic Damper Actuator extends chrome piston rod
+    // Stage C: Hydraulic Damper Actuator extends chrome piston rod
     if (arm.shoulder.damperPiston) {
       const basePiston = isLeft ? this.leftBaseDamperPistonPos : this.rightBaseDamperPistonPos;
-      arm.shoulder.damperPiston.position.y = basePiston.y - exp * 0.024;
+      arm.shoulder.damperPiston.position.y = basePiston.y - exp * 0.012;
     }
 
-    // Stage C: Rotational Joint Core separates along X axis
+    // Stage D: Rotational Joint Core separates along X axis
     arm.shoulder.jointGroup.position.set(
-      baseShoulderJoint.x + side * exp * 0.025,
+      baseShoulderJoint.x + side * exp * 0.008,
       baseShoulderJoint.y,
       baseShoulderJoint.z
     );
 
-    // Stage D: Cycloidal Planetary Drive Ring separates further along X (Concentric Layer 2)
+    // Stage E: Cycloidal Planetary Drive Ring separates cleanly along X (Concentric Layer 1)
     if (arm.shoulder.cycloidalDrive) {
       const baseCyclo = isLeft ? this.leftBaseCycloidalPos : this.rightBaseCycloidalPos;
-      arm.shoulder.cycloidalDrive.position.x = baseCyclo.x + side * exp * 0.040;
+      arm.shoulder.cycloidalDrive.position.x = baseCyclo.x + side * exp * 0.016;
     }
 
-    // Stage E: Purple Reactor Accent Ring separates further along X (Concentric Layer 3)
+    // Stage F: Purple Reactor Accent Ring separates along X from cached base (Concentric Layer 2)
     if (arm.shoulder.accentRing) {
-      arm.shoulder.accentRing.position.x = side * (0.034 + exp * 0.060);
+      const baseAccent = isLeft ? this.leftBaseAccentRingPos : this.rightBaseAccentRingPos;
+      arm.shoulder.accentRing.position.x = baseAccent.x + side * exp * 0.024;
     }
 
-    // Stage F: Precision Billet Faceplate & Fasteners separates farthest along X (Concentric Layer 4)
+    // Stage G: Precision Billet Faceplate & Fasteners separates along X (Concentric Layer 3)
     if (arm.shoulder.faceplateHub) {
       const baseFace = isLeft ? this.leftBaseFaceplatePos : this.rightBaseFaceplatePos;
-      arm.shoulder.faceplateHub.position.x = baseFace.x + side * exp * 0.082;
+      arm.shoulder.faceplateHub.position.x = baseFace.x + side * exp * 0.034;
     }
 
-    // Stage G: Articulated Clevis & Trunnion drops downward along -Y
+    // Stage H: Articulated Clevis & Trunnion drops downward along -Y
     arm.shoulder.upperArmConnector.position.set(
       baseConnector.x,
-      baseConnector.y - exp * 0.038,
+      baseConnector.y - exp * 0.020,
       baseConnector.z
     );
 

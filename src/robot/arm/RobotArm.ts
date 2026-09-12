@@ -54,9 +54,9 @@ export function createRobotArm(
   armRoot.add(shoulder.group);
   ledMeshes.push(...shoulder.ledMeshes);
 
-  // 2. Upper Arm Pivot (attached hierarchically inside UpperArmConnector)
+  // 2. Upper Arm Pivot (attached hierarchically inside UpperArm Mounting Fork at y = -0.016)
   const upperArm = createUpperArm(side, materials);
-  upperArm.group.position.set(side * 0.002, -0.028, 0);
+  upperArm.group.position.set(side * 0.0035, -0.016, 0);
   shoulder.upperArmConnector.add(upperArm.group);
   ledMeshes.push(...upperArm.ledMeshes);
 

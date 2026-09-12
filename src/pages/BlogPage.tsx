@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Calendar, ArrowRight, X } from 'lucide-react';
 import { BLOG_POSTS } from '../data/siteData';
 import { BlogPostItem } from '../types';
+import { PageAtmosphere } from '../components/layout/PageAtmosphere';
 
 export const BlogPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -16,12 +17,11 @@ export const BlogPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 pb-24 space-y-16">
-      {/* Background Hero Bloom */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 ultraviolet-hero-bloom pointer-events-none" />
+      <PageAtmosphere />
 
       {/* 1. HERO */}
       <section className="relative px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
-        <h1 className="font-rebond font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
+        <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
           Blog & <span className="cosmic-text-gradient">News</span>
         </h1>
         <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
@@ -38,7 +38,7 @@ export const BlogPage: React.FC = () => {
               onClick={() => setActiveCategory(cat)}
               className={`px-5 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 cursor-pointer ${
                 activeCategory === cat
-                  ? 'bg-[#713dff] text-white font-semibold shadow-[0_0_20px_rgba(113,61,255,0.4)] border border-[#b7a4fb]/40'
+                  ? 'bg-[#713dff] text-white font-medium shadow-[0_0_20px_rgba(113,61,255,0.4)] border border-[#b7a4fb]/40'
                   : 'text-[#9b96b0] hover:text-white hover:bg-white/[0.06]'
               }`}
             >
@@ -66,7 +66,7 @@ export const BlogPage: React.FC = () => {
                     loading="lazy"
                   />
                   <div className="absolute top-3.5 left-3.5">
-                    <span className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#0a0118]/80 border border-white/[0.15] text-[#ba9cff] backdrop-blur-md shadow-[0_0_12px_rgba(113,61,255,0.25)]">
+                    <span className="px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider bg-[#0a0118]/80 border border-white/[0.15] text-[#ba9cff] backdrop-blur-md shadow-[0_0_12px_rgba(113,61,255,0.25)]">
                       {post.category}
                     </span>
                   </div>
@@ -78,7 +78,7 @@ export const BlogPage: React.FC = () => {
                     <span>{post.published_at}</span>
                   </div>
 
-                  <h3 className="font-rebond font-bold text-lg text-white group-hover:text-[#ba9cff] transition-colors line-clamp-2">
+                  <h3 className="font-rebond font-medium text-lg text-white group-hover:text-[#ba9cff] transition-colors line-clamp-2">
                     {post.title}
                   </h3>
 
@@ -91,7 +91,7 @@ export const BlogPage: React.FC = () => {
               <div className="p-6 pt-0 border-t border-white/[0.06] mt-4">
                 <button
                   onClick={() => setSelectedPost(post)}
-                  className="text-xs font-semibold text-[#ba9cff] hover:text-[#e59cff] flex items-center gap-1.5 cursor-pointer pt-3 transition-colors"
+                  className="text-xs font-medium text-[#ba9cff] hover:text-[#e59cff] flex items-center gap-1.5 cursor-pointer pt-3 transition-colors"
                 >
                   Read Article <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                 </button>
@@ -127,7 +127,7 @@ export const BlogPage: React.FC = () => {
 
             <div className="p-6 sm:p-7 overflow-y-auto space-y-4">
               <div className="flex items-center gap-3 text-xs">
-                <span className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#713dff]/20 text-[#ba9cff] border border-[#713dff]/40">
+                <span className="px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider bg-[#713dff]/20 text-[#ba9cff] border border-[#713dff]/40">
                   {selectedPost.category}
                 </span>
                 <span className="text-[#9b96b0] flex items-center gap-1.5">
@@ -136,7 +136,7 @@ export const BlogPage: React.FC = () => {
                 </span>
               </div>
 
-              <h2 className="font-rebond font-bold text-xl sm:text-2xl text-white leading-tight">
+              <h2 className="font-rebond font-medium text-xl sm:text-2xl text-white leading-tight">
                 {selectedPost.title}
               </h2>
 

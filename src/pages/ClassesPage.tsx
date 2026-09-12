@@ -11,16 +11,16 @@ import {
 } from 'lucide-react';
 import { Button } from '../components/ui/Button';
 import { LearningModesSection } from '../components/modules/LearningModesSection';
+import { PageAtmosphere } from '../components/layout/PageAtmosphere';
 
 export const ClassesPage: React.FC = () => {
   return (
     <div className="relative pt-28 pb-20 space-y-16 sm:space-y-24">
-      {/* Background ultraviolet bloom */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] ultraviolet-hero-bloom pointer-events-none -z-10" />
+      <PageAtmosphere />
 
       {/* 1. HERO BANNER */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center space-y-5 animate-fade-up">
-        <h1 className="font-rebond font-bold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.12]">
+        <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.12]">
           Online & Offline <span className="cosmic-text-gradient">Class Ecosystem</span>
         </h1>
 
@@ -46,15 +46,15 @@ export const ClassesPage: React.FC = () => {
         <div className="pt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-[#9b96b0]">
           <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center gap-2 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
             <Video className="w-3.5 h-3.5 text-[#b7a4fb]" />
-            <span className="text-slate-200">Live Interactive Virtual Cohorts</span>
+            <span className="text-[#f4f0ff]">Live Interactive Virtual Cohorts</span>
           </div>
           <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center gap-2 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
             <Building2 className="w-3.5 h-3.5 text-[#ba9cff]" />
-            <span className="text-slate-200">Physical Labs: Hyderabad, Bengaluru & Pune</span>
+            <span className="text-[#f4f0ff]">Physical Labs: Hyderabad, Bengaluru & Pune</span>
           </div>
           <div className="px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center gap-2 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
             <ShieldCheck className="w-3.5 h-3.5 text-[#b7a4fb]" />
-            <span className="text-slate-200">100% Shared Curriculum & Placement Guarantee</span>
+            <span className="text-[#f4f0ff]">100% Shared Curriculum & Placement Guarantee</span>
           </div>
         </div>
       </section>

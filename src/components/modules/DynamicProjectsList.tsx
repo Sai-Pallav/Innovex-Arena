@@ -40,7 +40,7 @@ export const DynamicProjectsList: React.FC<DynamicProjectsListProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex-1">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300 mb-1.5">
+          <h4 className="text-xs font-medium uppercase tracking-wider text-slate-300 mb-1.5">
             Featured Projects & Portfolio Repositories
           </h4>
           <p className="text-xs text-slate-400 leading-relaxed">
@@ -75,7 +75,7 @@ export const DynamicProjectsList: React.FC<DynamicProjectsListProps> = ({
             >
               {/* Project Header */}
               <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.06]">
-                <span className="font-mono text-xs font-semibold text-primary tracking-wide">
+                <span className="font-mono text-xs font-medium text-primary tracking-wide">
                   Project #{index + 1}
                 </span>
                 <button

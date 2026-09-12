@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Sparkles, ArrowRight, Compass } from 'lucide-react';
+import { Sparkles, ArrowRight } from 'lucide-react';
 import { RobotCanvas } from '../components/robot/RobotCanvas';
 import { AnimatedCounter } from '../components/ui/AnimatedCounter';
 import { HERO_DATA } from '../data/siteData';
@@ -128,12 +128,6 @@ export const HomePage: React.FC = () => {
               <Link to="/classes">
                 <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.03] hover:bg-white/[0.07] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-all duration-200 backdrop-blur-md active:scale-[0.98]">
                   Explore Classes
-                </button>
-              </Link>
-              <Link to="/blueprint">
-                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 hover:text-white border border-cyan-400/40 font-medium text-xs sm:text-sm transition-all duration-200 backdrop-blur-md active:scale-[0.98] flex items-center gap-1.5 shadow-[0_0_15px_rgba(0,240,255,0.15)]">
-                  <Compass className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>CAD Blueprint</span>
                 </button>
               </Link>
             </div>

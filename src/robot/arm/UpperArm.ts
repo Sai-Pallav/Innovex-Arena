@@ -47,31 +47,53 @@ export function createUpperArm(
   const armatureJointGroup = new THREE.Group();
 
   // ==============================================================
-  // 1. UPPER MOUNTING BRACKET & ROTARY COLLAR INTERFACE
+  // 1. UPPER MOUNTING BRACKET & STRUCTURAL CLEVIS INTERFACE
   // Mates flush with shoulder.upperArmConnector seating flange at y = 0
   // ==============================================================
-  const collarGeo = new THREE.CylinderGeometry(0.040, 0.038, 0.016, 32);
+  // A. Heavy machined titanium top mating flange
+  const collarGeo = new THREE.CylinderGeometry(0.032, 0.031, 0.006, 32);
   const upperCollar = new THREE.Mesh(collarGeo, materials.joint);
   upperCollar.name = 'UpperArmShoulderCollar';
-  upperCollar.position.set(0, -0.008, 0);
+  upperCollar.position.set(0, -0.003, 0);
   upperCollar.castShadow = true;
   upperCollar.receiveShadow = true;
   armatureJointGroup.add(upperCollar);
 
-  // Beveled collar rim trim ring
-  const collarRimGeo = new THREE.TorusGeometry(0.040, 0.0020, 8, 32);
+  // Beveled collar seating rim
+  const collarRimGeo = new THREE.TorusGeometry(0.032, 0.0016, 8, 32);
   const collarRim = new THREE.Mesh(collarRimGeo, materials.joint);
   collarRim.rotation.x = Math.PI / 2;
-  collarRim.position.set(0, -0.002, 0);
+  collarRim.position.set(0, -0.001, 0);
   armatureJointGroup.add(collarRim);
 
-  // 4 M4 structural socket cap screws on upper collar
+  // 4 Precision counterbore recesses receiving the shoulder fork studs
   for (let b = 0; b < 4; b++) {
     const angle = (b / 4) * Math.PI * 2 + Math.PI / 4;
-    const boltGeo = new THREE.CylinderGeometry(0.0020, 0.0020, 0.0040, 6);
-    const bolt = new THREE.Mesh(boltGeo, materials.joint);
-    bolt.position.set(Math.cos(angle) * 0.032, -0.002, Math.sin(angle) * 0.032);
-    armatureJointGroup.add(bolt);
+    const socketGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.0016, 12);
+    const socket = new THREE.Mesh(socketGeo, materials.joint);
+    socket.position.set(Math.cos(angle) * 0.026, -0.0008, Math.sin(angle) * 0.026);
+    armatureJointGroup.add(socket);
+  }
+
+  // B. Spherical trunnion journal neck with concentric reinforcement rib
+  const neckGeo = new THREE.CylinderGeometry(0.032, 0.029, 0.008, 28);
+  const neckMesh = new THREE.Mesh(neckGeo, materials.joint);
+  neckMesh.position.set(0, -0.008, 0);
+  armatureJointGroup.add(neckMesh);
+
+  // Dark nitrile rubber flex seal ring buffering collar interface
+  const neckSealGeo = new THREE.TorusGeometry(0.0305, 0.0018, 8, 28);
+  const neckSeal = new THREE.Mesh(neckSealGeo, materials.joint);
+  neckSeal.rotation.x = Math.PI / 2;
+  neckSeal.position.set(0, -0.010, 0);
+  armatureJointGroup.add(neckSeal);
+
+  // Structural gusset brackets linking neck directly to central spar
+  for (const gSide of [-1, 1]) {
+    const gussetGeo = new THREE.BoxGeometry(0.005, 0.010, 0.016);
+    const gusset = new THREE.Mesh(gussetGeo, materials.joint);
+    gusset.position.set(gSide * 0.012, -0.012, 0);
+    armatureJointGroup.add(gusset);
   }
 
   // ==============================================================
@@ -156,12 +178,12 @@ export function createUpperArm(
   bicepActRod.castShadow = true;
   armatureJointGroup.add(bicepActRod);
 
-  // Anodized Violet Sensor Ring
-  const bicepCollarGeo = new THREE.TorusGeometry(0.0082, 0.0014, 6, 16);
+  // Anodized Violet Sensor Ring recessed flush onto actuator barrel casing
+  const bicepCollarGeo = new THREE.TorusGeometry(0.0079, 0.0010, 6, 16);
   const bicepCollar = new THREE.Mesh(bicepCollarGeo, materials.purpleEmissive);
   bicepCollar.rotation.x = Math.PI / 2;
-  bicepCollar.position.set(-side * 0.025, -0.038, 0.006);
-  upperArmGroup.add(bicepCollar);
+  bicepCollar.position.set(-side * 0.025, -0.046, 0.006);
+  armatureJointGroup.add(bicepCollar);
   ledMeshes.push(bicepCollar);
 
   // B. Posterior Tricep Hydraulic Actuator
@@ -219,37 +241,44 @@ export function createUpperArm(
   // ==============================================================
   const bicepSubGroup = new THREE.Group();
   bicepSubGroup.name = side === -1 ? 'LeftBicepSubGroup' : 'RightBicepSubGroup';
-  bicepSubGroup.position.set(0, -0.082, 0);
+  bicepSubGroup.position.set(0, -0.070, 0);
   upperArmGroup.add(bicepSubGroup);
 
-  // A. Sculpted Anterior Bicep Shield Panel
-  // Covers front arc (phi between -60° and +60°), leaving sides completely open
+  // A. Sculpted Anterior Bicep Shield Panel with Engineered Tapered Crown
+  // Curves upward toward the central mount fork, with angled side chamfers (╱──────╲)
   function createAnteriorBicepShieldGeo(): THREE.BufferGeometry {
     const radialSegs = 20;
     const heightSegs = 22;
-    const length = 0.136; // Stops at y = -0.150, leaving clean 15mm clearance above elbow
+    const length = 0.136;
     const positions: number[] = [];
     const uvs: number[] = [];
     const indices: number[] = [];
 
+    const maxSin = Math.sin(Math.PI * 0.38);
+
     for (let iy = 0; iy <= heightSegs; iy++) {
       const v = iy / heightSegs;
-      const y = 0.068 - v * length;
 
-      // Base radius with slight anatomical bicep swell at v = 0.40
+      // Base radius with anatomical bicep swell
       const baseR = 0.0385 + 0.0040 * Math.sin(v * Math.PI) - 0.0035 * v;
 
       for (let ix = 0; ix <= radialSegs; ix++) {
         const u = ix / radialSegs;
-        // Arc spans from -Math.PI*0.38 to +Math.PI*0.38 (anterior front shield only!)
         const angle = -Math.PI * 0.38 + u * (Math.PI * 0.76);
         const sinA = Math.sin(angle);
         const cosA = Math.cos(angle);
 
+        // Engineered tapered crown: peaks at front center, chamfers down at edges (╱──────╲)
+        const sideRatio = Math.abs(sinA) / maxSin;
+        const crownDrop = 0.0125 * Math.pow(sideRatio, 1.4);
+        const yTop = 0.068 - crownDrop;
+        const yBottom = -0.068;
+        const y = yTop - v * (yTop - yBottom);
+
         let rx = baseR;
         let rz = baseR;
 
-        // Sharp Anterior Longitudinal Specular Ridge Crest (along centerline cosA > 0.6)
+        // Sharp Anterior Longitudinal Specular Ridge Crest
         if (cosA > 0.60) {
           const tRidge = (cosA - 0.60) / 0.40;
           const ridgeHeight = 0.0042 * Math.pow(tRidge, 1.6) * (0.7 + 0.3 * Math.sin(v * Math.PI));
@@ -301,8 +330,7 @@ export function createUpperArm(
   bicepShell.receiveShadow = true;
   bicepSubGroup.add(bicepShell);
 
-  // B. Sculpted Posterior Tricep Armor Panel
-  // Covers posterior arc (cosA < -0.40)
+  // B. Sculpted Posterior Tricep Armor Panel with Tapered Crown
   function createPosteriorTricepPanelGeo(): THREE.BufferGeometry {
     const radialSegs = 18;
     const heightSegs = 20;
@@ -313,15 +341,21 @@ export function createUpperArm(
 
     for (let iy = 0; iy <= heightSegs; iy++) {
       const v = iy / heightSegs;
-      const y = 0.065 - v * length;
+
       const baseR = 0.0375 + 0.0030 * Math.sin(v * Math.PI) - 0.0030 * v;
 
       for (let ix = 0; ix <= radialSegs; ix++) {
         const u = ix / radialSegs;
-        // Arc spans posterior side from Math.PI*0.62 to Math.PI*1.38
         const angle = Math.PI * 0.65 + u * (Math.PI * 0.70);
         const sinA = Math.sin(angle);
         const cosA = Math.cos(angle);
+
+        // Crown chamfer tapering at sides
+        const sideRatio = Math.abs(sinA);
+        const crownDrop = 0.011 * Math.pow(sideRatio, 1.4);
+        const yTop = 0.065 - crownDrop;
+        const yBottom = -0.065;
+        const y = yTop - v * (yTop - yBottom);
 
         const x = baseR * sinA;
         const z = baseR * cosA;

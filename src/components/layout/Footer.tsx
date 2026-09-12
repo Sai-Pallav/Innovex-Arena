@@ -25,7 +25,7 @@ export const Footer: React.FC = () => {
                   <span className="font-rebond font-black text-base tracking-tight text-white">
                     INNOVEX
                   </span>
-                  <span className="font-rebond font-bold text-base tracking-tight cosmic-text-gradient">
+                  <span className="font-rebond font-medium text-base tracking-tight cosmic-text-gradient">
                     ARENA
                   </span>
                 </div>
@@ -71,7 +71,7 @@ export const Footer: React.FC = () => {
 
           {/* Column 2: Company */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-semibold text-xs uppercase tracking-wider text-white">
+            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
               Company
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm text-[#9b96b0]">
@@ -87,7 +87,7 @@ export const Footer: React.FC = () => {
 
           {/* Column 3: Services */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-semibold text-xs uppercase tracking-wider text-white">
+            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
               Services
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm text-[#9b96b0]">
@@ -103,7 +103,7 @@ export const Footer: React.FC = () => {
 
           {/* Column 4: Resources */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-semibold text-xs uppercase tracking-wider text-white">
+            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
               Resources
             </h4>
             <ul className="space-y-2 text-xs sm:text-sm text-[#9b96b0]">
@@ -119,7 +119,7 @@ export const Footer: React.FC = () => {
 
           {/* Column 5: Contact */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-semibold text-xs uppercase tracking-wider text-white">
+            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
               Contact
             </h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#9b96b0]">

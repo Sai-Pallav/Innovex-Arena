@@ -1,12 +1,20 @@
 /**
  * Centralized dimensions, proportions, and mechanical constants for the procedural Robot Torso.
- * Adheres strictly to the Detailed Wireframe Reference Sheet & Critical Refinement Specification:
+ * Adheres strictly to the Master Engineering Reference Blueprint:
  *
- * Mechanical Spine & Articulated Taper Profile:
- * Chest Bottom -> Upper Connector (0.120) -> Segment 01 (0.116) -> Segment 02 (0.106)
- *              -> Segment 03 (0.096) -> Segment 04 (0.088 - NARROWEST WAIST REGION)
- *              -> Lower Connector (0.092) -> Upper Waist Collar (0.098)
- *              -> Waist Core (0.085) -> Lower Waist Collar (0.104) -> Hip Connectors (0.124)
+ * Dimensions (Reference):
+ * - Chest Width: 320 mm (0.320)
+ * - Torso Height: 280 mm (0.280)
+ * - Abdomen Height: 140 mm (0.140)
+ * - Waist Height: 80 mm (0.080)
+ * - Pelvis Width: 260 mm (0.260)
+ * - Torso Depth: 220 mm (0.220)
+ *
+ * 4-Segment Articulated Spine (Consistent cylindrical/central core width):
+ * - Vertebra 01: y = -0.098, w = 0.078
+ * - Vertebra 02: y = -0.124, w = 0.076
+ * - Vertebra 03: y = -0.150, w = 0.074
+ * - Vertebra 04: y = -0.176, w = 0.072
  */
 
 export interface StomachRingSpec {
@@ -21,149 +29,253 @@ export interface StomachRingSpec {
 }
 
 export const TORSO_CONFIG = {
-  // Proportions per Reference Image
+  // Proportions per Reference Blueprint
   proportions: {
-    chestPercent: 0.55,
-    waistPercent: 0.45,
+    chestPercent: 0.52,
+    waistPercent: 0.48,
   },
 
   // Total torso coordinate bounds
   totalHeight: 0.72,
   baseY: 0.12, // Anchor position in RobotRoot
 
-  // Chest Assembly Dimensions (~55% of height)
+  // Chest Assembly Dimensions (360 mm width, 220 mm depth — expanded upper chest)
   chest: {
-    width: 0.38,
-    height: 0.36,
-    depth: 0.23,
-    frontPlateThickness: 0.032,
-    collarRadius: 0.068,
-    collarY: 0.114,
+    width: 0.360,
+    height: 0.310,
+    depth: 0.220,
+    frontPlateThickness: 0.026,
+    collarRadius: 0.072,
+    collarY: 0.148,
     collarZ: 0.008,
-    shoulderMountX: 0.205, // Seats RobotArm pauldron & rotary joint against chest
-    shoulderMountY: 0.065,
-    shoulderMountZ: 0.018,
-    shoulderMountRadius: 0.058,
-    logoWidth: 0.054,
-    logoHeight: 0.062,
+    shoulderMountX: 0.210, // Wider shoulder span matching expanded clavicle
+    shoulderMountY: 0.082,
+    shoulderMountZ: 0.015,
+    shoulderMountRadius: 0.056,
+    logoWidth: 0.050,
+    logoHeight: 0.056,
     logoDepth: 0.006,
   },
 
-  // Abdomen & Stomach Section: Central Mechanical Spine + 5 Articulated Armor Segments
+  // Abdomen & Spine Section: 4 Articulated Vertebral Modules + Bilateral Actuators
   stomach: {
-    height: 0.30,
-    ringCount: 5,
-    internalSpineRadius: 0.034,
-    internalSpineHeight: 0.26,
+    height: 0.140, // 140 mm per blueprint
+    vertebraCount: 4,
+    vertebraY: [-0.058, -0.090, -0.122, -0.154] as const,
+    vertebraWidth: 0.088,
+    vertebraHeight: 0.026,
+    vertebraDepth: 0.052,
+    internalSpineRadius: 0.018,
+    internalSpineHeight: 0.135,
 
     // Upper Connector receiving chest sternal mount
     upperConnector: {
-      widthX: 0.112,
-      depthZ: 0.082,
-      height: 0.016,
-      yOffset: -0.104,
+      widthX: 0.114,
+      depthZ: 0.080,
+      height: 0.014,
+      yOffset: -0.048,
     },
 
-    // 5 Distinct Articulated Abdominal Segments (Progressive Taper, Articulated Joints)
+    // 4 Articulated Vertebrae Specifications (Evenly filling 140 mm abdomen)
     rings: [
-      // Segment 01 (Top): Seated snugly into chest sternal brackets
-      { name: 'segment01', radiusX: 0.116, radiusZ: 0.086, height: 0.022, thickness: 0.016, yOffset: -0.114, frontWidth: 0.138 },
-      // Segment 02: Tucks under Segment 01, reveals mechanical joint in gap
-      { name: 'segment02', radiusX: 0.108, radiusZ: 0.080, height: 0.021, thickness: 0.015, yOffset: -0.136, frontWidth: 0.126 },
-      // Segment 03: Mid athletic contour
-      { name: 'segment03', radiusX: 0.100, radiusZ: 0.075, height: 0.020, thickness: 0.015, yOffset: -0.157, frontWidth: 0.114 },
-      // Segment 04: Lower athletic contour
-      { name: 'segment04', radiusX: 0.092, radiusZ: 0.070, height: 0.019, thickness: 0.014, yOffset: -0.177, frontWidth: 0.102 },
-      // Segment 05: Narrowest athletic segment, transitions directly into waist collar
-      { name: 'segment05', radiusX: 0.085, radiusZ: 0.066, height: 0.018, thickness: 0.014, yOffset: -0.196, frontWidth: 0.092, isNarrowest: true },
+      { name: 'vertebra01', radiusX: 0.048, radiusZ: 0.029, height: 0.026, thickness: 0.012, yOffset: -0.058, frontWidth: 0.096 },
+      { name: 'vertebra02', radiusX: 0.044, radiusZ: 0.028, height: 0.026, thickness: 0.012, yOffset: -0.090, frontWidth: 0.088 },
+      { name: 'vertebra03', radiusX: 0.040, radiusZ: 0.026, height: 0.026, thickness: 0.012, yOffset: -0.122, frontWidth: 0.080 },
+      { name: 'vertebra04', radiusX: 0.036, radiusZ: 0.025, height: 0.026, thickness: 0.012, yOffset: -0.154, frontWidth: 0.072, isNarrowest: true },
     ] as StomachRingSpec[],
+
+    // 4 Tiered Articulated Segmental Armor Plates (Matching media_1789199822492.png & media_1789199822498.png)
+    armorPlates: [
+      { width: 0.104, height: 0.032, depth: 0.015, y: -0.056, z: 0.042 }, // Plate 01: Snug under sub-sternal arch, trapezoidal shield
+      { width: 0.126, height: 0.032, depth: 0.013, y: -0.090, z: 0.042 }, // Plate 02
+      { width: 0.110, height: 0.030, depth: 0.012, y: -0.122, z: 0.040 }, // Plate 03
+      { width: 0.096, height: 0.028, depth: 0.011, y: -0.154, z: 0.038 }, // Plate 04: Waist interface
+    ] as const,
+
+    // Backward compatibility aliases
+    upperArmor: {
+      width: 0.104,
+      height: 0.032,
+      depth: 0.015,
+      y: -0.056,
+      z: 0.042,
+    },
+    lowerArmor: {
+      width: 0.110,
+      height: 0.030,
+      depth: 0.012,
+      y: -0.122,
+      z: 0.040,
+    },
 
     // Lower Connector distributing load into waist
     lowerConnector: {
-      widthX: 0.084,
-      depthZ: 0.066,
+      widthX: 0.080,
+      depthZ: 0.052,
       height: 0.014,
-      yOffset: -0.212,
+      yOffset: -0.194,
     },
     lowerAbdomen: {
-      widthX: 0.084,
-      depthZ: 0.066,
+      widthX: 0.080,
+      depthZ: 0.052,
       height: 0.014,
-      yOffset: -0.212,
+      yOffset: -0.194,
     },
 
-    // Side structural support rails flanking the abdomen
-    sideRails: {
-      bracketX: 0.096,
-      thickness: 0.006,
-      depth: 0.010,
+    // Side Actuator Mounting Coordinates
+    actuator: {
+      upperMount: { x: 0.088, y: -0.018, z: 0.018 },
+      lowerMount: { x: 0.088, y: -0.188, z: 0.012 },
+      upperX: 0.088,
+      upperY: -0.018,
+      upperZ: 0.018,
+      lowerX: 0.088,
+      lowerY: -0.188,
+      lowerZ: 0.012,
+      cylinderRadius: 0.0095,
+      pistonRadius: 0.0058,
+    },
+
+    // Dual Side Actuators per side (Outer angled hydraulic + Inner vertical stabilizer per wireframe reference)
+    dualActuators: {
+      outer: {
+        upperMount: { x: 0.088, y: -0.018, z: 0.018 },
+        lowerMount: { x: 0.088, y: -0.188, z: 0.012 },
+        cylinderRadius: 0.0102,
+        pistonRadius: 0.0055,
+      },
+      inner: {
+        upperMount: { x: 0.052, y: -0.044, z: -0.006 },
+        lowerMount: { x: 0.050, y: -0.188, z: -0.006 },
+        cylinderRadius: 0.0088,
+        pistonRadius: 0.0050,
+      },
+    },
+
+    // Multi-Column Kinematic Actuator & Stabilizer Array (Matching Reference: "WAIST INTERNAL STRUCTURE")
+    actuatorArray: {
+      frontLinear: {
+        upperMount: { x: 0.088, y: -0.018, z: 0.018 },
+        lowerMount: { x: 0.088, y: -0.188, z: 0.012 },
+        cylinderRadius: 0.0102,
+        pistonRadius: 0.0056,
+        powerCoreLength: 0.026,
+      },
+      midStabilizer: {
+        upperMount: { x: 0.076, y: -0.046, z: 0.002 },
+        lowerMount: { x: 0.062, y: -0.190, z: 0.000 },
+        columnRadius: 0.0068,
+        collarRadius: 0.0092,
+      },
+      rearLinear: {
+        upperMount: { x: 0.052, y: -0.044, z: -0.006 },
+        lowerMount: { x: 0.050, y: -0.188, z: -0.006 },
+        cylinderRadius: 0.0088,
+        pistonRadius: 0.0050,
+        powerCoreLength: 0.044,
+      },
+    },
+
+    // Reference Actuator Specifications (Replicating media_1789199822492.png, media_1789199822498.png, media_1789199822501.png)
+    referenceActuators: {
+      outerAngled: {
+        upperMount: { x: 0.106, y: -0.034, z: 0.016 },
+        lowerMount: { x: 0.082, y: -0.192, z: 0.010 },
+        cylinderRadius: 0.0092,
+        pistonRadius: 0.0055,
+        socketRadius: 0.0095,
+        socketHeight: 0.012,
+      },
+      innerGlowing: {
+        upperMount: { x: 0.052, y: -0.046, z: -0.006 },
+        lowerMount: { x: 0.050, y: -0.190, z: -0.006 },
+        cylinderRadius: 0.0084,
+        glowingCoreRadius: 0.0076,
+        glowingCoreLength: 0.042,
+        pistonRadius: 0.0050,
+        socketRadius: 0.0088,
+        socketHeight: 0.012,
+      },
+      segmentedSpine: {
+        discCount: 5,
+        discRadius: 0.029,
+        discHeight: 0.018,
+        damperHeight: 0.006,
+        damperRadius: 0.025,
+        yStart: -0.058,
+        yStep: 0.028,
+      },
     },
   },
 
-  // Compact Mechanical Waist Core (Priority 3)
+  // Rotational Waist Bearing Core (80 mm height per blueprint)
   waist: {
-    height: 0.12,
+    height: 0.080,
     // 1. Primary Upper Waist Collar
     upperWaistRing: {
       radiusX: 0.084,
       radiusZ: 0.065,
       height: 0.014,
-      yOffset: -0.226,
+      yOffset: -0.202,
     },
-    // 2. Compact Central Rotational Core
+    // 2. Rotational Bearing Turntable Core
     waistCore: {
       upperRadius: 0.070,
       lowerRadius: 0.076,
-      height: 0.020,
-      yOffset: -0.244,
-      innerBoreRadius: 0.034,
+      height: 0.022,
+      yOffset: -0.220,
+      innerBoreRadius: 0.032,
     },
     // 3. Lower Waist Collar
     lowerWaistRing: {
       radiusX: 0.086,
       radiusZ: 0.066,
       height: 0.014,
-      yOffset: -0.260,
+      yOffset: -0.236,
     },
-    // 4. Compact Functional Hip Connectors (Priority 4)
+    // 4. Functional Hip Connectors & Pelvis Interface (260 mm pelvis width)
     hipConnector: {
       mountX: 0.096,
-      mountY: -0.268,
+      mountY: -0.250,
       mountZ: 0.004,
       hubRadius: 0.020,
       hubWidth: 0.016,
       accentRingRadius: 0.015,
     },
-    // 5. Waist Hydraulic / Linear Stabilization Actuators
-    actuator: {
-      mountX: 0.058,
-      mountY: -0.222,
-      mountZ: 0.024,
-      targetX: 0.076,
-      targetY: -0.260,
-      targetZ: 0.016,
-      cylinderRadius: 0.0055,
-      pistonRadius: 0.0034,
-    },
 
     // Backward compatibility aliases
-    upperCollarRadius: 0.098,
-    rotationalRingRadius: 0.104,
-    coreRadius: 0.088,
-    pelvisRadius: 0.104,
+    upperCollarRadius: 0.084,
+    rotationalRingRadius: 0.076,
+    coreRadius: 0.070,
+    pelvisRadius: 0.086,
     hipCowlX: 0.124,
     hipCowlY: -0.352,
     hipCowlZ: 0.005,
   },
 
-  // Motion limits for subtle robotic articulation
+  // Motion limits for robotic articulation
   limits: {
-    chestPitch: 0.045, // ±2.5 deg
-    chestYaw: 0.055,   // ±3.1 deg
-    chestRoll: 0.030,  // ±1.7 deg
-    abdomenBend: 0.020,
-    waistPitch: 0.055, // ±3.1 deg
-    waistYaw: 0.075,   // ±4.3 deg
-    waistRoll: 0.040,  // ±2.3 deg
+    chest: {
+      pitchMin: -0.08,
+      pitchMax: 0.14,
+      yawMax: 0.18,
+      rollMax: 0.06,
+    },
+    stomach: {
+      pitchMin: -0.05,
+      pitchMax: 0.08,
+      yawMax: 0.10,
+      rollMax: 0.04,
+    },
+    waist: {
+      pitchMin: -0.06,
+      pitchMax: 0.10,
+      yawMax: 0.22,
+      rollMax: 0.05,
+    },
+    // Controller property aliases
+    waistPitch: 0.10,
+    waistYaw: 0.22,
+    waistRoll: 0.05,
   },
-};
+} as const;

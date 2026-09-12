@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { CyberCard } from '../components/ui/CyberCard';
 import { EventRegistrationDialog } from '../components/modules/EventRegistrationDialog';
 import { EventItem } from '../types';
+import { PageAtmosphere } from '../components/layout/PageAtmosphere';
 
 export const EventsPage: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<string>('All');
@@ -20,12 +21,11 @@ export const EventsPage: React.FC = () => {
 
   return (
     <div className="relative pt-24 pb-16 space-y-16">
-      {/* Background ultraviolet bloom */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[550px] ultraviolet-hero-bloom pointer-events-none -z-10" />
+      <PageAtmosphere />
 
       {/* 1. HERO */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-3 animate-fade-up">
-        <h1 className="font-rebond font-bold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+        <h1 className="font-rebond font-medium text-3xl sm:text-5xl tracking-tight text-white leading-tight">
           Events & <span className="cosmic-text-gradient">Programs</span>
         </h1>
         <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
@@ -40,9 +40,9 @@ export const EventsPage: React.FC = () => {
             <button
               key={tab}
               onClick={() => setActiveFilter(tab)}
-              className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 cursor-pointer ${
+              className={`px-4 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-200 cursor-pointer ${
                 activeFilter === tab
-                  ? 'bg-white/[0.08] text-white font-bold border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
+                  ? 'bg-white/[0.08] text-white font-medium border border-[#9382ff]/50 shadow-[inset_0_-7px_11px_rgba(164,143,255,0.18),0_0_15px_rgba(147,130,255,0.2)]'
                   : 'text-[#9b96b0] border border-transparent hover:text-white hover:bg-white/[0.05]'
               }`}
             >
@@ -55,7 +55,7 @@ export const EventsPage: React.FC = () => {
       {/* 3. UPCOMING EVENTS */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Upcoming <span className="cosmic-text-gradient">Events</span>
           </h2>
           <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
@@ -72,7 +72,7 @@ export const EventsPage: React.FC = () => {
             >
               <div className="flex-1 space-y-4">
                 {/* Title */}
-                <h3 className="font-rebond font-bold text-lg text-white group-hover:text-[#b7a4fb] transition-colors leading-tight">
+                <h3 className="font-rebond font-medium text-lg text-white group-hover:text-[#b7a4fb] transition-colors leading-tight">
                   {evt.title}
                 </h3>
 
@@ -82,7 +82,7 @@ export const EventsPage: React.FC = () => {
                 </p>
 
                 {/* Event Details */}
-                <div className="p-3.5 rounded-[10px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-all duration-300 space-y-2">
+                <div className="p-3.5 rounded-[16px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-all duration-300 space-y-2">
                   <div className="flex items-center gap-2 text-xs text-white font-medium">
                     <Calendar className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
                     <span>{evt.date}</span>
@@ -131,7 +131,7 @@ export const EventsPage: React.FC = () => {
       {/* 4. PAST EVENTS */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Past <span className="cosmic-text-gradient">Events</span>
           </h2>
           <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
@@ -144,12 +144,12 @@ export const EventsPage: React.FC = () => {
             <CyberCard key={i} glow="purple" className="p-5">
               <div className="space-y-3">
                 {/* Title */}
-                <h3 className="font-rebond text-base font-semibold text-white leading-tight">
+                <h3 className="font-rebond text-base font-medium text-white leading-tight">
                   {evt.title}
                 </h3>
 
                 {/* Event Info */}
-                <div className="p-3 rounded-[10px] bg-white/[0.03] border border-white/[0.08] space-y-2 text-xs text-[#9b96b0]">
+                <div className="p-3 rounded-[16px] bg-white/[0.03] border border-white/[0.08] space-y-2 text-xs text-[#9b96b0]">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
                     <span className="text-[#f4f0ff]">{evt.date}</span>
@@ -175,7 +175,7 @@ export const EventsPage: React.FC = () => {
           <div className="aurora-divider-line absolute top-0 left-0 right-0" />
           <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
 
-          <h2 className="font-rebond font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Want to <span className="cosmic-text-gradient">Host an Event?</span>
           </h2>
           <p className="text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">

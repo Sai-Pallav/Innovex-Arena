@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GALLERY_ITEMS } from '../data/siteData';
 import { GalleryItem } from '../types';
+import { PageAtmosphere } from '../components/layout/PageAtmosphere';
 
 export const GalleryPage: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('All');
@@ -30,12 +31,11 @@ export const GalleryPage: React.FC = () => {
 
   return (
     <div className="relative pt-28 pb-24 space-y-16">
-      {/* Background Hero Bloom */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 ultraviolet-hero-bloom pointer-events-none" />
+      <PageAtmosphere />
 
       {/* 1. HERO */}
       <section className="relative px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
-        <h1 className="font-rebond font-extrabold text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
+        <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
           Our <span className="cosmic-text-gradient">Gallery</span>
         </h1>
         <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
@@ -52,7 +52,7 @@ export const GalleryPage: React.FC = () => {
               onClick={() => setActiveCategory(cat)}
               className={`px-5 py-2 rounded-full text-xs font-medium tracking-wide transition-all duration-300 cursor-pointer ${
                 activeCategory === cat
-                  ? 'bg-[#713dff] text-white font-semibold shadow-[0_0_20px_rgba(113,61,255,0.4)] border border-[#b7a4fb]/40'
+                  ? 'bg-[#713dff] text-white font-medium shadow-[0_0_20px_rgba(113,61,255,0.4)] border border-[#b7a4fb]/40'
                   : 'text-[#9b96b0] hover:text-white hover:bg-white/[0.06]'
               }`}
             >
@@ -81,12 +81,12 @@ export const GalleryPage: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#0a0118] via-[#0a0118]/40 to-transparent opacity-85 group-hover:opacity-95 transition-opacity" />
                 <div className="absolute top-3.5 right-3.5">
-                  <span className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#0a0118]/80 border border-white/[0.15] text-[#ba9cff] backdrop-blur-md shadow-[0_0_12px_rgba(113,61,255,0.25)]">
+                  <span className="px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider bg-[#0a0118]/80 border border-white/[0.15] text-[#ba9cff] backdrop-blur-md shadow-[0_0_12px_rgba(113,61,255,0.25)]">
                     {item.category}
                   </span>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1.5">
-                  <h3 className="font-rebond font-bold text-base text-white group-hover:text-[#ba9cff] transition-colors">
+                  <h3 className="font-rebond font-medium text-base text-white group-hover:text-[#ba9cff] transition-colors">
                     {item.title}
                   </h3>
                   <p className="text-xs text-[#9b96b0] line-clamp-2">
@@ -126,25 +126,25 @@ export const GalleryPage: React.FC = () => {
 
             <div className="p-6 sm:p-7 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-[#713dff]/20 text-[#ba9cff] border border-[#713dff]/40">
+                <span className="px-3 py-1 rounded-full text-[10px] font-medium uppercase tracking-wider bg-[#713dff]/20 text-[#ba9cff] border border-[#713dff]/40">
                   {selectedItem.category}
                 </span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handlePrev}
-                    className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.15] text-slate-300 hover:text-white border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.15] text-[#f4f0ff] hover:text-white border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
                     onClick={handleNext}
-                    className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.15] text-slate-300 hover:text-white border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
+                    className="w-8 h-8 rounded-full bg-white/[0.06] hover:bg-white/[0.15] text-[#f4f0ff] hover:text-white border border-white/[0.1] flex items-center justify-center transition-all cursor-pointer"
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
-              <h2 className="font-rebond font-bold text-xl sm:text-2xl text-white">
+              <h2 className="font-rebond font-medium text-xl sm:text-2xl text-white">
                 {selectedItem.title}
               </h2>
               <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">

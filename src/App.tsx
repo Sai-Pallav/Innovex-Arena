@@ -18,7 +18,6 @@ import { ContactPage } from './pages/ContactPage';
 import { AdminLoginPage } from './pages/AdminLoginPage';
 import { GalleryPage } from './pages/GalleryPage';
 import { BlogPage } from './pages/BlogPage';
-import { BlueprintPage } from './pages/BlueprintPage';
 
 // Scroll to top or target hash upon route change
 const ScrollToTop: React.FC = () => {
@@ -76,7 +75,6 @@ export const App: React.FC = () => {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/blog" element={<BlogPage />} />
-              <Route path="/blueprint" element={<BlueprintPage />} />
               <Route path="/admin/login" element={<AdminLoginPage />} />
               {/* Fallback wildcard */}
               <Route path="*" element={<HomePage />} />

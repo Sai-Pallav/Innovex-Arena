@@ -23,7 +23,7 @@ import { Textarea } from '../components/ui/Textarea';
 import { DynamicProjectsList } from '../components/modules/DynamicProjectsList';
 import { JobApplicationFormData } from '../types';
 import { useToast } from '../components/ui/Toast';
-
+import { PageAtmosphere } from '../components/layout/PageAtmosphere';
 export const CareersPage: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>(JOB_POSITIONS[0]?.title || 'Backend Developer (Node.js)');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -107,12 +107,11 @@ export const CareersPage: React.FC = () => {
 
   return (
     <div className="relative pt-24 pb-16 space-y-20">
-      {/* Background ultraviolet bloom */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[550px] ultraviolet-hero-bloom pointer-events-none -z-10" />
+      <PageAtmosphere />
 
       {/* 1. HERO */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-3 animate-fade-up">
-        <h1 className="font-rebond font-bold text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+        <h1 className="font-rebond font-medium text-3xl sm:text-5xl tracking-tight text-white leading-tight">
           Join <span className="cosmic-text-gradient">Innovex Arena</span>
         </h1>
         <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
@@ -123,7 +122,7 @@ export const CareersPage: React.FC = () => {
       {/* 2. WHY JOIN US? */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Why <span className="cosmic-text-gradient">Join Us?</span>
           </h2>
           <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
@@ -135,11 +134,11 @@ export const CareersPage: React.FC = () => {
           {CAREER_PERKS.map((perk, i) => (
             <CyberCard key={i} glow="cyan" className="p-5 group">
               <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_15px_rgba(147,130,255,0.25)] transition-all">
+                <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_15px_rgba(147,130,255,0.25)] transition-all">
                   {getPerkIcon(perk.iconName)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-rebond text-base font-semibold text-white mb-1.5">
+                  <h3 className="font-rebond text-base font-medium text-white mb-1.5">
                     {perk.title}
                   </h3>
                   <p className="text-xs text-[#9b96b0] leading-relaxed">
@@ -155,7 +154,7 @@ export const CareersPage: React.FC = () => {
       {/* 3. OPEN POSITIONS */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Open <span className="cosmic-text-gradient">Positions</span>
           </h2>
           <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
@@ -170,7 +169,7 @@ export const CareersPage: React.FC = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-white/[0.06]">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-rebond text-lg sm:text-xl font-bold text-white mb-2">
+                    <h3 className="font-rebond text-lg sm:text-xl font-medium text-white mb-2">
                       {role.title}
                     </h3>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[#9b96b0]">
@@ -211,7 +210,7 @@ export const CareersPage: React.FC = () => {
                 {/* Requirements & Responsibilities */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
                   <div>
-                    <h4 className="font-rebond font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
+                    <h4 className="font-rebond font-medium text-white uppercase tracking-wider text-[11px] mb-3">
                       Requirements
                     </h4>
                     <ul className="space-y-2">
@@ -224,7 +223,7 @@ export const CareersPage: React.FC = () => {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-rebond font-semibold text-white uppercase tracking-wider text-[11px] mb-3">
+                    <h4 className="font-rebond font-medium text-white uppercase tracking-wider text-[11px] mb-3">
                       Responsibilities
                     </h4>
                     <ul className="space-y-2">
@@ -246,7 +245,7 @@ export const CareersPage: React.FC = () => {
       {/* 4. APPLICATION FORM */}
       <section id="apply-form" className="px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Apply for a <span className="cosmic-text-gradient">Position</span>
           </h2>
           <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
@@ -284,8 +283,8 @@ export const CareersPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] block">
-                  Position <span className="text-[#b7a4fb] font-bold">*</span>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#9b96b0] block">
+                  Position <span className="text-[#b7a4fb] font-medium">*</span>
                 </label>
                 <select
                   value={formData.position}
@@ -311,8 +310,8 @@ export const CareersPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, college: e.target.value })}
               />
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] block">
-                  Year of Study <span className="text-[#b7a4fb] font-bold">*</span>
+                <label className="text-xs font-medium uppercase tracking-wider text-[#9b96b0] block">
+                  Year of Study <span className="text-[#b7a4fb] font-medium">*</span>
                 </label>
                 <select
                   value={formData.yearOfStudy}
@@ -330,7 +329,7 @@ export const CareersPage: React.FC = () => {
 
             {/* Profile Links */}
             <div className="space-y-4 pt-3 border-t border-white/[0.06]">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <h4 className="text-xs font-medium uppercase tracking-wider text-[#f4f0ff]">
                 Profile Links
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

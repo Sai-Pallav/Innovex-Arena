@@ -123,8 +123,10 @@ export function createProceduralRobot(): RobotNodes {
   // Poised athletic humanoid arm posture matching reference figure
   leftArm.shoulder.group.rotation.set(0.01, 0.02, -0.03);
   rightArm.shoulder.group.rotation.set(0.01, -0.02, 0.03);
-  leftArm.upperArm.group.rotation.set(-0.10, 0.04, -0.07);
-  rightArm.upperArm.group.rotation.set(-0.10, -0.04, 0.07);
+  leftArm.shoulder.jointGroup.rotation.x = -0.10;
+  rightArm.shoulder.jointGroup.rotation.x = -0.10;
+  leftArm.upperArm.group.rotation.set(0, 0.04, -0.07);
+  rightArm.upperArm.group.rotation.set(0, -0.04, 0.07);
   leftArm.elbow.group.rotation.set(0, 0, 0);
   rightArm.elbow.group.rotation.set(0, 0, 0);
   leftArm.elbow.forearmPivot.rotation.set(-0.48, 0.08, 0.04);

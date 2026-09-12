@@ -4,6 +4,7 @@ import { Shield, Eye, EyeOff, Lock, ArrowLeft } from 'lucide-react';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useToast } from '../components/ui/Toast';
+import { PageAtmosphere } from '../components/layout/PageAtmosphere';
 
 export const AdminLoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -33,13 +34,12 @@ export const AdminLoginPage: React.FC = () => {
 
   return (
     <div className="relative min-h-[85vh] flex items-center justify-center px-4 pt-24 pb-16">
-      {/* Background Hero Bloom */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-3xl h-96 ultraviolet-hero-bloom pointer-events-none" />
+      <PageAtmosphere />
 
       <div className="w-full max-w-md space-y-5 animate-fade-up relative z-10">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#9b96b0] hover:text-[#ba9cff] transition-colors group"
+          className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-[#9b96b0] hover:text-[#ba9cff] transition-colors group"
         >
           <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" /> Back to Home
         </Link>
@@ -56,7 +56,7 @@ export const AdminLoginPage: React.FC = () => {
             <div className="w-12 h-12 mx-auto rounded-full bg-[#713dff]/15 border border-[#713dff]/30 flex items-center justify-center text-[#ba9cff] mb-2 shadow-[0_0_20px_rgba(113,61,255,0.3)]">
               <Shield className="w-5 h-5" />
             </div>
-            <h2 className="font-rebond font-bold text-xl sm:text-2xl text-white tracking-tight">
+            <h2 className="font-rebond font-medium text-xl sm:text-2xl text-white tracking-tight">
               {isModeSignUp ? 'Request Admin Access' : 'Admin Sign In'}
             </h2>
             <p className="text-xs text-[#9b96b0] leading-relaxed max-w-xs mx-auto">
@@ -117,7 +117,7 @@ export const AdminLoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModeSignUp(false)}
-                  className="text-[#ba9cff] hover:text-[#e59cff] hover:underline font-semibold cursor-pointer ml-1"
+                  className="text-[#ba9cff] hover:text-[#e59cff] hover:underline font-medium cursor-pointer ml-1"
                 >
                   Sign In
                 </button>
@@ -128,7 +128,7 @@ export const AdminLoginPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModeSignUp(true)}
-                  className="text-[#ba9cff] hover:text-[#e59cff] hover:underline font-semibold cursor-pointer ml-1"
+                  className="text-[#ba9cff] hover:text-[#e59cff] hover:underline font-medium cursor-pointer ml-1"
                 >
                   Request Access
                 </button>
