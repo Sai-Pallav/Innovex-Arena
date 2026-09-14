@@ -54,7 +54,7 @@ export const App: React.FC = () => {
     <ToastProvider>
       <Router>
         <ScrollToTop />
-        <div className="relative min-h-screen flex flex-col bg-background text-foreground overflow-x-hidden">
+        <div className="relative min-h-screen flex flex-col bg-background text-foreground">
           {/* Ambient Cyber Background Mesh */}
           <BackgroundGlow />
 

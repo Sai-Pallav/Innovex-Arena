@@ -103,14 +103,16 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   shape.bezierCurveTo(-0.124, 0.185, -0.152, 0.172, -0.172, 0.156);
   // Upper pectoral outer contour
   shape.quadraticCurveTo(-0.188, 0.118, -0.178, 0.072);
-  // Outer flank sweeps smoothly down and arches cleanly into the lower substernal contour
-  shape.bezierCurveTo(-0.165, 0.025, -0.140, -0.010, -0.105, -0.018);
-  shape.bezierCurveTo(-0.085, -0.0215, -0.070, -0.0215, -0.050, -0.0215);
-  // Central sternal contour framing Plate 01 with exact equal 10mm gap
-  shape.lineTo(0, -0.0215);
-  shape.lineTo(0.050, -0.0215);
-  shape.bezierCurveTo(0.070, -0.0215, 0.085, -0.0215, 0.105, -0.018);
-  shape.bezierCurveTo(0.140, -0.010, 0.165, 0.025, 0.178, 0.072);
+  // Outer flank sweeps smoothly down and arches cleanly into the engineered sub-costal arch
+  shape.bezierCurveTo(-0.165, 0.028, -0.138, 0.006, -0.100, -0.001);
+  shape.bezierCurveTo(-0.076, -0.003, -0.050, -0.003, -0.028, -0.002);
+  // Sculpted central sub-xiphoid notch framing the transition frame & Vertebra 01 interlocking crest
+  shape.lineTo(-0.014, 0.000);
+  shape.lineTo(0, 0.002);
+  shape.lineTo(0.014, 0.000);
+  shape.lineTo(0.028, -0.002);
+  shape.bezierCurveTo(0.050, -0.003, 0.076, -0.003, 0.100, -0.001);
+  shape.bezierCurveTo(0.138, 0.006, 0.165, 0.028, 0.178, 0.072);
   shape.quadraticCurveTo(0.188, 0.118, 0.172, 0.156);
   shape.bezierCurveTo(0.152, 0.172, 0.124, 0.185, 0.088, 0.190);
   shape.bezierCurveTo(0.054, 0.185, 0.024, 0.180, 0, 0.178);
@@ -366,11 +368,11 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const ledMeshes: THREE.Mesh[] = [];
   const frameJointGroup = new THREE.Group();
 
-  // Central dark spinal column inside chest — taller to match expanded chest
-  const spineGeo = new THREE.CylinderGeometry(0.064, 0.055, 0.270, 24);
+  // Central dark spinal column inside chest — sized to terminate cleanly at the sub-sternal chassis bulkhead
+  const spineGeo = new THREE.CylinderGeometry(0.064, 0.052, 0.180, 24);
   const frameSpine = new THREE.Mesh(spineGeo, materials.joint);
   frameSpine.name = 'ChestFrameSpine';
-  frameSpine.position.set(0, -0.037, -0.020);
+  frameSpine.position.set(0, 0.032, -0.020);
   frameSpine.scale.set(1.08, 1.0, 0.88);
   frameSpine.castShadow = true;
   frameSpine.receiveShadow = true;
@@ -499,87 +501,127 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   ledMeshes.push(backLightBar);
 
   // ==============================================================
-  // LOWER CHEST FRAME (Reference: "LOWER CHEST FRAME")
+  // LOWER CHEST FRAME — SUB-STERNAL TRANSITION GIRDLE & GIMBAL BRIDGE
   // ==============================================================
   const lowerFrame = new THREE.Group();
   lowerFrame.name = 'LowerChestFrame';
   group.add(lowerFrame);
 
   const tempLower = new THREE.Group();
+  const tempMetallic = new THREE.Group();
 
-  // 1. Sub-Sternal Structural Lip (conforms directly to the chest lower contour)
-  const lipShape = new THREE.Shape();
-  lipShape.moveTo(-0.060, 0.008);
-  lipShape.lineTo(0.060, 0.008);
-  lipShape.quadraticCurveTo(0.052, -0.008, 0.044, -0.014);
-  lipShape.lineTo(-0.044, -0.014);
-  lipShape.quadraticCurveTo(-0.052, -0.008, -0.060, 0.008);
-  lipShape.closePath();
+  // 1. Sub-Sternal Structural Girdle (Dark Titanium)
+  // Engineered sub-costal arch frame that:
+  // - Precisely cradles the upper abdominal transition module (Vertebra 01, width 0.148)
+  // - Bridges smoothly to the bilateral actuator clevises at x = ±0.118
+  // - Houses a central docking receiver collar for the spine knuckle
+  // - Eliminates excessive empty gap and floating plates
+  const archFrameShape = new THREE.Shape();
+  archFrameShape.moveTo(0, -0.014);
+  archFrameShape.lineTo(0.074, -0.014);
+  archFrameShape.bezierCurveTo(0.088, -0.012, 0.102, -0.004, 0.118, 0.010);
+  archFrameShape.lineTo(0.118, 0.022);
+  archFrameShape.lineTo(-0.118, 0.022);
+  archFrameShape.lineTo(-0.118, 0.010);
+  archFrameShape.bezierCurveTo(-0.102, -0.004, -0.088, -0.012, -0.074, -0.014);
+  archFrameShape.closePath();
 
-  const lipGeo = new THREE.ExtrudeGeometry(lipShape, {
-    depth: 0.024,
+  const archFrameGeo = new THREE.ExtrudeGeometry(archFrameShape, {
+    depth: 0.032,
     bevelEnabled: true,
-    bevelThickness: 0.002,
-    bevelSize: 0.002,
-    bevelSegments: 2,
+    bevelThickness: 0.0028,
+    bevelSize: 0.0024,
+    bevelSegments: 3,
   });
-  lipGeo.center();
+  archFrameGeo.center();
 
-  const chassisLip = new THREE.Mesh(lipGeo, materials.joint);
-  chassisLip.name = 'SubSternalChassisLip';
-  chassisLip.position.set(0, -0.075, -0.006);
-  chassisLip.rotation.x = -0.04;
-  tempLower.add(chassisLip);
+  const chassisGirdle = new THREE.Mesh(archFrameGeo, materials.joint);
+  chassisGirdle.name = 'SubSternalChassisGirdle';
+  chassisGirdle.position.set(0, -0.066, 0.018);
+  chassisGirdle.rotation.x = -0.04;
+  tempLower.add(chassisGirdle);
 
-  // 2. Central Structural Frame (trapezoidal core housing)
-  const coreHousingGeo = new THREE.CylinderGeometry(0.050, 0.044, 0.018, 32);
-  const coreHousing = new THREE.Mesh(coreHousingGeo, materials.joint);
-  coreHousing.scale.set(1.10, 1.0, 0.84);
-  coreHousing.position.set(0, -0.086, 0.002);
-  tempLower.add(coreHousing);
-
-  // 3. Bilateral Diagonal Support Struts (Reference: "LOWER CHEST FRAME")
+  // 2. Sub-Costal Structural Mounting Shoulders & Gussets (Section 4 & 7)
+  // Carries structural load from the chest armor flanks into the central spine
   for (const side of [-1, 1] as const) {
-    const strutGeo = new THREE.CylinderGeometry(0.0040, 0.0040, 0.034, 14);
-    const strut = new THREE.Mesh(strutGeo, materials.joint);
-    strut.position.set(side * 0.036, -0.082, 0.016);
-    strut.rotation.z = side * 0.28;
-    strut.rotation.x = -0.16;
-    tempLower.add(strut);
+    const shoulderGeo = new THREE.BoxGeometry(0.028, 0.016, 0.020);
+    const shoulder = new THREE.Mesh(shoulderGeo, materials.joint);
+    shoulder.position.set(side * 0.082, -0.062, 0.024);
+    shoulder.rotation.z = -side * 0.15;
+    tempLower.add(shoulder);
+
+    // Precision CNC metallic clamping brackets with twin cap screws
+    const bracketGeo = new THREE.BoxGeometry(0.010, 0.014, 0.012);
+    const bracket = new THREE.Mesh(bracketGeo, materials.metallic);
+    bracket.position.set(side * 0.076, -0.063, 0.034);
+    bracket.rotation.y = -side * 0.12;
+    tempMetallic.add(bracket);
+
+    for (const bOff of [-0.0035, 0.0035]) {
+      const boltGeo = new THREE.CylinderGeometry(0.0016, 0.0016, 0.003, 6);
+      const bolt = new THREE.Mesh(boltGeo, materials.joint);
+      bolt.rotation.x = Math.PI / 2;
+      bolt.position.set(side * 0.076, -0.063 + bOff, 0.040);
+      tempLower.add(bolt);
+    }
   }
 
-  // 4. Actuator Array Upper Mounting Clevis Blocks & Pins per side (Outer & Inner)
-  for (const side of [-1, 1] as const) {
-    // 1. Outer angled actuator upper clevis (tucked inside chest flank)
-    const fClevisGeo = new THREE.BoxGeometry(0.014, 0.016, 0.016);
-    const fClevis = new THREE.Mesh(fClevisGeo, materials.joint);
-    fClevis.position.set(side * 0.112, -0.066, 0.016);
-    tempLower.add(fClevis);
+  // 3. Central Sub-Xiphoid Status LED nestled in the xiphoid notch
+  const xiphoidLedGeo = new THREE.BoxGeometry(0.0032, 0.007, 0.004);
+  const xiphoidLed = new THREE.Mesh(xiphoidLedGeo, materials.purpleEmissive);
+  xiphoidLed.name = 'SubXiphoidStatusLed';
+  xiphoidLed.position.set(0, -0.066, 0.046);
+  lowerFrame.add(xiphoidLed);
+  ledMeshes.push(xiphoidLed);
 
-    const fPinGeo = new THREE.CylinderGeometry(0.0032, 0.0032, 0.018, 12);
-    const fPin = new THREE.Mesh(fPinGeo, materials.joint);
-    fPin.rotation.z = Math.PI / 2;
-    fPin.position.set(side * 0.112, -0.066, 0.016);
-    tempLower.add(fPin);
+  // 4. Central Structural Backbone Keel (Section 9)
+  const keelGeo = new THREE.BoxGeometry(0.046, 0.034, 0.050);
+  const centralKeel = new THREE.Mesh(keelGeo, materials.joint);
+  centralKeel.position.set(0, -0.072, 0.006);
+  tempLower.add(centralKeel);
 
-    // 2. Inner vertical actuator upper clevis
-    const rClevisGeo = new THREE.BoxGeometry(0.012, 0.014, 0.014);
-    const rClevis = new THREE.Mesh(rClevisGeo, materials.joint);
-    rClevis.position.set(side * 0.052, -0.078, -0.006);
-    tempLower.add(rClevis);
-
-    const rPinGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.016, 12);
-    const rPin = new THREE.Mesh(rPinGeo, materials.joint);
-    rPin.rotation.z = Math.PI / 2;
-    rPin.position.set(side * 0.052, -0.078, -0.006);
-    tempLower.add(rPin);
-  }
-
-  // 5. Central Vertebral Gimbal Socket linking directly into vertebra 01
-  const socketGeo = new THREE.CylinderGeometry(0.032, 0.028, 0.014, 28);
+  // 5. Central Vertebral Gimbal Yoke Housing (Receives SpineUpperMount)
+  const socketGeo = new THREE.CylinderGeometry(0.038, 0.034, 0.018, 32);
   const socket = new THREE.Mesh(socketGeo, materials.joint);
-  socket.position.set(0, -0.086, -0.002);
+  socket.position.set(0, -0.076, 0.008);
   tempLower.add(socket);
+
+  // Stepped internal bearing race inside the gimbal housing
+  const bearingRaceGeo = new THREE.CylinderGeometry(0.031, 0.031, 0.006, 28);
+  const bearingRace = new THREE.Mesh(bearingRaceGeo, materials.metallic);
+  bearingRace.position.set(0, -0.080, 0.008);
+  tempMetallic.add(bearingRace);
+
+  // 6. Bilateral Actuator Clevis Housings with Angled Reinforcement Spars
+  for (const side of [-1, 1] as const) {
+    const clevisGeo = new THREE.BoxGeometry(0.022, 0.024, 0.024);
+    const clevis = new THREE.Mesh(clevisGeo, materials.joint);
+    clevis.position.set(side * 0.118, -0.066, 0.024);
+    clevis.rotation.z = side * 0.28;
+    tempLower.add(clevis);
+
+    // Hardened pivot pin with hex fastener head
+    const pinGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.028, 16);
+    const pin = new THREE.Mesh(pinGeo, materials.metallic);
+    pin.rotation.z = Math.PI / 2;
+    pin.position.set(side * 0.118, -0.066, 0.024);
+    tempMetallic.add(pin);
+
+    for (const pHeadSide of [-1, 1] as const) {
+      const headGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0028, 6);
+      const pinHead = new THREE.Mesh(headGeo, materials.joint);
+      pinHead.rotation.z = Math.PI / 2;
+      pinHead.position.set(side * 0.118 + pHeadSide * 0.014, -0.066, 0.024);
+      tempLower.add(pinHead);
+    }
+
+    // Angled sub-costal reinforcement truss spar linking clevis upward into chest frame
+    const sparGeo = new THREE.BoxGeometry(0.036, 0.012, 0.016);
+    const spar = new THREE.Mesh(sparGeo, materials.joint);
+    spar.position.set(side * 0.088, -0.058, 0.020);
+    spar.rotation.z = -side * 0.20;
+    tempLower.add(spar);
+  }
 
   const mergedLower = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerChestFrame_Merged')!;
   tempLower.traverse((child) => {
@@ -589,14 +631,32 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   });
   lowerFrame.add(mergedLower);
 
-  // Purple Emissive Accent Ring recessed inside the lower frame collar
-  const lowerAccentGeo = new THREE.TorusGeometry(0.042, 0.0012, 6, 32);
+  const mergedMetallic = mergeGroupMeshesByMaterial(tempMetallic, materials.metallic, 'LowerChestMetallic_Merged', false);
+  if (mergedMetallic) {
+    tempMetallic.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+        (child as THREE.Mesh).geometry.dispose();
+      }
+    });
+    lowerFrame.add(mergedMetallic);
+  }
+
+  // Purple Emissive Accent Ring recessed inside the lower gimbal housing
+  const lowerAccentGeo = new THREE.TorusGeometry(0.034, 0.0016, 8, 32);
   const lowerAccentRing = new THREE.Mesh(lowerAccentGeo, materials.purpleEmissive);
   lowerAccentRing.rotation.x = Math.PI / 2;
-  lowerAccentRing.position.set(0, -0.082, 0.002);
-  lowerAccentRing.scale.set(1.08, 0.86, 1.0);
+  lowerAccentRing.position.set(0, -0.080, 0.008);
   lowerFrame.add(lowerAccentRing);
   ledMeshes.push(lowerAccentRing);
+
+  // Lateral optical indicators on clevis mounts
+  for (const side of [-1, 1] as const) {
+    const indGeo = new THREE.BoxGeometry(0.0024, 0.008, 0.003);
+    const ind = new THREE.Mesh(indGeo, materials.purpleEmissive);
+    ind.position.set(side * 0.128, -0.066, 0.024);
+    lowerFrame.add(ind);
+    ledMeshes.push(ind);
+  }
 
   return {
     group,
@@ -614,7 +674,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   };
 }
 
-// ─── 7. SHOULDER CONNECTION SOCKET ──────────────────────────────────────────
+// ─── 7. SHOULDER / UPPER TORSO GIRDLE ───────────────────────────────────────
 export function createShoulderMount(
   side: -1 | 1,
   materials: RobotMaterialPalette
@@ -629,58 +689,78 @@ export function createShoulderMount(
 
   const ledMeshes: THREE.Mesh[] = [];
 
-  // A. Structural Clavicle Socket Housing (anchored high near upper clavicle frame)
-  const housingGeo = new THREE.CylinderGeometry(0.024, 0.026, 0.018, 28);
+  // A. Intermediate Transverse Clavicle Girder (Ties shoulder into chest keel)
+  const girderLen = 0.064;
+  const girderGeo = new THREE.BoxGeometry(girderLen, 0.024, 0.024);
+  const girder = new THREE.Mesh(girderGeo, materials.joint);
+  girder.position.set(-side * (girderLen * 0.5), 0, 0);
+  girder.castShadow = true;
+  girder.receiveShadow = true;
+  group.add(girder);
+
+  // Weight-reduction cutouts along the girder
+  for (let c = 0; c < 2; c++) {
+    const cutoutGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.026, 16);
+    const cutoutRim = new THREE.Mesh(cutoutGeo, materials.metallic);
+    cutoutRim.position.set(-side * (0.018 + c * 0.022), 0, 0);
+    group.add(cutoutRim);
+  }
+
+  // B. Precision Rotary Trunnion Bearing Housing
+  const housingRadius = 0.028;
+  const housingGeo = new THREE.CylinderGeometry(housingRadius, housingRadius * 1.05, 0.024, 32);
   const socketHousing = new THREE.Mesh(housingGeo, materials.joint);
   socketHousing.rotation.z = Math.PI / 2;
-  socketHousing.position.set(-side * 0.014, 0.018, 0);
+  socketHousing.position.set(-side * 0.010, 0, 0);
   socketHousing.castShadow = true;
   socketHousing.receiveShadow = true;
   group.add(socketHousing);
 
-  // B. Hollow Clavicle Bearing Cup Sleeve (receives shoulder trunnion collar)
-  const trunnionGeo = new THREE.CylinderGeometry(0.026, 0.024, 0.012, 28);
-  const rotaryTrunnion = new THREE.Mesh(trunnionGeo, materials.joint);
+  // C. Stepped Bearing Retainer Collar
+  const trunnionGeo = new THREE.CylinderGeometry(housingRadius * 0.92, housingRadius * 0.92, 0.014, 32);
+  const rotaryTrunnion = new THREE.Mesh(trunnionGeo, materials.metallic);
   rotaryTrunnion.rotation.z = Math.PI / 2;
-  rotaryTrunnion.position.set(-side * 0.008, 0.018, 0);
+  rotaryTrunnion.position.set(-side * 0.004, 0, 0);
   rotaryTrunnion.castShadow = true;
   rotaryTrunnion.receiveShadow = true;
   group.add(rotaryTrunnion);
 
-  // C. Stepped Lavender / Metallic Purple Shoulder Neck Sleeve (Matching Reference Image 2)
-  const sleeveGeo = new THREE.CylinderGeometry(0.020, 0.022, 0.012, 28);
+  // D. Purple Accent Indicator Sleeve inside the shoulder trunnion bore
+  const sleeveGeo = new THREE.CylinderGeometry(housingRadius * 0.78, housingRadius * 0.78, 0.012, 28);
   const purpleNeckSleeve = new THREE.Mesh(sleeveGeo, materials.purpleEmissive);
   purpleNeckSleeve.name = side === -1 ? 'ShoulderPurpleNeckSleeve_Left' : 'ShoulderPurpleNeckSleeve_Right';
   purpleNeckSleeve.rotation.z = Math.PI / 2;
-  purpleNeckSleeve.position.set(-side * 0.002, 0.018, 0);
-  purpleNeckSleeve.castShadow = true;
-  purpleNeckSleeve.receiveShadow = true;
+  purpleNeckSleeve.position.set(-side * 0.001, 0, 0);
   group.add(purpleNeckSleeve);
   ledMeshes.push(purpleNeckSleeve);
 
-  // Stepped accent ring on lavender sleeve
-  const sleeveRingGeo = new THREE.TorusGeometry(0.022, 0.0014, 8, 28);
+  // Concentric metallic highlight ring
+  const sleeveRingGeo = new THREE.TorusGeometry(housingRadius * 0.82, 0.0014, 8, 28);
   const sleeveRing = new THREE.Mesh(sleeveRingGeo, materials.metallic);
   sleeveRing.rotation.y = Math.PI / 2;
-  sleeveRing.position.set(-side * 0.004, 0.018, 0);
+  sleeveRing.position.set(-side * 0.002, 0, 0);
   group.add(sleeveRing);
 
-  // 6 Perimeter Clavicle Fasteners securing socket cup to chest frame
-  for (let b = 0; b < 6; b++) {
-    const angle = (b / 6) * Math.PI * 2;
-    const boltGeo = new THREE.CylinderGeometry(0.0015, 0.0015, 0.0025, 6);
+  // 8 Perimeter Socket Flange Fasteners
+  for (let b = 0; b < 8; b++) {
+    const angle = (b / 8) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0016, 0.0016, 0.003, 6);
     const bolt = new THREE.Mesh(boltGeo, materials.joint);
     bolt.rotation.z = Math.PI / 2;
-    bolt.position.set(-side * 0.014, 0.018 + Math.sin(angle) * 0.022, Math.cos(angle) * 0.022);
+    bolt.position.set(
+      -side * 0.012,
+      Math.sin(angle) * (housingRadius * 0.88),
+      Math.cos(angle) * (housingRadius * 0.88)
+    );
     group.add(bolt);
   }
 
-  // D. Purple Accent LED Ring recessed inside the clavicle socket housing bore
-  const ringGeo = new THREE.TorusGeometry(0.025, 0.0012, 8, 32);
+  // E. Purple Emissive Core Ring
+  const ringGeo = new THREE.TorusGeometry(housingRadius * 0.96, 0.0014, 8, 32);
   const accentRing = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRing.name = side === -1 ? 'ShoulderAccentRing_Left' : 'ShoulderAccentRing_Right';
   accentRing.rotation.y = Math.PI / 2;
-  accentRing.position.set(-side * 0.014, 0.018, 0);
+  accentRing.position.set(-side * 0.012, 0, 0);
   group.add(accentRing);
   ledMeshes.push(accentRing);
 

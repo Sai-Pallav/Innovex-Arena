@@ -630,23 +630,23 @@
 }
 
 .contact-layer-primary {
-  animation: contactFieldBreath 20s ease-in-out infinite;
+  animation: contactFieldBreath 28s ease-in-out infinite;
   will-change: transform, opacity;
 }
 
 .contact-layer-secondary {
-  animation: contactFieldDrift 25s ease-in-out infinite;
+  animation: contactFieldDrift 32s ease-in-out infinite;
   will-change: transform, opacity;
 }
 
 .contact-layer-particles-near {
-  animation: contactParticleFloat 30s ease-in-out infinite;
+  animation: contactParticleFloat 40s ease-in-out infinite;
   will-change: transform;
 }
 
 /* ============================================================
    SERVICES PAGE — SECONDARY LOWER FIELD ANIMATION
-   Independent 28s drift on a perpendicular axis to L03a so the
+   Independent 36s drift on a perpendicular axis to L03a so the
    two primary fields never move in sync. Lower amplitude than
    the contact breath — this is a carry-through field, not the
    focal zone.
@@ -659,6 +659,6 @@
 }
 
 .svc-layer-lower {
-  animation: svcLowerDrift 28s ease-in-out infinite;
+  animation: svcLowerDrift 36s ease-in-out infinite;
   will-change: transform, opacity;
 }

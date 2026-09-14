@@ -10,113 +10,110 @@ export const LEG_CONFIG = {
   // =========================================================================
   hip: {
     // Offset from hip connection pivot down to the thigh rotation center
-    yOffset: -0.028,
-    gimbalRadius: 0.028,
+    yOffset: -0.026,
+    actuatorRadius: 0.028,
+    actuatorLength: 0.038,
+    mountBracketWidth: 0.054,
+    mountBracketHeight: 0.028,
+    mountBracketDepth: 0.044,
     collarRadius: 0.034,
-    collarHeight: 0.028,
+    collarHeight: 0.024,
+    flangeRadius: 0.038,
     accentRingRadius: 0.025,
-    socketSleeveRadiusTop: 0.035,
-    socketSleeveRadiusBottom: 0.030,
-    socketSleeveHeight: 0.024,
-    actuator: {
-      mountX: 0.032,
-      mountY: 0.018,
-      mountZ: 0.016,
-      cylinderRadius: 0.0060,
-      pistonRadius: 0.0038,
-      length: 0.058,
-    },
   },
 
   thigh: {
     // Upper leg length from hip joint to knee joint center
     length: 0.320,
-    upperRadius: 0.050,
-    lowerRadius: 0.038,
-    // Trochanter hood cupping the hip socket
-    trochanterHood: {
-      radius: 0.036,
-      height: 0.032,
-      thickness: 0.014,
+    frame: {
+      spineWidth: 0.036,
+      spineDepth: 0.038,
+      upperCollarRadius: 0.035,
+      upperCollarHeight: 0.028,
+      lowerForkWidth: 0.066,
+      lowerForkDepth: 0.034,
+      lowerForkLength: 0.058,
     },
-    // Armor plate contours
+    // Segmented armor: leaves visible structural frame at top (hip interface) and bottom (knee fork)
     anteriorArmor: {
-      widthTop: 0.082,
-      widthBottom: 0.058,
-      length: 0.300,
-      thickness: 0.018,
-      creaseAngle: 0.16,
-      keelProtrusion: 0.009,
+      widthTop: 0.074,
+      widthBottom: 0.054,
+      length: 0.198, // Leaves ~48mm clearance to knee and ~32mm clearance to hip!
+      thickness: 0.020,
+      keelProtrusion: 0.010,
     },
     lateralArmor: {
-      width: 0.052,
-      thickness: 0.016,
-      cowlLength: 0.245,
+      width: 0.042,
+      thickness: 0.015,
+      cowlLength: 0.178,
     },
     medialArmor: {
-      width: 0.040,
+      width: 0.034,
       thickness: 0.012,
-      cowlLength: 0.210,
+      cowlLength: 0.165,
     },
-    skeletonRadius: 0.020,
     ledStrip: {
-      width: 0.0036,
-      depth: 0.0030,
-      length: 0.250,
-    },
-    rearDamper: {
-      cylinderRadius: 0.0065,
-      pistonRadius: 0.0040,
-      mountY: -0.060,
-      mountZ: -0.034,
-      targetY: -0.275,
-      targetZ: -0.026,
+      width: 0.0032,
+      depth: 0.0025,
+      length: 0.170,
     },
   },
 
   knee: {
-    // Rotary hinge condyle discs
-    discRadius: 0.026,
-    discWidth: 0.014,
-    outerDiscSpacing: 0.072,
-    accentRingRadius: 0.020,
-    centerCapRadius: 0.017,
-    centralAxleRadius: 0.0075,
-    centralAxleLength: 0.076,
-    // Floating patellar knee cap shield
+    // High-precision robotic revolute joint
+    jointRadius: 0.026,
+    jointLength: 0.064,
+    axleRadius: 0.009,
+    axleLength: 0.076,
+    upperForkWidth: 0.066,
+    upperForkThickness: 0.010,
+    lowerClevisWidth: 0.044,
+    lowerClevisThickness: 0.010,
+    bearingCapRadius: 0.024,
+    bearingCapThickness: 0.007,
+    accentRingRadius: 0.019,
+    centerCapRadius: 0.015,
+    // Low-profile central patellar bumper shield that preserves full view of the joint mechanics
     patella: {
-      width: 0.046,
-      height: 0.058,
-      thickness: 0.014,
-      offsetZ: 0.034,
-      yOffset: 0.004,
+      width: 0.030,
+      height: 0.026,
+      thickness: 0.008,
+      offsetZ: 0.028,
+      yOffset: 0.0,
     },
   },
 
   shin: {
     // Lower leg length from knee joint to ankle joint center
     length: 0.330,
-    upperRadius: 0.042,
-    lowerRadius: 0.030,
+    frame: {
+      spineWidth: 0.032,
+      spineDepth: 0.034,
+      upperPlateauWidth: 0.052,
+      upperPlateauDepth: 0.038,
+      upperPlateauHeight: 0.024,
+      lowerCollarRadius: 0.026,
+    },
+    // Segmented armor: leaves ~45mm clearance under knee and exposes tibial collar
     anteriorKeel: {
       widthTop: 0.056,
       widthBottom: 0.036,
-      thickness: 0.022,
-      keelProtrusion: 0.018,
+      length: 0.208, // Segmented length leaves ~45mm clearance below knee!
+      thickness: 0.020,
+      keelProtrusion: 0.015,
     },
     posteriorCalf: {
-      width: 0.058,
-      height: 0.170,
-      depth: 0.042,
-      ventCount: 4,
-      ventWidth: 0.034,
+      width: 0.054,
+      height: 0.155,
+      depth: 0.036,
+      ventCount: 3,
+      ventWidth: 0.030,
       ventHeight: 0.0045,
     },
-    skeletonRadius: 0.015,
     ledStrip: {
-      width: 0.0028,
-      depth: 0.0025,
-      length: 0.260,
+      width: 0.0026,
+      depth: 0.0022,
+      length: 0.180,
     },
   },
 

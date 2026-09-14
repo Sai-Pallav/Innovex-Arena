@@ -3,14 +3,6 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 
-export interface HipActuatorNodes {
-  group: THREE.Group;
-  cylinder: THREE.Mesh;
-  piston: THREE.Mesh;
-  upperMount: THREE.Mesh;
-  lowerMount: THREE.Mesh;
-}
-
 export interface HipNodes {
   group: THREE.Group;
   gimbalHousing: THREE.Mesh;
@@ -19,95 +11,27 @@ export interface HipNodes {
   accentRing: THREE.Mesh;
   thighMount: THREE.Group;
   interlockingCollar: THREE.Mesh;
-  actuatorFront?: HipActuatorNodes;
-  actuatorLateral?: HipActuatorNodes;
   ledMeshes: THREE.Mesh[];
 }
 
 /**
- * Creates an engineered linear hydraulic assist actuator for the hip joint.
- */
-function createHipActuator(
-  startPoint: THREE.Vector3,
-  endPoint: THREE.Vector3,
-  namePrefix: string,
-  materials: RobotMaterialPalette
-): HipActuatorNodes {
-  const group = new THREE.Group();
-  group.name = `${namePrefix}Actuator`;
-
-  const dir = new THREE.Vector3().subVectors(endPoint, startPoint);
-  const len = dir.length();
-
-  group.position.copy(startPoint);
-
-  const up = new THREE.Vector3(0, -1, 0);
-  const quat = new THREE.Quaternion().setFromUnitVectors(up, dir.clone().normalize());
-  group.quaternion.copy(quat);
-
-  const cfg = LEG_CONFIG.hip.actuator;
-
-  // Upper mount clevis with dual flange ears
-  const uMountGeo = new THREE.CylinderGeometry(cfg.cylinderRadius * 1.30, cfg.cylinderRadius * 1.30, 0.007, 16);
-  const upperMount = new THREE.Mesh(uMountGeo, materials.joint);
-  upperMount.rotation.x = Math.PI / 2;
-  group.add(upperMount);
-
-  // Cross pivot pin
-  const pinGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.016, 12);
-  const pin = new THREE.Mesh(pinGeo, materials.joint);
-  pin.rotation.z = Math.PI / 2;
-  group.add(pin);
-
-  // Outer cylinder barrel (dark titanium)
-  const cylLen = len * 0.54;
-  const cylGeo = new THREE.CylinderGeometry(cfg.cylinderRadius, cfg.cylinderRadius * 0.94, cylLen, 18);
-  const cylinder = new THREE.Mesh(cylGeo, materials.joint);
-  cylinder.position.set(0, -cylLen * 0.5, 0);
-  cylinder.castShadow = true;
-  cylinder.receiveShadow = true;
-  group.add(cylinder);
-
-  // Cylinder high-pressure collar ring
-  const collarGeo = new THREE.CylinderGeometry(cfg.cylinderRadius * 1.16, cfg.cylinderRadius * 1.16, 0.0032, 18);
-  const collar = new THREE.Mesh(collarGeo, materials.joint);
-  collar.position.set(0, -cylLen + 0.0016, 0);
-  group.add(collar);
-
-  // Telescoping Piston Rod (Polished metallic / chrome)
-  const pistLen = len * 0.52;
-  const pistGeo = new THREE.CylinderGeometry(cfg.pistonRadius, cfg.pistonRadius, pistLen, 16);
-  const piston = new THREE.Mesh(pistGeo, materials.joint);
-  piston.position.set(0, -cylLen - pistLen * 0.5 + 0.004, 0);
-  piston.castShadow = true;
-  group.add(piston);
-
-  // Lower mount rod-end eyelet
-  const lMountGeo = new THREE.CylinderGeometry(cfg.pistonRadius * 1.45, cfg.pistonRadius * 1.45, 0.006, 14);
-  const lowerMount = new THREE.Mesh(lMountGeo, materials.joint);
-  lowerMount.position.set(0, -len, 0);
-  lowerMount.rotation.x = Math.PI / 2;
-  group.add(lowerMount);
-
-  const mergedMesh = mergeGroupMeshesByMaterial(group, materials.joint, `${namePrefix}JointMesh`, true) || cylinder;
-
-  return {
-    group,
-    cylinder: mergedMesh,
-    piston: mergedMesh,
-    upperMount: mergedMesh,
-    lowerMount: mergedMesh,
-  };
-}
-
-/**
- * NEXT-LEVEL ARTICULATED HIP JOINT ASSEMBLY:
- * - Eliminates floating gaps: continuous structural socket bell sleeves directly into thigh
- * - Multiaxial high-torque spherical titanium gimbal
- * - Stepped flared socket skirt with CNC machined chamfers
- * - Dual linear hydraulic assist actuators anchored to thigh
- * - Concentric electric purple emissive accent ring
- * - Interlocking trochanter mounting flange with structural hex fasteners
+ * REBUILDS THE HIP ROTATIONAL BEARING & STRUCTURAL THIGH MOUNT (RULE #1 & #5):
+ *
+ *   PELVIS CONNECTION
+ *          │
+ *          ▼
+ *   HIP ROTATIONAL BEARING & HOUSING (Titanium Cylindrical Drive)
+ *          │
+ *          ▼
+ *   OUTPUT COUPLING & TORQUE FLANGE (Hex Fasteners & Bearing Seal)
+ *          │
+ *          ▼
+ *   STRUCTURAL THIGH MOUNT YOKE (Bilateral Interlocking Ears)
+ *          │
+ *          ▼
+ *   THIGH STRUCTURAL FRAME (Receiving Collar & Femur Spine)
+ *
+ * Physically suspends the thigh directly from the hip with zero floating gap.
  */
 export function createHip(
   side: -1 | 1,
@@ -119,140 +43,158 @@ export function createHip(
   const cfg = LEG_CONFIG.hip;
   const ledMeshes: THREE.Mesh[] = [];
 
-  // ==========================================
-  // 1. STRUCTURAL GIMBAL HOUSING & UPPER MOUNTING FLANGE
-  // ==========================================
+  // Group containing the stationary hip actuator housing and bearing
   const housingGroup = new THREE.Group();
   housingGroup.name = side === -1 ? 'HipHousing_L' : 'HipHousing_R';
   hipGroup.add(housingGroup);
 
-  const gimbalGeo = new THREE.CylinderGeometry(
-    cfg.collarRadius * 1.04,
-    cfg.collarRadius * 0.94,
-    cfg.collarHeight * 0.55,
-    32
+  // ==========================================
+  // 1. HIP ROTATIONAL BEARING & HOUSING
+  // Heavy-duty titanium cylindrical drive unit
+  // ==========================================
+  const actuatorGeo = new THREE.CylinderGeometry(
+    cfg.actuatorRadius,
+    cfg.actuatorRadius * 0.96,
+    cfg.actuatorLength,
+    28
   );
-  const gimbalHousing = new THREE.Mesh(gimbalGeo, materials.joint);
-  gimbalHousing.name = side === -1 ? 'HipGimbal_L' : 'HipGimbal_R';
-  gimbalHousing.position.set(0, -0.006, 0);
+  const gimbalHousing = new THREE.Mesh(actuatorGeo, materials.joint);
+  gimbalHousing.name = side === -1 ? 'HipActuator_L' : 'HipActuator_R';
+  gimbalHousing.position.set(0, -cfg.actuatorLength * 0.45, 0);
   gimbalHousing.castShadow = true;
   gimbalHousing.receiveShadow = true;
   housingGroup.add(gimbalHousing);
 
-  // Upper bearing race ring
-  const upperRingGeo = new THREE.TorusGeometry(cfg.collarRadius * 1.05, 0.0024, 12, 32);
-  const upperRing = new THREE.Mesh(upperRingGeo, materials.joint);
-  upperRing.rotation.x = Math.PI / 2;
-  upperRing.position.y = -0.002;
-  housingGroup.add(upperRing);
-
-  // ==========================================
-  // 2. FLARED CONICAL SOCKET SKIRT (Completely seals upper joint gap)
-  // ==========================================
-  const skirtGeo = new THREE.CylinderGeometry(
-    cfg.collarRadius * 0.94,
-    cfg.socketSleeveRadiusTop * 1.06,
-    cfg.collarHeight * 0.65,
-    32,
-    1,
-    true
+  // Bearing seal ring at the upper pelvis interface
+  const sealGeo = new THREE.CylinderGeometry(
+    cfg.actuatorRadius * 1.08,
+    cfg.actuatorRadius * 1.08,
+    0.006,
+    28
   );
-  const socketSkirt = new THREE.Mesh(skirtGeo, materials.joint);
-  socketSkirt.name = side === -1 ? 'HipSocketSkirt_L' : 'HipSocketSkirt_R';
-  socketSkirt.position.set(0, -0.016, 0);
+  const socketSkirt = new THREE.Mesh(sealGeo, materials.joint);
+  socketSkirt.position.set(0, -0.003, 0);
   socketSkirt.castShadow = true;
-  socketSkirt.receiveShadow = true;
   housingGroup.add(socketSkirt);
 
-  // Stepped lower collar seal ring
-  const lowerSealGeo = new THREE.CylinderGeometry(
-    cfg.socketSleeveRadiusTop * 1.08,
-    cfg.socketSleeveRadiusTop * 1.04,
-    0.006,
-    32
-  );
-  const lowerSeal = new THREE.Mesh(lowerSealGeo, materials.joint);
-  lowerSeal.position.set(0, -0.024, 0);
-  lowerSeal.castShadow = true;
-  housingGroup.add(lowerSeal);
-
-  // ==========================================
-  // 3. INTERNAL TITANIUM MULTIAXIAL SWIVEL BEARING BALL
-  // ==========================================
-  const ballGeo = new THREE.SphereGeometry(cfg.gimbalRadius, 28, 24);
+  // Internal bearing pivot core
+  const ballGeo = new THREE.SphereGeometry(cfg.actuatorRadius * 0.88, 24, 20);
   const swivelBall = new THREE.Mesh(ballGeo, materials.joint);
-  swivelBall.name = side === -1 ? 'HipSwivelBall_L' : 'HipSwivelBall_R';
-  swivelBall.position.set(0, -0.014, 0);
+  swivelBall.position.set(0, -cfg.actuatorLength * 0.35, 0);
   swivelBall.castShadow = true;
-  swivelBall.receiveShadow = true;
   housingGroup.add(swivelBall);
 
-  const mergedHousing = mergeGroupMeshesByMaterial(housingGroup, materials.joint, side === -1 ? 'HipHousingJoint_L' : 'HipHousingJoint_R', true) || gimbalHousing;
+  // Vertical structural gussets reinforcing the housing against bending moments
+  for (let i = 0; i < 4; i++) {
+    const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
+    const gussetGeo = new THREE.BoxGeometry(0.0045, 0.026, 0.007);
+    const gusset = new THREE.Mesh(gussetGeo, materials.joint);
+    gusset.position.set(
+      Math.cos(angle) * (cfg.actuatorRadius * 0.92),
+      -cfg.actuatorLength * 0.46,
+      Math.sin(angle) * (cfg.actuatorRadius * 0.92)
+    );
+    gusset.rotation.y = -angle;
+    housingGroup.add(gusset);
+  }
 
-  // ==========================================
-  // 4. CONCENTRIC PURPLE EMISSIVE ACCENT RING
-  // ==========================================
-  const accentRingGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0020, 12, 32);
+  const mergedHousing = mergeGroupMeshesByMaterial(
+    housingGroup,
+    materials.joint,
+    side === -1 ? 'HipHousingJoint_L' : 'HipHousingJoint_R',
+    true
+  ) || gimbalHousing;
+
+  // Single functional status indicator ring inset flush into the actuator shoulder
+  const accentRingGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0016, 8, 32);
   const accentRing = new THREE.Mesh(accentRingGeo, materials.purpleEmissive);
   accentRing.name = side === -1 ? 'HipAccentRing_L' : 'HipAccentRing_R';
   accentRing.rotation.x = Math.PI / 2;
-  accentRing.position.set(0, -0.005, 0);
+  accentRing.position.set(0, -0.004, 0);
   hipGroup.add(accentRing);
   ledMeshes.push(accentRing);
 
   // ==========================================
-  // 5. THIGH MOUNTING INTERFACE & INTERLOCKING TROCHANTER SLEEVE
+  // 2. STRUCTURAL THIGH MOUNT
+  // Engineered mechanical interface suspending the thigh directly from the hip
   // ==========================================
   const thighMount = new THREE.Group();
   thighMount.name = side === -1 ? 'ThighMount_L' : 'ThighMount_R';
   thighMount.position.set(0, cfg.yOffset, 0);
   hipGroup.add(thighMount);
 
-  // Continuous interlocking dark titanium collar sleeve
-  const sleeveGeo = new THREE.CylinderGeometry(
-    cfg.socketSleeveRadiusBottom * 1.02,
-    cfg.socketSleeveRadiusBottom * 1.08,
-    0.016,
-    30
-  );
-  const interlockingCollar = new THREE.Mesh(sleeveGeo, materials.joint);
-  interlockingCollar.name = side === -1 ? 'InterlockingCollar_L' : 'InterlockingCollar_R';
-  interlockingCollar.position.set(0, 0.006, 0);
-  interlockingCollar.castShadow = true;
-  interlockingCollar.receiveShadow = true;
-  thighMount.add(interlockingCollar);
+  const mountGroup = new THREE.Group();
 
-  // Machined bolt flange with 8 radial hex fasteners
-  const flangeGeo = new THREE.CylinderGeometry(0.034, 0.034, 0.0045, 28);
-  const mountFlange = new THREE.Mesh(flangeGeo, materials.joint);
-  mountFlange.position.set(0, 0.001, 0);
-  mountFlange.castShadow = true;
-  thighMount.add(mountFlange);
+  // A. High-Torque Output Shaft Journal
+  const journalGeo = new THREE.CylinderGeometry(0.020, 0.020, 0.014, 24);
+  const journalMesh = new THREE.Mesh(journalGeo, materials.joint);
+  journalMesh.position.set(0, 0.004, 0);
+  mountGroup.add(journalMesh);
 
-  for (let i = 0; i < 8; i++) {
-    const angle = (i / 8) * Math.PI * 2;
-    const boltGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.0035, 6);
+  // B. Circular Machined Mounting Flange with 6 Perimeter Bolts
+  const flangeGeo = new THREE.CylinderGeometry(cfg.flangeRadius, cfg.flangeRadius, 0.006, 28);
+  const flange = new THREE.Mesh(flangeGeo, materials.joint);
+  flange.position.set(0, -0.002, 0);
+  flange.castShadow = true;
+  mountGroup.add(flange);
+
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.0045, 6);
     const bolt = new THREE.Mesh(boltGeo, materials.joint);
-    bolt.position.set(Math.cos(angle) * 0.027, 0.004, Math.sin(angle) * 0.027);
-    thighMount.add(bolt);
+    bolt.position.set(
+      Math.cos(angle) * (cfg.flangeRadius * 0.88),
+      0.0015,
+      Math.sin(angle) * (cfg.flangeRadius * 0.88)
+    );
+    mountGroup.add(bolt);
   }
 
-  const mergedThighMount = mergeGroupMeshesByMaterial(thighMount, materials.joint, side === -1 ? 'ThighMountJoint_L' : 'ThighMountJoint_R', true) || interlockingCollar;
+  // C. Interlocking Structural Spigot Sleeve (Inserts into Thigh Frame Collar)
+  const spigotGeo = new THREE.CylinderGeometry(
+    cfg.collarRadius * 0.94,
+    cfg.collarRadius * 0.90,
+    cfg.collarHeight,
+    28
+  );
+  const interlockingCollar = new THREE.Mesh(spigotGeo, materials.joint);
+  interlockingCollar.name = side === -1 ? 'ThighMountCollar_L' : 'ThighMountCollar_R';
+  interlockingCollar.position.set(0, -cfg.collarHeight * 0.5 - 0.002, 0);
+  interlockingCollar.castShadow = true;
+  interlockingCollar.receiveShadow = true;
+  mountGroup.add(interlockingCollar);
 
-  // ==========================================
-  // 6. DUAL HEAVY HYDRAULIC ASSIST STRUTS
-  // ==========================================
-  // Actuator 1: Anterior-Medial Pitch Stabilizer
-  const start1 = new THREE.Vector3(0, 0.008, 0.022);
-  const end1 = new THREE.Vector3(0, -0.046, 0.030);
-  const actuatorFront = createHipActuator(start1, end1, `${side === -1 ? 'Left' : 'Right'}HipFront`, materials);
-  hipGroup.add(actuatorFront.group);
+  // D. Heavy Bilateral Structural Yoke Ears (Direct load path into thigh spine)
+  for (const bSide of [-1, 1]) {
+    const earGeo = new THREE.BoxGeometry(0.008, 0.024, 0.020);
+    const ear = new THREE.Mesh(earGeo, materials.joint);
+    ear.position.set(
+      bSide * (cfg.collarRadius * 0.86),
+      -cfg.collarHeight * 0.55,
+      0
+    );
+    ear.castShadow = true;
+    mountGroup.add(ear);
 
-  // Actuator 2: Lateral-Posterior Roll Stabilizer
-  const start2 = new THREE.Vector3(side * 0.022, 0.006, -0.012);
-  const end2 = new THREE.Vector3(side * 0.028, -0.048, -0.018);
-  const actuatorLateral = createHipActuator(start2, end2, `${side === -1 ? 'Left' : 'Right'}HipLat`, materials);
-  hipGroup.add(actuatorLateral.group);
+    // Cross clamp bolt through each yoke ear
+    const earBoltGeo = new THREE.CylinderGeometry(0.002, 0.002, 0.010, 6);
+    const earBolt = new THREE.Mesh(earBoltGeo, materials.joint);
+    earBolt.rotation.z = Math.PI / 2;
+    earBolt.position.set(
+      bSide * (cfg.collarRadius * 0.86),
+      -cfg.collarHeight * 0.65,
+      0
+    );
+    mountGroup.add(earBolt);
+  }
+
+  const mergedMount = mergeGroupMeshesByMaterial(
+    mountGroup,
+    materials.joint,
+    side === -1 ? 'ThighMount_Merged_L' : 'ThighMount_Merged_R',
+    true
+  ) || interlockingCollar;
+  thighMount.add(mergedMount);
 
   return {
     group: hipGroup,
@@ -261,9 +203,7 @@ export function createHip(
     swivelBall: mergedHousing,
     accentRing,
     thighMount,
-    interlockingCollar: mergedThighMount,
-    actuatorFront,
-    actuatorLateral,
+    interlockingCollar: mergedMount,
     ledMeshes,
   };
 }

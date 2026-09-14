@@ -3,6 +3,7 @@ import { ROBOT_ROTATION } from '../config';
 import { createRobotMaterials } from '../materials/RobotMaterials';
 import { createRobotHead } from '../head/RobotHead';
 import { createRobotArm, RobotArmNodes } from '../arm/RobotArm';
+import { createChestShoulderMount, ChestShoulderMountNodes } from '../shoulder/ChestShoulderMount';
 import { createRobotTorso, RobotTorsoNodes } from '../torso/RobotTorso';
 import { createRobotLeg, RobotLegNodes } from '../leg/RobotLeg';
 
@@ -30,6 +31,8 @@ export interface RobotNodes {
   rightHand: THREE.Group;
   leftArmNodes?: RobotArmNodes;
   rightArmNodes?: RobotArmNodes;
+  leftChestShoulderMount?: ChestShoulderMountNodes;
+  rightChestShoulderMount?: ChestShoulderMountNodes;
   leftLeg: THREE.Group;
   rightLeg: THREE.Group;
   leftFoot: THREE.Group;
@@ -107,41 +110,53 @@ export function createProceduralRobot(): RobotNodes {
   ledMeshes.push(...headAssembly.ledMeshes);
 
   // ==========================================
-  // 7. MODULAR SHOULDERS, ARMS & COMPLETE ARTICULATED HANDS
-  // (Mounted directly into Chest Shoulder Mounts per Section 2, 8, 9)
+  // 7. CHEST SHOULDER MOUNT — LATERAL EDGE EXTENSIONS
   // ==========================================
-  const leftArm = createRobotArm(-1, materials);
-  leftArm.root.position.set(0, 0, 0);
-  torsoNodes.shoulderMountLeft.group.add(leftArm.root);
+  // Extends the chest's lateral edges outward to form integrated shoulder
+  // mounting foundations.
+  //
+  // This is NOT a separate structure attached to the chest.
+  // This is the CHEST ITSELF extending to create shoulder mounts.
+  //
+  // The extensions:
+  // - Follow the chest's existing curvature and design language
+  // - Use the chest's white armor material
+  // - Create structural transition from chest edge to mounting platform
+  // - Provide mounting surface for future shoulder joint
+  //
+  // Arms are temporarily removed (see RobotArmAssembly_Standalone.ts).
 
-  const rightArm = createRobotArm(1, materials);
-  rightArm.root.position.set(0, 0, 0);
-  torsoNodes.shoulderMountRight.group.add(rightArm.root);
+  const leftChestShoulderMount = createChestShoulderMount(-1, materials);
+  leftChestShoulderMount.group.position.set(0, 0, 0);
+  torsoNodes.shoulderMountLeft.group.add(leftChestShoulderMount.group);
 
-  ledMeshes.push(...leftArm.ledMeshes, ...rightArm.ledMeshes);
+  const rightChestShoulderMount = createChestShoulderMount(1, materials);
+  rightChestShoulderMount.group.position.set(0, 0, 0);
+  torsoNodes.shoulderMountRight.group.add(rightChestShoulderMount.group);
 
-  // Poised athletic humanoid arm posture matching natural rest pose
-  leftArm.shoulder.group.rotation.set(0, 0, 0);
-  rightArm.shoulder.group.rotation.set(0, 0, 0);
-  leftArm.shoulder.jointGroup.rotation.set(-0.04, 0.02, -0.03);
-  rightArm.shoulder.jointGroup.rotation.set(-0.04, -0.02, 0.03);
-  leftArm.upperArm.group.rotation.set(0, 0, 0);
-  rightArm.upperArm.group.rotation.set(0, 0, 0);
-  leftArm.elbow.group.rotation.set(0, 0, 0);
-  rightArm.elbow.group.rotation.set(0, 0, 0);
-  leftArm.elbow.forearmPivot.rotation.set(-0.44, 0.06, 0.02);
-  rightArm.elbow.forearmPivot.rotation.set(-0.44, -0.06, -0.02);
-  leftArm.wrist.group.rotation.set(0.04, -0.42, 0.02);
-  rightArm.wrist.group.rotation.set(0.04, 0.42, -0.02);
+  ledMeshes.push(...leftChestShoulderMount.ledMeshes, ...rightChestShoulderMount.ledMeshes);
 
-  const leftShoulder = leftArm.shoulder.group;
-  const rightShoulder = rightArm.shoulder.group;
-  const leftUpperArm = leftArm.upperArm.group;
-  const rightUpperArm = rightArm.upperArm.group;
-  const leftForearm = leftArm.elbow.forearmPivot;
-  const rightForearm = rightArm.elbow.forearmPivot;
-  const leftHand = leftArm.hand.group;
-  const rightHand = rightArm.hand.group;
+  // Placeholder groups for arms (maintain interface compatibility)
+  const leftShoulder = new THREE.Group();
+  leftShoulder.name = 'LeftShoulderPlaceholder';
+  const rightShoulder = new THREE.Group();
+  rightShoulder.name = 'RightShoulderPlaceholder';
+  const leftUpperArm = new THREE.Group();
+  leftUpperArm.name = 'LeftUpperArmPlaceholder';
+  const rightUpperArm = new THREE.Group();
+  rightUpperArm.name = 'RightUpperArmPlaceholder';
+  const leftForearm = new THREE.Group();
+  leftForearm.name = 'LeftForearmPlaceholder';
+  const rightForearm = new THREE.Group();
+  rightForearm.name = 'RightForearmPlaceholder';
+  const leftHand = new THREE.Group();
+  leftHand.name = 'LeftHandPlaceholder';
+  const rightHand = new THREE.Group();
+  rightHand.name = 'RightHandPlaceholder';
+
+  // Arm nodes undefined (arms removed, chest edge extensions in place)
+  const leftArmNodes = undefined;
+  const rightArmNodes = undefined;
 
   // ==========================================
   // 8. MODULAR ARTICULATED ROBOT LEGS & FEET
@@ -182,8 +197,10 @@ export function createProceduralRobot(): RobotNodes {
     rightForearm,
     leftHand,
     rightHand,
-    leftArmNodes: leftArm,
-    rightArmNodes: rightArm,
+    leftArmNodes,
+    rightArmNodes,
+    leftChestShoulderMount,
+    rightChestShoulderMount,
     leftLeg: leftLeg.root,
     rightLeg: rightLeg.root,
     leftFoot,
