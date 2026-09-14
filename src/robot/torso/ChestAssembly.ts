@@ -95,12 +95,12 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   frontZ: number;
 } {
   const shape = new THREE.Shape();
-  // Central suprasternal notch dip directly below neck collar LED (jugular notch)
-  shape.moveTo(0, 0.144);
-  // Curve smoothly up from notch to left clavicle peak
-  shape.bezierCurveTo(-0.026, 0.146, -0.054, 0.165, -0.088, 0.178);
+  // Expanded & refined upper chest neckline rising smoothly to cup the neck collar
+  shape.moveTo(0, 0.178);
+  // Curve smoothly up from suprasternal notch to left clavicle peak
+  shape.bezierCurveTo(-0.024, 0.180, -0.054, 0.185, -0.088, 0.190);
   // Clavicle shoulder ridge sloping out toward left shoulder mount
-  shape.bezierCurveTo(-0.124, 0.175, -0.152, 0.166, -0.172, 0.156);
+  shape.bezierCurveTo(-0.124, 0.185, -0.152, 0.172, -0.172, 0.156);
   // Upper pectoral outer contour
   shape.quadraticCurveTo(-0.188, 0.118, -0.178, 0.072);
   // Outer flank sweeps smoothly down and arches cleanly into the lower substernal contour
@@ -112,8 +112,8 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   shape.bezierCurveTo(0.070, -0.0215, 0.085, -0.0215, 0.105, -0.018);
   shape.bezierCurveTo(0.140, -0.010, 0.165, 0.025, 0.178, 0.072);
   shape.quadraticCurveTo(0.188, 0.118, 0.172, 0.156);
-  shape.bezierCurveTo(0.152, 0.166, 0.124, 0.175, 0.088, 0.178);
-  shape.bezierCurveTo(0.054, 0.165, 0.026, 0.146, 0, 0.144);
+  shape.bezierCurveTo(0.152, 0.172, 0.124, 0.185, 0.088, 0.190);
+  shape.bezierCurveTo(0.054, 0.185, 0.024, 0.180, 0, 0.178);
   shape.closePath();
 
   const extrudeSettings: THREE.ExtrudeGeometryOptions = {
@@ -142,14 +142,14 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
     if (z > 0) {
       const ax = Math.abs(x);
 
-      // 1. Clavicle crest Y position as a function of |x| in centered coordinates (shape center Y = 0.078)
+      // 1. Clavicle crest Y position as a function of |x| in centered coordinates (shape center Y = 0.08425)
       let yCrest: number;
       if (ax <= 0.088) {
         const t = ax / 0.088;
-        yCrest = 0.066 + (0.100 - 0.066) * Math.sin(t * (Math.PI / 2));
+        yCrest = 0.094 + (0.106 - 0.094) * Math.sin(t * (Math.PI / 2));
       } else {
         const t = Math.min(1.0, (ax - 0.088) / (0.172 - 0.088));
-        yCrest = 0.100 - (0.100 - 0.078) * t;
+        yCrest = 0.106 - (0.106 - 0.072) * t;
       }
 
       // 2. Clavicle bone ridge elevation (raised proud along the crest line)
@@ -161,17 +161,17 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
 
       // 3. Upper collar chamfer facet (sloping back towards neck socket above the crest)
       let chamferSlope = 0;
-      if (y > yCrest - 0.010) {
-        const chamferT = Math.min(1.0, (y - (yCrest - 0.010)) / 0.030);
-        chamferSlope = -chamferT * 0.010;
+      if (y > yCrest - 0.015) {
+        const chamferT = Math.min(1.0, (y - (yCrest - 0.015)) / 0.035);
+        chamferSlope = -chamferT * 0.022;
       }
 
       // 4. Suprasternal notch triangular recessed facet (sternal depression)
       let notchRecess = 0;
-      if (ax < 0.046 && y > 0.035) {
-        const tX = 1.0 - ax / 0.046;
-        const tY = Math.min(1.0, (y - 0.035) / 0.032);
-        notchRecess = -tX * tY * 0.0065;
+      if (ax < 0.036 && y > 0.070) {
+        const tX = 1.0 - ax / 0.036;
+        const tY = Math.min(1.0, (y - 0.070) / 0.024);
+        notchRecess = -tX * tY * 0.005;
       }
 
       // 5. Pectoral muscle dome curvature (athletic forward bulge below the clavicle)
@@ -193,7 +193,7 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
 
   const mesh = new THREE.Mesh(geo, materials.armor);
   mesh.name = 'ChestPlate_Central';
-  mesh.position.set(0, 0.0278, 0.048);
+  mesh.position.set(0, 0.0338, 0.048);
   mesh.rotation.x = -0.04;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -389,22 +389,40 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   frameClavicleRight.position.set(0.126, TORSO_CONFIG.chest.shoulderMountY, 0.008);
   frameJointGroup.add(frameClavicleRight);
 
-  // 3. Engineered Dark Titanium Neck Collar Bezel & Sleeve (Recessed inside neck cavity behind notch)
-  const collarRecessedZ = -0.018;
-  const collarBezelGeo = new THREE.CylinderGeometry(0.048, 0.052, 0.020, 36);
-  const neckCollar = new THREE.Mesh(collarBezelGeo, materials.joint);
+  // 3. Sculpted White Ceramic Collar Bezel (Mantle cupping the neck base flush)
+  const collarShape = new THREE.Shape();
+  const cOuterRx = 0.088;
+  const cOuterRz = 0.084;
+  collarShape.absellipse(0, 0, cOuterRx, cOuterRz, 0, Math.PI * 2, false, 0);
+
+  const collarHole = new THREE.Path();
+  const cInnerRx = 0.0745;
+  const cInnerRz = 0.0745;
+  collarHole.absellipse(0, 0, cInnerRx, cInnerRz, 0, Math.PI * 2, true, 0);
+  collarShape.holes.push(collarHole);
+
+  const collarExtrude = new THREE.ExtrudeGeometry(collarShape, {
+    depth: 0.018,
+    bevelEnabled: true,
+    bevelThickness: 0.0035,
+    bevelSize: 0.0030,
+    bevelSegments: 4,
+    curveSegments: 36,
+  });
+  collarExtrude.center();
+
+  const neckCollar = new THREE.Mesh(collarExtrude, materials.armor);
   neckCollar.name = 'NeckCollar';
-  neckCollar.position.set(0, TORSO_CONFIG.chest.collarY - 0.002, collarRecessedZ);
-  neckCollar.scale.set(1.04, 1.0, 0.92);
+  neckCollar.rotation.x = Math.PI / 2;
+  neckCollar.position.set(0, TORSO_CONFIG.chest.collarY, TORSO_CONFIG.chest.collarZ);
   neckCollar.castShadow = true;
   neckCollar.receiveShadow = true;
-  neckCollar.visible = true;
-  frameJointGroup.add(neckCollar);
+  group.add(neckCollar);
 
-  const collarSleeveGeo = new THREE.CylinderGeometry(0.044, 0.042, 0.028, 32);
+  // Stepped internal dark titanium mounting sleeve
+  const collarSleeveGeo = new THREE.CylinderGeometry(0.073, 0.070, 0.024, 32);
   const neckCollarSleeve = new THREE.Mesh(collarSleeveGeo, materials.joint);
-  neckCollarSleeve.position.set(0, TORSO_CONFIG.chest.collarY - 0.006, collarRecessedZ);
-  neckCollarSleeve.scale.set(1.0, 1.0, 0.92);
+  neckCollarSleeve.position.set(0, TORSO_CONFIG.chest.collarY - 0.008, TORSO_CONFIG.chest.collarZ);
   neckCollarSleeve.castShadow = true;
   frameJointGroup.add(neckCollarSleeve);
 
@@ -415,27 +433,27 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
     group.add(mergedFrameJoint);
   }
 
-  // 4. Horizontal Glowing Purple Light Ring at Neck Base
-  const lightRingGeo = new THREE.TorusGeometry(0.046, 0.0020, 10, 40);
+  // 4. Horizontal Glowing Purple Light Ring at Collar Seam
+  const lightRingGeo = new THREE.TorusGeometry(0.0745, 0.0016, 10, 40);
   const neckCollarLightRing = new THREE.Mesh(lightRingGeo, materials.purpleEmissive);
   neckCollarLightRing.name = 'NeckCollarLightRing';
   neckCollarLightRing.rotation.x = Math.PI / 2;
-  neckCollarLightRing.position.set(0, TORSO_CONFIG.chest.collarY + 0.005, collarRecessedZ + 0.002);
-  neckCollarLightRing.scale.set(1.04, 0.92, 1.0);
+  neckCollarLightRing.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, TORSO_CONFIG.chest.collarZ);
   group.add(neckCollarLightRing);
   ledMeshes.push(neckCollarLightRing);
 
-  // 5. Central Vertical Purple Light Slit at Neck Base (Recessed inside notch cavity)
-  const slitGeo = new THREE.BoxGeometry(0.0030, 0.014, 0.003);
+  // 5. Central Vertical Purple Light Slit at Suprasternal Notch
+  const slitGeo = new THREE.BoxGeometry(0.0032, 0.012, 0.004);
   const neckCollarLightSlit = new THREE.Mesh(slitGeo, materials.purpleEmissive);
   neckCollarLightSlit.name = 'NeckCollarLightSlit';
-  neckCollarLightSlit.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, 0.024);
+  neckCollarLightSlit.position.set(0, 0.124, 0.058);
+  neckCollarLightSlit.rotation.x = -0.04;
   group.add(neckCollarLightSlit);
   ledMeshes.push(neckCollarLightSlit);
 
   // Localized subtle purple bounce light illuminating suprasternal notch & chin
   const neckGlowLight = new THREE.PointLight(ROBOT_ACCENT, 0.65, 0.16, 2.0);
-  neckGlowLight.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, 0.022);
+  neckGlowLight.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, 0.045);
   group.add(neckGlowLight);
 
 

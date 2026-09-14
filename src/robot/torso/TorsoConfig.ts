@@ -44,9 +44,9 @@ export const TORSO_CONFIG = {
     height: 0.310,
     depth: 0.220,
     frontPlateThickness: 0.026,
-    collarRadius: 0.072,
-    collarY: 0.080,
-    collarZ: 0.008,
+    collarRadius: 0.076,
+    collarY: 0.124,
+    collarZ: 0.004,
     shoulderMountX: 0.210, // Wider shoulder span matching expanded clavicle
     shoulderMountY: 0.052,
     shoulderMountZ: 0.015,

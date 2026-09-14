@@ -139,10 +139,10 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   jawJointGroup.add(submentalVent);
 
   // 4. Dark Titanium Neck Socket Gorget Collar (Underneath the jaw)
-  const socketGeo = new THREE.CylinderGeometry(0.048, 0.045, 0.016, 32);
+  const socketGeo = new THREE.CylinderGeometry(0.054, 0.050, 0.020, 32);
   const neckSocket = new THREE.Mesh(socketGeo, materials.joint);
   neckSocket.name = 'JawNeckSocketGorget';
-  neckSocket.position.set(0, -0.124, 0.008);
+  neckSocket.position.set(0, -0.124, 0.010);
   neckSocket.castShadow = true;
   neckSocket.receiveShadow = true;
   jawJointGroup.add(neckSocket);

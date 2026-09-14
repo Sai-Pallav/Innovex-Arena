@@ -85,7 +85,7 @@ export function createProceduralRobot(): RobotNodes {
   // ==========================================
   const headAssembly = createRobotHead(materials);
   torsoNodes.upperTorsoFrame.group.add(headAssembly.neck);
-  headAssembly.neck.position.set(0, 0.080, -0.004);
+  headAssembly.neck.position.set(0, 0.128, 0.004);
 
   const head = headAssembly.head;
   const neck = headAssembly.neck;
