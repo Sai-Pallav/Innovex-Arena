@@ -31,11 +31,10 @@ export interface HeadAssemblyNodes {
  * └── Neck
  */
 export function createRobotHead(materials: RobotMaterialPalette): HeadAssemblyNodes {
-  // Head Root Group (Independently rotated by kinematic controller per Part 20)
+  // Head Root Group (Articulated at cervical rotation pivot)
   const head = new THREE.Group();
   head.name = 'RobotHead';
-  head.position.set(0, 0.175, 0.005);
-  // Priority 8: 5% scale reduction for heroic torso proportion and neck integration
+  head.position.set(0, 0.122, 0.004);
   head.scale.setScalar(0.95);
 
   const ledMeshes: THREE.Mesh[] = [];
@@ -81,8 +80,11 @@ export function createRobotHead(materials: RobotMaterialPalette): HeadAssemblyNo
 
   // 7. Stacked Telescoping Mechanical Neck (Part 10)
   const neckAssembly = createRobotNeck(materials);
-  // Head mounts directly onto neck upper cervical connector
-  neckAssembly.group.add(head);
+  // Head mounts directly onto cervical rotation pivot
+  neckAssembly.cervicalPivot.add(head);
+  if (neckAssembly.ledMeshes) {
+    ledMeshes.push(...neckAssembly.ledMeshes);
+  }
 
   return {
     head,

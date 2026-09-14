@@ -177,6 +177,14 @@ export class TorsoAnimationController {
       const spread = (idx - midIdx) * 0.024 * exp;
       ring.group.position.y = this.baseRingYs[idx] + spread;
     });
+
+    // - Abdominal side mechanism clusters (bilateral actuators) expand laterally in ±X during exploded view
+    if (this.torso.stomach.sideMechanismLeft && this.torso.stomach.sideMechanismRight) {
+      this.torso.stomach.sideMechanismLeft.position.x = -exp * 0.045;
+      this.torso.stomach.sideMechanismLeft.position.z = exp * 0.020;
+      this.torso.stomach.sideMechanismRight.position.x = exp * 0.045;
+      this.torso.stomach.sideMechanismRight.position.z = exp * 0.020;
+    }
     // - Waist and hips drop slightly in -Y
     this.torso.waist.waistPivot.position.y = -exp * 0.06;
 

@@ -407,7 +407,7 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
   const pelvicPlate = new THREE.Mesh(plateGeo, materials.armor);
   pelvicPlate.name = 'PelvicShieldPlate';
-  pelvicPlate.position.set(0, -0.258, 0.046);
+  pelvicPlate.position.set(0, -0.273, 0.046);
   pelvicPlate.rotation.x = -0.02;
   pelvicPlate.castShadow = true;
   pelvicPlate.receiveShadow = true;
@@ -461,7 +461,7 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
     const flapMesh = new THREE.Mesh(flapGeo, materials.armor);
     flapMesh.name = `InguinalFlap_${fSide === -1 ? 'L' : 'R'}`;
-    flapMesh.position.set(fSide * 0.046, -0.254, 0.038);
+    flapMesh.position.set(fSide * 0.046, -0.269, 0.038);
     flapMesh.rotation.y = fSide * -0.26;
     flapMesh.rotation.x = -0.04;
     flapMesh.castShadow = true;
@@ -498,7 +498,7 @@ export function createWaistAssembly(materials: RobotMaterialPalette): WaistAssem
 
   const subPelvisCradle = mergeGroupMeshesByMaterial(cradleGroup, materials.joint, 'SubPelvisCradle_Merged', false)!;
   subPelvisCradle.name = 'SubPelvisCradle';
-  subPelvisCradle.position.set(0, -0.244, 0.010);
+  subPelvisCradle.position.set(0, -0.259, 0.010);
   subPelvisCradle.castShadow = true;
   hipConnectionGroup.add(subPelvisCradle);
 

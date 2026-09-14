@@ -103,12 +103,14 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   shape.bezierCurveTo(-0.124, 0.175, -0.152, 0.166, -0.172, 0.156);
   // Upper pectoral outer contour
   shape.quadraticCurveTo(-0.188, 0.118, -0.178, 0.072);
-  // Pectoral flank seam tapering diagonally toward lower sternum
-  shape.bezierCurveTo(-0.152, 0.014, -0.108, -0.022, -0.072, -0.040);
-  // Sub-sternal contour
-  shape.quadraticCurveTo(0, -0.044, 0.072, -0.040);
-  // Symmetrical return right
-  shape.bezierCurveTo(0.108, -0.022, 0.152, 0.014, 0.178, 0.072);
+  // Outer flank sweeps smoothly down and arches cleanly into the lower substernal contour
+  shape.bezierCurveTo(-0.165, 0.025, -0.140, -0.010, -0.105, -0.018);
+  shape.bezierCurveTo(-0.085, -0.0215, -0.070, -0.0215, -0.050, -0.0215);
+  // Central sternal contour framing Plate 01 with exact equal 10mm gap
+  shape.lineTo(0, -0.0215);
+  shape.lineTo(0.050, -0.0215);
+  shape.bezierCurveTo(0.070, -0.0215, 0.085, -0.0215, 0.105, -0.018);
+  shape.bezierCurveTo(0.140, -0.010, 0.165, 0.025, 0.178, 0.072);
   shape.quadraticCurveTo(0.188, 0.118, 0.172, 0.156);
   shape.bezierCurveTo(0.152, 0.166, 0.124, 0.175, 0.088, 0.178);
   shape.bezierCurveTo(0.054, 0.165, 0.026, 0.146, 0, 0.144);
@@ -140,15 +142,14 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
     if (z > 0) {
       const ax = Math.abs(x);
 
-      // 1. Clavicle crest Y position as a function of |x| in centered coordinates
-      // (local center Y is at ~0.067, notch is at 0.077, peaks at 0.111, shoulders at 0.089)
+      // 1. Clavicle crest Y position as a function of |x| in centered coordinates (shape center Y = 0.078)
       let yCrest: number;
       if (ax <= 0.088) {
         const t = ax / 0.088;
-        yCrest = 0.077 + (0.111 - 0.077) * Math.sin(t * (Math.PI / 2));
+        yCrest = 0.066 + (0.100 - 0.066) * Math.sin(t * (Math.PI / 2));
       } else {
         const t = Math.min(1.0, (ax - 0.088) / (0.172 - 0.088));
-        yCrest = 0.111 - (0.111 - 0.089) * t;
+        yCrest = 0.100 - (0.100 - 0.078) * t;
       }
 
       // 2. Clavicle bone ridge elevation (raised proud along the crest line)
@@ -167,9 +168,9 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
 
       // 4. Suprasternal notch triangular recessed facet (sternal depression)
       let notchRecess = 0;
-      if (ax < 0.046 && y > 0.045) {
+      if (ax < 0.046 && y > 0.035) {
         const tX = 1.0 - ax / 0.046;
-        const tY = Math.min(1.0, (y - 0.045) / 0.032);
+        const tY = Math.min(1.0, (y - 0.035) / 0.032);
         notchRecess = -tX * tY * 0.0065;
       }
 
@@ -177,7 +178,7 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
       let pectoralBulge = 0;
       if (y < yCrest) {
         const nx = Math.min(1.0, ax / 0.175);
-        const ny = Math.min(1.0, Math.max(0, (y + 0.060) / 0.130));
+        const ny = Math.min(1.0, Math.max(0, (y + 0.080) / 0.140));
         pectoralBulge = Math.cos(nx * (Math.PI / 2)) * Math.sin(ny * Math.PI) * 0.018;
       }
 
@@ -192,7 +193,7 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
 
   const mesh = new THREE.Mesh(geo, materials.armor);
   mesh.name = 'ChestPlate_Central';
-  mesh.position.set(0, 0.054, 0.048);
+  mesh.position.set(0, 0.0278, 0.048);
   mesh.rotation.x = -0.04;
   mesh.castShadow = true;
   mesh.receiveShadow = true;
@@ -200,17 +201,18 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   return { mesh, frontZ: 0.026 * 0.5 + 0.0065 + 0.018 };
 }
 
+
 // ─── 3. CHEST SIDE PANELS & DIAGONAL PURPLE LIGHT STRIPS ────────────────────
 function createChestSidePanel(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): { panel: THREE.Mesh; lightStrip: THREE.Mesh } {
   const shape = new THREE.Shape();
-  // Extended upper side panel matching elevated clavicle contour
+  // Extended upper side panel matching elevated clavicle contour, expanding downward
   shape.moveTo(side * 0.178, 0.082);
-  shape.bezierCurveTo(side * 0.158, 0.018, side * 0.118, -0.022, side * 0.072, -0.040);
-  shape.lineTo(side * 0.134, -0.044);
-  shape.bezierCurveTo(side * 0.192, -0.008, side * 0.198, 0.055, side * 0.186, 0.154);
+  shape.bezierCurveTo(side * 0.158, 0.010, side * 0.118, -0.036, side * 0.072, -0.056);
+  shape.lineTo(side * 0.134, -0.060);
+  shape.bezierCurveTo(side * 0.192, -0.020, side * 0.198, 0.055, side * 0.186, 0.154);
   shape.lineTo(side * 0.162, 0.156);
   shape.closePath();
 
@@ -237,22 +239,24 @@ function createChestSidePanel(
 
   const panel = new THREE.Mesh(geo, materials.armor);
   panel.name = side === -1 ? 'ChestSidePanel_Left' : 'ChestSidePanel_Right';
-  panel.position.set(side * 0.128, 0.048, 0.040);
+  panel.position.set(side * 0.128, 0.003, 0.040);
   panel.rotation.y = -side * 0.14;
   panel.rotation.x = -0.04;
   panel.castShadow = true;
   panel.receiveShadow = true;
 
-  // Diagonal Purple Emissive Light Strip
-  const stripLength = 0.138;
-  const stripGeo = new THREE.CylinderGeometry(0.0034, 0.0034, stripLength, 12);
+  // Diagonal Purple Emissive Light Strip aligned flush with side panel
+  const stripLength = 0.128;
+  const stripGeo = new THREE.CylinderGeometry(0.0032, 0.0032, stripLength, 14);
   const lightStrip = new THREE.Mesh(stripGeo, materials.purpleEmissive);
   lightStrip.name = side === -1 ? 'ChestLightStrip_Left' : 'ChestLightStrip_Right';
-  lightStrip.position.set(side * 0.122, 0.062, 0.060);
+  lightStrip.position.set(side * 0.124, 0.029, 0.064);
+  lightStrip.rotation.y = -side * 0.14;
   lightStrip.rotation.z = -side * 0.46;
   lightStrip.rotation.x = -0.04;
 
   return { panel, lightStrip };
+
 }
 
 // ─── 4. LOWER FLANK ARMOR WITH ARCHED UNDER-COWL ───────────────────────────
@@ -261,12 +265,13 @@ function createChestFlankArmor(
   materials: RobotMaterialPalette
 ): THREE.Mesh {
   const shape = new THREE.Shape();
-  shape.moveTo(0.048, 0.038);
-  shape.lineTo(0.056, 0.010);
-  shape.bezierCurveTo(0.058, -0.020, 0.052, -0.046, 0.040, -0.058);
-  shape.quadraticCurveTo(0.012, -0.034, -0.014, -0.036);
-  shape.bezierCurveTo(-0.032, -0.038, -0.044, -0.015, -0.048, 0.012);
-  shape.lineTo(-0.032, 0.038);
+  shape.moveTo(0.048, 0.048);
+  shape.lineTo(0.058, 0.015);
+  // Curves downward to close tightly around the upper actuator cylinder and mount
+  shape.bezierCurveTo(0.062, -0.025, 0.055, -0.060, 0.038, -0.078);
+  shape.quadraticCurveTo(0.008, -0.058, -0.018, -0.058);
+  shape.bezierCurveTo(-0.038, -0.054, -0.048, -0.020, -0.048, 0.018);
+  shape.lineTo(-0.032, 0.048);
   shape.closePath();
 
   const geo = new THREE.ExtrudeGeometry(shape, {
@@ -292,7 +297,7 @@ function createChestFlankArmor(
 
   const mesh = new THREE.Mesh(geo, materials.armor);
   mesh.name = side === -1 ? 'ChestFlankArmor_Left' : 'ChestFlankArmor_Right';
-  mesh.position.set(side * 0.116, 0.034, 0.032);
+  mesh.position.set(side * 0.114, -0.029, 0.028);
   mesh.rotation.y = -side * 0.20;
   mesh.rotation.x = -0.03;
   mesh.castShadow = true;
@@ -315,7 +320,7 @@ export function createChestArmor(materials: RobotMaterialPalette): ChestArmorNod
 
   // Purple Logo "A"
   const logo = createChestLogo(materials);
-  logo.position.set(0, 0.008, 0.036);
+  logo.position.set(0, -0.016, 0.036);
   logo.rotation.x = -0.04;
   centerPanel.add(logo);
   ledMeshes.push(logo);
@@ -365,7 +370,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const spineGeo = new THREE.CylinderGeometry(0.064, 0.055, 0.270, 24);
   const frameSpine = new THREE.Mesh(spineGeo, materials.joint);
   frameSpine.name = 'ChestFrameSpine';
-  frameSpine.position.set(0, 0.030, -0.020);
+  frameSpine.position.set(0, -0.037, -0.020);
   frameSpine.scale.set(1.08, 1.0, 0.88);
   frameSpine.castShadow = true;
   frameSpine.receiveShadow = true;
@@ -376,33 +381,30 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
 
   const frameClavicleLeft = new THREE.Mesh(clavicleBeamGeo, materials.joint);
   frameClavicleLeft.rotation.z = Math.PI / 2;
-  frameClavicleLeft.position.set(-0.126, 0.082, 0.008);
+  frameClavicleLeft.position.set(-0.126, TORSO_CONFIG.chest.shoulderMountY, 0.008);
   frameJointGroup.add(frameClavicleLeft);
 
   const frameClavicleRight = new THREE.Mesh(clavicleBeamGeo, materials.joint);
   frameClavicleRight.rotation.z = Math.PI / 2;
-  frameClavicleRight.position.set(0.126, 0.082, 0.008);
+  frameClavicleRight.position.set(0.126, TORSO_CONFIG.chest.shoulderMountY, 0.008);
   frameJointGroup.add(frameClavicleRight);
 
-  // 3. Engineered Dark Titanium Neck Collar Bezel & Sleeve (Reference Images 1 & 2)
-  const collarBezelGeo = new THREE.CylinderGeometry(0.062, 0.068, 0.020, 36);
+  // 3. Engineered Dark Titanium Neck Collar Bezel & Sleeve (Recessed inside neck cavity behind notch)
+  const collarRecessedZ = -0.018;
+  const collarBezelGeo = new THREE.CylinderGeometry(0.048, 0.052, 0.020, 36);
   const neckCollar = new THREE.Mesh(collarBezelGeo, materials.joint);
   neckCollar.name = 'NeckCollar';
-  neckCollar.position.set(0, TORSO_CONFIG.chest.collarY - 0.002, TORSO_CONFIG.chest.collarZ);
+  neckCollar.position.set(0, TORSO_CONFIG.chest.collarY - 0.002, collarRecessedZ);
   neckCollar.scale.set(1.04, 1.0, 0.92);
   neckCollar.castShadow = true;
   neckCollar.receiveShadow = true;
   neckCollar.visible = true;
   frameJointGroup.add(neckCollar);
 
-  const gRx = TORSO_CONFIG.chest.collarRadius;
-  const gRz = TORSO_CONFIG.chest.collarRadius * 0.90;
-  const gIrx = gRx * 0.80;
-
-  const collarSleeveGeo = new THREE.CylinderGeometry(gIrx * 1.02, gIrx * 0.96, 0.028, 32);
+  const collarSleeveGeo = new THREE.CylinderGeometry(0.044, 0.042, 0.028, 32);
   const neckCollarSleeve = new THREE.Mesh(collarSleeveGeo, materials.joint);
-  neckCollarSleeve.position.set(0, TORSO_CONFIG.chest.collarY - 0.006, TORSO_CONFIG.chest.collarZ);
-  neckCollarSleeve.scale.set(1.0, 1.0, gRz / gRx);
+  neckCollarSleeve.position.set(0, TORSO_CONFIG.chest.collarY - 0.006, collarRecessedZ);
+  neckCollarSleeve.scale.set(1.0, 1.0, 0.92);
   neckCollarSleeve.castShadow = true;
   frameJointGroup.add(neckCollarSleeve);
 
@@ -413,28 +415,29 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
     group.add(mergedFrameJoint);
   }
 
-  // 4. Horizontal Glowing Purple Light Ring at Neck Base (Reference Images 1 & 2)
-  const lightRingGeo = new THREE.TorusGeometry(0.057, 0.0024, 10, 40);
+  // 4. Horizontal Glowing Purple Light Ring at Neck Base
+  const lightRingGeo = new THREE.TorusGeometry(0.046, 0.0020, 10, 40);
   const neckCollarLightRing = new THREE.Mesh(lightRingGeo, materials.purpleEmissive);
   neckCollarLightRing.name = 'NeckCollarLightRing';
   neckCollarLightRing.rotation.x = Math.PI / 2;
-  neckCollarLightRing.position.set(0, TORSO_CONFIG.chest.collarY + 0.005, TORSO_CONFIG.chest.collarZ + 0.002);
+  neckCollarLightRing.position.set(0, TORSO_CONFIG.chest.collarY + 0.005, collarRecessedZ + 0.002);
   neckCollarLightRing.scale.set(1.04, 0.92, 1.0);
   group.add(neckCollarLightRing);
   ledMeshes.push(neckCollarLightRing);
 
-  // 5. Central Vertical Purple Light Slit at Neck Base (Reference Images 1 & 2)
-  const slitGeo = new THREE.BoxGeometry(0.0034, 0.016, 0.004);
+  // 5. Central Vertical Purple Light Slit at Neck Base (Recessed inside notch cavity)
+  const slitGeo = new THREE.BoxGeometry(0.0030, 0.014, 0.003);
   const neckCollarLightSlit = new THREE.Mesh(slitGeo, materials.purpleEmissive);
   neckCollarLightSlit.name = 'NeckCollarLightSlit';
-  neckCollarLightSlit.position.set(0, TORSO_CONFIG.chest.collarY + 0.013, TORSO_CONFIG.chest.collarZ + 0.054);
+  neckCollarLightSlit.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, 0.024);
   group.add(neckCollarLightSlit);
   ledMeshes.push(neckCollarLightSlit);
 
   // Localized subtle purple bounce light illuminating suprasternal notch & chin
   const neckGlowLight = new THREE.PointLight(ROBOT_ACCENT, 0.65, 0.16, 2.0);
-  neckGlowLight.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, TORSO_CONFIG.chest.collarZ + 0.038);
+  neckGlowLight.position.set(0, TORSO_CONFIG.chest.collarY + 0.008, 0.022);
   group.add(neckGlowLight);
+
 
   // Sculpted White Upper Back Armor (Reference Blueprint: "BACK VIEW")
   const backShape = new THREE.Shape();
@@ -463,7 +466,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
 
   const backArmor = new THREE.Mesh(backGeo, materials.armor);
   backArmor.name = 'ChestBackArmor';
-  backArmor.position.set(0, 0.035, -0.080);
+  backArmor.position.set(0, -0.032, -0.080);
   backArmor.rotation.x = 0.05;
   backArmor.castShadow = true;
   backArmor.receiveShadow = true;
@@ -473,7 +476,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const backLightGeo = new THREE.BoxGeometry(0.100, 0.0050, 0.006);
   const backLightBar = new THREE.Mesh(backLightGeo, materials.purpleEmissive);
   backLightBar.name = 'BackLightBar';
-  backLightBar.position.set(0, 0.068, -0.094);
+  backLightBar.position.set(0, 0.001, -0.094);
   group.add(backLightBar);
   ledMeshes.push(backLightBar);
 
@@ -496,17 +499,17 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   lipShape.closePath();
 
   const lipGeo = new THREE.ExtrudeGeometry(lipShape, {
-    depth: 0.064,
+    depth: 0.024,
     bevelEnabled: true,
-    bevelThickness: 0.003,
-    bevelSize: 0.0025,
+    bevelThickness: 0.002,
+    bevelSize: 0.002,
     bevelSegments: 2,
   });
   lipGeo.center();
 
   const chassisLip = new THREE.Mesh(lipGeo, materials.joint);
   chassisLip.name = 'SubSternalChassisLip';
-  chassisLip.position.set(0, -0.048, 0.012);
+  chassisLip.position.set(0, -0.075, -0.006);
   chassisLip.rotation.x = -0.04;
   tempLower.add(chassisLip);
 
@@ -514,14 +517,14 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const coreHousingGeo = new THREE.CylinderGeometry(0.050, 0.044, 0.018, 32);
   const coreHousing = new THREE.Mesh(coreHousingGeo, materials.joint);
   coreHousing.scale.set(1.10, 1.0, 0.84);
-  coreHousing.position.set(0, -0.060, 0.002);
+  coreHousing.position.set(0, -0.086, 0.002);
   tempLower.add(coreHousing);
 
   // 3. Bilateral Diagonal Support Struts (Reference: "LOWER CHEST FRAME")
   for (const side of [-1, 1] as const) {
     const strutGeo = new THREE.CylinderGeometry(0.0040, 0.0040, 0.034, 14);
     const strut = new THREE.Mesh(strutGeo, materials.joint);
-    strut.position.set(side * 0.036, -0.054, 0.016);
+    strut.position.set(side * 0.036, -0.082, 0.016);
     strut.rotation.z = side * 0.28;
     strut.rotation.x = -0.16;
     tempLower.add(strut);
@@ -532,32 +535,32 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
     // 1. Outer angled actuator upper clevis (tucked inside chest flank)
     const fClevisGeo = new THREE.BoxGeometry(0.014, 0.016, 0.016);
     const fClevis = new THREE.Mesh(fClevisGeo, materials.joint);
-    fClevis.position.set(side * 0.112, -0.032, 0.016);
+    fClevis.position.set(side * 0.112, -0.066, 0.016);
     tempLower.add(fClevis);
 
     const fPinGeo = new THREE.CylinderGeometry(0.0032, 0.0032, 0.018, 12);
     const fPin = new THREE.Mesh(fPinGeo, materials.joint);
     fPin.rotation.z = Math.PI / 2;
-    fPin.position.set(side * 0.112, -0.032, 0.016);
+    fPin.position.set(side * 0.112, -0.066, 0.016);
     tempLower.add(fPin);
 
     // 2. Inner vertical actuator upper clevis
     const rClevisGeo = new THREE.BoxGeometry(0.012, 0.014, 0.014);
     const rClevis = new THREE.Mesh(rClevisGeo, materials.joint);
-    rClevis.position.set(side * 0.052, -0.044, -0.006);
+    rClevis.position.set(side * 0.052, -0.078, -0.006);
     tempLower.add(rClevis);
 
     const rPinGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.016, 12);
     const rPin = new THREE.Mesh(rPinGeo, materials.joint);
     rPin.rotation.z = Math.PI / 2;
-    rPin.position.set(side * 0.052, -0.044, -0.006);
+    rPin.position.set(side * 0.052, -0.078, -0.006);
     tempLower.add(rPin);
   }
 
   // 5. Central Vertebral Gimbal Socket linking directly into vertebra 01
   const socketGeo = new THREE.CylinderGeometry(0.032, 0.028, 0.014, 28);
   const socket = new THREE.Mesh(socketGeo, materials.joint);
-  socket.position.set(0, -0.054, -0.002);
+  socket.position.set(0, -0.086, -0.002);
   tempLower.add(socket);
 
   const mergedLower = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerChestFrame_Merged')!;
@@ -572,7 +575,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const lowerAccentGeo = new THREE.TorusGeometry(0.042, 0.0012, 6, 32);
   const lowerAccentRing = new THREE.Mesh(lowerAccentGeo, materials.purpleEmissive);
   lowerAccentRing.rotation.x = Math.PI / 2;
-  lowerAccentRing.position.set(0, -0.062, 0.002);
+  lowerAccentRing.position.set(0, -0.082, 0.002);
   lowerAccentRing.scale.set(1.08, 0.86, 1.0);
   lowerFrame.add(lowerAccentRing);
   ledMeshes.push(lowerAccentRing);
@@ -608,42 +611,58 @@ export function createShoulderMount(
 
   const ledMeshes: THREE.Mesh[] = [];
 
-  // A. Structural Clavicle Socket Housing (anchored medially into chest frame)
-  // Medial position: towards torso center (-side)
-  const r = TORSO_CONFIG.chest.shoulderMountRadius;
-  const housingGeo = new THREE.CylinderGeometry(r * 0.94, r * 1.02, 0.026, 28);
+  // A. Structural Clavicle Socket Housing (anchored high near upper clavicle frame)
+  const housingGeo = new THREE.CylinderGeometry(0.024, 0.026, 0.018, 28);
   const socketHousing = new THREE.Mesh(housingGeo, materials.joint);
   socketHousing.rotation.z = Math.PI / 2;
-  socketHousing.position.set(-side * 0.013, 0, 0);
+  socketHousing.position.set(-side * 0.014, 0.018, 0);
   socketHousing.castShadow = true;
   socketHousing.receiveShadow = true;
   group.add(socketHousing);
 
   // B. Hollow Clavicle Bearing Cup Sleeve (receives shoulder trunnion collar)
-  const trunnionGeo = new THREE.CylinderGeometry(0.042, 0.040, 0.014, 28);
+  const trunnionGeo = new THREE.CylinderGeometry(0.026, 0.024, 0.012, 28);
   const rotaryTrunnion = new THREE.Mesh(trunnionGeo, materials.joint);
   rotaryTrunnion.rotation.z = Math.PI / 2;
-  rotaryTrunnion.position.set(-side * 0.007, 0, 0);
+  rotaryTrunnion.position.set(-side * 0.008, 0.018, 0);
   rotaryTrunnion.castShadow = true;
   rotaryTrunnion.receiveShadow = true;
   group.add(rotaryTrunnion);
 
+  // C. Stepped Lavender / Metallic Purple Shoulder Neck Sleeve (Matching Reference Image 2)
+  const sleeveGeo = new THREE.CylinderGeometry(0.020, 0.022, 0.012, 28);
+  const purpleNeckSleeve = new THREE.Mesh(sleeveGeo, materials.purpleEmissive);
+  purpleNeckSleeve.name = side === -1 ? 'ShoulderPurpleNeckSleeve_Left' : 'ShoulderPurpleNeckSleeve_Right';
+  purpleNeckSleeve.rotation.z = Math.PI / 2;
+  purpleNeckSleeve.position.set(-side * 0.002, 0.018, 0);
+  purpleNeckSleeve.castShadow = true;
+  purpleNeckSleeve.receiveShadow = true;
+  group.add(purpleNeckSleeve);
+  ledMeshes.push(purpleNeckSleeve);
+
+  // Stepped accent ring on lavender sleeve
+  const sleeveRingGeo = new THREE.TorusGeometry(0.022, 0.0014, 8, 28);
+  const sleeveRing = new THREE.Mesh(sleeveRingGeo, materials.metallic);
+  sleeveRing.rotation.y = Math.PI / 2;
+  sleeveRing.position.set(-side * 0.004, 0.018, 0);
+  group.add(sleeveRing);
+
   // 6 Perimeter Clavicle Fasteners securing socket cup to chest frame
   for (let b = 0; b < 6; b++) {
     const angle = (b / 6) * Math.PI * 2;
-    const boltGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.003, 6);
+    const boltGeo = new THREE.CylinderGeometry(0.0015, 0.0015, 0.0025, 6);
     const bolt = new THREE.Mesh(boltGeo, materials.joint);
     bolt.rotation.z = Math.PI / 2;
-    bolt.position.set(-side * 0.014, Math.sin(angle) * (r * 0.88), Math.cos(angle) * (r * 0.88));
+    bolt.position.set(-side * 0.014, 0.018 + Math.sin(angle) * 0.022, Math.cos(angle) * 0.022);
     group.add(bolt);
   }
 
-  // C. Purple Accent LED Ring recessed inside the clavicle socket housing bore
-  const ringGeo = new THREE.TorusGeometry(0.034, 0.0012, 8, 32);
+  // D. Purple Accent LED Ring recessed inside the clavicle socket housing bore
+  const ringGeo = new THREE.TorusGeometry(0.025, 0.0012, 8, 32);
   const accentRing = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRing.name = side === -1 ? 'ShoulderAccentRing_Left' : 'ShoulderAccentRing_Right';
   accentRing.rotation.y = Math.PI / 2;
-  accentRing.position.set(-side * 0.014, 0, 0);
+  accentRing.position.set(-side * 0.014, 0.018, 0);
   group.add(accentRing);
   ledMeshes.push(accentRing);
 

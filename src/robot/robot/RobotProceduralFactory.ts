@@ -85,7 +85,7 @@ export function createProceduralRobot(): RobotNodes {
   // ==========================================
   const headAssembly = createRobotHead(materials);
   torsoNodes.upperTorsoFrame.group.add(headAssembly.neck);
-  headAssembly.neck.position.set(0, 0.136, 0.010);
+  headAssembly.neck.position.set(0, 0.080, -0.004);
 
   const head = headAssembly.head;
   const neck = headAssembly.neck;
@@ -120,22 +120,19 @@ export function createProceduralRobot(): RobotNodes {
 
   ledMeshes.push(...leftArm.ledMeshes, ...rightArm.ledMeshes);
 
-  // Poised athletic humanoid arm posture matching reference figure
-  leftArm.shoulder.group.rotation.set(0.01, 0.02, -0.03);
-  rightArm.shoulder.group.rotation.set(0.01, -0.02, 0.03);
-  leftArm.shoulder.jointGroup.rotation.x = -0.10;
-  rightArm.shoulder.jointGroup.rotation.x = -0.10;
-  leftArm.upperArm.group.rotation.set(0, 0.04, -0.07);
-  rightArm.upperArm.group.rotation.set(0, -0.04, 0.07);
+  // Poised athletic humanoid arm posture matching natural rest pose
+  leftArm.shoulder.group.rotation.set(0, 0, 0);
+  rightArm.shoulder.group.rotation.set(0, 0, 0);
+  leftArm.shoulder.jointGroup.rotation.set(-0.04, 0.02, -0.03);
+  rightArm.shoulder.jointGroup.rotation.set(-0.04, -0.02, 0.03);
+  leftArm.upperArm.group.rotation.set(0, 0, 0);
+  rightArm.upperArm.group.rotation.set(0, 0, 0);
   leftArm.elbow.group.rotation.set(0, 0, 0);
   rightArm.elbow.group.rotation.set(0, 0, 0);
-  leftArm.elbow.forearmPivot.rotation.set(-0.48, 0.08, 0.04);
-  rightArm.elbow.forearmPivot.rotation.set(-0.48, -0.08, -0.04);
-  // Semi-pronated athletic humanoid wrist posture:
-  // Palms face medially toward the thighs, dorsal ceramic shields face anterolaterally (45°),
-  // thumbs point forward/medially in grasping readiness, fingers cascade along thigh contours.
-  leftArm.wrist.group.rotation.set(0.06, -0.92, 0.04);
-  rightArm.wrist.group.rotation.set(0.06, 0.92, -0.04);
+  leftArm.elbow.forearmPivot.rotation.set(-0.44, 0.06, 0.02);
+  rightArm.elbow.forearmPivot.rotation.set(-0.44, -0.06, -0.02);
+  leftArm.wrist.group.rotation.set(0.04, -0.42, 0.02);
+  rightArm.wrist.group.rotation.set(0.04, 0.42, -0.02);
 
   const leftShoulder = leftArm.shoulder.group;
   const rightShoulder = rightArm.shoulder.group;

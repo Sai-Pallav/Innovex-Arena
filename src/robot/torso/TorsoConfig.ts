@@ -10,11 +10,10 @@
  * - Pelvis Width: 260 mm (0.260)
  * - Torso Depth: 220 mm (0.220)
  *
- * 4-Segment Articulated Spine (Consistent cylindrical/central core width):
- * - Vertebra 01: y = -0.098, w = 0.078
- * - Vertebra 02: y = -0.124, w = 0.076
- * - Vertebra 03: y = -0.150, w = 0.074
- * - Vertebra 04: y = -0.176, w = 0.072
+ * 3-Segment Articulated Spine (Consistent cylindrical/central core width):
+ * - Vertebra 01: y = -0.082, w = 0.078
+ * - Vertebra 02: y = -0.118, w = 0.076
+ * - Vertebra 03: y = -0.154, w = 0.074
  */
 
 export interface StomachRingSpec {
@@ -46,10 +45,10 @@ export const TORSO_CONFIG = {
     depth: 0.220,
     frontPlateThickness: 0.026,
     collarRadius: 0.072,
-    collarY: 0.148,
+    collarY: 0.080,
     collarZ: 0.008,
     shoulderMountX: 0.210, // Wider shoulder span matching expanded clavicle
-    shoulderMountY: 0.082,
+    shoulderMountY: 0.052,
     shoulderMountZ: 0.015,
     shoulderMountRadius: 0.056,
     logoWidth: 0.050,
@@ -60,11 +59,11 @@ export const TORSO_CONFIG = {
   // Abdomen & Spine Section: 4 Articulated Vertebral Modules + Bilateral Actuators
   stomach: {
     height: 0.140, // 140 mm per blueprint
-    vertebraCount: 4,
-    vertebraY: [-0.058, -0.090, -0.122, -0.154] as const,
+    vertebraCount: 3,
+    vertebraY: [-0.100, -0.136, -0.172] as const,
     vertebraWidth: 0.088,
-    vertebraHeight: 0.026,
-    vertebraDepth: 0.052,
+    vertebraHeight: 0.022,
+    vertebraDepth: 0.050,
     internalSpineRadius: 0.018,
     internalSpineHeight: 0.135,
 
@@ -73,39 +72,37 @@ export const TORSO_CONFIG = {
       widthX: 0.114,
       depthZ: 0.080,
       height: 0.014,
-      yOffset: -0.048,
+      yOffset: -0.042,
     },
 
-    // 4 Articulated Vertebrae Specifications (Evenly filling 140 mm abdomen)
+    // 3 Articulated Vertebrae Specifications
     rings: [
-      { name: 'vertebra01', radiusX: 0.048, radiusZ: 0.029, height: 0.026, thickness: 0.012, yOffset: -0.058, frontWidth: 0.096 },
-      { name: 'vertebra02', radiusX: 0.044, radiusZ: 0.028, height: 0.026, thickness: 0.012, yOffset: -0.090, frontWidth: 0.088 },
-      { name: 'vertebra03', radiusX: 0.040, radiusZ: 0.026, height: 0.026, thickness: 0.012, yOffset: -0.122, frontWidth: 0.080 },
-      { name: 'vertebra04', radiusX: 0.036, radiusZ: 0.025, height: 0.026, thickness: 0.012, yOffset: -0.154, frontWidth: 0.072, isNarrowest: true },
+      { name: 'vertebra01', radiusX: 0.046, radiusZ: 0.028, height: 0.022, thickness: 0.011, yOffset: -0.100, frontWidth: 0.096 },
+      { name: 'vertebra02', radiusX: 0.044, radiusZ: 0.028, height: 0.022, thickness: 0.011, yOffset: -0.136, frontWidth: 0.092 },
+      { name: 'vertebra03', radiusX: 0.040, radiusZ: 0.026, height: 0.022, thickness: 0.011, yOffset: -0.172, frontWidth: 0.084 },
     ] as StomachRingSpec[],
 
-    // 4 Tiered Articulated Segmental Armor Plates (Matching media_1789199822492.png & media_1789199822498.png)
+    // 3 Identical Tiered Trapezoidal Armor Plates with 10mm gaps matching reference image
     armorPlates: [
-      { width: 0.104, height: 0.032, depth: 0.015, y: -0.056, z: 0.042 }, // Plate 01: Snug under sub-sternal arch, trapezoidal shield
-      { width: 0.126, height: 0.032, depth: 0.013, y: -0.090, z: 0.042 }, // Plate 02
-      { width: 0.110, height: 0.030, depth: 0.012, y: -0.122, z: 0.040 }, // Plate 03
-      { width: 0.096, height: 0.028, depth: 0.011, y: -0.154, z: 0.038 }, // Plate 04: Waist interface
+      { width: 0.118, height: 0.026, depth: 0.018, y: -0.100, z: 0.040 }, // Plate 01: Sub-sternal arch, wide trapezoid
+      { width: 0.096, height: 0.026, depth: 0.017, y: -0.136, z: 0.038 }, // Plate 02: Mid-abdomen, identical trapezoid
+      { width: 0.078, height: 0.026, depth: 0.016, y: -0.172, z: 0.036 }, // Plate 03: Lower abdomen, identical trapezoid
     ] as const,
 
     // Backward compatibility aliases
     upperArmor: {
-      width: 0.104,
-      height: 0.032,
-      depth: 0.015,
-      y: -0.056,
-      z: 0.042,
+      width: 0.118,
+      height: 0.026,
+      depth: 0.018,
+      y: -0.082,
+      z: 0.040,
     },
     lowerArmor: {
-      width: 0.110,
-      height: 0.030,
-      depth: 0.012,
-      y: -0.122,
-      z: 0.040,
+      width: 0.078,
+      height: 0.026,
+      depth: 0.016,
+      y: -0.154,
+      z: 0.036,
     },
 
     // Lower Connector distributing load into waist
@@ -113,66 +110,66 @@ export const TORSO_CONFIG = {
       widthX: 0.080,
       depthZ: 0.052,
       height: 0.014,
-      yOffset: -0.194,
+      yOffset: -0.209,
     },
     lowerAbdomen: {
       widthX: 0.080,
       depthZ: 0.052,
       height: 0.014,
-      yOffset: -0.194,
+      yOffset: -0.209,
     },
 
     // Side Actuator Mounting Coordinates
     actuator: {
-      upperMount: { x: 0.088, y: -0.018, z: 0.018 },
-      lowerMount: { x: 0.088, y: -0.188, z: 0.012 },
-      upperX: 0.088,
-      upperY: -0.018,
-      upperZ: 0.018,
-      lowerX: 0.088,
-      lowerY: -0.188,
-      lowerZ: 0.012,
-      cylinderRadius: 0.0095,
+      upperMount: { x: 0.096, y: -0.055, z: 0.016 },
+      lowerMount: { x: 0.074, y: -0.203, z: 0.010 },
+      upperX: 0.096,
+      upperY: -0.046,
+      upperZ: 0.016,
+      lowerX: 0.074,
+      lowerY: -0.203,
+      lowerZ: 0.010,
+      cylinderRadius: 0.0106,
       pistonRadius: 0.0058,
     },
 
-    // Dual Side Actuators per side (Outer angled hydraulic + Inner vertical stabilizer per wireframe reference)
+    // Dual Side Actuators per side (Outer angled hydraulic + Inner crossed stabilizer)
     dualActuators: {
       outer: {
-        upperMount: { x: 0.088, y: -0.018, z: 0.018 },
-        lowerMount: { x: 0.088, y: -0.188, z: 0.012 },
-        cylinderRadius: 0.0102,
-        pistonRadius: 0.0055,
+        upperMount: { x: 0.096, y: -0.046, z: 0.016 },
+        lowerMount: { x: 0.074, y: -0.203, z: 0.010 },
+        cylinderRadius: 0.0106,
+        pistonRadius: 0.0058,
       },
       inner: {
-        upperMount: { x: 0.052, y: -0.044, z: -0.006 },
-        lowerMount: { x: 0.050, y: -0.188, z: -0.006 },
-        cylinderRadius: 0.0088,
-        pistonRadius: 0.0050,
+        upperMount: { x: 0.076, y: -0.052, z: 0.006 },
+        lowerMount: { x: 0.054, y: -0.203, z: 0.014 },
+        cylinderRadius: 0.0078,
+        pistonRadius: 0.0048,
       },
     },
 
     // Multi-Column Kinematic Actuator & Stabilizer Array (Matching Reference: "WAIST INTERNAL STRUCTURE")
     actuatorArray: {
       frontLinear: {
-        upperMount: { x: 0.088, y: -0.018, z: 0.018 },
-        lowerMount: { x: 0.088, y: -0.188, z: 0.012 },
-        cylinderRadius: 0.0102,
-        pistonRadius: 0.0056,
+        upperMount: { x: 0.096, y: -0.046, z: 0.016 },
+        lowerMount: { x: 0.074, y: -0.203, z: 0.010 },
+        cylinderRadius: 0.0106,
+        pistonRadius: 0.0058,
         powerCoreLength: 0.026,
       },
       midStabilizer: {
-        upperMount: { x: 0.076, y: -0.046, z: 0.002 },
-        lowerMount: { x: 0.062, y: -0.190, z: 0.000 },
+        upperMount: { x: 0.076, y: -0.090, z: 0.002 },
+        lowerMount: { x: 0.062, y: -0.205, z: 0.000 },
         columnRadius: 0.0068,
         collarRadius: 0.0092,
       },
       rearLinear: {
-        upperMount: { x: 0.052, y: -0.044, z: -0.006 },
-        lowerMount: { x: 0.050, y: -0.188, z: -0.006 },
-        cylinderRadius: 0.0088,
-        pistonRadius: 0.0050,
-        powerCoreLength: 0.044,
+        upperMount: { x: 0.076, y: -0.052, z: 0.006 },
+        lowerMount: { x: 0.054, y: -0.203, z: 0.014 },
+        cylinderRadius: 0.0078,
+        pistonRadius: 0.0048,
+        powerCoreLength: 0.030,
       },
     },
 
@@ -180,7 +177,7 @@ export const TORSO_CONFIG = {
     referenceActuators: {
       outerAngled: {
         upperMount: { x: 0.106, y: -0.034, z: 0.016 },
-        lowerMount: { x: 0.082, y: -0.192, z: 0.010 },
+        lowerMount: { x: 0.082, y: -0.200, z: 0.010 },
         cylinderRadius: 0.0092,
         pistonRadius: 0.0055,
         socketRadius: 0.0095,
@@ -188,7 +185,7 @@ export const TORSO_CONFIG = {
       },
       innerGlowing: {
         upperMount: { x: 0.052, y: -0.046, z: -0.006 },
-        lowerMount: { x: 0.050, y: -0.190, z: -0.006 },
+        lowerMount: { x: 0.050, y: -0.198, z: -0.006 },
         cylinderRadius: 0.0084,
         glowingCoreRadius: 0.0076,
         glowingCoreLength: 0.042,
@@ -216,14 +213,14 @@ export const TORSO_CONFIG = {
       radiusX: 0.084,
       radiusZ: 0.065,
       height: 0.014,
-      yOffset: -0.202,
+      yOffset: -0.221,
     },
     // 2. Rotational Bearing Turntable Core
     waistCore: {
       upperRadius: 0.070,
       lowerRadius: 0.076,
       height: 0.022,
-      yOffset: -0.220,
+      yOffset: -0.237,
       innerBoreRadius: 0.032,
     },
     // 3. Lower Waist Collar
@@ -231,12 +228,12 @@ export const TORSO_CONFIG = {
       radiusX: 0.086,
       radiusZ: 0.066,
       height: 0.014,
-      yOffset: -0.236,
+      yOffset: -0.251,
     },
     // 4. Functional Hip Connectors & Pelvis Interface (260 mm pelvis width)
     hipConnector: {
       mountX: 0.096,
-      mountY: -0.250,
+      mountY: -0.265,
       mountZ: 0.004,
       hubRadius: 0.020,
       hubWidth: 0.016,
@@ -249,7 +246,7 @@ export const TORSO_CONFIG = {
     coreRadius: 0.070,
     pelvisRadius: 0.086,
     hipCowlX: 0.124,
-    hipCowlY: -0.352,
+    hipCowlY: -0.367,
     hipCowlZ: 0.005,
   },
 
