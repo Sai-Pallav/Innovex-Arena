@@ -138,13 +138,13 @@ export class ArmElbowController {
 
     const targetLeftElbow = THREE.MathUtils.clamp(
       this.currentPoseState.leftElbow + elbowIdleL,
-      -0.65, // ~ -37° maximum forward bend
-      -0.26  // ~ -15° minimum forward bend
+      -0.38, // ~ -22° maximum subtle forward bend
+      -0.18  // ~ -10° minimum subtle forward bend
     );
     const targetRightElbow = THREE.MathUtils.clamp(
       this.currentPoseState.rightElbow + elbowIdleR,
-      -0.65,
-      -0.26
+      -0.38,
+      -0.18
     );
 
     // Damped interpolation for mechanical inertia

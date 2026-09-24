@@ -72,8 +72,11 @@ export function createRobotArm(
   // Attaches flush to the shoulder mounting flange interface.
   // ==========================================================================
   const upperArm = createUpperArm(side, materials);
-  // Natural athletic outward splay and compensated yaw for unbroken centerline
-  upperArm.group.rotation.set(0.025, side * 0.12, side * 0.10);
+  // Natural relaxed resting posture:
+  // Upper arm rotates forward ~3.7° (-0.065 rad) relative to torso (subtle humanoid forward bias)
+  // Y-axis rotation: side * 0.010 rad (minimal twist, arms close to body)
+  // Lateral Z-axis: 0 rad (zero lateral splay, hanging naturally beside torso)
+  upperArm.group.rotation.set(-0.065, side * 0.010, 0);
   armRoot.add(upperArm.group);
   ledMeshes.push(...upperArm.ledMeshes);
 
@@ -88,10 +91,12 @@ export function createRobotArm(
   // ==========================================================================
   // 3. TAPERED FOREARM GAUNTLET & MECHANICAL CORE
   // Parented directly to elbow.forearmPivot — follows true 1-DOF elbow flexion.
+  // Subtle carrying angle (-side * 0.025) aligns forearm vertically beside hips.
   // ==========================================================================
   const forearm = createForearm(side, materials);
   // Aligned flush with the elbow lower knuckle docking collar
   forearm.group.position.set(0, -0.014, 0);
+  forearm.group.rotation.set(0, 0, -side * 0.025);
   elbow.forearmPivot.add(forearm.group);
   ledMeshes.push(...forearm.ledMeshes);
 
@@ -101,6 +106,10 @@ export function createRobotArm(
   // ==========================================================================
   const wrist = createWrist(side, materials);
   wrist.group.position.set(0, 0, 0);
+  // Natural relaxed wrist pronation: palms face inward/backward (not forward)
+  // Y-axis rotation (roll): side * 0.52 rad (~30°) pronates palm inward
+  // This matches the reference image showing relaxed humanoid robot hand orientation
+  wrist.group.rotation.set(0, side * 0.52, 0);
   forearm.distalWristMount.add(wrist.group);
   ledMeshes.push(...wrist.ledMeshes);
 
@@ -118,7 +127,7 @@ export function createRobotArm(
   // 6. DEFAULT ATHLETIC RESTING POSTURE
   // Sets natural relaxed angles for immediate hero rendering
   // ==========================================================================
-  elbow.setAngle(-0.30); // ~17° natural flexion bend matching ready stance
+  elbow.setAngle(-0.297); // ~ -17.0° natural flexion bend creating visible elbow articulation
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {

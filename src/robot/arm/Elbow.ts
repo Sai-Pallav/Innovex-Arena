@@ -22,21 +22,21 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ELBOW_CONFIG = {
-  hingeRadius:      0.0270,   // compact transverse hinge core outer radius (54 mm dia)
-  hingeWidth:       0.0580,   // total axle span along X (58 mm matching upper arm distal cuff)
-  discOuterRadius:  0.0295,   // circular actuator disc outer bezel radius (59 mm outer dia)
-  discThickness:    0.0055,   // actuator side cover thickness
-  emissiveRingR:    0.0225,   // purple accent ring radius
-  emissiveRingTube: 0.0020,   // accent ring tube thickness
-  hubCapRadius:     0.0115,   // machined hub cap radius
-  axleRadius:       0.0090,   // central axle pin radius
-  axleLength:       0.0620,   // axle pin total length
+  hingeRadius:      0.0320,   // transverse hinge core outer radius (64 mm dia)
+  hingeWidth:       0.0660,   // total axle span along X (66 mm matching upper arm distal cuff)
+  discOuterRadius:  0.0350,   // circular actuator disc outer bezel radius (70 mm outer dia)
+  discThickness:    0.0062,   // actuator side cover thickness
+  emissiveRingR:    0.0268,   // purple accent ring radius
+  emissiveRingTube: 0.0022,   // accent ring tube thickness
+  hubCapRadius:     0.0135,   // machined hub cap radius
+  axleRadius:       0.0105,   // central axle pin radius
+  axleLength:       0.0700,   // axle pin total length
 
   // Angular limits (radians) — rotation.x on forearmPivot
   neutralAngle:  0.00,
   minBend:       0.08,        // slight hyperextension guard
   maxBend:      -2.18,        // ≈ 125 ° maximum anatomical flexion
-  restingBend:  -0.30,        // natural relaxed ready posture
+  restingBend:  -0.28,        // natural subtle relaxed posture (10°–20° reference spec)
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -306,13 +306,13 @@ export function createElbow(
   upperHousing.add(upperConnector);
 
   // Upper collar socket flange (mates with UpperArm elbowSocketCuff)
-  const upperCollarGeo = new THREE.CylinderGeometry(0.0265, 0.0285, 0.012, 28);
+  const upperCollarGeo = new THREE.CylinderGeometry(0.0305, 0.0325, 0.012, 28);
   const upperCollar = new THREE.Mesh(upperCollarGeo, materials.joint);
   upperCollar.position.set(0, 0.026, 0);
   upperCollar.castShadow = true;
   upperHousing.add(upperCollar);
 
-  const upperCollarRingGeo = new THREE.TorusGeometry(0.0270, 0.0012, 6, 28);
+  const upperCollarRingGeo = new THREE.TorusGeometry(0.0310, 0.0012, 6, 28);
   upperCollarRingGeo.rotateX(Math.PI / 2);
   const upperCollarRing = new THREE.Mesh(upperCollarRingGeo, materials.metallic);
   upperCollarRing.position.set(0, 0.031, 0);
@@ -553,13 +553,13 @@ export function createElbow(
   lowerHousing.add(stemMesh);
 
   // Lower docking collar — interfaces flush with Forearm.ts proximal collar
-  const lowCollarGeo = new THREE.CylinderGeometry(0.0265, 0.0285, 0.010, 28);
+  const lowCollarGeo = new THREE.CylinderGeometry(0.0305, 0.0325, 0.010, 28);
   const lowCollar = new THREE.Mesh(lowCollarGeo, materials.joint);
   lowCollar.position.set(0, -0.014, 0);
   lowCollar.castShadow = true;
   lowerHousing.add(lowCollar);
 
-  const lowCollarRingGeo = new THREE.TorusGeometry(0.0270, 0.0012, 6, 28);
+  const lowCollarRingGeo = new THREE.TorusGeometry(0.0310, 0.0012, 6, 28);
   lowCollarRingGeo.rotateX(Math.PI / 2);
   const lowCollarRing = new THREE.Mesh(lowCollarRingGeo, materials.metallic);
   lowCollarRing.position.set(0, -0.010, 0);

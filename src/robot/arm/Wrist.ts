@@ -1,28 +1,28 @@
-/**
- * ============================================================================
- * WRIST MODULE — DEDICATED HOUSING & ROTATIONAL ASSEMBLY
- * ============================================================================
- *
- * Implements a dedicated, structural wrist housing module:
- * - Dedicated Wrist Housing: Faceted CNC-machined titanium enclosure block
- *   with chamfered corners, bilateral styloid trunnion ears, and inspection cutouts.
- * - Rotational Assembly: Integrated nested crossed-roller bearing stack,
- *   harmonic drive collar, transverse axle pin, and signature purple emissive accent ring.
- * - Precision End-Effector Interface: 8-bolt titanium mounting plate with central bore.
- * - Absolute Stop Condition: No hands, fingers, or grippers.
- * ============================================================================
- */
-
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WRIST MODULE — Sleek Humanoid Robotic Wrist Joint Assembly
+// Exact match to Reference Blueprint Image:
+//
+// Architecture (proximal → distal):
+//   Forearm gauntlet docking rim
+//     ↓  Vibrant Purple Emissive LED Ring Collar (signature cybernetic accent)
+//     ↓  Segmented Dark Titanium Cylindrical Wrist Sleeve with Chrome Inset Flutes
+//     ↓  Polished Metallic Retaining Ring
+//     ↓  Precision Internal Flexion Axle Pin & Bearing Races
+//     ↓  Stepped Carpal Transition Collar
+//     ↓  Distal Hand Mount (Interfaces flush with Hand.ts carpal cuff)
+// ─────────────────────────────────────────────────────────────────────────────
 
 export interface WristNodes {
   group: THREE.Group;
   wristPivot: THREE.Group;
+  distalHandMount: THREE.Group;
   swivelCollar: THREE.Mesh;
   accentRing: THREE.Mesh;
   pivotPin: THREE.Mesh;
-  distalInterfacePlate: THREE.Mesh;
+  distalClevis: THREE.Mesh;
   ribbedRings: THREE.Mesh[];
   styloidCaps: THREE.Mesh[];
   ledMeshes: THREE.Mesh[];
@@ -31,10 +31,6 @@ export interface WristNodes {
   dorsalCowl: THREE.Mesh;
   rotaryCore: THREE.Mesh;
   distalSocket: THREE.Mesh;
-  distalHandMount: THREE.Group;
-  // Compatibility alias
-  distalClevis: THREE.Mesh;
-  dedicatedWristHousing?: THREE.Group;
 }
 
 export function createWrist(
@@ -42,235 +38,170 @@ export function createWrist(
   materials: RobotMaterialPalette
 ): WristNodes {
   const wristGroup = new THREE.Group();
-  wristGroup.name = side === -1 ? 'LeftWristInterface' : 'RightWristInterface';
+  wristGroup.name = side === -1 ? 'LeftWristPivot' : 'RightWristPivot';
 
   const ledMeshes: THREE.Mesh[] = [];
   const ribbedRings: THREE.Mesh[] = [];
   const styloidCaps: THREE.Mesh[] = [];
 
-  // ════════════════════════════════════════════════════════════
-  // 1. DEDICATED STRUCTURAL WRIST HOUSING BLOCK
-  //    Stationary relative to forearm distal mount.
-  //    Faceted enclosure with chamfers, bilateral styloid bosses, and internal bore.
-  // ════════════════════════════════════════════════════════════
-  const dedicatedWristHousing = new THREE.Group();
-  dedicatedWristHousing.name = 'DedicatedWristHousing';
-  wristGroup.add(dedicatedWristHousing);
-
-  // Main faceted housing block (36mm wide, 22mm high, 32mm deep)
-  const housingBodyGeo = new THREE.BoxGeometry(0.036, 0.022, 0.032);
-  const housingBody = new THREE.Mesh(housingBodyGeo, materials.joint);
-  housingBody.name = 'WristHousingMainBody';
-  housingBody.position.set(0, -0.011, 0);
-  housingBody.castShadow = true;
-  housingBody.receiveShadow = true;
-  dedicatedWristHousing.add(housingBody);
-
-  // Top docking collar (seats inside forearm gauntlet distal socket)
-  const topDockGeo = new THREE.CylinderGeometry(0.0185, 0.0195, 0.008, 28);
-  const topDock = new THREE.Mesh(topDockGeo, materials.joint);
-  topDock.position.set(0, 0.002, 0);
-  topDock.castShadow = true;
-  dedicatedWristHousing.add(topDock);
-
-  const topDockRimGeo = new THREE.TorusGeometry(0.0190, 0.0010, 6, 28);
-  topDockRimGeo.rotateX(Math.PI / 2);
-  const topDockRim = new THREE.Mesh(topDockRimGeo, materials.metallic);
-  topDockRim.position.set(0, 0.004, 0);
-  dedicatedWristHousing.add(topDockRim);
-  ribbedRings.push(topDockRim);
-
-  // Bilateral Chamfered Corner Reinforcements
-  for (const cSide of [-1, 1]) {
-    const cornerGeo = new THREE.BoxGeometry(0.005, 0.020, 0.030);
-    const corner = new THREE.Mesh(cornerGeo, materials.joint);
-    corner.position.set(cSide * 0.017, -0.011, 0);
-    dedicatedWristHousing.add(corner);
-
-    // Bilateral Styloid Trunnion Bosses (Anatomical styloid process mecha equivalents)
-    const styloidBossGeo = new THREE.CylinderGeometry(0.0075, 0.0075, 0.0028, 20);
-    styloidBossGeo.rotateZ(Math.PI / 2);
-    const styloidBoss = new THREE.Mesh(styloidBossGeo, materials.joint);
-    styloidBoss.position.set(cSide * 0.0190, -0.011, 0);
-    styloidBoss.castShadow = true;
-    dedicatedWristHousing.add(styloidBoss);
-
-    const styloidRimGeo = new THREE.TorusGeometry(0.0072, 0.0008, 6, 20);
-    styloidRimGeo.rotateY(Math.PI / 2);
-    const styloidRim = new THREE.Mesh(styloidRimGeo, materials.metallic);
-    styloidRim.position.set(cSide * (0.0190 + 0.0016), -0.011, 0);
-    dedicatedWristHousing.add(styloidRim);
-
-    // Chrome central pivot bolt
-    const boltGeo = new THREE.CylinderGeometry(0.0015, 0.0015, 0.0026, 6);
-    boltGeo.rotateZ(Math.PI / 2);
-    const bolt = new THREE.Mesh(boltGeo, materials.metallic);
-    bolt.position.set(cSide * (0.0190 + 0.0022), -0.011, 0);
-    dedicatedWristHousing.add(bolt);
-    styloidCaps.push(bolt);
-  }
-
-  // Anterior & Posterior Inspection Cutouts (Reveals internal bearing and accent ring)
-  for (const cutZ of [-0.015, 0.015]) {
-    const cutBezelGeo = new THREE.BoxGeometry(0.020, 0.009, 0.0018);
-    const cutBezel = new THREE.Mesh(cutBezelGeo, materials.metallic);
-    cutBezel.position.set(0, -0.011, cutZ);
-    dedicatedWristHousing.add(cutBezel);
-  }
-
-  // ════════════════════════════════════════════════════════════
-  // 2. DEDICATED ROTATIONAL PIVOT & MECHANICS ASSEMBLY
-  //    Integrated directly inside the dedicated housing.
-  // ════════════════════════════════════════════════════════════
-  const wristPivot = new THREE.Group();
-  wristPivot.name = side === -1 ? 'LeftWristPivot' : 'RightWristPivot';
-  wristPivot.position.set(0, -0.012, 0);
-  wristGroup.add(wristPivot);
-
   const mechanicsGroup = new THREE.Group();
   mechanicsGroup.name = 'WristMechanics';
-  wristPivot.add(mechanicsGroup);
+  wristGroup.add(mechanicsGroup);
 
-  // Rotational Harmonic Drive Collar
-  const collarGeo = new THREE.CylinderGeometry(0.0165, 0.0175, 0.012, 28);
+  // ════════════════════════════════════════════════════════════
+  // 1. FOREARM DOCKING COLLAR & UPPER RETAINER RIM
+  // ════════════════════════════════════════════════════════════
+  const upperCollarGeo = new THREE.CylinderGeometry(0.0238, 0.0250, 0.004, 32);
+  const upperCollar = new THREE.Mesh(upperCollarGeo, materials.joint);
+  upperCollar.position.set(0, -0.001, 0);
+  mechanicsGroup.add(upperCollar);
+
+  const upperRimGeo = new THREE.TorusGeometry(0.0252, 0.0010, 8, 32);
+  upperRimGeo.rotateX(Math.PI / 2);
+  const upperRim = new THREE.Mesh(upperRimGeo, materials.metallic);
+  upperRim.position.set(0, -0.001, 0);
+  mechanicsGroup.add(upperRim);
+  ribbedRings.push(upperRim);
+
+  // ════════════════════════════════════════════════════════════
+  // 2. SIGNATURE PURPLE GLOWING LED RING COLLAR
+  //    Bright circular halo right below the forearm gauntlet cuff
+  // ════════════════════════════════════════════════════════════
+  const accentGeo = new THREE.TorusGeometry(0.0255, 0.0020, 12, 38);
+  accentGeo.rotateX(Math.PI / 2);
+  const accentRing = new THREE.Mesh(accentGeo, materials.purpleEmissive);
+  accentRing.name = 'WristPurpleEmissiveRing';
+  accentRing.position.set(0, -0.004, 0);
+  mechanicsGroup.add(accentRing);
+  ledMeshes.push(accentRing);
+
+  // Soft purple bloom aura
+  const bloomGeo = new THREE.TorusGeometry(0.0258, 0.0030, 8, 32);
+  bloomGeo.rotateX(Math.PI / 2);
+  const bloomRing = new THREE.Mesh(bloomGeo, materials.purpleBloom);
+  bloomRing.position.copy(accentRing.position);
+  mechanicsGroup.add(bloomRing);
+
+  // ════════════════════════════════════════════════════════════
+  // 3. SEGMENTED DARK TITANIUM CYLINDRICAL WRIST SLEEVE
+  //    With Chrome/Metallic Vertical Inset Splines (matching reference)
+  // ════════════════════════════════════════════════════════════
+  const collarHeight = 0.011;
+  const collarR = 0.0246;
+  const collarGeo = new THREE.CylinderGeometry(collarR, collarR, collarHeight, 32);
   const swivelCollar = new THREE.Mesh(collarGeo, materials.joint);
   swivelCollar.name = 'WristSwivelCollar';
-  swivelCollar.position.set(0, 0, 0);
+  swivelCollar.position.set(0, -0.0105, 0);
   swivelCollar.castShadow = true;
   swivelCollar.receiveShadow = true;
   mechanicsGroup.add(swivelCollar);
 
-  // Precision Metallic Crossed-Roller Bearing Race Ring
-  const outerRaceGeo = new THREE.TorusGeometry(0.0168, 0.0011, 8, 30);
-  outerRaceGeo.rotateX(Math.PI / 2);
-  const outerRace = new THREE.Mesh(outerRaceGeo, materials.metallic);
-  outerRace.position.set(0, 0.002, 0);
-  mechanicsGroup.add(outerRace);
-  ribbedRings.push(outerRace);
+  // Vertical Polished Chrome Inset Flutes/Plates around sleeve
+  const fluteCount = 10;
+  for (let i = 0; i < fluteCount; i++) {
+    const angle = (i / fluteCount) * Math.PI * 2;
+    const fluteGeo = new THREE.BoxGeometry(0.0036, collarHeight * 0.75, 0.0015);
+    const flute = new THREE.Mesh(fluteGeo, materials.metallic);
+    flute.position.set(
+      Math.sin(angle) * (collarR + 0.0004),
+      -0.0105,
+      Math.cos(angle) * (collarR + 0.0004)
+    );
+    flute.rotation.y = angle;
+    mechanicsGroup.add(flute);
+  }
 
-  // Signature Purple Emissive Accent Ring (Nestled in housing inspection window)
-  const accentGeo = new THREE.TorusGeometry(0.0170, 0.0013, 8, 32);
-  accentGeo.rotateX(Math.PI / 2);
-  const accentRing = new THREE.Mesh(accentGeo, materials.purpleEmissive);
-  accentRing.name = 'WristPurpleEmissiveRing';
-  accentRing.position.set(0, 0, 0);
-  mechanicsGroup.add(accentRing);
-  ledMeshes.push(accentRing);
+  // Lower Metallic Retaining Ring
+  const lowerRimGeo = new THREE.TorusGeometry(collarR + 0.0006, 0.0011, 8, 32);
+  lowerRimGeo.rotateX(Math.PI / 2);
+  const lowerRim = new THREE.Mesh(lowerRimGeo, materials.metallic);
+  lowerRim.position.set(0, -0.016, 0);
+  mechanicsGroup.add(lowerRim);
+  ribbedRings.push(lowerRim);
 
-  // High-intensity Bloom Ring
-  const bloomGeo = new THREE.TorusGeometry(0.0170, 0.0030, 8, 28);
-  bloomGeo.rotateX(Math.PI / 2);
-  const bloomMesh = new THREE.Mesh(bloomGeo, materials.purpleBloom);
-  bloomMesh.position.copy(accentRing.position);
-  mechanicsGroup.add(bloomMesh);
-
-  // Transverse Axle Pin
-  const pinGeo = new THREE.CylinderGeometry(0.0045, 0.0045, 0.038, 16);
-  pinGeo.rotateZ(Math.PI / 2);
-  const pivotPin = new THREE.Mesh(pinGeo, materials.metallic);
-  pivotPin.name = 'WristPivotPin';
-  pivotPin.position.set(0, 0, 0);
-  pivotPin.castShadow = true;
-  mechanicsGroup.add(pivotPin);
-
-  // Actuator Rotary Core
-  const coreGeo = new THREE.CylinderGeometry(0.0140, 0.0150, 0.012, 20);
+  // ════════════════════════════════════════════════════════════
+  // 4. TRANSVERSE FLEXION/EXTENSION AXLE PIN & BEARING FLANGES
+  // ════════════════════════════════════════════════════════════
+  const coreGeo = new THREE.CylinderGeometry(0.0210, 0.0218, 0.010, 24);
   const rotaryCore = new THREE.Mesh(coreGeo, materials.joint);
   rotaryCore.name = 'WristRotaryCore';
-  rotaryCore.position.set(0, -0.005, 0);
+  rotaryCore.position.set(0, -0.020, 0);
   rotaryCore.castShadow = true;
   mechanicsGroup.add(rotaryCore);
 
-  // ════════════════════════════════════════════════════════════
-  // 3. PRECISION CNC-MACHINED WRIST MOUNTING INTERFACE PLATE
-  //    8 M2.5 hex socket screws on pitch circle + central wiring bore.
-  // ════════════════════════════════════════════════════════════
-  const plateRadius = 0.0175;
-  const plateThickness = 0.0042;
-  const centralBoreR = 0.0050;
+  const pinGeo = new THREE.CylinderGeometry(0.0065, 0.0065, 0.046, 18);
+  pinGeo.rotateZ(Math.PI / 2);
+  const pivotPin = new THREE.Mesh(pinGeo, materials.metallic);
+  pivotPin.name = 'WristPivotPin';
+  pivotPin.position.set(0, -0.020, 0);
+  pivotPin.castShadow = true;
+  mechanicsGroup.add(pivotPin);
 
-  const plateShape = new THREE.Shape();
-  plateShape.absarc(0, 0, plateRadius, 0, Math.PI * 2, false);
-  const borePath = new THREE.Path();
-  borePath.absarc(0, 0, centralBoreR, 0, Math.PI * 2, true);
-  plateShape.holes.push(borePath);
+  // Lateral & Medial flush bearing endcaps
+  for (const pSide of [-1, 1]) {
+    const capGeo = new THREE.CylinderGeometry(0.0090, 0.0090, 0.0020, 16);
+    capGeo.rotateZ(Math.PI / 2);
+    const endCap = new THREE.Mesh(capGeo, materials.joint);
+    endCap.position.set(pSide * 0.0236, -0.020, 0);
+    mechanicsGroup.add(endCap);
+    styloidCaps.push(endCap);
 
-  const plateGeo = new THREE.ExtrudeGeometry(plateShape, {
-    depth: plateThickness,
-    bevelEnabled: true,
-    bevelThickness: 0.0008,
-    bevelSize: 0.0008,
-    bevelSegments: 2,
-    curveSegments: 32,
-  });
-  plateGeo.center();
-
-  const distalInterfacePlate = new THREE.Mesh(plateGeo, materials.joint);
-  distalInterfacePlate.name = 'WristDistalInterfacePlate';
-  distalInterfacePlate.rotation.x = Math.PI / 2;
-  distalInterfacePlate.position.set(0, -0.014, 0);
-  distalInterfacePlate.castShadow = true;
-  distalInterfacePlate.receiveShadow = true;
-  mechanicsGroup.add(distalInterfacePlate);
-
-  // Metallic Outer Flange Rim
-  const flangeRimGeo = new THREE.TorusGeometry(plateRadius * 0.98, 0.0009, 6, 28);
-  flangeRimGeo.rotateX(Math.PI / 2);
-  const flangeRim = new THREE.Mesh(flangeRimGeo, materials.metallic);
-  flangeRim.position.set(0, -0.014 - plateThickness * 0.45, 0);
-  mechanicsGroup.add(flangeRim);
-
-  // 8 M2.5 Precision Hex Socket Cap Screws on Pitch Circle (R = 0.0125m)
-  const boltCount = 8;
-  const boltPitchR = 0.0125;
-  for (let b = 0; b < boltCount; b++) {
-    const angle = (b / boltCount) * Math.PI * 2;
-    const socketGeo = new THREE.CylinderGeometry(0.0011, 0.0011, 0.0018, 10);
-    const socketMesh = new THREE.Mesh(socketGeo, materials.metallic);
-    socketMesh.position.set(
-      Math.sin(angle) * boltPitchR,
-      -0.014 - plateThickness * 0.40,
-      Math.cos(angle) * boltPitchR
-    );
-    mechanicsGroup.add(socketMesh);
-
-    const boltGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0022, 6);
-    const bolt = new THREE.Mesh(boltGeo, materials.joint);
-    bolt.position.set(
-      Math.sin(angle) * boltPitchR,
-      -0.014 - plateThickness * 0.48,
-      Math.cos(angle) * boltPitchR
-    );
+    const boltGeo = new THREE.CylinderGeometry(0.0013, 0.0013, 0.0024, 6);
+    boltGeo.rotateZ(Math.PI / 2);
+    const bolt = new THREE.Mesh(boltGeo, materials.metallic);
+    bolt.position.set(pSide * 0.0248, -0.020, 0);
     mechanicsGroup.add(bolt);
   }
 
-  // Central Wiring Conduit Bore Tube extending upward
-  const conduitBoreGeo = new THREE.CylinderGeometry(centralBoreR * 0.95, centralBoreR * 0.95, 0.012, 16, 1, true);
-  const conduitBore = new THREE.Mesh(conduitBoreGeo, materials.joint);
-  conduitBore.position.set(0, -0.008, 0);
-  mechanicsGroup.add(conduitBore);
+  // ════════════════════════════════════════════════════════════
+  // 5. STEPPED CARPAL DOCKING COLLAR & DISTAL HAND MOUNT
+  // ════════════════════════════════════════════════════════════
+  const transitGeo = new THREE.CylinderGeometry(0.0215, 0.0205, 0.006, 26);
+  const transitCollar = new THREE.Mesh(transitGeo, materials.joint);
+  transitCollar.position.set(0, -0.024, 0);
+  transitCollar.castShadow = true;
+  mechanicsGroup.add(transitCollar);
 
-  // Dedicated Hand Mounting Anchor (at the outer face of the 8-bolt plate)
+  const transitRimGeo = new THREE.TorusGeometry(0.0210, 0.0009, 6, 26);
+  transitRimGeo.rotateX(Math.PI / 2);
+  const transitRim = new THREE.Mesh(transitRimGeo, materials.metallic);
+  transitRim.position.set(0, -0.0265, 0);
+  mechanicsGroup.add(transitRim);
+
+  const plateGeo = new THREE.BoxGeometry(0.040, 0.003, 0.026);
+  const distalClevis = new THREE.Mesh(plateGeo, materials.joint);
+  distalClevis.name = 'WristDistalClevis';
+  distalClevis.position.set(0, -0.027, 0);
+  mechanicsGroup.add(distalClevis);
+
+  const socketGeo = new THREE.CylinderGeometry(0.0175, 0.0185, 0.003, 20);
+  const distalSocket = new THREE.Mesh(socketGeo, materials.joint);
+  distalSocket.position.set(0, -0.028, 0);
+  mechanicsGroup.add(distalSocket);
+
+  // Dedicated Hand Mounting Anchor (at the outer face of the distal socket)
   const distalHandMount = new THREE.Group();
   distalHandMount.name = side === -1 ? 'LeftDistalHandMount' : 'RightDistalHandMount';
-  distalHandMount.position.set(0, -0.014 - plateThickness * 0.50, 0);
+  distalHandMount.position.set(0, -0.028, 0);
   mechanicsGroup.add(distalHandMount);
 
-  // Compatibility proxies
-  const styloidArmorLeft = housingBody;
-  const styloidArmorRight = housingBody;
-  const dorsalCowl = housingBody;
-  const distalSocket = distalInterfacePlate;
-  const distalClevis = distalInterfacePlate;
+  // Interface compatibility dummies (invisible/empty to avoid visual intrusion)
+  const dummyArmorGeo = new THREE.BufferGeometry();
+  const styloidArmorLeft = new THREE.Mesh(dummyArmorGeo, materials.armor);
+  styloidArmorLeft.visible = false;
+  const styloidArmorRight = new THREE.Mesh(dummyArmorGeo, materials.armor);
+  styloidArmorRight.visible = false;
+  const dorsalCowl = new THREE.Mesh(dummyArmorGeo, materials.armor);
+  dorsalCowl.visible = false;
 
   return {
     group: wristGroup,
-    wristPivot,
+    wristPivot: wristGroup,
+    distalHandMount,
     swivelCollar,
     accentRing,
     pivotPin,
-    distalInterfacePlate,
-    distalHandMount,
+    distalClevis,
     ribbedRings,
     styloidCaps,
     ledMeshes,
@@ -279,7 +210,5 @@ export function createWrist(
     dorsalCowl,
     rotaryCore,
     distalSocket,
-    distalClevis,
-    dedicatedWristHousing,
   };
 }

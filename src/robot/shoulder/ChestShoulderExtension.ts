@@ -46,6 +46,7 @@ export interface ShoulderExtensionNodes {
   secondaryAxisPivot?: THREE.Group;
   armMount?: THREE.Group;
   armMountingFlange?: THREE.Mesh;
+  blackPlateBetweenShellAndRotational?: THREE.Mesh | THREE.Group;
 }
 
 // Shoulder Joint Axis Centerline (Model/Torso Space)
@@ -183,42 +184,60 @@ function createSculptedPauldronGeometry(side: -1 | 1): THREE.BufferGeometry {
     const u = iu / uSegs;
     const v = iv / vSegs;
 
-    // Continuous wrap-around arch from anterior-inferior (u=0) over apex (u=0.48) to posterior-inferior (u=1.0)
-    const angle = (-0.14 * (1 - u) + 1.14 * u) * Math.PI;
+    // Continuous wrap-around arch from anterior-inferior draping face (u=0) over apex (u=0.44) to posterior-inferior (u=1.0)
+    const angle = (-0.28 * (1 - u) + 1.25 * u) * Math.PI;
     const sinA = Math.sin(angle);
     const cosA = Math.cos(angle);
 
     // Slimmed bearing outer radius is 0.0465m.
-    // rBase maintains a snug 2.0mm mechanical clearance around the actuator.
-    // rOuter provides a sleek 3.6mm - 4.5mm volumetric armor shell thickness.
-    const rBase = 0.0475 + 0.0010 * Math.sin(u * Math.PI);
-    const rOuter = rBase + 0.0036 + 0.0012 * Math.pow(Math.sin(u * Math.PI), 1.2);
+    // rBase maintains a snug 1.5mm mechanical clearance around the actuator.
+    // rOuter provides a sleek 4.5mm - 6.0mm volumetric armor shell thickness.
+    const rBase = 0.0480 + 0.0015 * Math.sin(u * Math.PI);
+    const rOuter = rBase + 0.0045 + 0.0018 * Math.pow(Math.sin(u * Math.PI), 1.2);
     const radius = layer === 0 ? rOuter : rBase;
 
-    // Compact lateral span:
-    // v = 0: inboard connects flush with chest collar seam at side * -0.036m
-    // v = 1: outboard frames the lateral bearing face at side * +0.012m (no longer flaring way out to +0.030m!)
-    const xSpan = -0.036 + v * 0.048;
-    const x = side * xSpan;
+    // Centered lateral span:
+    // v = 0: inboard connects flush with chest collar seam at side * -0.024m
+    // v = 1: outboard frames the lateral bearing face at side * +0.012m (directly against the black plate)
+    const xSpan = -0.024 + v * 0.036;
+    let x = side * xSpan;
 
-    // Compound roll: outboard edge tapers down around the lateral face toward upper arm
     let y = radius * sinA;
-    if (v > 0.35) {
-      const tOut = (v - 0.35) / 0.65;
-      y -= Math.pow(tOut, 1.25) * 0.020;
-    }
-
     let z = radius * cosA;
 
-    // Precision chamfered lower edge return on anterior and posterior terminations
-    if (u < 0.12) {
-      const tEdge = (0.12 - u) / 0.12;
-      z += tEdge * 0.0028;
-      y -= tEdge * 0.0024;
-    } else if (u > 0.88) {
-      const tEdge = (u - 0.88) / 0.12;
-      z -= tEdge * 0.0028;
-      y -= tEdge * 0.0024;
+    // Sculpted anterior-lateral downward winglet draping over the upper arm connector
+    // Prominently shown in reference image as an angled triangular chamfered facet
+    if (u < 0.32) {
+      const tAnt = Math.pow(1.0 - (u / 0.32), 0.85);
+      if (v > 0.35 && v <= 0.86) {
+        const tSlope = (v - 0.35) / 0.51;
+        y -= tAnt * (0.004 + tSlope * 0.018); // reaches lowest apex tip at v = 0.86 (Y ≈ -0.052)
+        z += tAnt * 0.003;
+      } else if (v > 0.86) {
+        // Sharp diagonal chamfer return up to meet the circular lateral black plate
+        const tRet = (v - 0.86) / 0.14;
+        y -= tAnt * (0.022 * (1.0 - tRet * 0.70));
+        z += tAnt * 0.003;
+      }
+    }
+
+    // Outboard rim smooth contour hugging the circular bearing
+    if (v > 0.70) {
+      const tRim = (v - 0.70) / 0.30;
+      if (u > 0.32 && u < 0.80) {
+        y -= tRim * 0.0020;
+      }
+    }
+
+    // Precision chamfered lower edge returns
+    if (u < 0.08) {
+      const tEdge = (0.08 - u) / 0.08;
+      z += tEdge * 0.0020;
+      y -= tEdge * 0.0015;
+    } else if (u > 0.92) {
+      const tEdge = (u - 0.92) / 0.08;
+      z -= tEdge * 0.0020;
+      y -= tEdge * 0.0015;
     }
 
     return new THREE.Vector3(x, y, z);
@@ -365,7 +384,7 @@ function createUpperShoulderShell(
   group.add(liningMesh);
 
   group.position.set(side * 0.222, Y_CENTER, Z_CENTER);
-  group.rotation.set(0.02, -side * 0.20, side * 0.04);
+  group.rotation.set(0.01, -side * 0.05, 0);
 
   return group;
 }
@@ -380,7 +399,31 @@ function createOuterShoulderShell(
   const group = new THREE.Group();
   group.name = side === -1 ? 'LeftOuterShoulderShell' : 'RightOuterShoulderShell';
 
-  // Low-profile dark titanium backing collar that neatly seals the lateral joint aperture
+  // 1. Black Plate between white shell and rotational joint
+  // Sits directly along the lateral rim of the white pauldron, creating a crisp dark mechanical border
+  const plateShape = new THREE.Shape();
+  plateShape.absarc(0, 0, 0.0485, 0, Math.PI * 2, false);
+  const plateHole = new THREE.Path();
+  plateHole.absarc(0, 0, 0.0380, 0, Math.PI * 2, true);
+  plateShape.holes.push(plateHole);
+
+  const plateGeo = new THREE.ExtrudeGeometry(plateShape, {
+    depth: 0.005,
+    bevelEnabled: true,
+    bevelThickness: 0.0012,
+    bevelSize: 0.0010,
+    bevelSegments: 2,
+    curveSegments: 36,
+  });
+  plateGeo.center();
+  const plateMesh = new THREE.Mesh(plateGeo, materials.joint);
+  plateMesh.name = side === -1 ? 'LeftShoulderShellBlackPlate' : 'RightShoulderShellBlackPlate';
+  plateMesh.rotation.y = Math.PI / 2;
+  plateMesh.position.set(side * 0.015, 0, 0);
+  plateMesh.castShadow = true;
+  group.add(plateMesh);
+
+  // 2. Low-profile dark titanium backing collar that neatly seals the lateral joint aperture
   const backingGeo = new THREE.TorusGeometry(0.0470, 0.0018, 8, 36, Math.PI * 0.75);
   backingGeo.rotateZ(Math.PI * 0.15);
   backingGeo.rotateY(Math.PI / 2);
@@ -390,7 +433,7 @@ function createOuterShoulderShell(
   group.add(backingMesh);
 
   group.position.set(side * 0.222, Y_CENTER, Z_CENTER);
-  group.rotation.set(0.02, -side * 0.20, side * 0.04);
+  group.rotation.set(0.01, -side * 0.05, 0);
 
   return group;
 }
@@ -627,5 +670,6 @@ export function createChestShoulderExtension(
     secondaryAxisPivot: multiAxisJoint.secondaryAxisPivot,
     armMount: multiAxisJoint.armMount,
     armMountingFlange: multiAxisJoint.armMountingFlange,
+    blackPlateBetweenShellAndRotational: multiAxisJoint.blackPlateBetweenShellAndRotational,
   };
 }

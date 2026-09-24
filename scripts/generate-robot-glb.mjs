@@ -271,7 +271,14 @@ for (const [shoulder, side, prefix] of [[leftShoulder, -1, 'Left'], [rightShould
   pauldron.scale.set(0.90, 1.32, 1.08);
   shoulder.add(pauldron);
 
-  // Concentric shoulder accent ring
+  // Black plate between white shell (pauldron) and rotational ring
+  const sBlackPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.008, 28), jointMat);
+  sBlackPlate.name = `${prefix}ShoulderBlackPlate`;
+  sBlackPlate.rotation.z = Math.PI / 2;
+  sBlackPlate.position.set(side * 0.058, 0, 0);
+  shoulder.add(sBlackPlate);
+
+  // Concentric shoulder accent ring (rotational joint)
   const sAccent = new THREE.Mesh(new THREE.TorusGeometry(0.048, 0.003, 12, 24), violetMat);
   sAccent.rotation.y = Math.PI / 2;
   sAccent.position.set(side * 0.065, 0, 0);
@@ -281,7 +288,24 @@ for (const [shoulder, side, prefix] of [[leftShoulder, -1, 'Left'], [rightShould
   upperArm.name = `${prefix}UpperArm`;
   shoulder.add(upperArm);
 
-  // Sculpted Bicep with Scalloped Arch Cutout
+  // Upper Arm Rotational Joint Assembly
+  const bicepRotationalRing = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.016, 24), jointMat);
+  bicepRotationalRing.name = `${prefix}BicepRotationalRing`;
+  bicepRotationalRing.position.set(side * 0.008, -0.006, 0.008);
+  upperArm.add(bicepRotationalRing);
+
+  const bicepPurpleLine = new THREE.Mesh(new THREE.TorusGeometry(0.046, 0.0016, 8, 24), violetMat);
+  bicepPurpleLine.rotation.x = Math.PI / 2;
+  bicepPurpleLine.position.set(side * 0.008, -0.006, 0.008);
+  upperArm.add(bicepPurpleLine);
+
+  // Black plate between white shell (bicep) and rotational ring
+  const bicepBlackPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.054, 0.053, 0.008, 24), jointMat);
+  bicepBlackPlate.name = `${prefix}BicepBlackPlateBetweenShellAndRotational`;
+  bicepBlackPlate.position.set(side * 0.008, -0.016, 0.008);
+  upperArm.add(bicepBlackPlate);
+
+  // Sculpted Bicep with Scalloped Arch Cutout (White shell)
   const bicepGeo = new THREE.CylinderGeometry(0.052, 0.044, 0.16, 24);
   const bicep = new THREE.Mesh(bicepGeo, armorMat);
   bicep.position.set(side * 0.008, -0.095, 0.008);

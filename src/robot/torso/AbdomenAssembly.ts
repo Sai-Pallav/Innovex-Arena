@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { TORSO_CONFIG } from './TorsoConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
@@ -159,11 +160,22 @@ function createVertebraModule(
   group.add(pivotMesh);
 
   // Elastomeric Dampening Ring between adjacent vertebrae
+  // ENHANCED: Deeper recess creating pronounced horizontal segmentation groove
   if (index < cfg.vertebraCount - 1) {
     const damperGeo = new THREE.CylinderGeometry(coreRadius * 0.88, coreRadius * 0.88, 0.005, 28);
     const damperMesh = new THREE.Mesh(damperGeo, materials.joint);
     damperMesh.position.set(0, -coreHeight * 0.5 - 0.0025, 0);
     group.add(damperMesh);
+    
+    // ADDITION: Deep horizontal separation groove creating mechanical segmented appearance
+    const grooveDepth = 0.008;
+    const grooveRadius = coreRadius * 1.15;
+    const grooveGeo = new THREE.CylinderGeometry(grooveRadius, grooveRadius, grooveDepth, 32);
+    const grooveMesh = new THREE.Mesh(grooveGeo, materials.joint);
+    grooveMesh.position.set(0, -coreHeight * 0.5 - grooveDepth * 0.5, 0);
+    grooveMesh.castShadow = true;
+    grooveMesh.receiveShadow = true;
+    group.add(grooveMesh);
   }
 
   // Structural Chassis Backing Block (Dark Titanium)
@@ -371,8 +383,13 @@ function createVertebraModule(
   const armorGeo = new THREE.BufferGeometry();
   armorGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   armorGeo.computeVertexNormals();
+  
+  // CRITICAL: Apply edge smoothing for premium rounded appearance
+  // Merge close vertices and compute smooth normals for rounded edge effect
+  const mergedGeo = BufferGeometryUtils.mergeVertices(armorGeo, 0.0001);
+  mergedGeo.computeVertexNormals();
 
-  const armorMesh = new THREE.Mesh(armorGeo, materials.armor);
+  const armorMesh = new THREE.Mesh(mergedGeo, materials.armor);
   armorMesh.name = `VertebraArmor_${index + 1}`;
   armorMesh.castShadow = true;
   armorMesh.receiveShadow = true;
@@ -389,6 +406,60 @@ function createVertebraModule(
   creviceLed.position.set(0, 0, zRidge + 0.001);
   group.add(creviceLed);
   ledMeshes.push(creviceLed);
+  
+  // CRITICAL FIX: Prominent horizontal dark separator bands on outer armor surface
+  // These create the visible segmented ring appearance matching the reference image
+  if (index < cfg.vertebraCount - 1) {
+    // Bottom dark separator band (visible horizontal black line between segments)
+    const separatorHeight = 0.006;
+    const separatorW = w * 1.02;
+    
+    // Create rounded separator band using ExtrudeGeometry with bevel
+    const separatorShape = new THREE.Shape();
+    separatorShape.moveTo(-separatorW * 0.5, -separatorHeight * 0.5);
+    separatorShape.lineTo(separatorW * 0.5, -separatorHeight * 0.5);
+    separatorShape.lineTo(separatorW * 0.5, separatorHeight * 0.5);
+    separatorShape.lineTo(-separatorW * 0.5, separatorHeight * 0.5);
+    separatorShape.closePath();
+    
+    const separatorGeo = new THREE.ExtrudeGeometry(separatorShape, {
+      depth: 0.002,
+      bevelEnabled: true,
+      bevelThickness: 0.0008,
+      bevelSize: 0.0008,
+      bevelSegments: 3,
+    });
+    separatorGeo.center();
+    
+    const separatorMesh = new THREE.Mesh(separatorGeo, materials.joint);
+    separatorMesh.position.set(0, -halfH - separatorHeight * 0.5, zFace + 0.002);
+    separatorMesh.castShadow = true;
+    separatorMesh.receiveShadow = true;
+    group.add(separatorMesh);
+  }
+  
+  // Top dark border line for enhanced definition with smooth edges
+  const topBorderShape = new THREE.Shape();
+  const topBW = w * 0.98;
+  const topBH = 0.0018;
+  topBorderShape.moveTo(-topBW * 0.5, -topBH * 0.5);
+  topBorderShape.lineTo(topBW * 0.5, -topBH * 0.5);
+  topBorderShape.lineTo(topBW * 0.5, topBH * 0.5);
+  topBorderShape.lineTo(-topBW * 0.5, topBH * 0.5);
+  topBorderShape.closePath();
+  
+  const topBorderGeo = new THREE.ExtrudeGeometry(topBorderShape, {
+    depth: 0.001,
+    bevelEnabled: true,
+    bevelThickness: 0.0004,
+    bevelSize: 0.0004,
+    bevelSegments: 2,
+  });
+  topBorderGeo.center();
+  
+  const topBorder = new THREE.Mesh(topBorderGeo, materials.joint);
+  topBorder.position.set(0, halfH - 0.001, zFace + 0.002);
+  group.add(topBorder);
 
   // 3. Posterior power core lens on mid-thoracic vertebra (Vertebra 03)
   if (index === 2) {

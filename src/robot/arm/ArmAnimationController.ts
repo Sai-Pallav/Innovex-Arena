@@ -697,20 +697,21 @@ export class ArmAnimationController {
   ): void {
     if (!finger || !finger.proximal || !finger.proximal.group) return;
     const isLeft = side === -1;
-    // Progressive anatomical flexion angles (cascade of flexion curving naturally into palm):
-    // - Index finger is most extended/relaxed (~68° total curl)
-    // - Little finger is most flexed/curled (~103° total curl)
+    // Progressive natural relaxation angles matching reference pose:
+    // Fingers hang downward with natural relaxed anatomical curvature
+    // matching "SIDE POSITION" and "RELAXED FINGERS" from reference image
+    // Slightly curved posture creating natural powered-down humanoid robot appearance
     const restingLeft = [
-      { prox: 0.32, mid: 0.46, dist: 0.28, splay: 0.042 },  // Index (~18°, 26°, 16° = ~60° total curl)
-      { prox: 0.40, mid: 0.54, dist: 0.32, splay: 0.012 },  // Middle (~23°, 31°, 18° = ~72° total curl)
-      { prox: 0.48, mid: 0.62, dist: 0.36, splay: -0.018 }, // Ring (~27°, 35°, 21° = ~83° total curl)
-      { prox: 0.56, mid: 0.70, dist: 0.42, splay: -0.048 }, // Little (~32°, 40°, 24° = ~96° total curl)
+      { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 }, // Index - slightly curved
+      { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 }, // Middle - most extended
+      { prox: 0.29, mid: 0.48, dist: 0.33, splay: -0.012 }, // Ring - progressive curl
+      { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 }, // Little - most curled
     ];
     const restingRight = [
-      { prox: 0.32, mid: 0.46, dist: 0.28, splay: 0.042 },  // Index
-      { prox: 0.40, mid: 0.54, dist: 0.32, splay: 0.012 },  // Middle
-      { prox: 0.48, mid: 0.62, dist: 0.36, splay: -0.018 }, // Ring
-      { prox: 0.56, mid: 0.70, dist: 0.42, splay: -0.048 }, // Little
+      { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 }, // Index - slightly curved
+      { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 }, // Middle - most extended
+      { prox: 0.29, mid: 0.48, dist: 0.33, splay: -0.012 }, // Ring - progressive curl
+      { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 }, // Little - most curled
     ];
 
     const target = isLeft ? restingLeft[idx] : restingRight[idx];
@@ -719,18 +720,18 @@ export class ArmAnimationController {
     // Dual-harmonic subtle wave cascaded across fingers for lifelike mechanical relaxation
     const speed = 0.45 + idx * 0.06;
     const phase = idx * 0.42 + timePhase;
-    const amp = 0.015 - idx * 0.002;
+    const amp = 0.008 - idx * 0.001;
 
     const wave =
       Math.sin(this.time * speed + phase) * amp +
       Math.sin(this.time * speed * 2.0 + phase * 0.7) * (amp * 0.25) +
-      breathOffset * 0.008;
+      breathOffset * 0.004;
 
     // Overrides are additive deltas on top of resting posture (or user grip command)
     const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.3;
     const addMid = override?.midCurl !== undefined ? override.midCurl : wave * 0.5;
     const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.4;
-    const addSplay = override?.splay !== undefined ? override.splay : Math.sin(this.time * 0.25 + phase) * 0.004;
+    const addSplay = override?.splay !== undefined ? override.splay : Math.sin(this.time * 0.25 + phase) * 0.002;
 
     // Segmented bending: positive rotation around X axis flexes fingers naturally toward palm (-Z)
     finger.proximal.group.rotation.x = target.prox + addProx;
@@ -750,20 +751,23 @@ export class ArmAnimationController {
   ): void {
     if (!thumb || !thumb.proximal || !thumb.proximal.group) return;
     const wave =
-      Math.cos(this.time * 0.40 + timePhase) * 0.012 +
-      Math.sin(this.time * 0.80 + timePhase) * 0.008 +
-      breathOffset * 0.006;
+      Math.cos(this.time * 0.40 + timePhase) * 0.006 +
+      Math.sin(this.time * 0.80 + timePhase) * 0.004 +
+      breathOffset * 0.003;
 
     const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.05;
     const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.05;
     const addSplay = override?.splay !== undefined ? override.splay : 0;
 
-    // Natural relaxed thumb posture angled forward (+Z) and medially toward index/palm in ready opposition
-    thumb.group.rotation.set(0.30 + wave * 0.04, -side * 0.32, -side * (0.24 + addSplay));
-    thumb.proximal.group.rotation.x = 0.28 + addProx;
-    thumb.proximal.group.rotation.z = -side * 0.08;
-    thumb.distal.group.rotation.x = 0.32 + addDist;
-    if (thumb.middle) thumb.middle.group.rotation.x = 0.32 + addDist;
+    // Natural relaxed thumb posture matching reference image:
+    // Thumb rests along medial palm margin with slight separation and natural curl
+    // Creating humanoid robot powered-down appearance
+    thumb.group.rotation.set(0.16 + wave * 0.02, -side * 0.08, -side * (0.22 + addSplay));
+    thumb.proximal.group.rotation.x = 0.24 + addProx;
+    thumb.proximal.group.rotation.z = -side * 0.05;
+    thumb.distal.group.rotation.x = 0.28 + addDist;
+    thumb.distal.group.rotation.z = side * 0.08;
+    if (thumb.middle) thumb.middle.group.rotation.x = 0.26 + addDist;
   }
 }
 

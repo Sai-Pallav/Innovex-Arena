@@ -53,38 +53,39 @@ export const ANIMATION_CONFIG = {
   },
 
   // ==========================================
-  // 3. ARM POSTURES & PARTIAL FOLD (1/3 to 2/3 fold)
+  // 3. ARM POSTURES & PARTIAL FOLD
   // ==========================================
   arm: {
-    // Poses with natural resting flexion (in radians):
-    // Flexion is negative rotation around X-axis (-0.26 to -0.61 rad, i.e. ~ -15° to -35°)
+    // Poses with natural resting subtle flexion matching reference image:
+    // Upper arms slope forward ~7.5 deg with natural lateral clearing roll (-0.038 / +0.038 rad)
+    // and subtle natural elbow flexion bend of ~ -16.0 deg (-0.28 rad, 10°–20° spec)
     poses: {
       poseA: {
         name: 'PoseA_RightDominant',
-        leftElbow: -0.35,                     // ~ -20° forward flexion
-        rightElbow: -0.52,                    // ~ -30° forward flexion
-        leftUpperPitch: -0.10,
-        rightUpperPitch: -0.08,
-        leftUpperRoll: -0.06,
-        rightUpperRoll: 0.07,
+        leftElbow: -0.28,                     // ~ -16.0 deg subtle flexion bend (10°–20° spec)
+        rightElbow: -0.28,
+        leftUpperPitch: -0.13,                // ~ -7.45 deg forward pitch (0°–10° spec)
+        rightUpperPitch: -0.13,
+        leftUpperRoll: -0.038,                // natural lateral clearing angle (outward)
+        rightUpperRoll: 0.038,
       },
       poseB: {
         name: 'PoseB_LeftDominant',
-        leftElbow: -0.52,                     // ~ -30° forward flexion
-        rightElbow: -0.35,                    // ~ -20° forward flexion
-        leftUpperPitch: -0.08,
-        rightUpperPitch: -0.10,
-        leftUpperRoll: -0.07,
-        rightUpperRoll: 0.06,
+        leftElbow: -0.30,                     // subtle organic variation (-17.2 deg)
+        rightElbow: -0.26,                     // subtle organic variation (-14.9 deg)
+        leftUpperPitch: -0.14,
+        rightUpperPitch: -0.12,
+        leftUpperRoll: -0.035,
+        rightUpperRoll: 0.040,
       },
       poseC: {
         name: 'PoseC_Balanced',
-        leftElbow: -0.44,                     // ~ -25° forward flexion
-        rightElbow: -0.44,                    // ~ -25° forward flexion
-        leftUpperPitch: -0.09,
-        rightUpperPitch: -0.09,
-        leftUpperRoll: -0.065,
-        rightUpperRoll: 0.065,
+        leftElbow: -0.28,
+        rightElbow: -0.28,
+        leftUpperPitch: -0.13,
+        rightUpperPitch: -0.13,
+        leftUpperRoll: -0.038,
+        rightUpperRoll: 0.038,
       },
     },
     poseIntervalMin: 14.0,                    // Infrequent pose transitions (seconds)
@@ -96,9 +97,9 @@ export const ANIMATION_CONFIG = {
   // 4. WRIST STABILIZATION & MICRO-REACTION
   // ==========================================
   wrist: {
-    pitchLimit: (4.0 * Math.PI) / 180,        // ±4°
-    rollLimit: (3.0 * Math.PI) / 180,         // ±3°
-    yawLimit: (2.5 * Math.PI) / 180,          // ±2.5°
+    pitchLimit: (4.0 * Math.PI) / 180,        // +/- 4 deg
+    rollLimit: (3.0 * Math.PI) / 180,         // +/- 3 deg
+    yawLimit: (2.5 * Math.PI) / 180,          // +/- 2.5 deg
     cursorReactFactor: 0.015,
     damping: 5.0,
   },
@@ -107,14 +108,14 @@ export const ANIMATION_CONFIG = {
   // 5. HAND & COORDINATED FINGER MICRO-ANIMATION
   // ==========================================
   hand: {
-    // Subtle curl range: 0° -> 2° -> 4° -> 1° over several seconds
+    // Subtle curl range: fingers stay relaxed and hanging straight down
     minCurl: 0.0,
-    maxCurl: (4.5 * Math.PI) / 180,           // ~4.5°
+    maxCurl: (2.0 * Math.PI) / 180,           // ~2.0° subtle micro-motion
     cycleSpeed: 0.28,                         // Slow periodic cycle (~22s full cycle)
-    splayAmplitude: 0.008,
-    // Thumb thenar multi-axis kinematics
-    thumbPitchFactor: 0.024,
-    thumbYawFactor: 0.018,
+    splayAmplitude: 0.004,
+    // Thumb thenar subtle micro-kinematics
+    thumbPitchFactor: 0.012,
+    thumbYawFactor: 0.008,
   },
 
   // ==========================================
