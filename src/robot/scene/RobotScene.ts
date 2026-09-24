@@ -61,12 +61,11 @@ export class RobotScene {
       depth: true,
     });
     this.renderer.setSize(dims.width, dims.height);
-    this.renderer.setPixelRatio(getOptimalPixelRatio(ROBOT_CONFIG.maxPixelRatio));
+    this.renderer.setPixelRatio(Math.min(getOptimalPixelRatio(ROBOT_CONFIG.maxPixelRatio), 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.0;
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
-    this.renderer.shadowMap.enabled = true;
-    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this.renderer.shadowMap.enabled = false;
 
     // Procedural Studio Environment for realistic PBR visor reflections (Part 5 & 16)
     const pmremGenerator = new THREE.PMREMGenerator(this.renderer);

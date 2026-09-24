@@ -91,6 +91,6 @@ export class RobotController {
   }
 
   public dispose(): void {
-    // Clean up controller resources
+    this.animController.dispose();
   }
 }

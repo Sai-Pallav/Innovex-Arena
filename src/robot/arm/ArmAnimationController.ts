@@ -167,10 +167,10 @@ export class ArmAnimationController {
 
     // Cache pad & cap Z positions and disc subnode X positions
     [leftArm, rightArm].forEach((arm) => {
-      arm.hand.palmarPads.forEach((pad) => {
+      (arm.hand?.palmarPads || []).forEach((pad: any) => {
         pad.userData.baseZ = pad.position.z;
       });
-      arm.hand.knuckleCaps.forEach((cap) => {
+      (arm.hand?.knuckleCaps || []).forEach((cap: any) => {
         cap.userData.baseZ = cap.position.z;
       });
 
@@ -559,13 +559,13 @@ export class ArmAnimationController {
     );
 
     // Segmented Palmar Friction Grip Pads separate backward along -Z
-    arm.hand.palmarPads.forEach((pad) => {
+    (arm.hand?.palmarPads || []).forEach((pad: any) => {
       const bZ = pad.userData.baseZ !== undefined ? pad.userData.baseZ : pad.position.z;
       pad.position.z = bZ - exp * 0.012;
     });
 
     // MCP Knuckle Caps separate along +Z
-    arm.hand.knuckleCaps.forEach((cap) => {
+    (arm.hand?.knuckleCaps || []).forEach((cap: any) => {
       const bZ = cap.userData.baseZ !== undefined ? cap.userData.baseZ : cap.position.z;
       cap.position.z = bZ + exp * 0.012;
     });
@@ -652,33 +652,39 @@ export class ArmAnimationController {
       );
     }
 
-    // 5. Hand Fingers Kinematics
-    const fingers = [
-      arm.hand.indexFinger,
-      arm.hand.middleFinger,
-      arm.hand.ringFinger,
-      arm.hand.littleFinger,
-    ];
+    // 5. Hand Fingers Kinematics (Guarded if arm terminates at wrist interface)
+    if (arm.hand && arm.hand.indexFinger) {
+      const fingers = [
+        arm.hand.indexFinger,
+        arm.hand.middleFinger,
+        arm.hand.ringFinger,
+        arm.hand.littleFinger,
+      ];
 
-    fingers.forEach((finger, idx) => {
-      this.updateFingerKinematics(
-        finger,
-        idx,
-        overrides.fingers ? overrides.fingers[idx] : undefined,
+      fingers.forEach((finger, idx) => {
+        if (finger) {
+          this.updateFingerKinematics(
+            finger,
+            idx,
+            overrides.fingers ? overrides.fingers[idx] : undefined,
+            side,
+            timePhase,
+            breathOffset
+          );
+        }
+      });
+    }
+
+    // 6. Thumb Kinematics
+    if (arm.hand && arm.hand.thumb && arm.hand.thumb.proximalGroup) {
+      this.updateThumbKinematics(
+        arm.hand.thumb,
+        overrides.thumb,
         side,
         timePhase,
         breathOffset
       );
-    });
-
-    // 6. Thumb Kinematics
-    this.updateThumbKinematics(
-      arm.hand.thumb,
-      overrides.thumb,
-      side,
-      timePhase,
-      breathOffset
-    );
+    }
   }
 
   private updateFingerKinematics(
@@ -689,6 +695,7 @@ export class ArmAnimationController {
     timePhase: number,
     breathOffset: number
   ): void {
+    if (!finger || !finger.proximal || !finger.proximal.group) return;
     const isLeft = side === -1;
     // Progressive anatomical flexion angles (cascade of flexion curving naturally into palm):
     // - Index finger is most extended/relaxed (~68° total curl)
@@ -741,6 +748,7 @@ export class ArmAnimationController {
     timePhase: number,
     breathOffset: number
   ): void {
+    if (!thumb || !thumb.proximal || !thumb.proximal.group) return;
     const wave =
       Math.cos(this.time * 0.40 + timePhase) * 0.012 +
       Math.sin(this.time * 0.80 + timePhase) * 0.008 +

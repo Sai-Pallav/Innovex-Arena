@@ -42,6 +42,8 @@ export interface ThumbNodes {
   middle?: FingerSegmentNodes;
   distal: FingerSegmentNodes;
   tipMesh: THREE.Mesh;
+  proximalGroup?: THREE.Group;
+  distalGroup?: THREE.Group;
 }
 
 export interface FingerSpec {
@@ -239,6 +241,14 @@ function buildSegment(
   boneMesh.castShadow = true;
   group.add(boneMesh);
 
+  // Miniature internal tendon conduit (chrome metallic)
+  const tendonGeo = new THREE.CylinderGeometry(
+    radius * 0.12, radius * 0.12, length * 0.88, 8
+  );
+  const tendonMesh = new THREE.Mesh(tendonGeo, materials.metallic);
+  tendonMesh.position.set(0, -length * 0.5, -radius * 0.32);
+  group.add(tendonMesh);
+
   // White ceramic dorsal armor cowl
   const armorW = radius * 2.10;
   const armorD = radius * 1.90;
@@ -249,12 +259,34 @@ function buildSegment(
   armorMesh.receiveShadow = true;
   group.add(armorMesh);
 
-  // Palmar friction pad
+  // Palmar friction pad (tactile elastomeric grip)
   const padMesh = createPalmarPad(
     armorW * 0.68, length * 0.72, 0.0018, materials
   );
   padMesh.position.set(0, -length * 0.50, -armorD * 0.30);
   group.add(padMesh);
+
+  // Micro-fastener on dorsal armor plate
+  if (!isDistal) {
+    const screwGeo = new THREE.CylinderGeometry(0.0006, 0.0006, 0.0010, 6);
+    screwGeo.rotateX(Math.PI / 2);
+    const screw = new THREE.Mesh(screwGeo, materials.metallic);
+    screw.position.set(0, -length * 0.32, armorD * 0.52);
+    group.add(screw);
+  } else {
+    // Fingertip capacitive sensor pad on distal tip
+    const sensorCapGeo = new THREE.SphereGeometry(radius * 0.42, 10, 8);
+    const sensorCap = new THREE.Mesh(sensorCapGeo, materials.joint);
+    sensorCap.position.set(0, -length * 0.94, -radius * 0.15);
+    sensorCap.scale.set(1.0, 0.6, 0.8);
+    group.add(sensorCap);
+
+    const sensorRimGeo = new THREE.TorusGeometry(radius * 0.42, 0.0004, 6, 16);
+    sensorRimGeo.rotateX(Math.PI / 2);
+    const sensorRim = new THREE.Mesh(sensorRimGeo, materials.metallic);
+    sensorRim.position.copy(sensorCap.position);
+    group.add(sensorRim);
+  }
 
   return { group, boneMesh, armorMesh, padMesh };
 }
@@ -354,38 +386,38 @@ export function createThumb(
   const thumbGroup = new THREE.Group();
   thumbGroup.name = 'Thumb';
 
-  // Thenar origin on palm
-  thumbGroup.position.set(-side * 0.025, -0.022, 0.006);
-  // Resting opposition: pitched forward, rotated toward palm, rolled inward
-  thumbGroup.rotation.set(0.32, -side * 0.42, -side * 0.28);
+  // Thenar origin on palm margin (radial side)
+  thumbGroup.position.set(-side * 0.019, -0.018, 0.005);
+  // Resting opposition: pitched forward, rotated medially toward palm, rolled inward
+  thumbGroup.rotation.set(0.30, -side * 0.38, -side * 0.25);
 
   // ── Thenar Base Swivel Knuckle ─────────────────────────────────────────────
-  const ballGeo = new THREE.SphereGeometry(0.0088, 16, 12);
+  const ballGeo = new THREE.SphereGeometry(0.0068, 16, 12);
   const baseBall = new THREE.Mesh(ballGeo, materials.joint);
   baseBall.castShadow = true;
   thumbGroup.add(baseBall);
 
   // White ceramic thenar cowl (partial sphere, open toward fingers)
   const cowlGeo = new THREE.SphereGeometry(
-    0.0100, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.52
+    0.0080, 18, 12, 0, Math.PI * 2, 0, Math.PI * 0.52
   );
   const thenarCowl = new THREE.Mesh(cowlGeo, materials.armor);
-  thenarCowl.position.set(0, 0, 0.0016);
+  thenarCowl.position.set(0, 0, 0.0014);
   thenarCowl.scale.set(0.90, 0.94, 0.70);
   thenarCowl.castShadow = true;
   thenarCowl.receiveShadow = true;
   thumbGroup.add(thenarCowl);
 
   // Swivel collar bracket
-  const collarGeo = new THREE.CylinderGeometry(0.0078, 0.0078, 0.007, 16);
+  const collarGeo = new THREE.CylinderGeometry(0.0060, 0.0060, 0.0055, 16);
   const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
-  baseCollar.position.set(0, -0.005, 0);
+  baseCollar.position.set(0, -0.004, 0);
   baseCollar.castShadow = true;
   thumbGroup.add(baseCollar);
 
   // ── PROXIMAL PHALANX ──────────────────────────────────────────────────────
-  const proxLen = 0.026;
-  const proxRad = 0.0058;
+  const proxLen = 0.021;
+  const proxRad = 0.0046;
   const proxSeg = buildSegment('ThumbProximal', proxRad, proxLen, false, materials);
   thumbGroup.add(proxSeg.group);
 
@@ -399,8 +431,8 @@ export function createThumb(
   proxSeg.hingeCaps  = ipHinge.caps;
 
   // ── DISTAL PHALANX & THUMBTIP ─────────────────────────────────────────────
-  const distLen = 0.020;
-  const distRad = 0.0052;
+  const distLen = 0.016;
+  const distRad = 0.0040;
   const distSeg = buildSegment('ThumbDistal', distRad, distLen, true, materials);
   distSeg.group.position.set(0, -proxLen, 0);
   proxSeg.group.add(distSeg.group);
@@ -416,5 +448,7 @@ export function createThumb(
     proximal:  proxSeg,
     distal:    distSeg,
     tipMesh:   distSeg.armorMesh,
+    proximalGroup: proxSeg.group,
+    distalGroup:   distSeg.group,
   };
 }

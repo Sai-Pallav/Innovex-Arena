@@ -3,6 +3,7 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { TORSO_CONFIG } from './TorsoConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 import { ROBOT_ACCENT } from '../config';
+import { createChestShoulderExtension, ShoulderExtensionNodes } from '../shoulder/ChestShoulderExtension';
 
 // ─── Public interfaces (strictly preserved for animation controller compatibility) ──
 
@@ -39,6 +40,7 @@ export interface ShoulderMountNodes {
   rotaryTrunnion: THREE.Mesh;
   accentRing: THREE.Mesh;
   ledMeshes: THREE.Mesh[];
+  extensionNodes?: ShoulderExtensionNodes;
 }
 
 export interface ChestAssemblyNodes {
@@ -203,19 +205,18 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   return { mesh, frontZ: 0.026 * 0.5 + 0.0065 + 0.018 };
 }
 
-
 // ─── 3. CHEST SIDE PANELS & DIAGONAL PURPLE LIGHT STRIPS ────────────────────
 function createChestSidePanel(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): { panel: THREE.Mesh; lightStrip: THREE.Mesh } {
   const shape = new THREE.Shape();
-  // Extended upper side panel matching elevated clavicle contour, expanding downward
-  shape.moveTo(side * 0.178, 0.082);
-  shape.bezierCurveTo(side * 0.158, 0.010, side * 0.118, -0.036, side * 0.072, -0.056);
+  // Sculpted side panel framing the diagonal purple light strip and meeting the extension seam cleanly
+  shape.moveTo(side * 0.156, 0.082);
+  shape.bezierCurveTo(side * 0.144, 0.010, side * 0.118, -0.036, side * 0.072, -0.056);
   shape.lineTo(side * 0.134, -0.060);
-  shape.bezierCurveTo(side * 0.192, -0.020, side * 0.198, 0.055, side * 0.186, 0.154);
-  shape.lineTo(side * 0.162, 0.156);
+  shape.bezierCurveTo(side * 0.152, -0.020, side * 0.162, 0.050, side * 0.158, 0.142);
+  shape.lineTo(side * 0.144, 0.144);
   shape.closePath();
 
   const geo = new THREE.ExtrudeGeometry(shape, {
@@ -233,7 +234,7 @@ function createChestSidePanel(
     const x = pos.getX(i);
     const z = pos.getZ(i);
     if (z > 0) {
-      const d = Math.abs(x) / 0.19;
+      const d = Math.abs(x) / 0.16;
       pos.setZ(i, z + Math.sin(d * Math.PI) * 0.010);
     }
   }
@@ -241,7 +242,7 @@ function createChestSidePanel(
 
   const panel = new THREE.Mesh(geo, materials.armor);
   panel.name = side === -1 ? 'ChestSidePanel_Left' : 'ChestSidePanel_Right';
-  panel.position.set(side * 0.128, 0.003, 0.040);
+  panel.position.set(side * 0.118, 0.003, 0.040);
   panel.rotation.y = -side * 0.14;
   panel.rotation.x = -0.04;
   panel.castShadow = true;
@@ -258,7 +259,6 @@ function createChestSidePanel(
   lightStrip.rotation.x = -0.04;
 
   return { panel, lightStrip };
-
 }
 
 // ─── 4. LOWER FLANK ARMOR WITH ARCHED UNDER-COWL ───────────────────────────
@@ -592,35 +592,45 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   bearingRace.position.set(0, -0.080, 0.008);
   tempMetallic.add(bearingRace);
 
-  // 6. Bilateral Actuator Clevis Housings with Angled Reinforcement Spars
+  // 6. Bilateral Actuator Clevis Housings (Outer & Inner upper mounts for all 4 abdominal poles)
+  const upperMounts = [
+    { x: 0.118, y: -0.066, z: 0.024, isOuter: true },
+    { x: 0.068, y: -0.070, z: 0.006, isOuter: false },
+  ];
+
   for (const side of [-1, 1] as const) {
-    const clevisGeo = new THREE.BoxGeometry(0.022, 0.024, 0.024);
-    const clevis = new THREE.Mesh(clevisGeo, materials.joint);
-    clevis.position.set(side * 0.118, -0.066, 0.024);
-    clevis.rotation.z = side * 0.28;
-    tempLower.add(clevis);
+    for (const mount of upperMounts) {
+      const cWidth = mount.isOuter ? 0.022 : 0.016;
+      const clevisGeo = new THREE.BoxGeometry(cWidth, 0.022, 0.022);
+      const clevis = new THREE.Mesh(clevisGeo, materials.joint);
+      clevis.position.set(side * mount.x, mount.y, mount.z);
+      clevis.rotation.z = side * (mount.isOuter ? 0.28 : 0.14);
+      tempLower.add(clevis);
 
-    // Hardened pivot pin with hex fastener head
-    const pinGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.028, 16);
-    const pin = new THREE.Mesh(pinGeo, materials.metallic);
-    pin.rotation.z = Math.PI / 2;
-    pin.position.set(side * 0.118, -0.066, 0.024);
-    tempMetallic.add(pin);
+      // Hardened pivot pin with hex fastener head
+      const pinGeo = new THREE.CylinderGeometry(0.0036, 0.0036, cWidth + 0.006, 16);
+      const pin = new THREE.Mesh(pinGeo, materials.metallic);
+      pin.rotation.z = Math.PI / 2;
+      pin.position.set(side * mount.x, mount.y, mount.z);
+      tempMetallic.add(pin);
 
-    for (const pHeadSide of [-1, 1] as const) {
-      const headGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0028, 6);
-      const pinHead = new THREE.Mesh(headGeo, materials.joint);
-      pinHead.rotation.z = Math.PI / 2;
-      pinHead.position.set(side * 0.118 + pHeadSide * 0.014, -0.066, 0.024);
-      tempLower.add(pinHead);
+      for (const pHeadSide of [-1, 1] as const) {
+        const headGeo = new THREE.CylinderGeometry(0.0048, 0.0048, 0.0024, 6);
+        const pinHead = new THREE.Mesh(headGeo, materials.joint);
+        pinHead.rotation.z = Math.PI / 2;
+        pinHead.position.set(side * mount.x + pHeadSide * (cWidth * 0.5 + 0.002), mount.y, mount.z);
+        tempLower.add(pinHead);
+      }
+
+      // Angled sub-costal reinforcement truss spar linking clevis upward into chest frame
+      if (mount.isOuter) {
+        const sparGeo = new THREE.BoxGeometry(0.036, 0.012, 0.016);
+        const spar = new THREE.Mesh(sparGeo, materials.joint);
+        spar.position.set(side * 0.088, -0.058, 0.020);
+        spar.rotation.z = -side * 0.20;
+        tempLower.add(spar);
+      }
     }
-
-    // Angled sub-costal reinforcement truss spar linking clevis upward into chest frame
-    const sparGeo = new THREE.BoxGeometry(0.036, 0.012, 0.016);
-    const spar = new THREE.Mesh(sparGeo, materials.joint);
-    spar.position.set(side * 0.088, -0.058, 0.020);
-    spar.rotation.z = -side * 0.20;
-    tempLower.add(spar);
   }
 
   const mergedLower = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerChestFrame_Merged')!;
@@ -679,97 +689,15 @@ export function createShoulderMount(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): ShoulderMountNodes {
-  const group = new THREE.Group();
-  group.name = side === -1 ? 'ShoulderMountLeft' : 'ShoulderMountRight';
-  group.position.set(
-    side * TORSO_CONFIG.chest.shoulderMountX,
-    TORSO_CONFIG.chest.shoulderMountY,
-    TORSO_CONFIG.chest.shoulderMountZ
-  );
-
-  const ledMeshes: THREE.Mesh[] = [];
-
-  // A. Intermediate Transverse Clavicle Girder (Ties shoulder into chest keel)
-  const girderLen = 0.064;
-  const girderGeo = new THREE.BoxGeometry(girderLen, 0.024, 0.024);
-  const girder = new THREE.Mesh(girderGeo, materials.joint);
-  girder.position.set(-side * (girderLen * 0.5), 0, 0);
-  girder.castShadow = true;
-  girder.receiveShadow = true;
-  group.add(girder);
-
-  // Weight-reduction cutouts along the girder
-  for (let c = 0; c < 2; c++) {
-    const cutoutGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.026, 16);
-    const cutoutRim = new THREE.Mesh(cutoutGeo, materials.metallic);
-    cutoutRim.position.set(-side * (0.018 + c * 0.022), 0, 0);
-    group.add(cutoutRim);
-  }
-
-  // B. Precision Rotary Trunnion Bearing Housing
-  const housingRadius = 0.028;
-  const housingGeo = new THREE.CylinderGeometry(housingRadius, housingRadius * 1.05, 0.024, 32);
-  const socketHousing = new THREE.Mesh(housingGeo, materials.joint);
-  socketHousing.rotation.z = Math.PI / 2;
-  socketHousing.position.set(-side * 0.010, 0, 0);
-  socketHousing.castShadow = true;
-  socketHousing.receiveShadow = true;
-  group.add(socketHousing);
-
-  // C. Stepped Bearing Retainer Collar
-  const trunnionGeo = new THREE.CylinderGeometry(housingRadius * 0.92, housingRadius * 0.92, 0.014, 32);
-  const rotaryTrunnion = new THREE.Mesh(trunnionGeo, materials.metallic);
-  rotaryTrunnion.rotation.z = Math.PI / 2;
-  rotaryTrunnion.position.set(-side * 0.004, 0, 0);
-  rotaryTrunnion.castShadow = true;
-  rotaryTrunnion.receiveShadow = true;
-  group.add(rotaryTrunnion);
-
-  // D. Purple Accent Indicator Sleeve inside the shoulder trunnion bore
-  const sleeveGeo = new THREE.CylinderGeometry(housingRadius * 0.78, housingRadius * 0.78, 0.012, 28);
-  const purpleNeckSleeve = new THREE.Mesh(sleeveGeo, materials.purpleEmissive);
-  purpleNeckSleeve.name = side === -1 ? 'ShoulderPurpleNeckSleeve_Left' : 'ShoulderPurpleNeckSleeve_Right';
-  purpleNeckSleeve.rotation.z = Math.PI / 2;
-  purpleNeckSleeve.position.set(-side * 0.001, 0, 0);
-  group.add(purpleNeckSleeve);
-  ledMeshes.push(purpleNeckSleeve);
-
-  // Concentric metallic highlight ring
-  const sleeveRingGeo = new THREE.TorusGeometry(housingRadius * 0.82, 0.0014, 8, 28);
-  const sleeveRing = new THREE.Mesh(sleeveRingGeo, materials.metallic);
-  sleeveRing.rotation.y = Math.PI / 2;
-  sleeveRing.position.set(-side * 0.002, 0, 0);
-  group.add(sleeveRing);
-
-  // 8 Perimeter Socket Flange Fasteners
-  for (let b = 0; b < 8; b++) {
-    const angle = (b / 8) * Math.PI * 2;
-    const boltGeo = new THREE.CylinderGeometry(0.0016, 0.0016, 0.003, 6);
-    const bolt = new THREE.Mesh(boltGeo, materials.joint);
-    bolt.rotation.z = Math.PI / 2;
-    bolt.position.set(
-      -side * 0.012,
-      Math.sin(angle) * (housingRadius * 0.88),
-      Math.cos(angle) * (housingRadius * 0.88)
-    );
-    group.add(bolt);
-  }
-
-  // E. Purple Emissive Core Ring
-  const ringGeo = new THREE.TorusGeometry(housingRadius * 0.96, 0.0014, 8, 32);
-  const accentRing = new THREE.Mesh(ringGeo, materials.purpleEmissive);
-  accentRing.name = side === -1 ? 'ShoulderAccentRing_Left' : 'ShoulderAccentRing_Right';
-  accentRing.rotation.y = Math.PI / 2;
-  accentRing.position.set(-side * 0.012, 0, 0);
-  group.add(accentRing);
-  ledMeshes.push(accentRing);
+  const extension = createChestShoulderExtension(side, materials);
 
   return {
-    group,
-    socketHousing,
-    rotaryTrunnion,
-    accentRing,
-    ledMeshes,
+    group: extension.group,
+    socketHousing: extension.recessHousing,
+    rotaryTrunnion: extension.driveHub,
+    accentRing: extension.accentRing,
+    ledMeshes: extension.ledMeshes,
+    extensionNodes: extension,
   };
 }
 

@@ -60,27 +60,28 @@ export const LEG_CONFIG = {
   },
 
   knee: {
-    // High-precision robotic revolute joint
-    jointRadius: 0.026,
-    jointLength: 0.064,
-    axleRadius: 0.009,
-    axleLength: 0.076,
-    upperForkWidth: 0.066,
-    upperForkThickness: 0.010,
-    lowerClevisWidth: 0.044,
-    lowerClevisThickness: 0.010,
-    bearingCapRadius: 0.024,
-    bearingCapThickness: 0.007,
-    accentRingRadius: 0.019,
-    centerCapRadius: 0.015,
-    // Low-profile central patellar bumper shield that preserves full view of the joint mechanics
+    // Reference-driven compact rotary condyle bearing integrated flush with leg width
+    discRadius: 0.022,
+    discWidth: 0.010,
+    outerDiscSpacing: 0.050,
+    accentRingRadius: 0.015,
+    centerCapRadius: 0.010,
+    centralAxleRadius: 0.007,
+    centralAxleLength: 0.060,
+    // Central white faceted knee cover
     patella: {
-      width: 0.030,
-      height: 0.026,
-      thickness: 0.008,
-      offsetZ: 0.028,
-      yOffset: 0.0,
+      width: 0.028,
+      height: 0.046,
+      thickness: 0.010,
+      offsetZ: 0.0298,
+      yOffset: 0.000,
+      rotX: 0.000,
     },
+    // Structural dark knee housing
+    housingWidth: 0.034,
+    upperStructureHeight: 0.022,
+    lowerStructureHeight: 0.018,
+    housingDepth: 0.024,
   },
 
   shin: {
@@ -89,9 +90,9 @@ export const LEG_CONFIG = {
     frame: {
       spineWidth: 0.032,
       spineDepth: 0.034,
-      upperPlateauWidth: 0.052,
-      upperPlateauDepth: 0.038,
-      upperPlateauHeight: 0.024,
+      upperPlateauWidth: 0.034,
+      upperPlateauDepth: 0.026,
+      upperPlateauHeight: 0.018,
       lowerCollarRadius: 0.026,
     },
     // Segmented armor: leaves ~45mm clearance under knee and exposes tibial collar

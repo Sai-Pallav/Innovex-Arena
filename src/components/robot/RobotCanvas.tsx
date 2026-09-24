@@ -29,7 +29,7 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
       onError: (err) => {
         console.error('Robot initialization error:', err);
         setIsLoading(false);
-        setLoadError('WebGL context or 3D engine failed to initialize');
+        setLoadError('Robot init error: ' + (err?.stack || err?.message || String(err)));
       },
     });
 

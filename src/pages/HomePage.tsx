@@ -76,7 +76,7 @@ export const HomePage: React.FC = () => {
           {/* ------------------------------------------------------------------- */}
           <div className="w-full lg:max-w-[48%] xl:max-w-[46%] 2xl:max-w-[45%] flex flex-col items-start text-left z-20 relative space-y-2.5 sm:space-y-3.5 xl:space-y-4 my-auto">
             {/* 1. About Innovex Arena Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.1] text-xs font-medium text-[#c4b5fd] shadow-[0_0_15px_rgba(139,92,246,0.12)] backdrop-blur-md">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.1] text-xs font-medium text-[#c4b5fd] shadow-[0_0_15px_rgba(139,92,246,0.12)]">
               <Sparkles className="w-3.5 h-3.5 text-[#b7a4fb]" />
               <span>About Innovex Arena</span>
             </div>
@@ -101,13 +101,13 @@ export const HomePage: React.FC = () => {
             </p>
 
             {/* 5. Specialization Pill (Clean Transition, No Trailing Pipe Cursor - Priority 11) */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#09041a]/90 border border-violet-500/25 text-xs sm:text-sm text-zinc-300 shadow-[0_4px_18px_rgba(0,0,0,0.4)] backdrop-blur-md">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#09041a]/95 border border-violet-500/25 text-xs sm:text-sm text-zinc-300 shadow-[0_4px_18px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-60" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
               </span>
               <span className="text-[#9b96b0] font-normal text-xs">Specialized in:</span>
-              <span className="font-semibold text-white text-xs sm:text-sm transition-all duration-300">
+              <span className="font-semibold text-white text-xs sm:text-sm transition-colors duration-200">
                 {SPECIALIZATIONS[specializationIndex]}
               </span>
             </div>
@@ -115,18 +115,18 @@ export const HomePage: React.FC = () => {
             {/* 6. Action CTA Buttons Group (Priority 12 Hierarchy) */}
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 pt-1.5">
               <Link to="/services">
-                <button className="px-6 py-2.5 sm:py-3 rounded-full bg-white text-[#060212] font-semibold text-xs sm:text-sm hover:bg-[#f4f0ff] transition-all duration-200 flex items-center gap-2 shadow-[0_0_24px_rgba(255,255,255,0.22),0_4px_16px_rgba(0,0,0,0.4)] hover:shadow-[0_0_36px_rgba(255,255,255,0.38)] active:scale-[0.98] group">
+                <button className="px-6 py-2.5 sm:py-3 rounded-full bg-white text-[#060212] font-semibold text-xs sm:text-sm hover:bg-[#f4f0ff] transition-[background-color,box-shadow,transform] duration-200 flex items-center gap-2 shadow-[0_0_24px_rgba(255,255,255,0.22),0_4px_16px_rgba(0,0,0,0.4)] hover:shadow-[0_0_36px_rgba(255,255,255,0.38)] active:scale-[0.98] cursor-pointer group">
                   <span>Explore Services</span>
                   <ArrowRight className="w-4 h-4 text-[#060212] group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
               <Link to="/events">
-                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.03] hover:bg-white/[0.07] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-all duration-200 backdrop-blur-md active:scale-[0.98]">
+                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-colors duration-200 active:scale-[0.98] cursor-pointer">
                   View Events
                 </button>
               </Link>
               <Link to="/classes">
-                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.03] hover:bg-white/[0.07] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-all duration-200 backdrop-blur-md active:scale-[0.98]">
+                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-colors duration-200 active:scale-[0.98] cursor-pointer">
                   Explore Classes
                 </button>
               </Link>
@@ -161,10 +161,10 @@ export const HomePage: React.FC = () => {
             {HERO_DATA.stats.map((stat, idx) => (
               <div
                 key={idx}
-                className="relative group p-3 sm:p-4 xl:p-4.5 rounded-xl sm:rounded-2xl bg-[#060217]/80 border border-white/[0.08] hover:border-violet-500/35 transition-all duration-300 backdrop-blur-xl flex flex-col items-center justify-center text-center shadow-[0_8px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5"
+                className="relative group p-3 sm:p-4 xl:p-4.5 rounded-xl sm:rounded-2xl bg-[#060217]/90 border border-white/[0.08] hover:border-violet-500/35 transition-[border-color,transform] duration-200 flex flex-col items-center justify-center text-center shadow-[0_8px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 cursor-pointer"
               >
                 {/* Subtle Top Card Hairline Beam */}
-                <div className="absolute top-0 inset-x-4 h-px bg-gradient-to-r from-transparent via-violet-400/25 to-transparent group-hover:via-violet-400/50 transition-all pointer-events-none" />
+                <div className="absolute top-0 inset-x-4 h-px bg-gradient-to-r from-transparent via-violet-400/25 to-transparent group-hover:via-violet-400/50 transition-colors pointer-events-none" />
                 
                 <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-b from-violet-600/08 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 

@@ -51,6 +51,7 @@ import { AnimatedCounter } from '../components/ui/AnimatedCounter';
 import { useScrollReveal } from '../hooks/useScrollReveal';
 import { EventItem, LearningModeType } from '../types';
 import { useToast } from '../components/ui/Toast';
+import { AboutAtmosphere } from '../components/layout/AboutAtmosphere';
 
 export const AboutPage: React.FC = () => {
   const [selectedEvent, setSelectedEvent] = useState<EventItem | null>(null);
@@ -70,110 +71,50 @@ export const AboutPage: React.FC = () => {
     rootMargin: '0px 0px -45px 0px',
   });
 
-  const [visionMissionHoverReady, setVisionMissionHoverReady] = useState(false);
-  const [aboutCardsHoverReady, setAboutCardsHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (visionMissionVisible) {
-      const timer = setTimeout(() => {
-        setVisionMissionHoverReady(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [visionMissionVisible]);
-
-  useEffect(() => {
-    if (aboutCardsVisible) {
-      const timer = setTimeout(() => {
-        setAboutCardsHoverReady(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-  }, [aboutCardsVisible]);
+  const visionMissionHoverReady = true;
+  const aboutCardsHoverReady = true;
 
   // 3. Our Services section reveal
   const { ref: servicesRef, isVisible: servicesVisible } = useScrollReveal({
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [servicesHoverReady, setServicesHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (servicesVisible) {
-      const timer = setTimeout(() => setServicesHoverReady(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [servicesVisible]);
+  const servicesHoverReady = true;
 
   // 4. Products section reveal
   const { ref: productsRef, isVisible: productsVisible } = useScrollReveal({
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [productsHoverReady, setProductsHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (productsVisible) {
-      const timer = setTimeout(() => setProductsHoverReady(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [productsVisible]);
+  const productsHoverReady = true;
 
   // 5. Classes section reveal
   const { ref: classesRef, isVisible: classesVisible } = useScrollReveal({
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [classesHoverReady, setClassesHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (classesVisible) {
-      const timer = setTimeout(() => setClassesHoverReady(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [classesVisible]);
+  const classesHoverReady = true;
 
   // 6. Events section reveal
   const { ref: eventsRef, isVisible: eventsVisible } = useScrollReveal({
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [eventsHoverReady, setEventsHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (eventsVisible) {
-      const timer = setTimeout(() => setEventsHoverReady(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [eventsVisible]);
+  const eventsHoverReady = true;
 
   // 7. Career Perks
   const { ref: perksRef, isVisible: perksVisible } = useScrollReveal({
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [perksHoverReady, setPerksHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (perksVisible) {
-      const timer = setTimeout(() => setPerksHoverReady(true), 600);
-      return () => clearTimeout(timer);
-    }
-  }, [perksVisible]);
+  const perksHoverReady = true;
 
   // 8. Open Positions & Internships
   const { ref: positionsRef, isVisible: positionsVisible } = useScrollReveal({
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [positionsHoverReady, setPositionsHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (positionsVisible) {
-      const timer = setTimeout(() => setPositionsHoverReady(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [positionsVisible]);
+  const positionsHoverReady = true;
 
   const openBookingModal = (mode: LearningModeType) => {
     setBookingDefaultMode(mode);
@@ -236,22 +177,7 @@ export const AboutPage: React.FC = () => {
   return (
     <div className="home-cosmos-theme relative min-h-screen bg-[#030014] text-[#f4f0ff] pb-24 overflow-hidden selection:bg-[#5046e4]/40 selection:text-white">
       {/* ATMOSPHERIC BACKGROUND LAYERS */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
-        {/* Reflect Notes Starlit Cosmos Starfield Layer */}
-        <div className="absolute inset-0 starlit-sky opacity-75" />
-
-        {/* Wope Ultraviolet Light Horizon Bloom */}
-        <div className="absolute inset-0 ultraviolet-hero-bloom pointer-events-none opacity-80" />
-
-        {/* Radial center underglow */}
-        <div
-          className="absolute -top-[10%] left-1/2 -translate-x-1/2 w-[90vw] max-w-[1200px] h-[550px] rounded-full blur-[140px] pointer-events-none"
-          style={{
-            background:
-              'radial-gradient(circle, rgba(113, 61, 255, 0.28) 0%, rgba(133, 98, 255, 0.16) 40%, rgba(183, 164, 251, 0.04) 70%, transparent 85%)',
-          }}
-        />
-      </div>
+      <AboutAtmosphere />
 
       {/* 1. ABOUT HERO SECTION */}
       <section
@@ -337,7 +263,7 @@ export const AboutPage: React.FC = () => {
               visionMissionVisible ? 'revealed' : ''
             } ${visionMissionHoverReady ? 'hover-ready' : ''}`}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] h-full flex flex-col justify-between group hover:border-[#9382ff]/30 transition-all">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] h-full flex flex-col justify-between group hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#b7a4fb] shrink-0">
@@ -363,7 +289,7 @@ export const AboutPage: React.FC = () => {
               transitionDelay: visionMissionVisible ? '120ms' : '0ms',
             }}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] h-full flex flex-col justify-between group hover:border-[#9382ff]/30 transition-all">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] h-full flex flex-col justify-between group hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#9382ff] shrink-0">
@@ -421,7 +347,7 @@ export const AboutPage: React.FC = () => {
                 transitionDelay: aboutCardsVisible ? `${idx * 80}ms` : '0ms',
               }}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] group flex flex-col justify-between h-full hover:border-[#9382ff]/30 transition-all">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] group flex flex-col justify-between h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
                 <div className="flex-1 flex flex-col space-y-3">
                   <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#f4f0ff]">
                     {getServiceIcon(srv.iconName)}
@@ -485,7 +411,7 @@ export const AboutPage: React.FC = () => {
                 productsVisible ? 'revealed' : ''
               } ${productsHoverReady ? 'hover-ready' : ''}`}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/30 transition-all">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
                 <div className="flex-1 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono uppercase tracking-wider text-[#9382ff] px-2 py-0.5 rounded-[5px] bg-[#10093a] border border-white/[0.06]">
@@ -569,7 +495,7 @@ export const AboutPage: React.FC = () => {
                 classesVisible ? 'revealed' : ''
               } ${classesHoverReady ? 'hover-ready' : ''}`}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/30 transition-all">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
                 <div className="flex-1 flex flex-col space-y-4">
                   <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#f4f0ff]">
                     {mode.id === 'online' && <Video className="w-5 h-5 stroke-[1.5]" />}
@@ -656,7 +582,7 @@ export const AboutPage: React.FC = () => {
                 eventsVisible ? 'revealed' : ''
               } ${eventsHoverReady ? 'hover-ready' : ''}`}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/30 transition-all">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
                 <div className="flex-1 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono text-[#9382ff] uppercase tracking-wider">
@@ -732,7 +658,7 @@ export const AboutPage: React.FC = () => {
           {CAREER_PERKS.map((perk, i) => (
             <div
               key={i}
-              className={`p-5 rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] text-center space-y-2 flex flex-col justify-between hover:border-[#9382ff]/30 transition-all ${
+              className={`p-5 rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] text-center space-y-2 flex flex-col justify-between hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer ${
                 perksVisible ? 'revealed' : ''
               } ${perksHoverReady ? 'hover-ready' : ''}`}
               style={{
@@ -763,7 +689,7 @@ export const AboutPage: React.FC = () => {
               positionsVisible ? 'revealed' : ''
             } ${positionsHoverReady ? 'hover-ready' : ''}`}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full flex-1 hover:border-[#9382ff]/30 transition-all">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full flex-1 hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#b7a4fb]">
@@ -783,7 +709,7 @@ export const AboutPage: React.FC = () => {
                   {JOB_POSITIONS.map((pos) => (
                     <div
                       key={pos.id}
-                      className="p-3 rounded-[5px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-between text-xs hover:border-[#9382ff]/30 hover:bg-[#10093a]/50 transition-all cursor-pointer group/pos"
+                      className="p-3 rounded-[5px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-between text-xs hover:border-[#9382ff]/40 hover:bg-[#10093a]/50 transition-[border-color,background-color] duration-150 ease-out cursor-pointer group/pos"
                     >
                       <div>
                         <div className="font-medium text-[#f4f0ff]">{pos.title}</div>
@@ -817,7 +743,7 @@ export const AboutPage: React.FC = () => {
               transitionDelay: positionsVisible ? '120ms' : '0ms',
             }}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full flex-1 hover:border-[#9382ff]/30 transition-all">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full flex-1 hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#9382ff]">
@@ -837,7 +763,7 @@ export const AboutPage: React.FC = () => {
                   {INTERN_POSITIONS.map((intern) => (
                     <div
                       key={intern.id}
-                      className="p-3 rounded-[5px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-between text-xs hover:border-[#9382ff]/30 hover:bg-[#10093a]/50 transition-all cursor-pointer group/intern"
+                      className="p-3 rounded-[5px] bg-white/[0.02] border border-white/[0.05] flex items-center justify-between text-xs hover:border-[#9382ff]/40 hover:bg-[#10093a]/50 transition-[border-color,background-color] duration-150 ease-out cursor-pointer group/intern"
                     >
                       <div>
                         <div className="font-medium text-[#f4f0ff]">{intern.title}</div>

@@ -307,6 +307,14 @@ function createVertebraModule(
     positions.push(...bl, ...tr, ...tl);
   }
 
+  function addTri(
+    p1: [number, number, number],
+    p2: [number, number, number],
+    p3: [number, number, number]
+  ) {
+    positions.push(...p1, ...p2, ...p3);
+  }
+
   // Vertices for precision trapezoidal chamfered facet
   const pTopL: [number, number, number] = [-topW * 0.75, halfH, zFace];
   const pTopM: [number, number, number] = [0, halfH + 0.0015, zFace];
@@ -348,11 +356,16 @@ function createVertebraModule(
   addQuad(pTopL, pTopR, pBackTopR, pBackTopL);
   addQuad(pBackBotL, pBackBotR, pBotR, pBotL);
 
-  // Lateral edges & back closure
-  addQuad(pBackBotL, pWingBotL, pWingMidL, pBackTopL);
-  addQuad(pBackTopL, pWingMidL, pWingTopL, pBackTopL);
-  addQuad(pWingBotR, pBackBotR, pBackTopR, pWingMidR);
-  addQuad(pWingMidR, pBackTopR, pBackTopR, pWingTopR);
+  // Watertight lateral edge closure (clean non-degenerate triangles)
+  addTri(pBackBotL, pWingBotL, pWingMidL);
+  addTri(pBackBotL, pWingMidL, pBackTopL);
+  addTri(pBackTopL, pWingMidL, pWingTopL);
+
+  addTri(pWingBotR, pBackBotR, pWingMidR);
+  addTri(pWingMidR, pBackBotR, pBackTopR);
+  addTri(pWingMidR, pBackTopR, pWingTopR);
+
+  // Watertight posterior back closure
   addQuad(pBackBotR, pBackBotL, pBackTopL, pBackTopR);
 
   const armorGeo = new THREE.BufferGeometry();
@@ -398,26 +411,32 @@ function createVertebraModule(
 }
 
 // ─── 3. HEAVY-DUTY HYDRAULIC ACTUATOR & TRIANGULATED LINKAGE ────────────────
+interface ActuatorPoleParams {
+  side: -1 | 1;
+  name: string;
+  upperMount: { x: number; y: number; z: number };
+  lowerMount: { x: number; y: number; z: number };
+  cylinderRadius: number;
+  pistonRadius: number;
+  hasStabilizerLink?: boolean;
+}
+
 /**
- * Engineered robotic linear actuator with triangulated lateral stabilization:
- * - Upper spherical uniball rod-end pinned into the chest clevis
- * - Heavy-duty dark titanium cylinder barrel (25mm OD)
- * - Windowed barrel housing exposing internal violet power core
- * - Mirror-polished chrome telescoping piston rod (13.6mm OD)
- * - Lower uniball rod-end seated into the waist deck plinth
- * - Rigid transverse tie-rod linkage connecting to Vertebra 03
+ * Creates a single precision hydraulic actuator pole assembly with complete
+ * dark titanium cylinder barrel, illuminated violet power core, slotted cage,
+ * gland seal collar, mirror-polished chrome telescoping piston rod, and uniball joints.
  */
-function createSideActuatorAssembly(
-  side: -1 | 1,
+function createSingleActuatorPole(
+  params: ActuatorPoleParams,
   materials: RobotMaterialPalette,
   ledMeshes: THREE.Mesh[]
-): { group: THREE.Group; primaryMesh: THREE.Mesh } {
+): { group: THREE.Group; barrelMesh: THREE.Mesh } {
+  const { side, name, upperMount, lowerMount, cylinderRadius, pistonRadius, hasStabilizerLink } = params;
   const group = new THREE.Group();
-  group.name = side === -1 ? 'LeftActuatorClusterAssembly' : 'RightActuatorClusterAssembly';
+  group.name = name;
 
-  const cfg = TORSO_CONFIG.stomach.actuator;
-  const startPt = new THREE.Vector3(side * cfg.upperMount.x, cfg.upperMount.y, cfg.upperMount.z);
-  const endPt = new THREE.Vector3(side * cfg.lowerMount.x, cfg.lowerMount.y, cfg.lowerMount.z);
+  const startPt = new THREE.Vector3(side * upperMount.x, upperMount.y, upperMount.z);
+  const endPt = new THREE.Vector3(side * lowerMount.x, lowerMount.y, lowerMount.z);
   const totalLen = startPt.distanceTo(endPt);
 
   const actGroup = new THREE.Group();
@@ -425,8 +444,8 @@ function createSideActuatorAssembly(
   const dir = new THREE.Vector3().subVectors(endPt, startPt).normalize();
   actGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir);
 
-  const barrelRadius = cfg.cylinderRadius; // 0.0125 (25mm OD)
-  const rodRadius = cfg.pistonRadius;       // 0.0068 (13.6mm OD)
+  const barrelRadius = cylinderRadius;
+  const rodRadius = pistonRadius;
   const barrelLen = totalLen * 0.48;
 
   // 1. Upper Spherical Rod-End Bearing (Uniball)
@@ -457,42 +476,37 @@ function createSideActuatorAssembly(
     actGroup.add(ring);
   }
 
-  // 3. Illuminated Violet Power Core visible through slotted barrel windows
+  // 3. Illuminated Violet Power Core (Single, seamless cylindrical glowing band - no vertical dividing bars)
   const coreLen = barrelLen * 0.44;
-  const coreGeo = new THREE.CylinderGeometry(barrelRadius * 1.02, barrelRadius * 1.02, coreLen, 28);
+  const coreGeo = new THREE.CylinderGeometry(barrelRadius * 1.015, barrelRadius * 1.015, coreLen, 32);
   const powerCore = new THREE.Mesh(coreGeo, materials.purpleEmissive);
-  powerCore.name = side === -1 ? 'LeftActuatorPowerCore' : 'RightActuatorPowerCore';
+  powerCore.name = `${name}_PowerCore`;
   powerCore.position.set(0, -0.012 - barrelLen * 0.5, 0);
   actGroup.add(powerCore);
   ledMeshes.push(powerCore);
 
-  // Metallic slotted window cage over power core
-  for (let w = 0; w < 4; w++) {
-    const barGeo = new THREE.BoxGeometry(0.003, coreLen + 0.004, 0.004);
-    const bar = new THREE.Mesh(barGeo, materials.joint);
-    const angle = (w / 4) * Math.PI * 2;
-    bar.position.set(
-      Math.sin(angle) * (barrelRadius + 0.0008),
-      -0.012 - barrelLen * 0.5,
-      Math.cos(angle) * (barrelRadius + 0.0008)
-    );
-    actGroup.add(bar);
+  // Recessed metallic collar rings framing top and bottom of the single illuminated core
+  for (const cY of [-0.012 - barrelLen * 0.5 + coreLen * 0.5, -0.012 - barrelLen * 0.5 - coreLen * 0.5]) {
+    const collarGeo = new THREE.CylinderGeometry(barrelRadius * 1.035, barrelRadius * 1.035, 0.0022, 32);
+    const collar = new THREE.Mesh(collarGeo, materials.metallic);
+    collar.position.set(0, cY, 0);
+    actGroup.add(collar);
   }
 
   // High-pressure 90° hydraulic union elbow fitting
-  const unionGeo = new THREE.BoxGeometry(0.008, 0.010, 0.008);
+  const unionGeo = new THREE.BoxGeometry(0.0065, 0.0085, 0.0065);
   const unionMesh = new THREE.Mesh(unionGeo, materials.metallic);
-  unionMesh.position.set(-side * (barrelRadius + 0.002), -0.022, 0);
+  unionMesh.position.set(0, -0.016, -barrelRadius - 0.0018);
   actGroup.add(unionMesh);
 
-  // High-Pressure Flexible Braided Hydraulic Hose leading back to chest frame
-  const hoseCurve = new THREE.CatmullRomCurve3([
-    new THREE.Vector3(startPt.x - side * 0.012, startPt.y - 0.020, startPt.z),
-    new THREE.Vector3(startPt.x - side * 0.024, startPt.y - 0.008, startPt.z - 0.008),
-    new THREE.Vector3(startPt.x - side * 0.034, startPt.y + 0.008, startPt.z - 0.012),
-  ]);
-  const hoseGeo = new THREE.TubeGeometry(hoseCurve, 16, 0.0020, 8, false);
+  // Flexible Braided Hydraulic Hose leading back symmetrically into lower chest frame
+  const hoseStart = new THREE.Vector3(startPt.x, startPt.y - 0.018, startPt.z - 0.004);
+  const hoseMid = new THREE.Vector3(startPt.x * 0.85, startPt.y - 0.008, startPt.z - 0.010);
+  const hoseEnd = new THREE.Vector3(startPt.x * 0.70, startPt.y + 0.008, startPt.z - 0.014);
+  const hoseCurve = new THREE.CatmullRomCurve3([hoseStart, hoseMid, hoseEnd]);
+  const hoseGeo = new THREE.TubeGeometry(hoseCurve, 16, 0.0018, 8, false);
   const hose = new THREE.Mesh(hoseGeo, materials.joint);
+  hose.castShadow = true;
   group.add(hose);
 
   // 4. Heavy Gland Seal Collar at barrel base
@@ -501,11 +515,12 @@ function createSideActuatorAssembly(
   seal.position.set(0, -0.012 - barrelLen - 0.003, 0);
   actGroup.add(seal);
 
-  // 5. Mirror-Polished Chrome Telescoping Piston Rod
+  // 5. Mirror-Polished Chrome Telescoping Piston Rod (Fully connects upper barrel down to lower waist mount)
   const rodStartY = -0.012 - barrelLen - 0.006;
   const rodLen = Math.abs(-totalLen - rodStartY);
   const rodGeo = new THREE.CylinderGeometry(rodRadius, rodRadius, rodLen, 24);
   const rod = new THREE.Mesh(rodGeo, materials.metallic);
+  rod.name = `${name}_PistonRod`;
   rod.position.set(0, rodStartY - rodLen * 0.5, 0);
   rod.castShadow = true;
   actGroup.add(rod);
@@ -523,38 +538,97 @@ function createSideActuatorAssembly(
 
   group.add(actGroup);
 
-  // ---------------------------------------------------------------------------
-  // 7. Triangulated Stabilizing Torque Linkage (Tie-Rod)
-  // Connects mid-barrel (y = -0.138) directly into Vertebra 03 lateral horn!
-  // ---------------------------------------------------------------------------
-  const linkStart = new THREE.Vector3(side * 0.096, -0.138, 0.025);
-  const linkEnd = new THREE.Vector3(side * 0.049, -0.138, 0.010);
-  const linkLen = linkStart.distanceTo(linkEnd);
+  // 7. Optional Triangulated Stabilizing Torque Linkage (Tie-Rod) connecting mid-barrel to Vertebra 03
+  if (hasStabilizerLink) {
+    const linkStart = new THREE.Vector3(side * 0.096, -0.138, 0.025);
+    const linkEnd = new THREE.Vector3(side * 0.049, -0.138, 0.010);
+    const linkLen = linkStart.distanceTo(linkEnd);
 
-  const linkGroup = new THREE.Group();
-  linkGroup.name = side === -1 ? 'LeftStabilizerTieRod' : 'RightStabilizerTieRod';
-  linkGroup.position.copy(linkStart);
-  const linkDir = new THREE.Vector3().subVectors(linkEnd, linkStart).normalize();
-  linkGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), linkDir);
+    const linkGroup = new THREE.Group();
+    linkGroup.name = `${name}_StabilizerTieRod`;
+    linkGroup.position.copy(linkStart);
+    const linkDir = new THREE.Vector3().subVectors(linkEnd, linkStart).normalize();
+    linkGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), linkDir);
 
-  // Central CNC Turnbuckle Body
-  const tieRodGeo = new THREE.CylinderGeometry(0.0034, 0.0034, linkLen * 0.72, 14);
-  const tieRod = new THREE.Mesh(tieRodGeo, materials.metallic);
-  tieRod.rotation.x = Math.PI / 2;
-  tieRod.position.set(0, 0, linkLen * 0.5);
-  linkGroup.add(tieRod);
+    const tieRodGeo = new THREE.CylinderGeometry(0.0034, 0.0034, linkLen * 0.72, 14);
+    const tieRod = new THREE.Mesh(tieRodGeo, materials.metallic);
+    tieRod.rotation.x = Math.PI / 2;
+    tieRod.position.set(0, 0, linkLen * 0.5);
+    linkGroup.add(tieRod);
 
-  // Ball-joint rod ends at both sides
-  for (const zOffset of [0, linkLen]) {
-    const ballGeo = new THREE.SphereGeometry(0.0048, 12, 10);
-    const ball = new THREE.Mesh(ballGeo, materials.joint);
-    ball.position.set(0, 0, zOffset);
-    linkGroup.add(ball);
+    for (const zOffset of [0, linkLen]) {
+      const ballGeo = new THREE.SphereGeometry(0.0048, 12, 10);
+      const ball = new THREE.Mesh(ballGeo, materials.joint);
+      ball.position.set(0, 0, zOffset);
+      linkGroup.add(ball);
+    }
+    group.add(linkGroup);
   }
 
-  group.add(linkGroup);
+  return { group, barrelMesh: barrel };
+}
 
-  return { group, primaryMesh: barrel };
+/**
+ * Engineered dual hydraulic actuator cluster (outer + inner poles) per side,
+ * forming the complete 4-pole abdominal kinematic support system.
+ */
+function createSideActuatorAssembly(
+  side: -1 | 1,
+  materials: RobotMaterialPalette,
+  ledMeshes: THREE.Mesh[]
+): { group: THREE.Group; primaryMesh: THREE.Mesh } {
+  const clusterGroup = new THREE.Group();
+  clusterGroup.name = side === -1 ? 'LeftActuatorClusterAssembly' : 'RightActuatorClusterAssembly';
+
+  const cfg = TORSO_CONFIG.stomach;
+  const dual = cfg.dualActuators || {
+    outer: {
+      upperMount: { x: 0.098, y: -0.066, z: 0.014 },
+      lowerMount: { x: 0.076, y: -0.204, z: 0.016 },
+      cylinderRadius: 0.0125,
+      pistonRadius: 0.0068,
+    },
+    inner: {
+      upperMount: { x: 0.068, y: -0.070, z: 0.006 },
+      lowerMount: { x: 0.052, y: -0.204, z: 0.012 },
+      cylinderRadius: 0.0090,
+      pistonRadius: 0.0052,
+    },
+  };
+
+  // Outer Actuator Pole (Single unified cylinder pole with tie-rod link)
+  const outerPole = createSingleActuatorPole(
+    {
+      side,
+      name: side === -1 ? 'OuterLeftActuatorPole' : 'OuterRightActuatorPole',
+      upperMount: cfg.actuator?.upperMount || dual.outer.upperMount,
+      lowerMount: cfg.actuator?.lowerMount || dual.outer.lowerMount,
+      cylinderRadius: 0.0118,
+      pistonRadius: 0.0064,
+      hasStabilizerLink: true,
+    },
+    materials,
+    ledMeshes
+  );
+  clusterGroup.add(outerPole.group);
+
+  // Inner Actuator Pole (Single unified cylinder pole - completing all 4 single poles)
+  const innerPole = createSingleActuatorPole(
+    {
+      side,
+      name: side === -1 ? 'InnerLeftActuatorPole' : 'InnerRightActuatorPole',
+      upperMount: dual.inner.upperMount,
+      lowerMount: dual.inner.lowerMount,
+      cylinderRadius: 0.0095,
+      pistonRadius: 0.0052,
+      hasStabilizerLink: false,
+    },
+    materials,
+    ledMeshes
+  );
+  clusterGroup.add(innerPole.group);
+
+  return { group: clusterGroup, primaryMesh: outerPole.barrelMesh };
 }
 
 // ─── 4. SLEW BEARING WAIST TRANSITION DECK & PLINTHS ────────────────────────
@@ -562,7 +636,7 @@ function createSideActuatorAssembly(
  * Precision lumbar-to-waist transition:
  * - Multi-tiered dark titanium turntable deck plate with precision bolt circle
  * - Lower lumbar socket receiver cup locking Vertebra 05
- * - Dual reinforced actuator receiver plinths with heavy-duty clevis pins
+ * - Quadruple reinforced actuator receiver plinths (outer & inner lower mounts) with heavy-duty clevis pins
  * - Forward glowing purple neon arc bar with ceramic white clamp hoods
  */
 function createWaistTransitionDeck(
@@ -617,27 +691,37 @@ function createWaistTransitionDeck(
   socketRim.position.set(0, deckY + 0.014, 0);
   group.add(socketRim);
 
-  // 3. Bilateral Reinforced Actuator Anchor Plinths (Dual-shear lower mounts)
+  // 3. Quadruple Reinforced Actuator Anchor Plinths (Outer & Inner mounts for all 4 abdominal poles)
   const cfgAct = TORSO_CONFIG.stomach.actuator;
+  const dualCfg = TORSO_CONFIG.stomach.dualActuators;
+  
+  const mountPositions = [
+    { x: cfgAct.lowerMount.x, z: cfgAct.lowerMount.z, isOuter: true },
+    { x: dualCfg?.inner.lowerMount.x || 0.052, z: dualCfg?.inner.lowerMount.z || 0.012, isOuter: false },
+  ];
+
   for (const side of [-1, 1] as const) {
-    const plinthGeo = new THREE.BoxGeometry(0.018, 0.020, 0.022);
-    const plinth = new THREE.Mesh(plinthGeo, materials.joint);
-    plinth.position.set(side * cfgAct.lowerMount.x, deckY + 0.008, cfgAct.lowerMount.z);
-    plinth.rotation.z = -side * 0.12;
-    deckGroup.add(plinth);
+    for (const mount of mountPositions) {
+      const pWidth = mount.isOuter ? 0.018 : 0.014;
+      const plinthGeo = new THREE.BoxGeometry(pWidth, 0.020, 0.020);
+      const plinth = new THREE.Mesh(plinthGeo, materials.joint);
+      plinth.position.set(side * mount.x, deckY + 0.008, mount.z);
+      plinth.rotation.z = -side * (mount.isOuter ? 0.12 : 0.06);
+      deckGroup.add(plinth);
 
-    const pinGeo = new THREE.CylinderGeometry(0.0036, 0.0036, 0.024, 16);
-    const pin = new THREE.Mesh(pinGeo, materials.metallic);
-    pin.rotation.z = Math.PI / 2;
-    pin.position.set(side * cfgAct.lowerMount.x, deckY + 0.008, cfgAct.lowerMount.z);
-    deckGroup.add(pin);
+      const pinGeo = new THREE.CylinderGeometry(0.0032, 0.0032, 0.022, 16);
+      const pin = new THREE.Mesh(pinGeo, materials.metallic);
+      pin.rotation.z = Math.PI / 2;
+      pin.position.set(side * mount.x, deckY + 0.008, mount.z);
+      deckGroup.add(pin);
 
-    // Gusset rib anchoring plinth to central lumbar hub
-    const ribGeo = new THREE.BoxGeometry(0.026, 0.012, 0.008);
-    const rib = new THREE.Mesh(ribGeo, materials.joint);
-    rib.position.set(side * (cfgAct.lowerMount.x * 0.65), deckY + 0.004, cfgAct.lowerMount.z * 0.65);
-    rib.rotation.y = -side * 0.28;
-    deckGroup.add(rib);
+      // Gusset rib anchoring plinth to central lumbar hub
+      const ribGeo = new THREE.BoxGeometry(0.020, 0.010, 0.007);
+      const rib = new THREE.Mesh(ribGeo, materials.joint);
+      rib.position.set(side * (mount.x * 0.68), deckY + 0.004, mount.z * 0.68);
+      rib.rotation.y = -side * 0.28;
+      deckGroup.add(rib);
+    }
   }
 
   const mergedDeck = mergeGroupMeshesByMaterial(deckGroup, materials.joint, 'WaistDeck_Merged', false)!;
@@ -738,7 +822,7 @@ export function createStomachAssembly(materials: RobotMaterialPalette): StomachA
 
   abdomenGroup.add(spineGroup);
 
-  // 4. Heavy-Duty Lateral Hydraulic Actuators & Triangulated Linkages
+  // 4. Heavy-Duty Quadruple Hydraulic Actuators (4 Poles: Outer & Inner pairs for Left & Right)
   const leftActuator = createSideActuatorAssembly(-1, materials, ledMeshes);
   const rightActuator = createSideActuatorAssembly(1, materials, ledMeshes);
   abdomenGroup.add(leftActuator.group);

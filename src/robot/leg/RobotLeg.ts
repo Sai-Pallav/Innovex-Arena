@@ -73,10 +73,11 @@ export function createRobotLeg(
 
   // ==========================================
   // 4. SHIN / CALF GAUNTLET
-  // (Attached hierarchically to knee.shinPivot so it rotates on knee pitch axis)
+  // (Attached hierarchically to knee.shinPivot flush against lower knee structure)
   // ==========================================
   const shin = createShin(side, materials);
   knee.shinPivot.add(shin.group);
+  shin.group.position.set(0, -LEG_CONFIG.knee.lowerStructureHeight, 0);
   ledMeshes.push(...shin.ledMeshes);
 
   // ==========================================

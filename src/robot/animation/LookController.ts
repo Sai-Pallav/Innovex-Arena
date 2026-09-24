@@ -76,6 +76,13 @@ export class LookController {
   private tempParentQuat = new THREE.Quaternion();
   private tempInvParentQuat = new THREE.Quaternion();
 
+  private cachedRect: DOMRect | null = null;
+  private boundUpdateRect = () => {
+    if (this.container) {
+      this.cachedRect = this.container.getBoundingClientRect();
+    }
+  };
+
   /**
    * Registers the 3D scene camera and container element to enable 100% physically accurate
    * 3D raycast gaze tracking.
@@ -90,6 +97,9 @@ export class LookController {
     this.container = container;
     this.headNode = head;
     this.neckParentNode = neckParent;
+    this.cachedRect = container.getBoundingClientRect();
+    window.addEventListener('resize', this.boundUpdateRect, { passive: true });
+    window.addEventListener('scroll', this.boundUpdateRect, { passive: true });
   }
 
   /**
@@ -145,8 +155,11 @@ export class LookController {
       this.tempInvParentQuat.copy(this.tempParentQuat).invert();
 
       if (this.isHovered && this.hasPointer && !input.reducedMotion) {
-        // True 3D raycast unprojection through camera viewport
-        const rect = this.container.getBoundingClientRect();
+        // True 3D raycast unprojection through camera viewport (cached rect prevents layout thrashing)
+        if (!this.cachedRect) {
+          this.cachedRect = this.container.getBoundingClientRect();
+        }
+        const rect = this.cachedRect;
         const ndcX = ((this.clientX - rect.left) / rect.width) * 2 - 1;
         const ndcY = -(((this.clientY - rect.top) / rect.height) * 2 - 1);
 
@@ -249,5 +262,10 @@ export class LookController {
 
   public getCurrentHeadPitch(): number {
     return this.currentPitch;
+  }
+
+  public dispose(): void {
+    window.removeEventListener('resize', this.boundUpdateRect);
+    window.removeEventListener('scroll', this.boundUpdateRect);
   }
 }

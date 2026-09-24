@@ -1,310 +1,510 @@
+/**
+ * ============================================================================
+ * FOREARM MODULE — GAUNTLET & MECHANICAL CORE (AAA PRODUCTION SPECIFICATION)
+ * ============================================================================
+ *
+ * Exact mechanical and hard-surface CAD reconstruction adhering strictly to:
+ * - Reference Image 2: Wide under-elbow mass, continuous taper to wrist,
+ *   exposed dark spaceframe core, and front-outer recessed purple LED accent.
+ * - Corrections 14 to 18: Forearm volume, multi-piece white armor, visible
+ *   dark titanium core, recessed longitudinal purple LED, and distinct wrist taper.
+ *
+ * Architecture:
+ *   elbow.forearmPivot (Parent rotation pivot for elbow flexion)
+ *     │
+ *     ▼
+ *   forearmMechanicalCore (Dark titanium structural spine + dual flexor actuators + cable conduit)
+ *     │
+ *     ▼
+ *   forearmWhiteArmor (Multi-piece ceramic composite gauntlet: anterior + lateral + posterior)
+ *     │
+ *     ▼
+ *   forearmVentilationChannel & purpleAccent (Recessed front-outer channel + purple LED rod)
+ *     │
+ *     ▼
+ *   distalWristMount (Precision machined cuff interfacing with Wrist.ts)
+ * ============================================================================
+ */
+
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// FOREARM MODULE — Premium Humanoid Robotic Forearm Assembly
-// Reference: Images 1, 2, 3
-//
-// Design language:
-//   - 152 mm structural gauntlet (matches proportional humanoid radius/ulna)
-//   - Wide proximal cradle near elbow (r≈0.040), brachioradialis swell at ~22%,
-//     smooth continuous taper to wrist (r≈0.026)
-//   - Anterior + posterior white ceramic armor panels, open lateral corridor
-//   - Iconic posterior dorsal spine/fin (Reference Images 1 & 3)
-//   - Dark titanium internal spaceframe + dual flexor actuators visible
-//   - Natural wrist-emergence — no abrupt ring at distal end
-// ─────────────────────────────────────────────────────────────────────────────
-
 export interface ForearmNodes {
   group: THREE.Group;
+  mechanicalCore: THREE.Group;
+  armatureSpine: THREE.Mesh;
+  armorGroup: THREE.Group;
+  anteriorArmor: THREE.Mesh;
+  posteriorArmor: THREE.Mesh;
+  sideArmor?: THREE.Mesh;
+  innerArmor?: THREE.Mesh;
+  ventilationChannel: THREE.Group;
+  ledStrip: THREE.Mesh;
+  ledMeshes: THREE.Mesh[];
+  distalWristMount: THREE.Group;
+  wristCuff: THREE.Mesh;
+  // Compatibility aliases
   gauntletBody: THREE.Mesh;
   innerSleeve: THREE.Mesh;
-  armorGroup: THREE.Group;
   elbowSocketCollar: THREE.Mesh;
   brachioradialis: THREE.Mesh;
-  wristCuff: THREE.Mesh;
   panelSeam: THREE.Mesh;
-  ledMeshes: THREE.Mesh[];
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// FOREARM ARMOR PANEL GEOMETRY
-// Dual-layer white ceramic shell.
-// Anterior: ±72° coverage centred on +Z
-// Posterior: ±76° coverage centred on -Z — carries the dorsal spine
+// 1. SCULPTED FOREARM ARMOR GEOMETRY (CORRECTIONS 14, 15, 18)
+// Wide near elbow, sleek continuous taper to wrist, real 3.5mm wall thickness.
 // ─────────────────────────────────────────────────────────────────────────────
-function createForearmArmorGeo(
-  isAnterior: boolean,
+// ─────────────────────────────────────────────────────────────────────────────
+// 1. COHERENT FOREARM GAUNTLET ARMOR GEOMETRY (SECTIONS 10, 11, 12, 15, 16)
+// Coherent volumetric gauntlet, wide under-elbow mass, continuous taper to wrist.
+// ─────────────────────────────────────────────────────────────────────────────
+function createForearmCoherentArmor(
+  shellType: 'primaryOuter' | 'secondaryInner',
   side: -1 | 1
 ): THREE.BufferGeometry {
-  const radialSegs = 26;
-  const heightSegs = 26;
+  const radialSegs = 32;
+  const heightSegs = 30;
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
 
-  const length    = 0.152;   // 152 mm humanoid forearm
-  const thickness = 0.0036;
+  const yTop = -0.015;
+  const totalLength = 0.110; // 110 mm sculpted gauntlet, ending at y = -0.125m to house dedicated wrist module
+  const thickness = 0.0028;  // 2.8 mm real physical wall thickness
 
-  const baseAngle    = isAnterior ? 0 : Math.PI;
-  const halfAngleSpan = isAnterior ? Math.PI * 0.40 : Math.PI * 0.43;
+  let startAngle = 0;
+  let endAngle = 0;
 
-  function getVertex(layer: 0 | 1, iy: number, ix: number): THREE.Vector3 {
+  if (side === 1) {
+    if (shellType === 'primaryOuter') {
+      startAngle = -0.16 * Math.PI;
+      endAngle = 0.82 * Math.PI;
+    } else {
+      startAngle = 0.86 * Math.PI;
+      endAngle = 1.80 * Math.PI;
+    }
+  } else {
+    if (shellType === 'primaryOuter') {
+      startAngle = 0.16 * Math.PI;
+      endAngle = -0.82 * Math.PI;
+    } else {
+      startAngle = -0.86 * Math.PI;
+      endAngle = -1.80 * Math.PI;
+    }
+  }
+
+  function evaluateSurface(layer: 0 | 1, iy: number, ix: number): THREE.Vector3 {
     const v = iy / heightSegs;
     const u = ix / radialSegs;
-    const y = -0.005 - v * length;
+    let y = yTop - v * totalLength;
 
-    // Radius profile:
-    //   Proximal (elbow): r ≈ 0.040
-    //   Brachioradialis swell at v ≈ 0.22: + 0.0026
-    //   Smooth taper to wrist (v = 1): r ≈ 0.025
-    let radius = 0.0398
-      + 0.0026 * Math.sin(v * Math.PI * 0.68)   // brachioradialis swell
-      - 0.0148 * v;                              // continuous taper to wrist
+    // Slim, athletic gauntlet taper: under-elbow width ~57mm down to wrist ~38mm
+    let radius = 0.0285 - 0.0095 * v + 0.0012 * Math.sin(v * Math.PI * 0.70);
 
-    const angle = baseAngle - halfAngleSpan + u * halfAngleSpan * 2.0;
-    const sinA  = Math.sin(angle);
-    const cosA  = Math.cos(angle);
-
-    let rx = radius * 0.935;
-    let rz = radius * 1.055;
-
-    // Anterior subtle highlight ridge
-    if (isAnterior && cosA > 0.52) {
-      const t = (cosA - 0.52) / 0.48;
-      rz += Math.pow(t, 1.4) * 0.0026 * Math.sin(v * Math.PI);
+    if (v < 0.16) {
+      // Inward chamfer at proximal elbow rim (/------\ )
+      const tTop = (0.16 - v) / 0.16;
+      radius -= tTop * 0.0020;
+    } else if (v > 0.82) {
+      // Inward socket bevel at distal wrist rim (\______/ )
+      const tBot = (v - 0.82) / 0.18;
+      radius -= tBot * 0.0016;
     }
 
-    // Posterior dorsal spine / fin (signature form — Ref 1 & 3)
-    if (!isAnterior && cosA < -0.52) {
-      const t = (-cosA - 0.52) / 0.48;
-      // Fin grows from v=0.10, peaks at v=0.55, fades toward wrist
-      const finEnvelope = Math.sin(Math.max(0, v - 0.10) * Math.PI / 0.90);
-      rz += Math.pow(t, 1.6) * 0.0060 * finEnvelope;
+    const angle = startAngle + u * (endAngle - startAngle);
+    const sinA = Math.sin(angle);
+    const cosA = Math.cos(angle);
+
+    // Both width (rx) and depth (rz) taper gradually to create the sculpted athletic profile
+    let rx = radius * 1.0; // medial-lateral width
+    let rz = radius * 0.96; // anterior-posterior depth
+
+    // 3D Facet Crowning & Crisp 45° Corner Chamfers (Eliminates flat sleeve appearance)
+    if (shellType === 'primaryOuter') {
+      if (cosA > 0.52) {
+        // Central anterior facet: prominent crowned curvature (convex aerodynamic arch)
+        const tCenter = (cosA - 0.52) / 0.48;
+        rz -= (1.0 - Math.pow(tCenter, 1.4) * 0.40) * 0.0032;
+      } else if (cosA > 0.15) {
+        // Crisp 45° chamfered corner bevel connecting front and lateral faces
+        const tChamfer = (cosA - 0.15) / 0.37;
+        rx -= Math.sin(tChamfer * Math.PI) * 0.0022;
+        rz -= (1.0 - tChamfer) * 0.0026;
+      }
     }
 
-    // Distal wrist-emergence taper — natural narrowing (v > 0.84)
-    if (v > 0.84) {
-      const tNarrow = (v - 0.84) / 0.16;
-      rx -= tNarrow * 0.0040;
-      rz -= tNarrow * 0.0050;
+    // Posterior dorsal flexor contour
+    if (shellType === 'secondaryInner') {
+      if (cosA < -0.40) {
+        const tPost = (-cosA - 0.40) / 0.60;
+        rz += Math.pow(tPost, 1.3) * 0.0024 * Math.sin(v * Math.PI * 0.85);
+      } else if (cosA < 0) {
+        const tChamfer = (-cosA) / 0.40;
+        rx -= Math.sin(tChamfer * Math.PI) * 0.0015;
+      }
     }
 
-    const rBase = layer === 0 ? 1.0 : (1.0 - thickness / Math.max(rx, rz));
+    // Proximal Lower Elbow Guard (cups the lower perimeter of elbow hinge)
+    if (v < 0.16) {
+      const tElbow = (0.16 - v) / 0.16;
+      rx += tElbow * 0.0012;
+      rz += tElbow * 0.0014;
+    }
+
+    // Distal Wrist Transition Socket (terminates in engineered collar socket)
+    if (v > 0.85) {
+      const tWrist = (v - 0.85) / 0.15;
+      rx -= tWrist * 0.0012;
+      rz -= tWrist * 0.0014;
+    }
+
+    const rFactor = layer === 0 ? 1.0 : (1.0 - thickness / Math.max(rx, rz));
 
     return new THREE.Vector3(
-      rBase * rx * sinA,
+      rFactor * rx * sinA,
       y,
-      rBase * rz * cosA
+      rFactor * rz * cosA
     );
   }
 
-  const vertCount = (heightSegs + 1) * (radialSegs + 1);
-
-  for (let layer = 0; layer < 2; layer++) {
+  // 1. Generate Vertices for Outer Shell (layer 0) and Inner Shell (layer 1)
+  for (let layer = 0; layer <= 1; layer++) {
     for (let iy = 0; iy <= heightSegs; iy++) {
       for (let ix = 0; ix <= radialSegs; ix++) {
-        const v3 = getVertex(layer as 0 | 1, iy, ix);
-        positions.push(v3.x, v3.y, v3.z);
+        const p = evaluateSurface(layer as 0 | 1, iy, ix);
+        positions.push(p.x, p.y, p.z);
         uvs.push(ix / radialSegs, iy / heightSegs);
       }
     }
   }
 
-  const stride = radialSegs + 1;
+  const layerStride = (heightSegs + 1) * (radialSegs + 1);
 
-  // Outer face
+  // 2. Generate Triangles for Outer Surface
   for (let iy = 0; iy < heightSegs; iy++) {
     for (let ix = 0; ix < radialSegs; ix++) {
-      const a = iy * stride + ix;
-      const b = (iy + 1) * stride + ix;
-      const c = (iy + 1) * stride + (ix + 1);
-      const d = iy * stride + (ix + 1);
-      indices.push(a, b, d, b, c, d);
+      const a = iy * (radialSegs + 1) + ix;
+      const b = a + 1;
+      const c = a + (radialSegs + 1);
+      const d = c + 1;
+      if (side === 1) {
+        indices.push(a, c, b);
+        indices.push(b, c, d);
+      } else {
+        indices.push(a, b, c);
+        indices.push(b, d, c);
+      }
     }
   }
 
-  // Inner face (reversed winding)
-  const iOff = vertCount;
+  // 3. Generate Triangles for Inner Surface
   for (let iy = 0; iy < heightSegs; iy++) {
     for (let ix = 0; ix < radialSegs; ix++) {
-      const a = iOff + iy * stride + ix;
-      const b = iOff + (iy + 1) * stride + ix;
-      const c = iOff + (iy + 1) * stride + (ix + 1);
-      const d = iOff + iy * stride + (ix + 1);
-      indices.push(a, d, b, b, d, c);
+      const a = layerStride + iy * (radialSegs + 1) + ix;
+      const b = a + 1;
+      const c = a + (radialSegs + 1);
+      const d = c + 1;
+      if (side === 1) {
+        indices.push(a, b, c);
+        indices.push(b, d, c);
+      } else {
+        indices.push(a, c, b);
+        indices.push(b, c, d);
+      }
     }
   }
 
-  // Edge caps — stitch outer to inner at angular edges
-  for (let iy = 0; iy < heightSegs; iy++) {
-    const oA = iy * stride,               oB = (iy + 1) * stride;
-    const iA = iOff + iy * stride,        iB = iOff + (iy + 1) * stride;
-    indices.push(oA, iA, oB, iA, iB, oB);
-
-    const oC = iy * stride + radialSegs,  oD = (iy + 1) * stride + radialSegs;
-    const iC = iOff + iy * stride + radialSegs;
-    const iD = iOff + (iy + 1) * stride + radialSegs;
-    indices.push(oD, iC, oC, iD, iC, oD);
+  // 4. Perimeter Edge Walls (watertight bevel borders)
+  for (let ix = 0; ix < radialSegs; ix++) {
+    const oA = ix;
+    const oB = ix + 1;
+    const iA = layerStride + ix;
+    const iB = layerStride + ix + 1;
+    if (side === 1) {
+      indices.push(oA, oB, iA);
+      indices.push(oB, iB, iA);
+    } else {
+      indices.push(oA, iA, oB);
+      indices.push(oB, iA, iB);
+    }
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('uv',       new THREE.Float32BufferAttribute(uvs, 2));
-  geo.setIndex(indices);
-  geo.computeVertexNormals();
-  return geo;
+  const botRow = heightSegs * (radialSegs + 1);
+  for (let ix = 0; ix < radialSegs; ix++) {
+    const oA = botRow + ix;
+    const oB = botRow + ix + 1;
+    const iA = layerStride + botRow + ix;
+    const iB = layerStride + botRow + ix + 1;
+    if (side === 1) {
+      indices.push(oA, iA, oB);
+      indices.push(oB, iA, iB);
+    } else {
+      indices.push(oA, oB, iA);
+      indices.push(oB, iB, iA);
+    }
+  }
+
+  for (let iy = 0; iy < heightSegs; iy++) {
+    const oA0 = iy * (radialSegs + 1);
+    const oC0 = (iy + 1) * (radialSegs + 1);
+    const iA0 = layerStride + oA0;
+    const iC0 = layerStride + oC0;
+    if (side === 1) {
+      indices.push(oA0, iA0, oC0);
+      indices.push(oC0, iA0, iC0);
+    } else {
+      indices.push(oA0, oC0, iA0);
+      indices.push(oC0, iC0, iA0);
+    }
+
+    const oA1 = iy * (radialSegs + 1) + radialSegs;
+    const oC1 = (iy + 1) * (radialSegs + 1) + radialSegs;
+    const iA1 = layerStride + oA1;
+    const iC1 = layerStride + oC1;
+    if (side === 1) {
+      indices.push(oA1, oC1, iA1);
+      indices.push(oC1, iC1, iA1);
+    } else {
+      indices.push(oA1, iA1, oC1);
+      indices.push(oC1, iA1, iC1);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+
+  return geometry;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MAIN FACTORY
+// 2. MAIN FOREARM ASSEMBLY BUILDER
 // ─────────────────────────────────────────────────────────────────────────────
 export function createForearm(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): ForearmNodes {
   const forearmGroup = new THREE.Group();
-  forearmGroup.name = side === -1 ? 'LeftForearmRoot' : 'RightForearmRoot';
+  forearmGroup.name = side === -1 ? 'LeftForearmAssembly' : 'RightForearmAssembly';
 
   const ledMeshes: THREE.Mesh[] = [];
 
-  // ════════════════════════════════════════════════════════════
-  // INTERNAL SPACEFRAME — dark titanium structural chassis
-  // ════════════════════════════════════════════════════════════
-  const internalChassisGroup = new THREE.Group();
-  internalChassisGroup.name = 'ForearmInternalChassis';
-  forearmGroup.add(internalChassisGroup);
+  // ==========================================================================
+  // SECTION 1: DARK STRUCTURAL MECHANICAL CORE (CORRECTION 16)
+  // Titanium load-bearing spaceframe visually connecting ELBOW → FOREARM → WRIST
+  // ==========================================================================
+  const mechanicalCore = new THREE.Group();
+  mechanicalCore.name = side === -1 ? 'LeftForearmMechanicalCore' : 'RightForearmMechanicalCore';
+  forearmGroup.add(mechanicalCore);
 
-  // ── Proximal Elbow Socket Collar & Interface Flange ──────────────────────
-  // Receives the articulating lower clevis knuckle from Elbow.
-  const collarGeo = new THREE.CylinderGeometry(0.028, 0.031, 0.016, 30);
-  const elbowSocketCollar = new THREE.Mesh(collarGeo, materials.joint);
+  // 1. Proximal Elbow Docking Collar (interfaces with Elbow lower housing)
+  const dockGeo = new THREE.CylinderGeometry(0.0265, 0.0285, 0.016, 28);
+  const elbowSocketCollar = new THREE.Mesh(dockGeo, materials.joint);
   elbowSocketCollar.name = 'ForearmElbowSocketCollar';
-  elbowSocketCollar.position.set(0, -0.010, 0);
+  elbowSocketCollar.position.set(0, -0.008, 0);
   elbowSocketCollar.castShadow = true;
-  elbowSocketCollar.receiveShadow = true;
-  internalChassisGroup.add(elbowSocketCollar);
+  mechanicalCore.add(elbowSocketCollar);
 
-  const socketRimGeo = new THREE.TorusGeometry(0.0295, 0.0016, 8, 30);
-  socketRimGeo.rotateX(Math.PI / 2);
-  const socketRim = new THREE.Mesh(socketRimGeo, materials.metallic);
-  socketRim.position.set(0, -0.006, 0);
-  internalChassisGroup.add(socketRim);
+  const dockRimGeo = new THREE.TorusGeometry(0.0270, 0.0012, 6, 28);
+  dockRimGeo.rotateX(Math.PI / 2);
+  const dockRim = new THREE.Mesh(dockRimGeo, materials.metallic);
+  dockRim.position.set(0, -0.003, 0);
+  mechanicalCore.add(dockRim);
 
-  // ── Central Structural Spine ──────────────────────────────────────────────
-  const spineGeo = new THREE.BoxGeometry(0.022, 0.144, 0.032);
-  const innerSleeve = new THREE.Mesh(spineGeo, materials.joint);
-  innerSleeve.name = 'ForearmStructuralSpine';
-  innerSleeve.position.set(0, -0.082, 0);
-  innerSleeve.castShadow = true;
-  innerSleeve.receiveShadow = true;
-  internalChassisGroup.add(innerSleeve);
+  // 2. Main Structural Column / Spaceframe Spine
+  const spineGeo = new THREE.BoxGeometry(0.018, 0.140, 0.022);
+  const armatureSpine = new THREE.Mesh(spineGeo, materials.joint);
+  armatureSpine.name = 'ForearmArmatureSpine';
+  armatureSpine.position.set(0, -0.072, 0);
+  armatureSpine.castShadow = true;
+  armatureSpine.receiveShadow = true;
+  mechanicalCore.add(armatureSpine);
 
-  // CNC weight-reduction cavities on spine
-  for (let c = 0; c < 4; c++) {
-    const cavGeo = new THREE.BoxGeometry(0.026, 0.020, 0.020);
+  // CNC Weight-Reduction Cutouts on Spine
+  for (let c = 0; c < 3; c++) {
+    const cavGeo = new THREE.BoxGeometry(0.022, 0.022, 0.016);
     const cav = new THREE.Mesh(cavGeo, materials.joint);
-    cav.position.set(0, -0.042 - c * 0.030, 0);
-    internalChassisGroup.add(cav);
+    cav.position.set(0, -0.045 - c * 0.028, 0);
+    mechanicalCore.add(cav);
   }
 
-  // ── Dual Internal Flexor Actuators ───────────────────────────────────────
-  // Simulates tendon-driven or hydraulic finger/wrist actuator cables.
+  // 3. Substantial Bilateral Linear Flexor Actuator Cylinders & Chrome Piston Rods
+  // Compacted load-bearing actuators nestled inside gauntlet spaceframe
   for (const aSide of [-1, 1]) {
-    const actCylGeo = new THREE.CylinderGeometry(0.0050, 0.0050, 0.054, 14);
+    const actCylGeo = new THREE.CylinderGeometry(0.0036, 0.0036, 0.052, 16);
     const actCyl = new THREE.Mesh(actCylGeo, materials.joint);
-    actCyl.position.set(aSide * 0.013, -0.062, 0.009);
+    actCyl.position.set(aSide * 0.010, -0.065, 0.007);
     actCyl.castShadow = true;
-    internalChassisGroup.add(actCyl);
+    mechanicalCore.add(actCyl);
 
-    const pistonGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.050, 12);
+    const actRingGeo = new THREE.TorusGeometry(0.0042, 0.0008, 6, 16);
+    const actRing = new THREE.Mesh(actRingGeo, materials.metallic);
+    actRing.position.set(aSide * 0.010, -0.052, 0.007);
+    mechanicalCore.add(actRing);
+
+    const pistonGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.054, 14);
     const piston = new THREE.Mesh(pistonGeo, materials.metallic);
-    piston.position.set(aSide * 0.013, -0.102, 0.009);
+    piston.position.set(aSide * 0.010, -0.102, 0.007);
     piston.castShadow = true;
-    internalChassisGroup.add(piston);
+    mechanicalCore.add(piston);
   }
 
-  // ── Distal Wrist Interface Cuff & Flange ─────────────────────────────────
-  // Transitions smoothly into the Wrist module.
-  const cuffGeo = new THREE.CylinderGeometry(0.0236, 0.0268, 0.016, 28);
+  // 4. Internal Protected Cable Conduit Raceway
+  const cableConduitGeo = new THREE.CylinderGeometry(0.0024, 0.0024, 0.130, 10);
+  const cableConduit = new THREE.Mesh(cableConduitGeo, materials.joint);
+  cableConduit.position.set(0, -0.075, -0.008);
+  cableConduit.castShadow = true;
+  mechanicalCore.add(cableConduit);
+
+  // 5. Distal Wrist Interface Mount (Receives Dedicated Wrist Module at Y = -0.126m)
+  const distalWristMount = new THREE.Group();
+  distalWristMount.name = side === -1 ? 'LeftDistalWristMount' : 'RightDistalWristMount';
+  distalWristMount.position.set(0, -0.126, 0);
+  mechanicalCore.add(distalWristMount);
+
+  const cuffGeo = new THREE.CylinderGeometry(0.0185, 0.0200, 0.010, 28);
   const wristCuff = new THREE.Mesh(cuffGeo, materials.joint);
   wristCuff.name = 'ForearmWristCuff';
-  wristCuff.position.set(0, -0.156, 0);
+  wristCuff.position.set(0, 0.005, 0);
   wristCuff.castShadow = true;
   wristCuff.receiveShadow = true;
-  internalChassisGroup.add(wristCuff);
+  distalWristMount.add(wristCuff);
 
-  const cuffRimGeo = new THREE.TorusGeometry(0.0248, 0.0014, 8, 28);
+  const cuffRimGeo = new THREE.TorusGeometry(0.0190, 0.0010, 6, 28);
   cuffRimGeo.rotateX(Math.PI / 2);
   const cuffRim = new THREE.Mesh(cuffRimGeo, materials.metallic);
-  cuffRim.position.set(0, -0.149, 0);
-  internalChassisGroup.add(cuffRim);
+  cuffRim.position.set(0, 0.009, 0);
+  distalWristMount.add(cuffRim);
 
-  // Proximal to distal transition bands (bridge armor to dark structure)
-  const proxBandGeo = new THREE.CylinderGeometry(0.0365, 0.0400, 0.012, 28, 1, true);
-  const proxBand = new THREE.Mesh(proxBandGeo, materials.joint);
-  proxBand.position.set(0, -0.012, 0);
-  internalChassisGroup.add(proxBand);
+  // Forearm -> Wrist Tapered Transition Collar (Interlocks with dedicated wrist housing)
+  const collarGeo = new THREE.CylinderGeometry(0.0188, 0.0202, 0.006, 28);
+  const transitionCollar = new THREE.Mesh(collarGeo, materials.joint);
+  transitionCollar.name = 'ForearmWristTransitionCollar';
+  transitionCollar.position.set(0, -0.124, 0);
+  transitionCollar.castShadow = true;
+  forearmGroup.add(transitionCollar);
 
-  const distBandGeo = new THREE.CylinderGeometry(0.0228, 0.0258, 0.014, 28, 1, true);
-  const distBand = new THREE.Mesh(distBandGeo, materials.joint);
-  distBand.position.set(0, -0.161, 0);
-  internalChassisGroup.add(distBand);
+  const collarRingGeo = new THREE.TorusGeometry(0.0192, 0.0009, 6, 28);
+  collarRingGeo.rotateX(Math.PI / 2);
+  const collarRing = new THREE.Mesh(collarRingGeo, materials.metallic);
+  collarRing.position.set(0, -0.124, 0);
+  forearmGroup.add(collarRing);
 
-  // ════════════════════════════════════════════════════════════
-  // WHITE CERAMIC GAUNTLET EXOSKELETON ARMOR
-  // ════════════════════════════════════════════════════════════
+  // ==========================================================================
+  // SECTION 2: SCULPTED WHITE CERAMIC COHERENT GAUNTLET (SECTIONS 10, 11, 12)
+  // Single coherent armored volume: primary outer shell + secondary inner shell
+  // ==========================================================================
   const armorGroup = new THREE.Group();
   armorGroup.name = side === -1 ? 'LeftForearmArmorGroup' : 'RightForearmArmorGroup';
   forearmGroup.add(armorGroup);
 
-  // Anterior Gauntlet Shell
-  const antGeo = createForearmArmorGeo(true, side);
-  const gauntletBody = new THREE.Mesh(antGeo, materials.armorDoubleSide);
-  gauntletBody.name = 'AnteriorForearmArmorShell';
-  gauntletBody.castShadow = true;
-  gauntletBody.receiveShadow = true;
-  armorGroup.add(gauntletBody);
+  // 1. Primary Outer Shell (Anterior face + lateral gauntlet + Lower Elbow Guard)
+  const outerGeo = createForearmCoherentArmor('primaryOuter', side);
+  const anteriorArmor = new THREE.Mesh(outerGeo, materials.armorDoubleSide);
+  anteriorArmor.name = 'ForearmPrimaryOuterArmorShell';
+  anteriorArmor.castShadow = true;
+  anteriorArmor.receiveShadow = true;
+  armorGroup.add(anteriorArmor);
 
-  // Posterior Gauntlet Shell (carries the dorsal fin)
-  const postGeo = createForearmArmorGeo(false, side);
-  const posteriorShell = new THREE.Mesh(postGeo, materials.armorDoubleSide);
-  posteriorShell.name = 'PosteriorForearmArmorShell';
-  posteriorShell.castShadow = true;
-  posteriorShell.receiveShadow = true;
-  armorGroup.add(posteriorShell);
+  // 2. Secondary Inner Shell (Medial + Posterior flexor volume)
+  const innerGeo = createForearmCoherentArmor('secondaryInner', side);
+  const posteriorArmor = new THREE.Mesh(innerGeo, materials.armorDoubleSide);
+  posteriorArmor.name = 'ForearmSecondaryInnerArmorShell';
+  posteriorArmor.castShadow = true;
+  posteriorArmor.receiveShadow = true;
+  armorGroup.add(posteriorArmor);
 
-  // ── Recessed Lateral Parting Seam (exposes internal chassis) ─────────────
-  const seamGeo = new THREE.BoxGeometry(0.0024, 0.140, 0.004);
-  const panelSeam = new THREE.Mesh(seamGeo, materials.joint);
-  panelSeam.name = 'ForearmPanelSeam';
-  panelSeam.position.set(side * 0.037, -0.082, 0);
+  const sideArmor = anteriorArmor;
+  const innerArmor = posteriorArmor;
+
+  // ==========================================================================
+  // SECTION 3: INTEGRATED TECHNICAL PANEL & PURPLE EMISSIVE DETAIL (SECTION 16)
+  // WHITE ARMOR → DARK RECESS → PURPLE EMISSIVE ELEMENT → THIN BEZEL
+  // Perfectly sunken flush into the sculpted armor facet with ZERO clipping
+  // ==========================================================================
+  const techBayGroup = new THREE.Group();
+  techBayGroup.name = 'ForearmStandardizedTechBay';
+  // Positioned flush on the anterior facet at y = -0.068m, z = 0.0208m
+  const bayX = side * 0.0012;
+  const bayZ = 0.0208;
+  const bayY = -0.068;
+  techBayGroup.position.set(bayX, bayY, bayZ);
+  armorGroup.add(techBayGroup);
+
+  // 1. Dark Titanium Recessed Tray / Cavity (sunken flush into the armor facet)
+  const bayHousingGeo = new THREE.BoxGeometry(0.0085, 0.040, 0.0020);
+  const bayHousing = new THREE.Mesh(bayHousingGeo, materials.joint);
+  bayHousing.position.set(0, 0, -0.0006);
+  bayHousing.castShadow = true;
+  techBayGroup.add(bayHousing);
+
+  // 2. Precision Machined Metallic Thin Bezel Rim
+  const bezelFrameGeo = new THREE.BoxGeometry(0.0092, 0.041, 0.0007);
+  const bezelFrame = new THREE.Mesh(bezelFrameGeo, materials.metallic);
+  bezelFrame.position.set(0, 0, 0.0003);
+  techBayGroup.add(bezelFrame);
+
+  // 3. Centered Flush Purple Emissive Accent Strip
+  const purpleRodGeo = new THREE.CapsuleGeometry(0.0011, 0.028, 8, 16);
+  const ledStrip = new THREE.Mesh(purpleRodGeo, materials.purpleEmissive);
+  ledStrip.name = 'ForearmPurpleLEDAccent';
+  ledStrip.position.set(0, 0, 0.0004);
+  techBayGroup.add(ledStrip);
+  ledMeshes.push(ledStrip);
+
+  // High-intensity Bloom Glow (Calibrated radius to stay inside bezel)
+  const purpleBloomGeo = new THREE.CapsuleGeometry(0.0016, 0.028, 8, 16);
+  const purpleBloomMesh = new THREE.Mesh(purpleBloomGeo, materials.purpleBloom);
+  purpleBloomMesh.position.copy(ledStrip.position);
+  techBayGroup.add(purpleBloomMesh);
+
+  // 4. Micro Heat-Dissipation Louvers (Symmetric top and bottom technical vents)
+  const ventilationChannel = new THREE.Group();
+  ventilationChannel.name = 'ForearmVentilationChannel';
+  ventilationChannel.position.set(0, 0, 0);
+  techBayGroup.add(ventilationChannel);
+
+  for (const lY of [-0.016, 0.016]) {
+    const slatGeo = new THREE.BoxGeometry(0.0050, 0.0008, 0.0010);
+    const slat = new THREE.Mesh(slatGeo, materials.joint);
+    slat.position.set(0, lY, 0.0002);
+    ventilationChannel.add(slat);
+  }
+
+  // Engineered Parting Seam between inner and outer shells (Safely inside at radius 21.5mm)
+  const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.080, 0.0025);
+  const panelSeam = new THREE.Mesh(medSeamGeo, materials.joint);
+  panelSeam.name = 'ForearmPartingSeam';
+  panelSeam.position.set(-side * 0.0215, -0.068, 0);
   armorGroup.add(panelSeam);
 
-  const medSeamGeo = new THREE.BoxGeometry(0.0024, 0.140, 0.004);
-  const medSeam = new THREE.Mesh(medSeamGeo, materials.joint);
-  medSeam.position.set(-side * 0.037, -0.082, 0);
-  armorGroup.add(medSeam);
-
-  // ── Lateral Brachioradialis Accent Plate ──────────────────────────────────
-  // Subtle panel accent on the lateral flank of the anterior shell.
-  const brachioGeo = new THREE.BoxGeometry(0.004, 0.050, 0.018);
-  const brachioradialis = new THREE.Mesh(brachioGeo, materials.armor);
-  brachioradialis.name = 'ForearmBrachioradialisPlate';
-  brachioradialis.position.set(side * 0.036, -0.050, 0.007);
-  brachioradialis.rotation.z = -side * 0.06;
-  brachioradialis.castShadow = true;
-  armorGroup.add(brachioradialis);
+  // Compatibility aliases
+  const gauntletBody = anteriorArmor;
+  const innerSleeve = armatureSpine;
+  const brachioradialis = anteriorArmor;
 
   return {
     group: forearmGroup,
+    mechanicalCore,
+    armatureSpine,
+    armorGroup,
+    anteriorArmor,
+    posteriorArmor,
+    sideArmor,
+    innerArmor,
+    ventilationChannel,
+    ledStrip,
+    ledMeshes,
+    distalWristMount,
+    wristCuff,
+    // Aliases
     gauntletBody,
     innerSleeve,
-    armorGroup,
     elbowSocketCollar,
     brachioradialis,
-    wristCuff,
     panelSeam,
-    ledMeshes,
   };
 }

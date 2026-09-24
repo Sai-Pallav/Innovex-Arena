@@ -61,7 +61,7 @@ export const Navbar: React.FC = () => {
       >
         {/* Backdrop Blur Layer */}
         <div
-          className={`absolute inset-0 transition-all duration-500 ${
+          className={`absolute inset-0 pointer-events-none transition-all duration-500 ${
             isScrolled
               ? 'bg-gradient-to-b from-[#060212]/95 via-[#060212]/90 to-[#060212]/80 backdrop-blur-xl border-b border-white/[0.06]'
               : 'bg-gradient-to-b from-[#060212]/40 via-[#060212]/20 to-transparent backdrop-blur-md'
@@ -70,7 +70,7 @@ export const Navbar: React.FC = () => {
 
         {/* Top Border Accent */}
         <div
-          className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#b7a4fb]/30 to-transparent transition-opacity duration-500 ${
+          className={`absolute top-0 left-0 right-0 h-px pointer-events-none bg-gradient-to-r from-transparent via-[#b7a4fb]/30 to-transparent transition-opacity duration-500 ${
             isScrolled ? 'opacity-100' : 'opacity-0'
           }`}
         />

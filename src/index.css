@@ -197,11 +197,11 @@
   .scroll-reveal-card {
     opacity: 0;
     transform: translate3d(0, 16px, 0);
-    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: transform, opacity;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+    pointer-events: auto;
   }
 
   .scroll-reveal-card.revealed {
@@ -244,32 +244,22 @@
   /* In-place Pure Fade Reveal */
   .scroll-reveal-fade {
     opacity: 0;
-    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity;
+    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     transform: translateZ(0);
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
-    pointer-events: none;
+    pointer-events: auto;
   }
 
   .scroll-reveal-fade.revealed {
     opacity: 1;
   }
 
-  .scroll-reveal-fade.revealed.hover-ready {
-    pointer-events: auto;
-  }
-
-  /* Disable hover effects & pointer events briefly during entrance animation */
+  /* Fully interactive cards - zero pointer-events blocking for instantaneous click & hover */
   .scroll-reveal-card,
   .scroll-reveal-left,
-  .scroll-reveal-right {
-    pointer-events: none;
-  }
-
-  .scroll-reveal-card.revealed.hover-ready,
-  .scroll-reveal-left.revealed.hover-ready,
-  .scroll-reveal-right.revealed.hover-ready {
+  .scroll-reveal-right,
+  .scroll-reveal-fade {
     pointer-events: auto;
   }
 
@@ -520,19 +510,20 @@
     line-height: 1;
     padding: 10px 18px;
     border: 1px solid #5046e4;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out, transform 0.15s ease-out, box-shadow 0.15s ease-out;
     cursor: pointer;
+    transform: translateZ(0);
   }
 
   .reflect-primary-btn:hover {
     background: #10093a;
     border-color: #9382ff;
     color: #f4f0ff;
-    transform: translateY(-1px);
+    transform: translate3d(0, -1px, 0);
   }
 
   .reflect-primary-btn:active {
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 
   .reflect-ghost-btn {
@@ -547,12 +538,17 @@
     font-weight: 400;
     line-height: 1;
     padding: 8px 16px;
-    transition: color 0.2s ease;
+    transition: color 0.15s ease-out, background-color 0.15s ease-out;
     cursor: pointer;
+    transform: translateZ(0);
   }
 
   .reflect-ghost-btn:hover {
     color: #f4f0ff;
+  }
+
+  .reflect-ghost-btn:active {
+    transform: translate3d(0, 0, 0);
   }
 
   .reflect-ai-badge {
@@ -568,6 +564,7 @@
     font-weight: 500;
     padding: 4px 14px;
     line-height: 1.4;
+    transition: border-color 0.15s ease-out;
   }
 
   .reflect-nav-pill {
@@ -596,69 +593,15 @@
 }
 
 /* ============================================================
-   CONTACT PAGE — ATMOSPHERIC LAYER ANIMATIONS
-   Very slow, low-amplitude, organic motion.
-   Respects prefers-reduced-motion (overridden to 0.01ms above).
-
-   Amplitude deliberately smaller than previous pass:
-   • Primary breath: 6px vertical drift (was 8px), opacity 0.88–1.0
-   • Secondary drift: 5px horizontal (was 6px), async phase offset
-   • Near particles: 4px vertical float (was 5px)
-
-   All three use ease-in-out so the motion is barely perceptible
-   at any single frame — only noticeable over multiple seconds.
+   ATMOSPHERIC LAYERS — HARDWARE ACCELERATED & STATIC TO PREVENT
+   MAIN-THREAD / GPU RASTERIZATION STALLS DURING INTERACTIONS
    ============================================================ */
-
-/* Primary field: very slow vertical breath — feels like deep respiration */
-@keyframes contactFieldBreath {
-  0%, 100% { opacity: 1.00; transform: translateY(0px)   scale(1.000); }
-  50%       { opacity: 0.88; transform: translateY(-6px)  scale(1.015); }
-}
-
-/* Secondary field: horizontal axis drift — perpendicular to primary */
-@keyframes contactFieldDrift {
-  0%        { opacity: 1.00;  transform: translateX(0px)  scale(1.000); }
-  38%       { opacity: 0.88;  transform: translateX(5px)  scale(1.008); }
-  72%       { opacity: 0.92;  transform: translateX(-3px) scale(1.004); }
-  100%      { opacity: 1.00;  transform: translateX(0px)  scale(1.000); }
-}
-
-/* Near particles: barely perceptible vertical float */
-@keyframes contactParticleFloat {
-  0%, 100% { transform: translateY(0px);  }
-  50%       { transform: translateY(-4px); }
-}
-
-.contact-layer-primary {
-  animation: contactFieldBreath 28s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-.contact-layer-secondary {
-  animation: contactFieldDrift 32s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-
-.contact-layer-particles-near {
-  animation: contactParticleFloat 40s ease-in-out infinite;
-  will-change: transform;
-}
-
-/* ============================================================
-   SERVICES PAGE — SECONDARY LOWER FIELD ANIMATION
-   Independent 36s drift on a perpendicular axis to L03a so the
-   two primary fields never move in sync. Lower amplitude than
-   the contact breath — this is a carry-through field, not the
-   focal zone.
-   ============================================================ */
-@keyframes svcLowerDrift {
-  0%   { opacity: 1.00; transform: translateX(0px)   scale(1.000); }
-  30%  { opacity: 0.90; transform: translateX(-4px)  scale(1.006); }
-  65%  { opacity: 0.94; transform: translateX(3px)   scale(1.003); }
-  100% { opacity: 1.00; transform: translateX(0px)   scale(1.000); }
-}
-
+.contact-layer-primary,
+.contact-layer-secondary,
+.contact-layer-particles-near,
 .svc-layer-lower {
-  animation: svcLowerDrift 36s ease-in-out infinite;
-  will-change: transform, opacity;
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: auto;
 }

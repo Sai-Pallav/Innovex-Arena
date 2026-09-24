@@ -88,16 +88,7 @@ const ServicePillarSection: React.FC<ServicePillarSectionProps> = ({ section, gl
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [hoverReady, setHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => {
-        setHoverReady(true);
-      }, section.items.length * 80 + 700);
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible, section.items.length]);
+  const hoverReady = true;
 
   return (
     <section id={section.id} className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 scroll-mt-28">
@@ -139,7 +130,7 @@ const ServicePillarSection: React.FC<ServicePillarSectionProps> = ({ section, gl
             >
               <div className="flex-1 flex flex-col">
                 <div
-                  className="w-10 h-10 rounded-[5px] flex items-center justify-center mb-3.5 group-hover:scale-110 transition-all duration-300 bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)]"
+                  className="w-10 h-10 rounded-[5px] flex items-center justify-center mb-3.5 group-hover:scale-105 transition-[transform,border-color,box-shadow] duration-150 ease-out bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)]"
                 >
                   {getPillarIcon(item.iconName, glow)}
                 </div>
@@ -165,16 +156,7 @@ const PastEventsSection: React.FC = () => {
     threshold: 0.08,
     rootMargin: '0px 0px -40px 0px',
   });
-  const [hoverReady, setHoverReady] = useState(false);
-
-  useEffect(() => {
-    if (isVisible) {
-      const timer = setTimeout(() => {
-        setHoverReady(true);
-      }, PAST_EVENTS_DATA.length * 80 + 700);
-      return () => clearTimeout(timer);
-    }
-  }, [isVisible]);
+  const hoverReady = true;
 
   return (
     <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 scroll-mt-28">
@@ -214,7 +196,7 @@ const PastEventsSection: React.FC = () => {
                   </h3>
                 </div>
 
-                <div className="p-3 rounded-[16px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-all duration-300 space-y-2 text-xs text-[#9b96b0] min-h-[5.5rem] flex flex-col justify-center">
+                <div className="p-3 rounded-[16px] bg-white/[0.03] border border-white/[0.08] group-hover:border-[#9382ff]/30 group-hover:bg-white/[0.05] transition-[border-color,background-color] duration-150 ease-out space-y-2 text-xs text-[#9b96b0] min-h-[5.5rem] flex flex-col justify-center">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0" />
                     <span className="text-[#f4f0ff]">{evt.date}</span>

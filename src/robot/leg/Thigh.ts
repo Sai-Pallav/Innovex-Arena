@@ -218,75 +218,67 @@ export function createThigh(
 
   // =========================================================================
   // 2. CENTRAL TITANIUM BOX-SECTION BACKBONE SPINE
+  // Continuous load-bearing column running directly to the distal mount
   // =========================================================================
   const spineGeo = new THREE.BoxGeometry(
     cfg.frame.spineWidth,
-    cfg.length * 0.80,
+    0.204,
     cfg.frame.spineDepth
   );
   const spineMesh = new THREE.Mesh(spineGeo, materials.joint);
-  spineMesh.position.set(0, -cfg.length * 0.45, 0);
+  spineMesh.position.set(0, -0.118, 0);
   spineMesh.castShadow = true;
   spineMesh.receiveShadow = true;
   frameGroup.add(spineMesh);
 
   // CNC transverse reinforcement bulkheads along the femur spine
-  for (const factor of [0.18, 0.36, 0.54, 0.72]) {
+  for (const bY of [-0.050, -0.095, -0.140, -0.185]) {
     const ribGeo = new THREE.BoxGeometry(
       cfg.frame.spineWidth * 1.25,
       0.007,
       cfg.frame.spineDepth * 1.15
     );
     const rib = new THREE.Mesh(ribGeo, materials.joint);
-    rib.position.set(0, -cfg.length * factor, 0);
+    rib.position.set(0, bY, 0);
     rib.castShadow = true;
     frameGroup.add(rib);
   }
 
   // =========================================================================
-  // 3. DISTAL STRUCTURAL CONDYLE FORK (Forms Upper Half of Knee Joint)
-  // Heavy titanium fork tines descending directly to the knee pivot axis
+  // 3. DISTAL FEMUR FRAME INTERFACE
+  // Precision-machined titanium interface mount with chamfers meeting knee upper housing
   // =========================================================================
-  for (const forkSide of [-1, 1]) {
-    const tineGeo = new THREE.BoxGeometry(
-      0.010,
-      cfg.frame.lowerForkLength,
-      cfg.frame.lowerForkDepth
-    );
-    const tine = new THREE.Mesh(tineGeo, materials.joint);
-    tine.position.set(
-      forkSide * (cfg.frame.lowerForkWidth * 0.5),
-      -cfg.length + cfg.frame.lowerForkLength * 0.45,
-      0
-    );
-    tine.castShadow = true;
-    tine.receiveShadow = true;
-    frameGroup.add(tine);
+  const mountShape = new THREE.Shape();
+  const halfMW = (cfg.frame.spineWidth * 1.05) * 0.5;
+  const halfMD = (cfg.frame.spineDepth * 0.90) * 0.5;
+  mountShape.moveTo(-halfMW * 0.85, -halfMD);
+  mountShape.lineTo(halfMW * 0.85, -halfMD);
+  mountShape.lineTo(halfMW, -halfMD * 0.70);
+  mountShape.lineTo(halfMW, halfMD * 0.70);
+  mountShape.lineTo(halfMW * 0.85, halfMD);
+  mountShape.lineTo(-halfMW * 0.85, halfMD);
+  mountShape.lineTo(-halfMW, halfMD * 0.70);
+  mountShape.lineTo(-halfMW, -halfMD * 0.70);
+  mountShape.closePath();
 
-    // Cross-reinforcement gusset bracing tine to femur spine
-    const gussetGeo = new THREE.BoxGeometry(0.014, 0.018, 0.018);
-    const gusset = new THREE.Mesh(gussetGeo, materials.joint);
-    gusset.position.set(
-      forkSide * (cfg.frame.lowerForkWidth * 0.35),
-      -cfg.length + cfg.frame.lowerForkLength * 0.85,
-      0
-    );
-    frameGroup.add(gusset);
+  const distalMountGeo = new THREE.ExtrudeGeometry(mountShape, {
+    depth: 0.016,
+    bevelEnabled: true,
+    bevelThickness: 0.0016,
+    bevelSize: 0.0012,
+    bevelSegments: 2,
+  });
+  distalMountGeo.center();
 
-    // Bearing boss ring at the fork tip
-    const bossGeo = new THREE.CylinderGeometry(0.014, 0.014, 0.012, 16);
-    const boss = new THREE.Mesh(bossGeo, materials.joint);
-    boss.rotation.z = Math.PI / 2;
-    boss.position.set(
-      forkSide * (cfg.frame.lowerForkWidth * 0.5),
-      -cfg.length + 0.006,
-      0
-    );
-    frameGroup.add(boss);
-  }
+  const distalMount = new THREE.Mesh(distalMountGeo, materials.joint);
+  distalMount.rotation.x = Math.PI / 2;
+  distalMount.position.set(0, -0.228, 0);
+  distalMount.castShadow = true;
+  distalMount.receiveShadow = true;
+  frameGroup.add(distalMount);
 
   // Armor mounting standoffs/bosses along the spine
-  for (const bY of [-cfg.length * 0.22, -cfg.length * 0.48, -cfg.length * 0.68]) {
+  for (const bY of [-0.065, -0.125, -0.185]) {
     const bossGeo = new THREE.CylinderGeometry(0.0045, 0.0045, 0.018, 12);
     const boss = new THREE.Mesh(bossGeo, materials.joint);
     boss.rotation.x = Math.PI / 2;
@@ -450,10 +442,12 @@ export function createThigh(
 
   // =========================================================================
   // 9. DISTAL KNEE ARTICULATION PIVOT (Attached hierarchically at knee axis)
+  // Perfectly positioned so knee upper housing meets distalMount with zero gap
+  // and patella shield nests right into the suprapatellar arch cutout
   // =========================================================================
   const kneePivot = new THREE.Group();
   kneePivot.name = side === -1 ? 'KneePivot_L' : 'KneePivot_R';
-  kneePivot.position.set(0, -cfg.length, 0);
+  kneePivot.position.set(0, -0.2596, 0);
   thighGroup.add(kneePivot);
 
   return {

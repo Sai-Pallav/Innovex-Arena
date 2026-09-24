@@ -28,3 +28,7 @@ Thumbs.db
 .idea
 *.sublime-project
 *.sublime-workspace
+
+# Temporary screenshots and visual audit captures
+*.png
+

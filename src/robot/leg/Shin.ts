@@ -35,24 +35,29 @@ function createSegmentedKeelGeometry(
   const halfWB = widthBottom * 0.5;
   const halfL = length * 0.5;
 
-  // Streamlined tapered robotic shin contour with articulation-aware upper shelf
-  shape.moveTo(0, halfL);
-  shape.quadraticCurveTo(halfWT * 0.60, halfL - 0.005, halfWT, halfL * 0.75);
+  // Sculpted upper shoulders flanking the dark neck, with central articulation notch matching reference image
+  shape.moveTo(0, halfL - 0.010); // Central articulation notch
+  shape.lineTo(halfWT * 0.35, halfL - 0.004);
+  shape.lineTo(halfWT * 0.65, halfL); // High sculpted shoulder peak flanking the joint
+  shape.lineTo(halfWT * 0.95, halfL * 0.78);
+  shape.lineTo(halfWT, halfL * 0.70);
   shape.lineTo(halfWT * 0.85, -halfL * 0.20);
   shape.quadraticCurveTo(halfWB * 1.15, -halfL * 0.55, halfWB, -halfL * 0.88);
   shape.lineTo(halfWB * 0.85, -halfL);
   shape.lineTo(-halfWB * 0.85, -halfL);
   shape.lineTo(-halfWB, -halfL * 0.88);
   shape.quadraticCurveTo(-halfWB * 1.15, -halfL * 0.55, -halfWT * 0.85, -halfL * 0.20);
-  shape.lineTo(-halfWT, halfL * 0.75);
-  shape.quadraticCurveTo(-halfWT * 0.60, halfL - 0.005, 0, halfL);
+  shape.lineTo(-halfWT, halfL * 0.70);
+  shape.lineTo(-halfWT * 0.95, halfL * 0.78);
+  shape.lineTo(-halfWT * 0.65, halfL); // High sculpted shoulder peak
+  shape.lineTo(-halfWT * 0.35, halfL - 0.004);
   shape.closePath();
 
   const geo = new THREE.ExtrudeGeometry(shape, {
     depth: thickness,
     bevelEnabled: true,
-    bevelThickness: 0.0038,
-    bevelSize: 0.0030,
+    bevelThickness: 0.0032,
+    bevelSize: 0.0026,
     bevelSegments: 4,
     curveSegments: 24,
   });
@@ -163,15 +168,33 @@ export function createShin(
 
   // =========================================================================
   // 1. KNEE-TO-SHIN STRUCTURAL INTERFACE (Tibial Plateau Collar & Receiver)
-  // Visible physical bracket connecting directly into the knee clevis
+  // Engineered titanium socket receiver nested inside the flanking shin shoulders
   // =========================================================================
-  const plateauGeo = new THREE.BoxGeometry(
-    cfg.frame.upperPlateauWidth,
-    cfg.frame.upperPlateauHeight,
-    cfg.frame.upperPlateauDepth
-  );
+  const plateauShape = new THREE.Shape();
+  const halfPW = cfg.frame.upperPlateauWidth * 0.5;
+  const halfPD = cfg.frame.upperPlateauDepth * 0.5;
+  plateauShape.moveTo(-halfPW * 0.85, -halfPD);
+  plateauShape.lineTo(halfPW * 0.85, -halfPD);
+  plateauShape.lineTo(halfPW, -halfPD * 0.70);
+  plateauShape.lineTo(halfPW, halfPD * 0.70);
+  plateauShape.lineTo(halfPW * 0.85, halfPD);
+  plateauShape.lineTo(-halfPW * 0.85, halfPD);
+  plateauShape.lineTo(-halfPW, halfPD * 0.70);
+  plateauShape.lineTo(-halfPW, -halfPD * 0.70);
+  plateauShape.closePath();
+
+  const plateauGeo = new THREE.ExtrudeGeometry(plateauShape, {
+    depth: cfg.frame.upperPlateauHeight,
+    bevelEnabled: true,
+    bevelThickness: 0.0016,
+    bevelSize: 0.0012,
+    bevelSegments: 2,
+  });
+  plateauGeo.center();
+
   const tibialPlateau = new THREE.Mesh(plateauGeo, materials.joint);
   tibialPlateau.name = side === -1 ? 'TibialPlateau_L' : 'TibialPlateau_R';
+  tibialPlateau.rotation.x = Math.PI / 2;
   tibialPlateau.position.set(0, -cfg.frame.upperPlateauHeight * 0.5, 0);
   tibialPlateau.castShadow = true;
   tibialPlateau.receiveShadow = true;
@@ -179,19 +202,19 @@ export function createShin(
 
   // Clevis receiver socket lip atop the plateau
   const lipGeo = new THREE.BoxGeometry(
-    cfg.frame.upperPlateauWidth * 1.04,
-    0.005,
-    cfg.frame.upperPlateauDepth * 1.04
+    cfg.frame.upperPlateauWidth * 0.95,
+    0.004,
+    cfg.frame.upperPlateauDepth * 0.95
   );
   const plateauLip = new THREE.Mesh(lipGeo, materials.joint);
-  plateauLip.position.set(0, -0.0025, 0);
+  plateauLip.position.set(0, -0.002, 0);
   plateauLip.castShadow = true;
   frameGroup.add(plateauLip);
 
   // 4 vertical mounting bolts receiving the knee clevis base
-  for (let bx of [-0.014, 0.014]) {
-    for (let bz of [-0.010, 0.010]) {
-      const boltGeo = new THREE.CylinderGeometry(0.0022, 0.0022, 0.004, 6);
+  for (let bx of [-0.010, 0.010]) {
+    for (let bz of [-0.006, 0.006]) {
+      const boltGeo = new THREE.CylinderGeometry(0.0020, 0.0020, 0.0035, 6);
       const bolt = new THREE.Mesh(boltGeo, materials.joint);
       bolt.position.set(bx, 0.001, bz);
       frameGroup.add(bolt);
@@ -200,10 +223,10 @@ export function createShin(
 
   // Bilateral load-transfer gussets on plateau flanks
   for (const pSide of [-1, 1]) {
-    const gussetGeo = new THREE.BoxGeometry(0.006, 0.020, 0.018);
+    const gussetGeo = new THREE.BoxGeometry(0.005, 0.016, 0.014);
     const gusset = new THREE.Mesh(gussetGeo, materials.joint);
     gusset.position.set(
-      pSide * (cfg.frame.upperPlateauWidth * 0.45),
+      pSide * (cfg.frame.upperPlateauWidth * 0.42),
       -cfg.frame.upperPlateauHeight * 0.65,
       0
     );
@@ -213,49 +236,50 @@ export function createShin(
 
   // =========================================================================
   // 2. CENTRAL TIBIA STRUCTURAL SPINE (Load-Bearing Backbone)
+  // Continuous titanium column from tibial plateau down to ankle collar
   // =========================================================================
   const spineGeo = new THREE.BoxGeometry(
     cfg.frame.spineWidth,
-    cfg.length * 0.88,
+    0.275,
     cfg.frame.spineDepth
   );
   const tibiaSkeleton = new THREE.Mesh(spineGeo, materials.joint);
   tibiaSkeleton.name = side === -1 ? 'TibiaSkeleton_L' : 'TibiaSkeleton_R';
-  tibiaSkeleton.position.set(0, -cfg.length * 0.48, 0);
+  tibiaSkeleton.position.set(0, -0.1575, 0);
   tibiaSkeleton.castShadow = true;
   tibiaSkeleton.receiveShadow = true;
   frameGroup.add(tibiaSkeleton);
 
   // CNC Reinforcement bulkheads along the tibia spine
-  for (const factor of [0.22, 0.48, 0.74]) {
+  for (const bY of [-0.065, -0.130, -0.195, -0.260]) {
     const ringGeo = new THREE.BoxGeometry(
       cfg.frame.spineWidth * 1.25,
       0.006,
       cfg.frame.spineDepth * 1.20
     );
     const ring = new THREE.Mesh(ringGeo, materials.joint);
-    ring.position.set(0, -cfg.length * factor, 0);
+    ring.position.set(0, bY, 0);
     ring.castShadow = true;
     frameGroup.add(ring);
   }
 
   // Lateral Fibula Strut & Triangular Reinforcement Bracing
-  const fibulaGeo = new THREE.CylinderGeometry(0.0048, 0.0038, cfg.length * 0.76, 12);
+  const fibulaGeo = new THREE.CylinderGeometry(0.0048, 0.0038, 0.245, 12);
   const fibulaStrut = new THREE.Mesh(fibulaGeo, materials.joint);
   fibulaStrut.name = side === -1 ? 'FibulaStrut_L' : 'FibulaStrut_R';
-  fibulaStrut.position.set(side * 0.025, -cfg.length * 0.48, -0.003);
+  fibulaStrut.position.set(side * 0.025, -0.150, -0.003);
   fibulaStrut.castShadow = true;
   frameGroup.add(fibulaStrut);
 
-  for (const factor of [0.30, 0.65]) {
+  for (const bY of [-0.080, -0.190]) {
     const braceGeo = new THREE.BoxGeometry(0.015, 0.005, 0.006);
     const brace = new THREE.Mesh(braceGeo, materials.joint);
-    brace.position.set(side * 0.013, -cfg.length * factor, -0.002);
+    brace.position.set(side * 0.013, bY, -0.002);
     frameGroup.add(brace);
   }
 
   // Armor mounting standoffs projecting forward from tibia spine
-  for (const bY of [-cfg.length * 0.28, -cfg.length * 0.52, -cfg.length * 0.72]) {
+  for (const bY of [-0.060, -0.135, -0.210]) {
     const bossGeo = new THREE.CylinderGeometry(0.004, 0.004, 0.016, 12);
     const boss = new THREE.Mesh(bossGeo, materials.joint);
     boss.rotation.x = Math.PI / 2;
@@ -271,7 +295,7 @@ export function createShin(
     24
   );
   const lowerCollar = new THREE.Mesh(collarGeo, materials.joint);
-  lowerCollar.position.set(0, -cfg.length * 0.94, 0);
+  lowerCollar.position.set(0, -0.295, 0);
   lowerCollar.castShadow = true;
   frameGroup.add(lowerCollar);
 
@@ -286,13 +310,13 @@ export function createShin(
   const collarRingGeo = new THREE.TorusGeometry(cfg.frame.lowerCollarRadius * 1.05, 0.0016, 8, 24);
   const collarRing = new THREE.Mesh(collarRingGeo, materials.purpleEmissive);
   collarRing.rotation.x = Math.PI / 2;
-  collarRing.position.set(0, -cfg.length * 0.94, 0);
+  collarRing.position.set(0, -0.295, 0);
   shinGroup.add(collarRing);
   ledMeshes.push(collarRing);
 
   // =========================================================================
   // 3. SEGMENTED SCULPTED ANTERIOR SHIN KEEL ARMOR
-  // Segmented length leaves ~45mm of open articulation clearance below knee!
+  // Mounted directly under the knee with controlled mechanical clearance (~7mm)
   // =========================================================================
   const keelGeo = createSegmentedKeelGeometry(
     cfg.anteriorKeel.widthTop,
@@ -303,10 +327,10 @@ export function createShin(
   );
   const anteriorKeelArmor = new THREE.Mesh(keelGeo, materials.armor);
   anteriorKeelArmor.name = side === -1 ? 'ShinAnteriorKeel_L' : 'ShinAnteriorKeel_R';
-  // Mounted over the front of the tibia spine
+  // Positioned with top shelf ~7mm below knee patella shield, matching reference
   anteriorKeelArmor.position.set(
     0,
-    -cfg.length * 0.48,
+    -0.105,
     cfg.frame.spineDepth * 0.5 + cfg.anteriorKeel.thickness * 0.4
   );
   anteriorKeelArmor.castShadow = true;
@@ -319,7 +343,7 @@ export function createShin(
   ledStrip.name = side === -1 ? 'ShinLedStrip_L' : 'ShinLedStrip_R';
   ledStrip.position.set(
     0,
-    -cfg.length * 0.48,
+    -0.105,
     cfg.frame.spineDepth * 0.5 + cfg.anteriorKeel.thickness * 0.4 + 0.012
   );
   shinGroup.add(ledStrip);
@@ -344,7 +368,7 @@ export function createShin(
   );
   const posteriorCalfArmor = new THREE.Mesh(calfGeo, materials.armor);
   posteriorCalfArmor.name = side === -1 ? 'CalfArmor_L' : 'CalfArmor_R';
-  posteriorCalfArmor.position.set(0, -cfg.length * 0.38, -cfg.frame.spineDepth * 0.5 - 0.008);
+  posteriorCalfArmor.position.set(0, -0.110, -cfg.frame.spineDepth * 0.5 - 0.008);
   posteriorCalfArmor.rotation.y = Math.PI;
   posteriorCalfArmor.castShadow = true;
   posteriorCalfArmor.receiveShadow = true;
@@ -356,7 +380,7 @@ export function createShin(
   const ventGlowGroup = new THREE.Group();
 
   for (let i = 0; i < ventCount; i++) {
-    const yOff = -cfg.length * 0.32 - i * 0.018;
+    const yOff = -0.085 - i * 0.018;
 
     const louverGeo = new THREE.BoxGeometry(cfg.posteriorCalf.ventWidth, cfg.posteriorCalf.ventHeight, 0.006);
     const louver = new THREE.Mesh(louverGeo, materials.joint);
@@ -398,7 +422,7 @@ export function createShin(
   // =========================================================================
   const anklePivot = new THREE.Group();
   anklePivot.name = side === -1 ? 'LeftAnklePivot' : 'RightAnklePivot';
-  anklePivot.position.set(0, -cfg.length, 0);
+  anklePivot.position.set(0, -0.310, 0);
   shinGroup.add(anklePivot);
 
   return {

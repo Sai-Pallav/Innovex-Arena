@@ -36,6 +36,8 @@ export class RobotInteraction {
   // Calibrated to the exact 3D projection of the visor/face
   private faceRelX: number = 0.50;
   private faceRelY: number = 0.23;
+  private cachedRect: DOMRect | null = null;
+  private boundUpdateRect: () => void;
 
   constructor(container: HTMLElement) {
     this.container = container;
@@ -52,10 +54,17 @@ export class RobotInteraction {
     this.boundPointerMove = this.onPointerMove.bind(this);
     this.boundPointerLeave = this.onPointerLeave.bind(this);
     this.boundWindowBlur = this.onPointerLeave.bind(this);
+    this.boundUpdateRect = () => {
+      if (this.container) {
+        this.cachedRect = this.container.getBoundingClientRect();
+      }
+    };
 
     // Track cursor across the ENTIRE window so head follows anywhere on page
     window.addEventListener('pointermove', this.boundPointerMove, { passive: true });
     window.addEventListener('pointerdown', this.boundPointerMove, { passive: true });
+    window.addEventListener('resize', this.boundUpdateRect, { passive: true });
+    window.addEventListener('scroll', this.boundUpdateRect, { passive: true });
     document.addEventListener('mouseleave', this.boundPointerLeave);
     window.addEventListener('blur', this.boundWindowBlur);
   }
@@ -77,7 +86,10 @@ export class RobotInteraction {
     // Calculate normalized coordinates relative to the robot FACE origin.
     // When cursor is directly on the face, normX = 0 and normY = 0 (looks straight ahead).
     // Moving up looks up, moving down looks down, moving left/right turns left/right.
-    const rect = this.container.getBoundingClientRect();
+    if (!this.cachedRect) {
+      this.cachedRect = this.container.getBoundingClientRect();
+    }
+    const rect = this.cachedRect;
     const robotCenterX = rect.left + rect.width * this.faceRelX;
     const robotCenterY = rect.top + rect.height * this.faceRelY;
 
@@ -146,6 +158,8 @@ export class RobotInteraction {
   public dispose(): void {
     window.removeEventListener('pointermove', this.boundPointerMove);
     window.removeEventListener('pointerdown', this.boundPointerMove);
+    window.removeEventListener('resize', this.boundUpdateRect);
+    window.removeEventListener('scroll', this.boundUpdateRect);
     document.removeEventListener('mouseleave', this.boundPointerLeave);
     window.removeEventListener('blur', this.boundWindowBlur);
   }

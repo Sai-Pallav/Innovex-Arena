@@ -33,11 +33,35 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
     return [...items, ...items, ...items, ...items];
   }, [items]);
 
-  // Measure single set width
-  const getSingleSetWidth = useCallback(() => {
-    if (!trackRef.current || items.length === 0) return 0;
-    return trackRef.current.scrollWidth / 4;
+  const setWidthRef = useRef<number>(0);
+  const isIntersectingRef = useRef<boolean>(true);
+
+  // Update cached set width on mount and on resize
+  const updateSetWidth = useCallback(() => {
+    if (trackRef.current && items.length > 0) {
+      setWidthRef.current = trackRef.current.scrollWidth / 4;
+    }
   }, [items.length]);
+
+  // Pause marquee when offscreen to save main thread and prevent layout thrashing
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isIntersectingRef.current = entry.isIntersecting;
+    }, { threshold: 0.05 });
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  // Update cached width on window resize
+  useEffect(() => {
+    updateSetWidth();
+    window.addEventListener('resize', updateSetWidth, { passive: true });
+    return () => window.removeEventListener('resize', updateSetWidth);
+  }, [updateSetWidth]);
 
   // Initialize scroll position to the second set for seamless bidirectional wrapping
   useEffect(() => {
@@ -45,24 +69,25 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
     if (!el) return;
 
     const timer = setTimeout(() => {
-      const setWidth = getSingleSetWidth();
+      updateSetWidth();
+      const setWidth = setWidthRef.current;
       if (setWidth > 0 && el.scrollLeft < setWidth * 0.5) {
         el.scrollLeft = setWidth;
       }
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [getSingleSetWidth]);
+  }, [updateSetWidth]);
 
-  // RequestAnimationFrame animation loop for smooth right-to-left infinite motion
+  // RequestAnimationFrame animation loop for smooth right-to-left infinite motion (zero layout thrashing)
   useEffect(() => {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReducedMotion) return;
 
     const animate = () => {
       const el = containerRef.current;
-      if (el && !isHovered && !isManualPaused && !isDragging) {
-        const setWidth = getSingleSetWidth();
+      if (el && isIntersectingRef.current && !isHovered && !isManualPaused && !isDragging) {
+        const setWidth = setWidthRef.current;
         el.scrollLeft += speed;
 
         // When we've scrolled past 2 full sets, loop seamlessly back by 1 set
@@ -80,7 +105,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
         cancelAnimationFrame(animFrameId.current);
       }
     };
-  }, [isHovered, isManualPaused, isDragging, speed, getSingleSetWidth]);
+  }, [isHovered, isManualPaused, isDragging, speed]);
 
   // Trigger manual scroll and temporarily pause the continuous loop
   const handleScrollStep = useCallback(
@@ -92,7 +117,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
 
       // Determine responsive scroll distance (approximately one card width + gap)
       const cardWidth = window.innerWidth < 640 ? 300 : window.innerWidth < 1024 ? 360 : 400;
-      const setWidth = getSingleSetWidth();
+      const setWidth = setWidthRef.current;
 
       if (direction === 'left') {
         // If scrolling left near the start, shift forward by one full set to prevent hit wall
@@ -114,7 +139,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
         setIsManualPaused(false);
       }, 3500);
     },
-    [getSingleSetWidth]
+    []
   );
 
   // Mouse drag handlers for desktop swipe/grab feel
@@ -198,7 +223,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUpOrLeave}
-          className={`flex overflow-x-auto scrollbar-none scroll-smooth py-6 sm:py-8 px-6 sm:px-14 md:px-20 cursor-grab active:cursor-grabbing ${
+          className={`flex overflow-x-auto scrollbar-none py-6 sm:py-8 px-6 sm:px-14 md:px-20 cursor-grab active:cursor-grabbing ${
             isDragging ? 'select-none' : ''
           }`}
           style={{
@@ -211,10 +236,10 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
               return (
                 <div
                   key={`${testimonial.id}-${idx}`}
-                  className="w-[280px] sm:w-[340px] md:w-[380px] shrink-0 flex flex-col relative transition-all duration-200 hover:z-20 group/item"
+                  className="w-[280px] sm:w-[340px] md:w-[380px] shrink-0 flex flex-col relative transition-[transform] duration-200 hover:z-20 group/item"
                 >
                   <div
-                    className="p-5 sm:p-6 flex-1 flex flex-col justify-between h-full rounded-2xl bg-[rgba(12,8,24,0.75)] border border-white/[0.07] hover:border-white/[0.18] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_-8px_rgba(0,0,0,0.5)] transition-all duration-200 cursor-pointer hover:-translate-y-1 relative overflow-hidden backdrop-blur-md"
+                    className="p-5 sm:p-6 flex-1 flex flex-col justify-between h-full rounded-2xl bg-[#0c0818]/95 border border-white/[0.07] hover:border-white/[0.22] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_8px_24px_-8px_rgba(0,0,0,0.5)] transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer hover:-translate-y-1 relative overflow-hidden"
                   >
                     {/* Top rating & Quote Badge */}
                     <div>

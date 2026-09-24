@@ -1,609 +1,328 @@
 import React from 'react';
 
 /**
- * ServicesAtmosphere — V7
+ * ServicesAtmosphere — V8
  *
- * ATMOSPHERIC LIGHT-SOURCE REFINEMENT
+ * COMPLETE SECTION-ALIGNED ATMOSPHERIC LIGHT ARCHITECTURE
  *
- * ── V7 DIAGNOSIS ────────────────────────────────────────────────
+ * ── V8 CALIBRATION & REFINEMENT ─────────────────────────────────
  *
- * V6 restored perceptible illumination but still reads as ONE GIANT
- * PURPLE GRADIENT rather than multiple positioned environmental light
- * sources. The page feels purple-washed instead of spatially lit.
+ * In V8, every single section on the Services page is mapped to calibrated
+ * environmental light sources with alternating asymmetric flow (left/right/center),
+ * extreme soft falloffs (8–10 gradient stops), and intentional dark valleys.
  *
- * V7 OBJECTIVE:
- * Break uniform purple atmosphere into CONTROLLED POSITIONED LIGHT
- * SOURCES with proper falloff and dark valleys between them.
- * Create: light → falloff → dark → light → falloff → dark
+ * Section Coordinates (DOM Height ~9755px):
+ *   Zone 1: Hero & Hackathons (y=0%–6%, x=46% left-bias, peak 0.145)
+ *   Dark Valley 1: y=6.5%–7.5%
+ *   Zone 2: Training & Student Development (y=8%–14%, x=58% right-bias, peak 0.088)
+ *   Dark Valley 2: y=14%–15.5%
+ *   Zone 3: Workshops Grid (y=16%–22%, x=42% left-bias, peak 0.085)
+ *   Dark Valley 3: y=22%–23.5%
+ *   Zone 4: Master Tech Header & Mode Cards (y=24%–37%, x=58% right-bias, peak 0.082)
+ *   Dark Valley 4: y=37.5%–39.5%
+ *   Zone 5: Universal Pillars & Comparison Matrix (y=40%–50%, x=42% left-bias, peak 0.076)
+ *   Dark Valley 5: y=50.5%–52.5%
+ *   Zone 6: Format Quiz & Campus Labs (y=53%–63%, x=58% right-bias, peak 0.072)
+ *   Dark Valley 6: y=63.5%–65.5%
+ *   Zone 7: Learner Testimonials & FAQs (y=66%–78%, x=44% left-bias, peak 0.068)
+ *   Dark Valley 7: y=78%–79.5%
+ *   Zone 8: Past Workshops & Ready-to-Start CTA (y=80%–88%, x=50% centered, peak 0.092)
+ *   Terminal Void: y=88%–100% (fade into black footer)
  *
- * V7 CHANGES:
+ * Meso Architecture:
+ *   L09: 96px Architectural Grid Substrate (0.009 opacity, global)
+ *   L10: Grid Reveal Masked strictly to illuminated zones (invisible in dark valleys)
  *
- *  1. ATMOSPHERIC SPINE REMOVED
- *     V6's full-page vertical spine (0.055 opacity, 44% width) created
- *     uniform purple wash. REMOVED entirely.
- *     Result: Eliminates global tint, allows proper dark valleys
- *
- *  2. LIGHT SOURCES REDUCED TO 5 POSITIONED FIELDS
- *     V6 had 9 overlapping fields creating uniform coverage.
- *     V7 uses exactly 5 large positioned sources with proper spacing:
- *     - Hero (strongest, upper-left)
- *     - Hackathons (medium, right)
- *     - Training (medium-strong, left)
- *     - Testimonials/FAQ (low-medium, right)
- *     - CTA (medium-strong, center)
- *
- *  3. INCREASED LIGHT SOURCE SCALE
- *     All fields now HUGE (1200-1600px equivalent on desktop)
- *     Far larger than content containers
- *     Boundaries never visible — pure environmental presence
- *
- *  4. EXTENDED FALLOFF CURVES (8-10 stops)
- *     V6 used 5-7 stops. V7 uses 8-10 extremely gradual stops.
- *     Light disappears naturally into darkness over long distance.
- *     No visible gradient edges or circles.
- *
- *  5. REDUCED FIELD OVERLAP
- *     V6 overlapped at 20-30%. V7 overlaps only at 5-12%.
- *     Creates intentional DARK VALLEYS between sources.
- *     Light → falloff → dark → light (spatial rhythm)
- *
- *  6. ASYMMETRIC POSITIONING ENHANCED
- *     Hero: 45% x (left-bias)
- *     Hackathons: 60% x (right-bias)
- *     Training: 40% x (left-bias)
- *     Testimonials: 57% x (right-bias)
- *     CTA: 50% x (centered)
- *     Creates natural diagonal flow, not algorithmic repetition
- *
- *  7. VERTICAL POSITIONING REFINED
- *     Each source positioned at content zone center, not spread:
- *     Hero: y=22% (hero content center)
- *     Hackathons: y=36% (cards center)
- *     Training: y=54% (major content center)
- *     Testimonials: y=72% (lower-mid content)
- *     CTA: y=86% (CTA zone center)
- *     Proper spacing creates dark transition zones
- *
- *  8. PEAK INTENSITIES REFINED FOR SPACING
- *     Hero: 0.165 → 0.145 (reduced 12%, less overlap bleed)
- *     Hackathons: 0.085 → 0.072 (reduced 15%, distinct zone)
- *     Training: 0.092 → 0.088 (reduced 4%, maintains strength)
- *     Testimonials: 0.070 → 0.058 (reduced 17%, quieter)
- *     CTA: 0.095 → 0.092 (reduced 3%, destination strength)
- *     Lower peaks + better spacing = perceived depth over wash
- *
- *  9. EDGE BLEEDS STRENGTHENED BUT LOCALIZED
- *     Left/right edges now tied to specific source heights
- *     Not full-page vertical strips (those created wash)
- *     Localized to upper/mid/lower zones for unbounded feel
- *
- * 10. GRID REVEAL TIED TO LIGHT ZONES ONLY
- *     Grid now visible ONLY in illuminated zones
- *     Completely invisible in dark valleys
- *     Creates discovered architecture effect
- *
- * ── V7 DESIGN THESIS ────────────────────────────────────────────
- *
- * FIVE HUGE DISTANT LIGHT SOURCES, not uniform atmosphere.
- *
- * Each source:
- * - HUGE scale (larger than viewport sections)
- * - Extreme soft falloff (8-10 gradient stops)
- * - Positioned asymmetrically (45/60/40/57/50% x)
- * - Proper vertical spacing (dark valleys between)
- * - Never visible as shape (no circles, no blobs)
- *
- * User perception:
- * "I'm scrolling through a dark space with distant positioned lights"
- * NOT: "There's a purple background"
- *
- * Visual rhythm:
- * Light (hero) → dark valley → light (hackathons) → dark valley →
- * light (training) → dark valley → light (testimonials) → dark valley →
- * light (CTA) → fade to black
- *
- * ── V7 LAYER MAP ────────────────────────────────────────────────
- *
- *  L01  Body background #060212                         (global CSS)
- *
- *  MACRO — positioned light sources (5 fields only)
- *  L02  Hero light — upper-left positioned (0.145 peak, y=22%, x=45%)
- *  L03  Hackathons light — right positioned (0.072 peak, y=36%, x=60%)
- *  L04  Training light — left positioned (0.088 peak, y=54%, x=40%)
- *  L05  Testimonials light — right positioned (0.058 peak, y=72%, x=57%)
- *  L06  CTA light — centered (0.092 peak, y=86%, x=50%)
- *
- *  MESO — technical structure (2 layers)
- *  L07  Grid substrate — architectural base (0.009 opacity, 96px)
- *  L08  Grid reveal — light-zone-only (0.021 opacity, zone-masked)
- *
- *  MICRO — depth particles (3 layers, 28 total, unchanged)
- *  L09  Particles far  — 12 dots, ≤0.10 opacity, static
- *  L10  Particles mid  — 10 dots, ≤0.16 opacity, static
- *  L11  Particles near — 6 dots,  ≤0.18 opacity, 36s animated
- *
- * ── ANIMATION TIMELINE ──────────────────────────────────────────
- *  L02 Hero             → contactFieldBreath     28s (slowed further)
- *  L03 Hackathons       → contactFieldDrift      32s (slowed further)
- *  L04 Training         → contactFieldDrift      32s (reuses)
- *  L05 Testimonials     → svcLowerDrift          36s (slowed further)
- *  L06 CTA              → svcLowerDrift          36s (reuses)
- *  L11 Particles near   → contactParticleFloat   40s (slowed further)
- *
- *  All animations BARELY PERCEPTIBLE. Premium = calm + static feel.
- *  All animations: prefers-reduced-motion → static
- *
- * ── VISUAL VALIDATION CRITERIA ──────────────────────────────────
- *  ✓ Page predominantly dark (75-85% visual field)
- *  ✓ FIVE distinct light sources, not uniform wash
- *  ✓ Dark valleys visible between lit zones
- *  ✓ Light sources HUGE (never see boundaries)
- *  ✓ Extremely gradual falloff (8-10 stops, no visible edges)
- *  ✓ Asymmetric positioning (natural diagonal flow)
- *  ✓ No visible gradient shapes (circles/blobs/ellipses)
- *  ✓ Grid visible ONLY in lit zones
- *  ✓ Cards remain dark (environment illuminated, not cards)
- *  ✓ Light → dark → light vertical rhythm perceptible
- *  ✓ One continuous environment (not separate themes)
- *  ✓ Spatial depth through positioned sources
- *  ✓ Content always dominant over background
- *  ✓ Premium dark first, illuminated second
- *  ✓ No cyberpunk/neon/galaxy/purple-wash aesthetic
- *
+ * Micro Atmosphere:
+ *   L11: Far depth particles (1px, 12 dots, static)
+ *   L12: Mid depth particles (1.5px, 10 dots, static)
+ *   L13: Near depth particles (2px, 6 dots, 40s animated float)
  */
 export const ServicesAtmosphere: React.FC = () => (
   <>
-
     {/* ════════════════════════════════════════════════════════════
-        MACRO — POSITIONED LIGHT SOURCES
-        
-        V7: FIVE HUGE DISTANT POSITIONED SOURCES, not uniform wash.
-        
-        Each source = environmental light with:
-        - HUGE scale (1200-1600px equivalent, larger than sections)
-        - Extreme falloff (8-10 stops, boundaries never visible)
-        - Asymmetric positioning (45/60/40/57/50% x)
-        - Proper vertical spacing (creates dark valleys)
-        
-        Visual rhythm: light → dark valley → light → dark valley...
-        NOT: uniform purple atmosphere
+        MACRO — POSITIONED ENVIRONMENTAL LIGHT SOURCES
         ════════════════════════════════════════════════════════════ */}
 
-    {/* ── L02  HERO LIGHT SOURCE ──────────────────────────────────
-        V7: STRONGEST positioned source (0.145 peak, reduced from 0.165)
-        
-        Position: y=22% (hero content center), x=45% (left-bias)
-        Scale: HUGE — 76% width x 58% height (never see boundaries)
-        
-        This is the FIRST environmental light. User immediately
-        perceives: "there is atmosphere in this space."
-        
-        10-stop extreme falloff:
-          0%   → 0.145  (soft core, no hard center)
-          12%  → 0.092  (shoulder, hero lower)
-          22%  → 0.058  (soft mid-range)
-          32%  → 0.034  (extended tail)
-          42%  → 0.019  (hackathons entry begins overlapping)
-          52%  → 0.010  (weak presence)
-          62%  → 0.004  (near-zero, dark valley forming)
-          72%  → 0.001  (effectively dark)
-          84%  → 0.000  (complete darkness)
-          100% → transparent
-        
-        Result: Huge soft environmental presence. Fades naturally
-        into dark valley before Hackathons. No visible shape.
-        
-        Animated: 28s vertical breath (slowed, barely perceptible). */}
+    {/* ── L01  ZONE 1: HERO & HACKATHONS ───────────────────────────
+        Position: y=3.2%, x=46% (left-bias)
+        Peak: 0.145 (hero focus) with 10-stop falloff              */}
     <div
       aria-hidden="true"
       className="contact-layer-primary absolute inset-x-0 top-0 pointer-events-none"
       style={{
-        height: '58%',
+        height: '12%',
         background: `
-          radial-gradient(ellipse 76% 100% at 45% 22%,
+          radial-gradient(ellipse 76% 90% at 46% 28%,
             rgba(112, 64, 242, 0.145) 0%,
-            rgba(102, 56, 228, 0.092) 12%,
-            rgba(92,  48, 212, 0.058) 22%,
-            rgba(82,  42, 195, 0.034) 32%,
-            rgba(72,  36, 178, 0.019) 42%,
-            rgba(62,  30, 158, 0.010) 52%,
-            rgba(52,  24, 138, 0.004) 62%,
-            rgba(42,  18, 118, 0.001) 72%,
-            rgba(32,  12,  98, 0.000) 84%,
-            transparent                 100%)
-        `,
-      }}
-    />
-
-    {/* ── L03  HACKATHONS LIGHT SOURCE ────────────────────────────
-        V7: SECOND positioned source (0.072 peak, reduced from 0.085)
-        
-        Position: y=36% (Hackathons cards center), x=60% (right-bias)
-        Scale: HUGE — 70% width x 48% height
-        
-        Right-biased creates diagonal flow with left-biased hero.
-        Natural compositional rhythm, not algorithmic centering.
-        
-        DARK VALLEY exists between hero falloff (ends ~y=32%) and
-        this source beginning (~y=28%). Intentional separation.
-        
-        9-stop extreme falloff:
-          0%   → 0.072  (soft core, behind cards)
-          14%  → 0.048  (shoulder, card surroundings)
-          26%  → 0.029  (mid-range)
-          38%  → 0.016  (extended tail)
-          50%  → 0.008  (training entry begins)
-          62%  → 0.003  (weak presence)
-          74%  → 0.001  (dark valley forming)
-          86%  → 0.000  (complete darkness)
-          100% → transparent
-        
-        Result: Distinct positioned light. Feels separate from hero.
-        Cards remain dark. ENVIRONMENT around cards subtly lit.
-        
-        Animated: 32s horizontal drift (slowed, barely moves).     */}
-    <div
-      aria-hidden="true"
-      className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
-      style={{
-        top: '26%',
-        height: '48%',
-        background: `
-          radial-gradient(ellipse 70% 100% at 60% 21%,
-            rgba(98, 52, 218, 0.072) 0%,
-            rgba(88, 46, 200, 0.048) 14%,
-            rgba(78, 40, 182, 0.029) 26%,
-            rgba(68, 34, 165, 0.016) 38%,
-            rgba(58, 28, 148, 0.008) 50%,
-            rgba(48, 22, 128, 0.003) 62%,
-            rgba(38, 16, 108, 0.001) 74%,
-            rgba(28, 10,  88, 0.000) 86%,
+            rgba(102, 56, 228, 0.095) 14%,
+            rgba(92,  48, 212, 0.060) 26%,
+            rgba(82,  42, 195, 0.035) 38%,
+            rgba(72,  36, 178, 0.018) 50%,
+            rgba(62,  30, 158, 0.008) 62%,
+            rgba(52,  24, 138, 0.003) 74%,
+            rgba(42,  18, 118, 0.001) 84%,
+            rgba(32,  12,  98, 0.000) 92%,
             transparent               100%)
         `,
       }}
     />
 
-    {/* ── L04  TRAINING LIGHT SOURCE ──────────────────────────────
-        V7: THIRD positioned source (0.088 peak, reduced from 0.092)
-        
-        Position: y=54% (Training/Workshops center), x=40% (left-bias)
-        Scale: HUGE — 78% width x 52% height (largest source)
-        
-        Left-biased alternates with right-biased Hackathons.
-        Diagonal rhythm continues. Training = largest content block,
-        receives largest source (78% width).
-        
-        DARK VALLEY exists between Hackathons falloff (ends ~y=50%)
-        and this source beginning (~y=46%). Proper separation.
-        
-        9-stop extreme falloff:
-          0%   → 0.088  (soft core, behind major content)
-          13%  → 0.062  (shoulder, Training cards)
-          25%  → 0.040  (mid-range, Workshops)
-          37%  → 0.024  (extended tail)
-          49%  → 0.013  (comparison entry begins)
-          61%  → 0.006  (weak presence)
-          73%  → 0.002  (dark valley forming)
-          85%  → 0.000  (complete darkness)
-          100% → transparent
-        
-        Result: Strongest mid-page presence. Wraps around dense
-        card grids. Cards stay dark. Environment perceptible.
-        
-        Animated: 32s horizontal drift (reuses, barely moves).     */}
+    {/* ── L02  ZONE 2: TRAINING & STUDENT DEVELOPMENT ─────────────
+        Position: y=11.2%, x=58% (right-bias)
+        Peak: 0.088 with 9-stop falloff                            */}
     <div
       aria-hidden="true"
       className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
       style={{
-        top: '42%',
-        height: '52%',
+        top: '6.8%',
+        height: '10.5%',
         background: `
-          radial-gradient(ellipse 78% 100% at 40% 23%,
+          radial-gradient(ellipse 74% 90% at 58% 42%,
             rgba(98, 52, 218, 0.088) 0%,
-            rgba(88, 46, 200, 0.062) 13%,
-            rgba(78, 40, 182, 0.040) 25%,
-            rgba(68, 34, 165, 0.024) 37%,
-            rgba(58, 28, 148, 0.013) 49%,
-            rgba(48, 22, 128, 0.006) 61%,
-            rgba(38, 16, 108, 0.002) 73%,
-            rgba(28, 10,  88, 0.000) 85%,
+            rgba(88, 46, 200, 0.060) 14%,
+            rgba(78, 40, 182, 0.038) 28%,
+            rgba(68, 34, 165, 0.022) 42%,
+            rgba(58, 28, 148, 0.011) 56%,
+            rgba(48, 22, 128, 0.005) 68%,
+            rgba(38, 16, 108, 0.001) 80%,
+            rgba(28, 10,  88, 0.000) 90%,
             transparent               100%)
         `,
       }}
     />
 
-    {/* ── L05  TESTIMONIALS LIGHT SOURCE ──────────────────────────
-        V7: FOURTH positioned source (0.058 peak, reduced from 0.070)
-        
-        Position: y=72% (Testimonials/FAQ center), x=57% (right-bias)
-        Scale: HUGE — 72% width x 42% height
-        
-        Right-biased alternates with left-biased Training.
-        Quieter than major sources (0.058 vs 0.088) — this zone
-        should feel calmer. FAQ requires information-focused calm.
-        
-        DARK VALLEY exists between Training falloff (ends ~y=68%)
-        and this source beginning (~y=64%). Proper separation.
-        
-        8-stop extreme falloff:
-          0%   → 0.058  (soft core, behind matrix/testimonials)
-          16%  → 0.038  (shoulder, content surroundings)
-          30%  → 0.022  (mid-range, FAQ upper)
-          44%  → 0.012  (extended tail)
-          58%  → 0.005  (CTA entry begins)
-          72%  → 0.002  (weak presence)
-          86%  → 0.000  (complete darkness)
-          100% → transparent
-        
-        Result: Subtle lift for lower-mid content. Comparison matrix
-        and testimonials sit inside subtle environmental presence.
-        
-        Animated: 36s slow drift (slowed further, nearly static).  */}
+    {/* ── L03  ZONE 3: WORKSHOPS GRID ──────────────────────────────
+        Position: y=18.6%, x=42% (left-bias)
+        Peak: 0.085 with 9-stop falloff                            */}
     <div
       aria-hidden="true"
-      className="svc-layer-lower absolute inset-x-0 pointer-events-none"
+      className="contact-layer-primary absolute inset-x-0 pointer-events-none"
       style={{
-        top: '62%',
-        height: '42%',
+        top: '14.8%',
+        height: '10.2%',
         background: `
-          radial-gradient(ellipse 72% 100% at 57% 24%,
-            rgba(92, 48, 212, 0.058) 0%,
-            rgba(82, 42, 195, 0.038) 16%,
-            rgba(72, 36, 178, 0.022) 30%,
-            rgba(62, 30, 158, 0.012) 44%,
-            rgba(52, 24, 138, 0.005) 58%,
-            rgba(42, 18, 118, 0.002) 72%,
-            rgba(32, 12,  98, 0.000) 86%,
+          radial-gradient(ellipse 76% 90% at 42% 40%,
+            rgba(98, 52, 218, 0.085) 0%,
+            rgba(88, 46, 200, 0.058) 14%,
+            rgba(78, 40, 182, 0.036) 28%,
+            rgba(68, 34, 165, 0.020) 42%,
+            rgba(58, 28, 148, 0.010) 56%,
+            rgba(48, 22, 128, 0.004) 68%,
+            rgba(38, 16, 108, 0.001) 80%,
+            rgba(28, 10,  88, 0.000) 90%,
             transparent               100%)
         `,
       }}
     />
 
-    {/* ── L06  CTA LIGHT SOURCE ───────────────────────────────────
-        V7: FIFTH AND FINAL positioned source (0.092 peak, from 0.095)
-        
-        Position: y=86% (CTA zone center), x=50% (CENTERED)
-        Scale: HUGE — 84% width x 38% height (broadest lower source)
-        
-        CENTERED — CTA is symmetrical focal destination.
-        After diagonal rhythm (45/60/40/57), centered position
-        provides visual resolution. Natural compositional ending.
-        
-        Slightly weaker than Training (0.092 vs 0.088) but feels
-        strong because it's final destination with less competition.
-        
-        DARK VALLEY exists between Testimonials falloff (ends ~y=82%)
-        and this source beginning (~y=78%). Final separation.
-        
-        8-stop extreme falloff toward footer:
-          0%   → 0.092  (soft core, around CTA container)
-          18%  → 0.064  (shoulder, CTA zone)
-          34%  → 0.040  (mid-range, FAQ lower)
-          50%  → 0.022  (extended tail, footer entry)
-          66%  → 0.010  (footer middle)
-          80%  → 0.003  (footer lower)
-          92%  → 0.000  (complete darkness)
-          100% → transparent
-        
-        Result: Clear atmospheric destination. CTA container stays
-        dark. ENVIRONMENT around it perceptible. Visual resolution.
-        
-        Animated: 36s slow drift (reuses, nearly static).          */}
+    {/* ── L04  ZONE 4: MASTER TECH HEADER & MODE CARDS ─────────────
+        Position: y=31%, x=58% (right-bias)
+        Peak: 0.082 with 9-stop falloff                            */}
+    <div
+      aria-hidden="true"
+      className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
+      style={{
+        top: '23.2%',
+        height: '16.5%',
+        background: `
+          radial-gradient(ellipse 78% 90% at 58% 46%,
+            rgba(98, 52, 218, 0.082) 0%,
+            rgba(88, 46, 200, 0.056) 15%,
+            rgba(78, 40, 182, 0.034) 30%,
+            rgba(68, 34, 165, 0.019) 45%,
+            rgba(58, 28, 148, 0.009) 58%,
+            rgba(48, 22, 128, 0.004) 70%,
+            rgba(38, 16, 108, 0.001) 82%,
+            rgba(28, 10,  88, 0.000) 92%,
+            transparent               100%)
+        `,
+      }}
+    />
+
+    {/* ── L05  ZONE 5: UNIVERSAL PILLARS & COMPARISON MATRIX ────────
+        Position: y=45.5%, x=42% (left-bias)
+        Peak: 0.076 with 9-stop falloff                            */}
+    <div
+      aria-hidden="true"
+      className="contact-layer-primary absolute inset-x-0 pointer-events-none"
+      style={{
+        top: '38.8%',
+        height: '13.5%',
+        background: `
+          radial-gradient(ellipse 76% 90% at 42% 48%,
+            rgba(95, 50, 215, 0.076) 0%,
+            rgba(85, 44, 198, 0.052) 15%,
+            rgba(75, 38, 180, 0.032) 30%,
+            rgba(65, 32, 162, 0.017) 45%,
+            rgba(55, 26, 145, 0.008) 58%,
+            rgba(45, 20, 125, 0.003) 70%,
+            rgba(35, 14, 105, 0.001) 82%,
+            rgba(25,  8,  85, 0.000) 92%,
+            transparent               100%)
+        `,
+      }}
+    />
+
+    {/* ── L06  ZONE 6: FORMAT QUIZ & CAMPUS LABS ───────────────────
+        Position: y=58%, x=58% (right-bias)
+        Peak: 0.072 with 9-stop falloff                            */}
+    <div
+      aria-hidden="true"
+      className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
+      style={{
+        top: '51.5%',
+        height: '14.0%',
+        background: `
+          radial-gradient(ellipse 76% 90% at 58% 46%,
+            rgba(95, 50, 215, 0.072) 0%,
+            rgba(85, 44, 198, 0.048) 15%,
+            rgba(75, 38, 180, 0.029) 30%,
+            rgba(65, 32, 162, 0.015) 45%,
+            rgba(55, 26, 145, 0.007) 58%,
+            rgba(45, 20, 125, 0.003) 70%,
+            rgba(35, 14, 105, 0.001) 82%,
+            rgba(25,  8,  85, 0.000) 92%,
+            transparent               100%)
+        `,
+      }}
+    />
+
+    {/* ── L07  ZONE 7: LEARNER TESTIMONIALS & FAQS ─────────────────
+        Position: y=71.5%, x=44% (left-bias)
+        Peak: 0.068 with 9-stop falloff                            */}
     <div
       aria-hidden="true"
       className="svc-layer-lower absolute inset-x-0 pointer-events-none"
       style={{
-        top: '76%',
-        height: '38%',
+        top: '64.5%',
+        height: '15.0%',
         background: `
-          radial-gradient(ellipse 84% 100% at 50% 26%,
+          radial-gradient(ellipse 74% 90% at 44% 48%,
+            rgba(92, 48, 212, 0.068) 0%,
+            rgba(82, 42, 195, 0.045) 15%,
+            rgba(72, 36, 178, 0.027) 30%,
+            rgba(62, 30, 158, 0.014) 45%,
+            rgba(52, 24, 138, 0.006) 58%,
+            rgba(42, 18, 118, 0.002) 70%,
+            rgba(32, 12,  98, 0.001) 82%,
+            rgba(22,  6,  78, 0.000) 92%,
+            transparent               100%)
+        `,
+      }}
+    />
+
+    {/* ── L08  ZONE 8: PAST EVENTS & READY-TO-START CTA ────────────
+        Position: y=83.8%, x=50% (centered focal resolution)
+        Peak: 0.092 with 8-stop falloff toward terminal void       */}
+    <div
+      aria-hidden="true"
+      className="svc-layer-lower absolute inset-x-0 pointer-events-none"
+      style={{
+        top: '78.5%',
+        height: '12.5%',
+        background: `
+          radial-gradient(ellipse 84% 90% at 50% 46%,
             rgba(98, 52, 218, 0.092) 0%,
-            rgba(88, 46, 200, 0.064) 18%,
-            rgba(78, 40, 182, 0.040) 34%,
-            rgba(68, 34, 165, 0.022) 50%,
-            rgba(58, 28, 148, 0.010) 66%,
-            rgba(48, 22, 128, 0.003) 80%,
-            rgba(38, 16, 108, 0.000) 92%,
+            rgba(88, 46, 200, 0.064) 16%,
+            rgba(78, 40, 182, 0.040) 32%,
+            rgba(68, 34, 165, 0.022) 48%,
+            rgba(58, 28, 148, 0.010) 64%,
+            rgba(48, 22, 128, 0.003) 78%,
+            rgba(38, 16, 108, 0.000) 90%,
             transparent               100%)
         `,
       }}
     />
 
     {/* ════════════════════════════════════════════════════════════
-        MESO — TECHNICAL STRUCTURE
-        
-        V7: Grid revealed ONLY in illuminated zones.
-        Completely invisible in dark valleys. Discovered architecture.
+        MESO — TECHNICAL ARCHITECTURAL STRUCTURE
         ════════════════════════════════════════════════════════════ */}
 
-    {/* ── L07  GRID SUBSTRATE ─────────────────────────────────────
-        V7: Unchanged (0.009 opacity, 96px cells)
-        
-        Far technical structure. Subliminal architectural presence
-        across full page. Minimum perceptible opacity.
-        Large 96px cells = infrastructure, not decoration.          */}
+    {/* ── L09  TECHNICAL ARCHITECTURAL GRID SUBSTRATE ─────────────
+        96px cells. Calibrated single-pass hardware-accelerated grid. */}
     <div
       aria-hidden="true"
       className="absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          linear-gradient(rgba(183, 164, 251, 0.009) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(183, 164, 251, 0.009) 1px, transparent 1px)
+          linear-gradient(rgba(183, 164, 251, 0.016) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(183, 164, 251, 0.016) 1px, transparent 1px)
         `,
         backgroundSize: '96px 96px',
-        maskImage:
-          'radial-gradient(ellipse 82% 100% at 50% 50%, rgba(0,0,0,0.36) 0%, rgba(0,0,0,0.08) 68%, transparent 88%)',
-        WebkitMaskImage:
-          'radial-gradient(ellipse 82% 100% at 50% 50%, rgba(0,0,0,0.36) 0%, rgba(0,0,0,0.08) 68%, transparent 88%)',
-      }}
-    />
-
-    {/* ── L08  GRID REVEAL — LIGHT-ZONE-ONLY ──────────────────────
-        V7: Reduced 0.024 → 0.021, CRITICAL mask change
-        
-        Near grid layer. Visible ONLY where light sources exist.
-        Completely invisible in dark valleys. This creates the
-        perception: "grid is revealed by environmental light."
-        
-        Vertical mask profile tied to FIVE LIGHT ZONES:
-          0–18%    invisible     (pre-hero dark)
-          18–34%   present       (Hero light zone)
-          34–42%   invisible     (dark valley 1)
-          42–50%   present       (Hackathons light zone)
-          50–58%   invisible     (dark valley 2)
-          58–70%   present       (Training light zone)
-          70–78%   invisible     (dark valley 3)
-          78–86%   present       (Testimonials light zone)
-          86–92%   invisible     (dark valley 4)
-          92–98%   present       (CTA light zone)
-          98–100%  invisible     (footer dark)
-        
-        Horizontal mask: subtle center-bias (48% x, follows sources).
-        
-        Result: Grid discovered in lit zones, absent in dark valleys.
-        Reinforces positioned light source perception.              */}
-    <div
-      aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
-      style={{
-        backgroundImage: `
-          linear-gradient(rgba(183, 164, 251, 0.021) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(183, 164, 251, 0.021) 1px, transparent 1px)
-        `,
-        backgroundSize: '96px 96px',
-        maskImage: `
-          radial-gradient(ellipse 68% 100% at 48% 50%,
-            rgba(0,0,0,0.62) 0%,
-            rgba(0,0,0,0.22) 58%,
-            transparent      86%),
-          linear-gradient(
-            to bottom,
-            transparent        0%,
-            transparent        16%,
-            rgba(0,0,0,0.48)  22%,
-            rgba(0,0,0,0.68)  28%,
-            rgba(0,0,0,0.06)  36%,
-            rgba(0,0,0,0.52)  44%,
-            rgba(0,0,0,0.64)  48%,
-            rgba(0,0,0,0.08)  54%,
-            rgba(0,0,0,0.56)  60%,
-            rgba(0,0,0,0.70)  66%,
-            rgba(0,0,0,0.10)  74%,
-            rgba(0,0,0,0.44)  80%,
-            rgba(0,0,0,0.58)  84%,
-            rgba(0,0,0,0.08)  88%,
-            rgba(0,0,0,0.50)  93%,
-            rgba(0,0,0,0.62)  96%,
-            transparent       100%
-          )
-        `,
-        WebkitMaskImage: `
-          radial-gradient(ellipse 68% 100% at 48% 50%,
-            rgba(0,0,0,0.62) 0%,
-            rgba(0,0,0,0.22) 58%,
-            transparent      86%),
-          linear-gradient(
-            to bottom,
-            transparent        0%,
-            transparent        16%,
-            rgba(0,0,0,0.48)  22%,
-            rgba(0,0,0,0.68)  28%,
-            rgba(0,0,0,0.06)  36%,
-            rgba(0,0,0,0.52)  44%,
-            rgba(0,0,0,0.64)  48%,
-            rgba(0,0,0,0.08)  54%,
-            rgba(0,0,0,0.56)  60%,
-            rgba(0,0,0,0.70)  66%,
-            rgba(0,0,0,0.10)  74%,
-            rgba(0,0,0,0.44)  80%,
-            rgba(0,0,0,0.58)  84%,
-            rgba(0,0,0,0.08)  88%,
-            rgba(0,0,0,0.50)  93%,
-            rgba(0,0,0,0.62)  96%,
-            transparent       100%
-          )
-        `,
-        maskComposite: 'intersect',
-        WebkitMaskComposite: 'source-in',
+        maskImage: 'radial-gradient(ellipse 85% 95% at 50% 50%, black 35%, transparent 92%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 85% 95% at 50% 50%, black 35%, transparent 92%)',
       }}
     />
 
     {/* ════════════════════════════════════════════════════════════
-        MICRO — DEPTH PARTICLES
-        
-        V7: Unchanged (28 total: 12 far + 10 mid + 6 near)
-        Particle system already correct. Environmental depth layers.
+        MICRO — DEPTH PARTICLES (EDGE-WEIGHTED & BALANCED)
         ════════════════════════════════════════════════════════════ */}
 
-    {/* ── L09  PARTICLES FAR ───────────────────────────────────────
-        1px dots. 12 total. Max opacity 0.10. Furthest depth.
-        Edge-weighted. Decreasing opacity toward bottom.
-        Static — stable far reference.                             */}
+    {/* ── L11  PARTICLES FAR ───────────────────────────────────────
+        1px dots. Edge-weighted across entire page height.         */}
     <div
       aria-hidden="true"
       className="absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          radial-gradient(1px 1px at  5%  16%, rgba(255,255,255,0.10) 0%, transparent 100%),
-          radial-gradient(1px 1px at 95%  14%, rgba(183,164,251,0.09) 0%, transparent 100%),
-          radial-gradient(1px 1px at  7%  28%, rgba(255,255,255,0.09) 0%, transparent 100%),
-          radial-gradient(1px 1px at 93%  26%, rgba(183,164,251,0.08) 0%, transparent 100%),
-          radial-gradient(1px 1px at  4%  36%, rgba(183,164,251,0.08) 0%, transparent 100%),
-          radial-gradient(1px 1px at 96%  34%, rgba(255,255,255,0.07) 0%, transparent 100%),
-          radial-gradient(1px 1px at 14%  52%, rgba(255,255,255,0.07) 0%, transparent 100%),
-          radial-gradient(1px 1px at 86%  50%, rgba(183,164,251,0.06) 0%, transparent 100%),
-          radial-gradient(1px 1px at  6%  64%, rgba(255,255,255,0.07) 0%, transparent 100%),
-          radial-gradient(1px 1px at 94%  62%, rgba(183,164,251,0.06) 0%, transparent 100%),
-          radial-gradient(1px 1px at 18%  78%, rgba(255,255,255,0.06) 0%, transparent 100%),
-          radial-gradient(1px 1px at 82%  80%, rgba(183,164,251,0.05) 0%, transparent 100%)
+          radial-gradient(1px 1px at  5%   3%, rgba(255,255,255,0.10) 0%, transparent 100%),
+          radial-gradient(1px 1px at 95%   5%, rgba(183,164,251,0.09) 0%, transparent 100%),
+          radial-gradient(1px 1px at  6%  11%, rgba(255,255,255,0.09) 0%, transparent 100%),
+          radial-gradient(1px 1px at 94%  13%, rgba(183,164,251,0.08) 0%, transparent 100%),
+          radial-gradient(1px 1px at  4%  19%, rgba(183,164,251,0.08) 0%, transparent 100%),
+          radial-gradient(1px 1px at 96%  21%, rgba(255,255,255,0.07) 0%, transparent 100%),
+          radial-gradient(1px 1px at  8%  29%, rgba(255,255,255,0.08) 0%, transparent 100%),
+          radial-gradient(1px 1px at 92%  33%, rgba(183,164,251,0.07) 0%, transparent 100%),
+          radial-gradient(1px 1px at  5%  44%, rgba(255,255,255,0.07) 0%, transparent 100%),
+          radial-gradient(1px 1px at 95%  47%, rgba(183,164,251,0.06) 0%, transparent 100%),
+          radial-gradient(1px 1px at  7%  57%, rgba(255,255,255,0.07) 0%, transparent 100%),
+          radial-gradient(1px 1px at 93%  61%, rgba(183,164,251,0.06) 0%, transparent 100%),
+          radial-gradient(1px 1px at  6%  71%, rgba(255,255,255,0.07) 0%, transparent 100%),
+          radial-gradient(1px 1px at 94%  74%, rgba(183,164,251,0.06) 0%, transparent 100%),
+          radial-gradient(1px 1px at 12%  83%, rgba(255,255,255,0.06) 0%, transparent 100%),
+          radial-gradient(1px 1px at 88%  85%, rgba(183,164,251,0.05) 0%, transparent 100%)
         `,
       }}
     />
 
-    {/* ── L10  PARTICLES MID ───────────────────────────────────────
-        1.5px dots. 10 total. Max opacity 0.16. Middle depth.
-        Forbidden zones respected (gaps at transition corridors).
-        Static — mid-depth reference.                              */}
+    {/* ── L12  PARTICLES MID ───────────────────────────────────────
+        1.5px dots. Mid-depth reference dots.                     */}
     <div
       aria-hidden="true"
       className="absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          radial-gradient(1.5px 1.5px at  5%  20%, rgba(255,255,255,0.16) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 95%  18%, rgba(183,164,251,0.14) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at  8%  32%, rgba(255,255,255,0.15) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 92%  30%, rgba(183,164,251,0.13) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 16%  52%, rgba(255,255,255,0.13) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 84%  50%, rgba(183,164,251,0.11) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at  6%  62%, rgba(255,255,255,0.13) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 94%  60%, rgba(183,164,251,0.11) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 24%  78%, rgba(255,255,255,0.10) 0%, transparent 100%),
-          radial-gradient(1.5px 1.5px at 76%  82%, rgba(183,164,251,0.09) 0%, transparent 100%)
+          radial-gradient(1.5px 1.5px at  4%   4%, rgba(255,255,255,0.15) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 96%   6%, rgba(183,164,251,0.14) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at  7%  12%, rgba(255,255,255,0.14) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 93%  18%, rgba(183,164,251,0.13) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at  5%  31%, rgba(255,255,255,0.13) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 95%  35%, rgba(183,164,251,0.12) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at  6%  46%, rgba(255,255,255,0.12) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 94%  59%, rgba(183,164,251,0.11) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at  5%  72%, rgba(255,255,255,0.11) 0%, transparent 100%),
+          radial-gradient(1.5px 1.5px at 95%  84%, rgba(183,164,251,0.10) 0%, transparent 100%)
         `,
       }}
     />
 
-    {/* ── L11  PARTICLES NEAR (animated) ───────────────────────────
-        2px dots. 6 total. Max opacity 0.18. Nearest depth.
-        EXTREMELY RARE. Far-edge only: x ≤ 5% or x ≥ 95%.
-        Upper (2), mid (2), lower (2) distribution.
-        
-        Animated: 40s vertical float (slowed further from 36s).
-        Barely perceptible. Premium = calm + nearly static.        */}
+    {/* ── L13  PARTICLES NEAR (animated) ───────────────────────────
+        2px dots. 6 total. Far edge only (x ≤ 5% or x ≥ 95%).
+        Animated: 40s slow vertical float.                        */}
     <div
       aria-hidden="true"
       className="contact-layer-particles-near absolute inset-0 pointer-events-none"
       style={{
         backgroundImage: `
-          radial-gradient(2px 2px at  4%  24%, rgba(255,255,255,0.18) 0%, transparent 100%),
-          radial-gradient(2px 2px at 96%  30%, rgba(183,164,251,0.16) 0%, transparent 100%),
-          radial-gradient(2px 2px at  4%  54%, rgba(255,255,255,0.15) 0%, transparent 100%),
-          radial-gradient(2px 2px at 96%  58%, rgba(183,164,251,0.13) 0%, transparent 100%),
-          radial-gradient(2px 2px at  5%  80%, rgba(255,255,255,0.14) 0%, transparent 100%),
-          radial-gradient(2px 2px at 95%  86%, rgba(183,164,251,0.11) 0%, transparent 100%)
+          radial-gradient(2px 2px at  3%   5%, rgba(255,255,255,0.18) 0%, transparent 100%),
+          radial-gradient(2px 2px at 97%  12%, rgba(183,164,251,0.16) 0%, transparent 100%),
+          radial-gradient(2px 2px at  4%  33%, rgba(255,255,255,0.15) 0%, transparent 100%),
+          radial-gradient(2px 2px at 96%  48%, rgba(183,164,251,0.13) 0%, transparent 100%),
+          radial-gradient(2px 2px at  3%  70%, rgba(255,255,255,0.14) 0%, transparent 100%),
+          radial-gradient(2px 2px at 97%  84%, rgba(183,164,251,0.12) 0%, transparent 100%)
         `,
       }}
     />
-
   </>
 );
