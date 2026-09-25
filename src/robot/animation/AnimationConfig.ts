@@ -62,8 +62,8 @@ export const ANIMATION_CONFIG = {
     poses: {
       poseA: {
         name: 'PoseA_RightDominant',
-        leftElbow: -0.28,                     // ~ -16.0 deg subtle flexion bend (10°–20° spec)
-        rightElbow: -0.28,
+        leftElbow: -0.52,                     // ~ -29.8 deg Euler (produces ~18°–20° visual hinge flexion)
+        rightElbow: -0.52,
         leftUpperPitch: -0.13,                // ~ -7.45 deg forward pitch (0°–10° spec)
         rightUpperPitch: -0.13,
         leftUpperRoll: -0.038,                // natural lateral clearing angle (outward)
@@ -71,8 +71,8 @@ export const ANIMATION_CONFIG = {
       },
       poseB: {
         name: 'PoseB_LeftDominant',
-        leftElbow: -0.30,                     // subtle organic variation (-17.2 deg)
-        rightElbow: -0.26,                     // subtle organic variation (-14.9 deg)
+        leftElbow: -0.54,                     // subtle organic variation (-30.9 deg Euler)
+        rightElbow: -0.50,                    // subtle organic variation (-28.6 deg Euler)
         leftUpperPitch: -0.14,
         rightUpperPitch: -0.12,
         leftUpperRoll: -0.035,
@@ -80,8 +80,8 @@ export const ANIMATION_CONFIG = {
       },
       poseC: {
         name: 'PoseC_Balanced',
-        leftElbow: -0.28,
-        rightElbow: -0.28,
+        leftElbow: -0.52,
+        rightElbow: -0.52,
         leftUpperPitch: -0.13,
         rightUpperPitch: -0.13,
         leftUpperRoll: -0.038,

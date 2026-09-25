@@ -70,7 +70,7 @@ function createForearmCoherentArmor(
   const indices: number[] = [];
 
   const yTop = -0.015;
-  const totalLength = 0.156; // 156 mm sculpted gauntlet, ending at y = -0.171m to house dedicated wrist module
+  const totalLength = 0.129; // 129 mm sculpted gauntlet, ending at y = -0.144m to house dedicated wrist module
   const thickness = 0.0028;  // 2.8 mm real physical wall thickness
 
   let startAngle = 0;
@@ -315,54 +315,54 @@ export function createForearm(
   mechanicalCore.add(dockRim);
 
   // 2. Main Structural Column / Spaceframe Spine
-  const spineGeo = new THREE.BoxGeometry(0.022, 0.175, 0.026);
+  const spineGeo = new THREE.BoxGeometry(0.022, 0.149, 0.026);
   const armatureSpine = new THREE.Mesh(spineGeo, materials.joint);
   armatureSpine.name = 'ForearmArmatureSpine';
-  armatureSpine.position.set(0, -0.096, 0);
+  armatureSpine.position.set(0, -0.0815, 0);
   armatureSpine.castShadow = true;
   armatureSpine.receiveShadow = true;
   mechanicalCore.add(armatureSpine);
 
   // CNC Weight-Reduction Cutouts on Spine
   for (let c = 0; c < 4; c++) {
-    const cavGeo = new THREE.BoxGeometry(0.024, 0.022, 0.018);
+    const cavGeo = new THREE.BoxGeometry(0.024, 0.018, 0.018);
     const cav = new THREE.Mesh(cavGeo, materials.joint);
-    cav.position.set(0, -0.046 - c * 0.030, 0);
+    cav.position.set(0, -0.042 - c * 0.024, 0);
     mechanicalCore.add(cav);
   }
 
   // 3. Substantial Bilateral Linear Flexor Actuator Cylinders & Chrome Piston Rods
   // Compacted load-bearing actuators nestled inside gauntlet spaceframe
   for (const aSide of [-1, 1]) {
-    const actCylGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.068, 16);
+    const actCylGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.050, 16);
     const actCyl = new THREE.Mesh(actCylGeo, materials.joint);
-    actCyl.position.set(aSide * 0.012, -0.082, 0.008);
+    actCyl.position.set(aSide * 0.012, -0.066, 0.008);
     actCyl.castShadow = true;
     mechanicalCore.add(actCyl);
 
     const actRingGeo = new THREE.TorusGeometry(0.0050, 0.0009, 6, 16);
     const actRing = new THREE.Mesh(actRingGeo, materials.metallic);
-    actRing.position.set(aSide * 0.012, -0.065, 0.008);
+    actRing.position.set(aSide * 0.012, -0.052, 0.008);
     mechanicalCore.add(actRing);
 
-    const pistonGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.070, 14);
+    const pistonGeo = new THREE.CylinderGeometry(0.0028, 0.0028, 0.054, 14);
     const piston = new THREE.Mesh(pistonGeo, materials.metallic);
-    piston.position.set(aSide * 0.012, -0.135, 0.008);
+    piston.position.set(aSide * 0.012, -0.110, 0.008);
     piston.castShadow = true;
     mechanicalCore.add(piston);
   }
 
   // 4. Internal Protected Cable Conduit Raceway
-  const cableConduitGeo = new THREE.CylinderGeometry(0.0026, 0.0026, 0.170, 10);
+  const cableConduitGeo = new THREE.CylinderGeometry(0.0024, 0.0024, 0.141, 10);
   const cableConduit = new THREE.Mesh(cableConduitGeo, materials.joint);
-  cableConduit.position.set(0, -0.098, -0.009);
+  cableConduit.position.set(0, -0.0815, -0.009);
   cableConduit.castShadow = true;
   mechanicalCore.add(cableConduit);
 
-  // 5. Distal Wrist Interface Mount (Receives Dedicated Wrist Module at Y = -0.176m)
+  // 5. Distal Wrist Interface Mount (Receives Dedicated Wrist Module at Y = -0.151m for balanced proportions)
   const distalWristMount = new THREE.Group();
   distalWristMount.name = side === -1 ? 'LeftDistalWristMount' : 'RightDistalWristMount';
-  distalWristMount.position.set(0, -0.176, 0);
+  distalWristMount.position.set(0, -0.151, 0);
   mechanicalCore.add(distalWristMount);
 
   const cuffGeo = new THREE.CylinderGeometry(0.0235, 0.0250, 0.010, 28);
@@ -383,14 +383,14 @@ export function createForearm(
   const collarGeo = new THREE.CylinderGeometry(0.0238, 0.0252, 0.006, 28);
   const transitionCollar = new THREE.Mesh(collarGeo, materials.joint);
   transitionCollar.name = 'ForearmWristTransitionCollar';
-  transitionCollar.position.set(0, -0.174, 0);
+  transitionCollar.position.set(0, -0.148, 0);
   transitionCollar.castShadow = true;
   forearmGroup.add(transitionCollar);
 
   const collarRingGeo = new THREE.TorusGeometry(0.0242, 0.0009, 6, 28);
   collarRingGeo.rotateX(Math.PI / 2);
   const collarRing = new THREE.Mesh(collarRingGeo, materials.metallic);
-  collarRing.position.set(0, -0.174, 0);
+  collarRing.position.set(0, -0.148, 0);
   forearmGroup.add(collarRing);
 
   // ==========================================================================
@@ -427,28 +427,28 @@ export function createForearm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'ForearmStandardizedTechBay';
-  // Positioned flush on the anterior facet at y = -0.092m, z = 0.0285m
+  // Positioned flush on the anterior facet at y = -0.080m, z = 0.0285m
   const bayX = side * 0.0012;
   const bayZ = 0.0285;
-  const bayY = -0.092;
+  const bayY = -0.080;
   techBayGroup.position.set(bayX, bayY, bayZ);
   armorGroup.add(techBayGroup);
 
   // 1. Dark Titanium Recessed Tray / Cavity (sunken flush into the armor facet)
-  const bayHousingGeo = new THREE.BoxGeometry(0.0085, 0.044, 0.0020);
+  const bayHousingGeo = new THREE.BoxGeometry(0.0088, 0.044, 0.0020);
   const bayHousing = new THREE.Mesh(bayHousingGeo, materials.joint);
   bayHousing.position.set(0, 0, -0.0006);
   bayHousing.castShadow = true;
   techBayGroup.add(bayHousing);
 
   // 2. Precision Machined Metallic Thin Bezel Rim
-  const bezelFrameGeo = new THREE.BoxGeometry(0.0092, 0.045, 0.0007);
+  const bezelFrameGeo = new THREE.BoxGeometry(0.0096, 0.045, 0.0007);
   const bezelFrame = new THREE.Mesh(bezelFrameGeo, materials.metallic);
   bezelFrame.position.set(0, 0, 0.0003);
   techBayGroup.add(bezelFrame);
 
   // 3. Centered Flush Purple Emissive Accent Strip
-  const purpleRodGeo = new THREE.CapsuleGeometry(0.0011, 0.032, 8, 16);
+  const purpleRodGeo = new THREE.CapsuleGeometry(0.0013, 0.030, 8, 16);
   const ledStrip = new THREE.Mesh(purpleRodGeo, materials.purpleEmissive);
   ledStrip.name = 'ForearmPurpleLEDAccent';
   ledStrip.position.set(0, 0, 0.0004);
@@ -456,7 +456,7 @@ export function createForearm(
   ledMeshes.push(ledStrip);
 
   // High-intensity Bloom Glow (Calibrated radius to stay inside bezel)
-  const purpleBloomGeo = new THREE.CapsuleGeometry(0.0016, 0.032, 8, 16);
+  const purpleBloomGeo = new THREE.CapsuleGeometry(0.0020, 0.030, 8, 16);
   const purpleBloomMesh = new THREE.Mesh(purpleBloomGeo, materials.purpleBloom);
   purpleBloomMesh.position.copy(ledStrip.position);
   techBayGroup.add(purpleBloomMesh);
@@ -467,7 +467,7 @@ export function createForearm(
   ventilationChannel.position.set(0, 0, 0);
   techBayGroup.add(ventilationChannel);
 
-  for (const lY of [-0.018, 0.018]) {
+  for (const lY of [-0.020, 0.020]) {
     const slatGeo = new THREE.BoxGeometry(0.0050, 0.0008, 0.0010);
     const slat = new THREE.Mesh(slatGeo, materials.joint);
     slat.position.set(0, lY, 0.0002);
@@ -475,10 +475,10 @@ export function createForearm(
   }
 
   // Engineered Parting Seam between inner and outer shells (Safely inside at radius 26mm)
-  const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.110, 0.0025);
+  const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.096, 0.0025);
   const panelSeam = new THREE.Mesh(medSeamGeo, materials.joint);
   panelSeam.name = 'ForearmPartingSeam';
-  panelSeam.position.set(-side * 0.0260, -0.094, 0);
+  panelSeam.position.set(-side * 0.0260, -0.080, 0);
   armorGroup.add(panelSeam);
 
   // Compatibility aliases

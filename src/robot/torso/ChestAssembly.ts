@@ -17,6 +17,7 @@ export interface ChestArmorNodes {
   rightLightStrip?: THREE.Mesh;
   flankArmorLeft?: THREE.Mesh;
   flankArmorRight?: THREE.Mesh;
+  lowerUnderside?: THREE.Mesh;
 }
 
 export interface UpperTorsoFrameNodes {
@@ -105,16 +106,16 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   shape.bezierCurveTo(-0.124, 0.185, -0.152, 0.172, -0.172, 0.156);
   // Upper pectoral outer contour
   shape.quadraticCurveTo(-0.188, 0.118, -0.178, 0.072);
-  // Outer flank sweeps smoothly down and arches cleanly into the engineered sub-costal arch
-  shape.bezierCurveTo(-0.165, 0.028, -0.138, 0.006, -0.100, -0.001);
-  shape.bezierCurveTo(-0.076, -0.003, -0.050, -0.003, -0.028, -0.002);
-  // Sculpted central sub-xiphoid notch framing the transition frame & Vertebra 01 interlocking crest
-  shape.lineTo(-0.014, 0.000);
-  shape.lineTo(0, 0.002);
-  shape.lineTo(0.014, 0.000);
-  shape.lineTo(0.028, -0.002);
-  shape.bezierCurveTo(0.050, -0.003, 0.076, -0.003, 0.100, -0.001);
-  shape.bezierCurveTo(0.138, 0.006, 0.165, 0.028, 0.178, 0.072);
+  // Outer flank sweeps smoothly down and arches cleanly into the sculpted lower chest contour
+  shape.bezierCurveTo(-0.168, 0.038, -0.150, 0.008, -0.125, -0.008);
+  // Dips into the sculpted lower pectoral contour (deeper at sides around x = -0.075 to -0.095)
+  shape.bezierCurveTo(-0.105, -0.018, -0.075, -0.022, -0.045, -0.014);
+  // Gently tapers upward toward the center sub-xiphoid arch/notch framing purple status LED
+  shape.bezierCurveTo(-0.026, -0.008, -0.012, 0.000, 0.000, 0.004);
+  // Symmetrically on the right side
+  shape.bezierCurveTo(0.012, 0.000, 0.026, -0.008, 0.045, -0.014);
+  shape.bezierCurveTo(0.075, -0.022, 0.105, -0.018, 0.125, -0.008);
+  shape.bezierCurveTo(0.150, 0.008, 0.168, 0.038, 0.178, 0.072);
   shape.quadraticCurveTo(0.188, 0.118, 0.172, 0.156);
   shape.bezierCurveTo(0.152, 0.172, 0.124, 0.185, 0.088, 0.190);
   shape.bezierCurveTo(0.054, 0.185, 0.024, 0.180, 0, 0.178);
@@ -137,6 +138,7 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   // - Upper collar chamfer facet sloping backwards toward neck cavity
   // - Triangular suprasternal notch depression reflecting neck purple LED
   // - Forward athletic pectoral compound curvature and lateral wrap
+  // - Sculpted lower armor lip and recessed underside transition (Requirement 4B, 4C, 4F)
   const pos = geo.attributes.position;
   for (let i = 0; i < pos.count; i++) {
     const x = pos.getX(i);
@@ -146,7 +148,7 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
     if (z > 0) {
       const ax = Math.abs(x);
 
-      // 1. Clavicle crest Y position as a function of |x| in centered coordinates (shape center Y = 0.08425)
+      // 1. Clavicle crest Y position as a function of |x| in centered coordinates
       let yCrest: number;
       if (ax <= 0.088) {
         const t = ax / 0.088;
@@ -190,7 +192,21 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
       const wrapNx = Math.min(1.0, ax / 0.175);
       const lateralWrap = -Math.pow(wrapNx, 2.2) * 0.012;
 
-      pos.setZ(i, z + ridgeElev + chamferSlope + notchRecess + pectoralBulge + lateralWrap);
+      // 7. Sculpted lower armor lip (Requirement 4C)
+      let lowerLip = 0;
+      if (y < -0.030) {
+        const tLip = Math.min(1.0, (-y - 0.030) / 0.065);
+        lowerLip = Math.sin(tLip * Math.PI) * 0.0042;
+      }
+
+      pos.setZ(i, z + ridgeElev + chamferSlope + notchRecess + pectoralBulge + lateralWrap + lowerLip);
+    } else {
+      // Recessed underside transition (Requirement 4C & 4F)
+      if (y < -0.030) {
+        const tUnder = Math.min(1.0, (-y - 0.030) / 0.065);
+        pos.setZ(i, z + Math.sin(tUnder * (Math.PI / 2)) * 0.0075);
+        pos.setY(i, y + tUnder * 0.0040);
+      }
     }
   }
   geo.computeVertexNormals();
@@ -213,9 +229,9 @@ function createChestSidePanel(
   const shape = new THREE.Shape();
   // Sculpted side panel framing the diagonal purple light strip and meeting the extension seam cleanly
   shape.moveTo(side * 0.156, 0.082);
-  shape.bezierCurveTo(side * 0.144, 0.010, side * 0.118, -0.036, side * 0.072, -0.056);
-  shape.lineTo(side * 0.134, -0.060);
-  shape.bezierCurveTo(side * 0.152, -0.020, side * 0.162, 0.050, side * 0.158, 0.142);
+  shape.bezierCurveTo(side * 0.144, 0.010, side * 0.118, -0.028, side * 0.072, -0.046);
+  shape.lineTo(side * 0.134, -0.048);
+  shape.bezierCurveTo(side * 0.152, -0.015, side * 0.162, 0.050, side * 0.158, 0.142);
   shape.lineTo(side * 0.144, 0.144);
   shape.closePath();
 
@@ -268,11 +284,11 @@ function createChestFlankArmor(
 ): THREE.Mesh {
   const shape = new THREE.Shape();
   shape.moveTo(0.048, 0.048);
-  shape.lineTo(0.058, 0.015);
-  // Curves downward to close tightly around the upper actuator cylinder and mount
-  shape.bezierCurveTo(0.062, -0.025, 0.055, -0.060, 0.038, -0.078);
-  shape.quadraticCurveTo(0.008, -0.058, -0.018, -0.058);
-  shape.bezierCurveTo(-0.038, -0.054, -0.048, -0.020, -0.048, 0.018);
+  shape.lineTo(0.056, 0.018);
+  // Curves downward with controlled clearance, contouring cleanly into rib actuator clearance
+  shape.bezierCurveTo(0.058, -0.015, 0.048, -0.036, 0.028, -0.044);
+  shape.quadraticCurveTo(0.005, -0.038, -0.018, -0.038);
+  shape.bezierCurveTo(-0.036, -0.036, -0.046, -0.015, -0.048, 0.018);
   shape.lineTo(-0.032, 0.048);
   shape.closePath();
 
@@ -307,6 +323,73 @@ function createChestFlankArmor(
   return mesh;
 }
 
+// ─── 4B. SCULPTED WHITE LOWER CHEST UNDERSIDE TRANSITION COWL ───────────────
+/**
+ * Controlled sculpted white ceramic underside return surface (Requirement 4C & 4F).
+ * Bridges smoothly from the curved lower pectoral armor lip backward and upward into the
+ * chassis frame and rib mechanism with visible depth, compound curvature, and clean clearance.
+ */
+function createChestLowerUndersideCowl(materials: RobotMaterialPalette): THREE.Mesh {
+  const xSegs = 36;
+  const ySegs = 14;
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  for (let iy = 0; iy <= ySegs; iy++) {
+    const ty = iy / ySegs; // 0 = front lip, 1 = recessed underside rear
+    for (let ix = 0; ix <= xSegs; ix++) {
+      const tx = (ix / xSegs) * 2 - 1; // -1 to +1 across chest
+      const x = tx * 0.128;
+      const ax = Math.abs(x);
+
+      // Pectoral lower edge compound curve in local centered space
+      let edgeY: number;
+      if (ax < 0.025) {
+        edgeY = -0.098 + 0.003 * (1 - ax / 0.025);
+      } else if (ax < 0.085) {
+        const t = (ax - 0.025) / 0.060;
+        edgeY = -0.098 - 0.012 * Math.sin(t * (Math.PI / 2));
+      } else {
+        const t = Math.min(1.0, (ax - 0.085) / 0.043);
+        edgeY = -0.110 + 0.022 * t;
+      }
+
+      // Front lip: starts proud at Z = 0.022 (flush with lower armor lip)
+      // Recessed back: sweeps backward to Z = -0.008, angling upward to Y + 0.012
+      const curX = x * (1 - ty * 0.06); // gentle side taper toward abdomen
+      const curY = edgeY + ty * 0.014;
+      const curZ = 0.022 * (1 - ty) - 0.008 * ty - Math.pow(ax / 0.128, 2.0) * 0.006;
+
+      positions.push(curX, curY, curZ);
+      uvs.push(ix / xSegs, iy / ySegs);
+    }
+  }
+
+  for (let iy = 0; iy < ySegs; iy++) {
+    for (let ix = 0; ix < xSegs; ix++) {
+      const a = iy * (xSegs + 1) + ix;
+      const b = a + 1;
+      const c = a + (xSegs + 1);
+      const d = c + 1;
+      indices.push(a, b, c);
+      indices.push(b, d, c);
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+
+  const mesh = new THREE.Mesh(geo, materials.armorDoubleSide);
+  mesh.name = 'ChestLowerUndersideCowl';
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+  return mesh;
+}
+
 // ─── 5. CHEST ARMOR ASSEMBLY ─────────────────────────────────────────────────
 export function createChestArmor(materials: RobotMaterialPalette): ChestArmorNodes & {
   ledMeshes: THREE.Mesh[];
@@ -326,6 +409,10 @@ export function createChestArmor(materials: RobotMaterialPalette): ChestArmorNod
   logo.rotation.x = -0.04;
   centerPanel.add(logo);
   ledMeshes.push(logo);
+
+  // Sculpted White Ceramic Lower Underside Cowl (Requirement 4C & 4F)
+  const lowerUnderside = createChestLowerUndersideCowl(materials);
+  centerPanel.add(lowerUnderside);
 
   // Left & Right Pectoral Panels with Diagonal Light Strips
   const leftSide = createChestSidePanel(-1, materials);
@@ -352,9 +439,11 @@ export function createChestArmor(materials: RobotMaterialPalette): ChestArmorNod
     rightLightStrip: rightSide.lightStrip,
     flankArmorLeft: flankLeft,
     flankArmorRight: flankRight,
+    lowerUnderside,
     ledMeshes,
   };
 }
+
 
 // ─── 6. UPPER TORSO FRAME & LOWER CHEST INTERFACE ───────────────────────────
 /**

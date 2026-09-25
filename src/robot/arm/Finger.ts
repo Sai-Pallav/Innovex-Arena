@@ -183,46 +183,46 @@ function createKnuckleHinge(
   const group = new THREE.Group();
   const caps: THREE.Mesh[] = [];
 
-  // Central hinge barrel (dark titanium)
+  // Refined central hinge barrel - slimmer and more elegant
   const barrelGeo = new THREE.CylinderGeometry(
-    pinRadius * 1.15, pinRadius * 1.15,
-    spanWidth * 0.60, 16
+    pinRadius * 1.08, pinRadius * 1.08,  // Reduced from 1.15 for slimmer profile
+    spanWidth * 0.56, 18  // Reduced width, increased segments for smoothness
   );
   barrelGeo.rotateZ(Math.PI / 2);
   const hingePin = new THREE.Mesh(barrelGeo, materials.joint);
   hingePin.castShadow = true;
   group.add(hingePin);
 
-  // Axle pin (metallic, protrudes slightly past barrel)
+  // Refined axle pin - more delicate
   const axleGeo = new THREE.CylinderGeometry(
-    pinRadius * 0.70, pinRadius * 0.70,
-    spanWidth * 0.90, 12
+    pinRadius * 0.65, pinRadius * 0.65,  // Reduced from 0.70
+    spanWidth * 0.88, 14  // Increased segments
   );
   axleGeo.rotateZ(Math.PI / 2);
   const axleMesh = new THREE.Mesh(axleGeo, materials.metallic);
   group.add(axleMesh);
 
-  // Side pivot caps with dual-concentric detailing (chrome ring + titanium hub)
+  // Refined side pivot caps - more subtle and elegant
   for (const cSide of [-1, 1]) {
     const capGeo = new THREE.CylinderGeometry(
-      pinRadius * 1.30, pinRadius * 1.30,
-      0.0012, 16
+      pinRadius * 1.22, pinRadius * 1.22,  // Reduced from 1.30
+      0.0010, 18  // Thinner, more segments
     );
     capGeo.rotateZ(Math.PI / 2);
     const cap = new THREE.Mesh(capGeo, materials.metallic);
-    cap.position.set(cSide * spanWidth * 0.32, 0, 0);
+    cap.position.set(cSide * spanWidth * 0.30, 0, 0);  // Adjusted position
     cap.castShadow = true;
     group.add(cap);
     caps.push(cap);
 
-    // Inner dark titanium hub
+    // Refined inner hub - more subtle
     const hubGeo = new THREE.CylinderGeometry(
-      pinRadius * 0.75, pinRadius * 0.75,
-      0.0014, 12
+      pinRadius * 0.70, pinRadius * 0.70,  // Reduced from 0.75
+      0.0012, 14  // Thinner
     );
     hubGeo.rotateZ(Math.PI / 2);
     const hub = new THREE.Mesh(hubGeo, materials.joint);
-    hub.position.set(cSide * spanWidth * 0.32, 0, 0);
+    hub.position.set(cSide * spanWidth * 0.30, 0, 0);
     group.add(hub);
   }
 
@@ -243,55 +243,57 @@ function buildSegment(
   const group = new THREE.Group();
   group.name = name;
 
-  // Dark titanium bone core
+  // Dark titanium bone core with refined taper for elegant appearance
   const boneGeo = new THREE.CylinderGeometry(
-    radius * 0.48, radius * 0.42, length, 12
+    radius * 0.44,  // Refined: reduced from 0.48 for slimmer core
+    radius * 0.38,  // Refined: reduced from 0.42 for better taper
+    length, 14      // Increased segments for smoother appearance
   );
   const boneMesh = new THREE.Mesh(boneGeo, materials.joint);
   boneMesh.position.set(0, -length * 0.5, 0);
   boneMesh.castShadow = true;
   group.add(boneMesh);
 
-  // Bold proximal dark titanium joint collar ring
-  const collarH = Math.max(0.0028, length * 0.12);
-  const collarR = radius * 1.05;
+  // Refined joint collar rings - slimmer and more elegant
+  const collarH = Math.max(0.0024, length * 0.10);  // Reduced from 0.0028 and 0.12
+  const collarR = radius * 1.02;  // Reduced from 1.05 for subtler collar
   const proxCollarGeo = new THREE.CylinderGeometry(
-    collarR, collarR, collarH, 18
+    collarR, collarR, collarH, 20  // Increased segments for smoothness
   );
   const proxCollar = new THREE.Mesh(proxCollarGeo, materials.joint);
   proxCollar.position.set(0, -collarH * 0.5, 0);
   proxCollar.castShadow = true;
   group.add(proxCollar);
 
-  // Metallic trim ring on proximal collar
-  const proxTrimGeo = new THREE.TorusGeometry(collarR, 0.00035, 6, 18);
+  // Refined metallic trim ring
+  const proxTrimGeo = new THREE.TorusGeometry(collarR, 0.0003, 6, 20);  // Thinner trim
   proxTrimGeo.rotateX(Math.PI / 2);
   const proxTrim = new THREE.Mesh(proxTrimGeo, materials.metallic);
   proxTrim.position.set(0, -collarH * 0.5, 0);
   group.add(proxTrim);
 
-  // Distal dark titanium joint collar ring (on non-distal segments)
+  // Distal collar with refined proportions
   if (!isDistal) {
     const distCollarGeo = new THREE.CylinderGeometry(
-      collarR * 0.98, collarR * 0.98, collarH, 18
+      collarR * 0.96, collarR * 0.96, collarH, 20  // Slightly slimmer distal collar
     );
     const distCollar = new THREE.Mesh(distCollarGeo, materials.joint);
     distCollar.position.set(0, -length + collarH * 0.5, 0);
     distCollar.castShadow = true;
     group.add(distCollar);
 
-    const distTrimGeo = new THREE.TorusGeometry(collarR * 0.98, 0.00035, 6, 18);
+    const distTrimGeo = new THREE.TorusGeometry(collarR * 0.96, 0.0003, 6, 20);
     distTrimGeo.rotateX(Math.PI / 2);
     const distTrim = new THREE.Mesh(distTrimGeo, materials.metallic);
     distTrim.position.set(0, -length + collarH * 0.5, 0);
     group.add(distTrim);
   }
 
-  // White ceramic dorsal armor cowl (framed cleanly between proximal and distal collars)
-  const armorW = radius * 2.05;
-  const armorD = radius * 1.88;
-  const armorStartY = isDistal ? collarH * 0.85 : collarH * 0.92;
-  const armorLen = isDistal ? (length - armorStartY) : (length - collarH * 1.84);
+  // Refined armor cowl proportions for sleeker appearance
+  const armorW = radius * 1.98;  // Reduced from 2.05
+  const armorD = radius * 1.82;  // Reduced from 1.88
+  const armorStartY = isDistal ? collarH * 0.82 : collarH * 0.88;
+  const armorLen = isDistal ? (length - armorStartY) : (length - collarH * 1.76);
   const armorGeo = createPhalanxArmorGeo(armorW, armorLen, armorD, isDistal);
   const armorMesh = new THREE.Mesh(armorGeo, materials.armorDoubleSide);
   armorMesh.position.set(0, -armorStartY, 0);
@@ -299,11 +301,11 @@ function buildSegment(
   armorMesh.receiveShadow = true;
   group.add(armorMesh);
 
-  // Palmar friction pad
+  // Refined palmar pad - slimmer profile
   const padMesh = createPalmarPad(
-    armorW * 0.70, length * 0.70, 0.0020, materials
+    armorW * 0.65, length * 0.65, 0.0018, materials  // Reduced dimensions
   );
-  padMesh.position.set(0, -length * 0.50, -armorD * 0.28);
+  padMesh.position.set(0, -length * 0.50, -armorD * 0.30);
   group.add(padMesh);
 
   return { group, boneMesh, armorMesh, padMesh };

@@ -123,8 +123,9 @@ function createChestTransitionGeometry(side: -1 | 1): THREE.BufferGeometry {
   const ring1 = [];
   const ring2 = [];
   const ring3 = [];
+  const ring4 = [];
 
-  const collarR = 0.0460;
+  const collarR = 0.0488;
 
   for (let s = 0; s < SECTORS; s++) {
     const angle = (s / SECTORS) * Math.PI * 2;
@@ -142,24 +143,32 @@ function createChestTransitionGeometry(side: -1 | 1): THREE.BufferGeometry {
 
     ring2.push({
       x: side * 0.192,
-      y: Y_CENTER + collarR * 0.95 * sinA,
-      z: Z_CENTER + collarR * 0.95 * cosA,
+      y: Y_CENTER + collarR * 0.96 * sinA,
+      z: Z_CENTER + collarR * 0.96 * cosA,
     });
 
     ring3.push({
-      x: side * 0.198,
+      x: side * 0.196,
+      y: Y_CENTER + collarR * 0.99 * sinA,
+      z: Z_CENTER + collarR * 0.99 * cosA,
+    });
+
+    ring4.push({
+      x: side * 0.199,
       y: Y_CENTER + collarR * sinA,
       z: Z_CENTER + collarR * cosA,
     });
   }
 
-  // Connect top and upper clavicle arch (s = 2 to 11)
-  // Leaves the front and underside 100% open so the black mechanical joint and bearing are exposed!
-  for (let s = 2; s < 11; s++) {
+  // Connect upper clavicle arch and anterior/posterior wraps (s = 23 through 0 to 13: 210° arch)
+  // Leaves the lower underside 100% open so the black mechanical joint, bearing, and connector are exposed!
+  for (let idx = 0; idx < 14; idx++) {
+    const s = (23 + idx) % SECTORS;
     const next = (s + 1) % SECTORS;
     pushQuad(ring0[s], ring0[next], ring1[next], ring1[s]);
     pushQuad(ring1[s], ring1[next], ring2[next], ring2[s]);
     pushQuad(ring2[s], ring2[next], ring3[next], ring3[s]);
+    pushQuad(ring3[s], ring3[next], ring4[next], ring4[s]);
   }
 
   const geo = new THREE.BufferGeometry();
@@ -169,85 +178,174 @@ function createChestTransitionGeometry(side: -1 | 1): THREE.BufferGeometry {
 }
 
 /**
- * 1. Upper Shoulder Shell (The Sculpted Pauldron Hood / Mantle)
- * Arches cleanly over the circular joint, closely hugging the compact bearing.
- * Maintains a deliberate 3mm clearance above the bearing, leaving the side, front, and bottom EXPOSED!
+ * 1. Upper Shoulder Shell (Sculpted Compact Wrapped Shoulder Cowl - Region A)
+ * Transforms the former block-like rectangular cap into a compact wrapped protective shell:
+ * - Subtle arched convex crown across top eliminating the flat boxy ceiling (Requirement 3B)
+ * - Inboard edge reaches seamlessly to meet chest collar at X ≈ ±0.198 (Requirement 3C)
+ * - Wraps smoothly over circular joint rather than flaring out sharp wings (Requirement 3A, 3B)
+ * - Shallow contoured opening leaves dark joint housing, purple detail, and connector visibly exposed (Requirement 3D, 3E)
+ * - Outboard rim cleanly frames the recessed circular bearing with hard-surface beveling (Requirement 3F)
+ * - Subtle flank taper preserves compact futuristic humanoid silhouette (Requirement 3B)
+ */
+/**
+ * Mathematical surface point evaluator for the sculpted shoulder cowl.
+ * Evaluates position on the outer (layer 0) or inner (layer 1) surface.
+ */
+function evaluatePauldronPoint(
+  u: number, // 0 = anterior (front), 0.5 = apex (top), 1.0 = posterior (rear)
+  v: number, // 0 = inboard (chest), 1.0 = outboard (lateral ring)
+  layer: 0 | 1,
+  side: -1 | 1,
+  offset: number = 0
+): THREE.Vector3 {
+  // 1. Unified, elegant Section 3E lower clearance contour
+  // Gentle concave clearance rise across the joint (v = 0.25 to 0.85),
+  // framing the dark cylinder without any jagged teeth or awkward steps.
+  const vArch = Math.sin(v * Math.PI);
+  const clearanceAngle = Math.pow(vArch, 1.4) * 0.085 * Math.PI;
+
+  const startAngle = -0.045 * Math.PI + clearanceAngle;
+  const endAngle = 1.045 * Math.PI - clearanceAngle;
+  const angle = startAngle * (1 - u) + endAngle * u;
+
+  const sinA = Math.sin(angle);
+  const cosA = Math.cos(angle);
+
+  // 2. Base inner radius & solid ceramic armor thickness (4.8mm)
+  const rInner = 0.0485;
+  const armorThick = 0.0048;
+
+  // Hard-surface crest ridge crease along apex (u ≈ 0.5)
+  const crestSharpness = Math.max(0, 1.0 - Math.abs(u - 0.5) / 0.16);
+  const crestLift = Math.pow(crestSharpness, 1.5) * 0.0018;
+
+  // Longitudinal crown
+  const archCrown = 0.0012 * Math.sin(u * Math.PI);
+
+  let rOuter = rInner + armorThick + archCrown + crestLift;
+
+  // Sleek beveled return chamfer framing the outer rotational ring (v > 0.80)
+  if (v > 0.80) {
+    const tBevel = (v - 0.80) / 0.20;
+    rOuter -= Math.pow(tBevel, 1.5) * 0.0016;
+  }
+
+  // 3. Lateral span X
+  // Inboard: X = -0.0340 (world X = 0.2000, flush with chest collar)
+  // Outboard: X = +0.0190 CONSTANT across u (perfect planar circle rim framing rotational ring!)
+  const xInboard = -0.0340 + 0.0015 * Math.sin(u * Math.PI);
+  const xOutboard = 0.0190;
+  let xSpan = xInboard * (1 - v) + xOutboard * v;
+
+  const radius = (layer === 0 ? rOuter : rInner) + offset;
+  let y = radius * sinA;
+  let z = radius * cosA;
+  let x = side * xSpan;
+
+  // Outboard 45° beveled rim: inner layer steps slightly inboard (by 1.8mm)
+  if (v > 0.85 && layer === 1) {
+    const tRim = (v - 0.85) / 0.15;
+    x -= side * tRim * 0.0018;
+  }
+
+  return new THREE.Vector3(x, y, z);
+}
+
+/**
+ * Computes the local orthonormal tangent frame (position, outward normal, tangentU, tangentV, quaternion)
+ * at any (u, v) parameter coordinates on the pauldron surface.
+ */
+function getPauldronFrame(
+  u: number,
+  v: number,
+  side: -1 | 1,
+  offset: number = 0
+): { p: THREE.Vector3; n: THREE.Vector3; tangentU: THREE.Vector3; tangentV: THREE.Vector3; quat: THREE.Quaternion } {
+  const eps = 0.004;
+  const p = evaluatePauldronPoint(u, v, 0, side, offset);
+  const pU = evaluatePauldronPoint(Math.min(1.0, u + eps), v, 0, side, offset);
+  const pV = evaluatePauldronPoint(u, Math.min(1.0, v + eps), 0, side, offset);
+
+  const tU = new THREE.Vector3().subVectors(pU, p).normalize();
+  const tV = new THREE.Vector3().subVectors(pV, p).normalize();
+  const n = new THREE.Vector3().crossVectors(tV, tU).multiplyScalar(side).normalize();
+
+  const tangentU = new THREE.Vector3().crossVectors(n, tV).normalize();
+  const tangentV = new THREE.Vector3().crossVectors(tangentU, n).normalize();
+
+  const rotMat = new THREE.Matrix4().makeBasis(tangentV, n, tangentU);
+  const quat = new THREE.Quaternion().setFromRotationMatrix(rotMat);
+
+  return { p, n, tangentU, tangentV, quat };
+}
+
+/**
+ * Generates a curved ribbon strip following the pauldron surface.
+ * Used for precision recessed dark titanium panel seams.
+ */
+function createCurvedRibbon(
+  u0: number,
+  u1: number,
+  v0: number,
+  v1: number,
+  side: -1 | 1,
+  uSteps: number,
+  vSteps: number,
+  offset: number = 0.0004
+): THREE.BufferGeometry {
+  const positions: number[] = [];
+  const indices: number[] = [];
+
+  for (let iu = 0; iu <= uSteps; iu++) {
+    const u = u0 + (u1 - u0) * (iu / uSteps);
+    for (let iv = 0; iv <= vSteps; iv++) {
+      const v = v0 + (v1 - v0) * (iv / vSteps);
+      const pt = evaluatePauldronPoint(u, v, 0, side, offset);
+      positions.push(pt.x, pt.y, pt.z);
+    }
+  }
+
+  for (let iu = 0; iu < uSteps; iu++) {
+    for (let iv = 0; iv < vSteps; iv++) {
+      const a = iu * (vSteps + 1) + iv;
+      const b = a + 1;
+      const c = a + (vSteps + 1);
+      const d = c + 1;
+      if (side === 1) {
+        indices.push(a, b, c);
+        indices.push(b, d, c);
+      } else {
+        indices.push(a, c, b);
+        indices.push(b, c, d);
+      }
+    }
+  }
+
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * 1. Upper Shoulder Shell (Sculpted Compact Wrapped Shoulder Cowl - Region A)
+ * Continuous sculpted white ceramic pauldron cowl with hard-surface crest facets.
  */
 function createSculptedPauldronGeometry(side: -1 | 1): THREE.BufferGeometry {
-  const uSegs = 32; // along arch
-  const vSegs = 24; // across width
+  const uSegs = 36; // along arch (anterior front -> apex top -> posterior rear)
+  const vSegs = 28; // across width (inboard chest -> outboard lateral bearing)
   const positions: number[] = [];
   const uvs: number[] = [];
   const indices: number[] = [];
-
-  function evaluatePoint(layer: 0 | 1, iu: number, iv: number): THREE.Vector3 {
-    const u = iu / uSegs;
-    const v = iv / vSegs;
-
-    // Continuous wrap-around arch from anterior-inferior draping face (u=0) over apex (u=0.44) to posterior-inferior (u=1.0)
-    const angle = (-0.28 * (1 - u) + 1.25 * u) * Math.PI;
-    const sinA = Math.sin(angle);
-    const cosA = Math.cos(angle);
-
-    // Slimmed bearing outer radius is 0.0465m.
-    // rBase maintains a snug 1.5mm mechanical clearance around the actuator.
-    // rOuter provides a sleek 4.5mm - 6.0mm volumetric armor shell thickness.
-    const rBase = 0.0480 + 0.0015 * Math.sin(u * Math.PI);
-    const rOuter = rBase + 0.0045 + 0.0018 * Math.pow(Math.sin(u * Math.PI), 1.2);
-    const radius = layer === 0 ? rOuter : rBase;
-
-    // Centered lateral span:
-    // v = 0: inboard connects flush with chest collar seam at side * -0.024m
-    // v = 1: outboard frames the lateral bearing face at side * +0.012m (directly against the black plate)
-    const xSpan = -0.024 + v * 0.036;
-    let x = side * xSpan;
-
-    let y = radius * sinA;
-    let z = radius * cosA;
-
-    // Sculpted anterior-lateral downward winglet draping over the upper arm connector
-    // Prominently shown in reference image as an angled triangular chamfered facet
-    if (u < 0.32) {
-      const tAnt = Math.pow(1.0 - (u / 0.32), 0.85);
-      if (v > 0.35 && v <= 0.86) {
-        const tSlope = (v - 0.35) / 0.51;
-        y -= tAnt * (0.004 + tSlope * 0.018); // reaches lowest apex tip at v = 0.86 (Y ≈ -0.052)
-        z += tAnt * 0.003;
-      } else if (v > 0.86) {
-        // Sharp diagonal chamfer return up to meet the circular lateral black plate
-        const tRet = (v - 0.86) / 0.14;
-        y -= tAnt * (0.022 * (1.0 - tRet * 0.70));
-        z += tAnt * 0.003;
-      }
-    }
-
-    // Outboard rim smooth contour hugging the circular bearing
-    if (v > 0.70) {
-      const tRim = (v - 0.70) / 0.30;
-      if (u > 0.32 && u < 0.80) {
-        y -= tRim * 0.0020;
-      }
-    }
-
-    // Precision chamfered lower edge returns
-    if (u < 0.08) {
-      const tEdge = (0.08 - u) / 0.08;
-      z += tEdge * 0.0020;
-      y -= tEdge * 0.0015;
-    } else if (u > 0.92) {
-      const tEdge = (u - 0.92) / 0.08;
-      z -= tEdge * 0.0020;
-      y -= tEdge * 0.0015;
-    }
-
-    return new THREE.Vector3(x, y, z);
-  }
 
   // Generate outer (0) and inner (1) surfaces
   for (let layer = 0; layer <= 1; layer++) {
     for (let iu = 0; iu <= uSegs; iu++) {
       for (let iv = 0; iv <= vSegs; iv++) {
-        const p = evaluatePoint(layer as 0 | 1, iu, iv);
+        const u = iu / uSegs;
+        const v = iv / vSegs;
+        const p = evaluatePauldronPoint(u, v, layer as 0 | 1, side);
         positions.push(p.x, p.y, p.z);
         uvs.push(iv / vSegs, iu / uSegs);
       }
@@ -318,7 +416,7 @@ function createSculptedPauldronGeometry(side: -1 | 1): THREE.BufferGeometry {
       indices.push(oB, iB, iA);
     } else {
       indices.push(oA, iA, oB);
-      indices.push(oB, iA, iB);
+      indices.push(oB, iB, iA);
     }
   }
 
@@ -348,7 +446,7 @@ function createSculptedPauldronGeometry(side: -1 | 1): THREE.BufferGeometry {
       indices.push(oC, iA, iC);
     } else {
       indices.push(oA, oC, iA);
-      indices.push(oC, iC, iA);
+      indices.push(oC, iA, iC);
     }
   }
 
@@ -360,14 +458,84 @@ function createSculptedPauldronGeometry(side: -1 | 1): THREE.BufferGeometry {
   return geo;
 }
 
-function createUpperShoulderShell(
+/**
+ * Scribes fine, recessed dark titanium panel seams flush onto the armor surface.
+ * Free of clumsy separate boxes or tacky attachments.
+ */
+function createPauldronPanelSeams(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): THREE.Group {
   const group = new THREE.Group();
+  group.name = side === -1 ? 'LeftPauldronPanelSeams' : 'RightPauldronPanelSeams';
+
+  // 1. Anterior Transverse Panel Seam: sleek 1.2mm recessed dark titanium groove separating forward face
+  const antGeo = createCurvedRibbon(0.28, 0.295, 0.28, 0.96, side, 1, 16, 0.00035);
+  const antMesh = new THREE.Mesh(antGeo, materials.joint);
+  antMesh.name = 'PauldronSeam_AnteriorTransverse';
+  antMesh.castShadow = true;
+  group.add(antMesh);
+
+  // 2. Outboard Concentric Framing Seam: separates main cowl from perimeter bevel bezel
+  const circGeo = createCurvedRibbon(0.04, 0.96, 0.865, 0.880, side, 28, 1, 0.00035);
+  const circMesh = new THREE.Mesh(circGeo, materials.joint);
+  circMesh.name = 'PauldronSeam_OutboardFraming';
+  circMesh.castShadow = true;
+  group.add(circMesh);
+
+  // 3. Hairline Metallic Inlay inside the concentric reveal
+  const accentGeo = createCurvedRibbon(0.08, 0.92, 0.870, 0.875, side, 24, 1, 0.00045);
+  const accentMesh = new THREE.Mesh(accentGeo, materials.metallic);
+  accentMesh.name = 'PauldronSeam_MetallicAccentInlay';
+  group.add(accentMesh);
+
+  return group;
+}
+
+/**
+ * Creates dark titanium concentric sub-rim seal ring underneath the outboard armor edge,
+ * providing realistic mechanical depth behind the white ceramic casing.
+ */
+function createPauldronSubRim(
+  side: -1 | 1,
+  materials: RobotMaterialPalette
+): THREE.Group {
+  const group = new THREE.Group();
+  group.name = side === -1 ? 'LeftPauldronSubRim' : 'RightPauldronSubRim';
+
+  // Sub-rim reveal ribbon extending under the white armor edge to meet the rotational ring
+  const subRimGeo = createCurvedRibbon(0.03, 0.97, 0.94, 1.02, side, 28, 2, -0.0008);
+  const subRimMesh = new THREE.Mesh(subRimGeo, materials.joint);
+  subRimMesh.name = 'PauldronSubRim_TitaniumSeal';
+  subRimMesh.castShadow = true;
+  group.add(subRimMesh);
+
+  // Precision metallic labyrinth seal wire
+  const raceGeo = createCurvedRibbon(0.06, 0.94, 0.97, 0.995, side, 24, 1, -0.0003);
+  const raceMesh = new THREE.Mesh(raceGeo, materials.metallic);
+  raceMesh.name = 'PauldronSubRim_MetallicRace';
+  group.add(raceMesh);
+
+  return group;
+}
+
+/**
+ * Creates the complete refined Upper Shoulder Shell assembly:
+ * - Solid sculpted white ceramic pauldron cowl with hard-surface crest facet (Section 3F)
+ * - Section 3E contoured lower clearance arch wrapping cleanly over the joint
+ * - Precision dark titanium scribed panel seams (no bulky greebles)
+ * - Concentric dark titanium sub-rim dust seal framing the rotational ring
+ * - Pure horizontal alignment with the joint rotation axis
+ */
+function createUpperShoulderShell(
+  side: -1 | 1,
+  materials: RobotMaterialPalette,
+  _ledMeshes?: THREE.Mesh[]
+): THREE.Group {
+  const group = new THREE.Group();
   group.name = side === -1 ? 'LeftUpperShoulderShell' : 'RightUpperShoulderShell';
 
-  // 1. Continuous sculpted white ceramic pauldron
+  // 1. Continuous sculpted white ceramic pauldron cowl
   const geo = createSculptedPauldronGeometry(side);
   const mesh = new THREE.Mesh(geo, materials.armorDoubleSide);
   mesh.name = side === -1 ? 'LeftUpperShoulderHood' : 'RightUpperShoulderHood';
@@ -375,16 +543,17 @@ function createUpperShoulderShell(
   mesh.receiveShadow = true;
   group.add(mesh);
 
-  // 2. Dark Titanium Inner Cavity Lining (provides depth & shadow behind white armor)
-  const liningGeo = new THREE.CylinderGeometry(0.0465, 0.0465, 0.026, 28, 1, true, -0.10 * Math.PI, 1.20 * Math.PI);
-  liningGeo.rotateZ(Math.PI / 2);
-  const liningMesh = new THREE.Mesh(liningGeo, materials.jointDoubleSide);
-  liningMesh.position.set(side * 0.003, 0, 0);
-  liningMesh.castShadow = true;
-  group.add(liningMesh);
+  // 2. Precision dark titanium recessed panel seams
+  const panelSeams = createPauldronPanelSeams(side, materials);
+  group.add(panelSeams);
 
-  group.position.set(side * 0.222, Y_CENTER, Z_CENTER);
-  group.rotation.set(0.01, -side * 0.05, 0);
+  // 3. Dark titanium sub-rim dust seal reveal framing the rotational ring
+  const subRim = createPauldronSubRim(side, materials);
+  group.add(subRim);
+
+  // Concentric placement aligned with the rotational joint centerline
+  group.position.set(side * 0.234, Y_CENTER, Z_CENTER);
+  group.rotation.set(0, 0, 0);
 
   return group;
 }
@@ -394,130 +563,37 @@ function createUpperShoulderShell(
  */
 function createOuterShoulderShell(
   side: -1 | 1,
-  materials: RobotMaterialPalette
+  _materials: RobotMaterialPalette
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = side === -1 ? 'LeftOuterShoulderShell' : 'RightOuterShoulderShell';
-
-  // 1. Black Plate between white shell and rotational joint
-  // Sits directly along the lateral rim of the white pauldron, creating a crisp dark mechanical border
-  const plateShape = new THREE.Shape();
-  plateShape.absarc(0, 0, 0.0485, 0, Math.PI * 2, false);
-  const plateHole = new THREE.Path();
-  plateHole.absarc(0, 0, 0.0380, 0, Math.PI * 2, true);
-  plateShape.holes.push(plateHole);
-
-  const plateGeo = new THREE.ExtrudeGeometry(plateShape, {
-    depth: 0.005,
-    bevelEnabled: true,
-    bevelThickness: 0.0012,
-    bevelSize: 0.0010,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  plateGeo.center();
-  const plateMesh = new THREE.Mesh(plateGeo, materials.joint);
-  plateMesh.name = side === -1 ? 'LeftShoulderShellBlackPlate' : 'RightShoulderShellBlackPlate';
-  plateMesh.rotation.y = Math.PI / 2;
-  plateMesh.position.set(side * 0.015, 0, 0);
-  plateMesh.castShadow = true;
-  group.add(plateMesh);
-
-  // 2. Low-profile dark titanium backing collar that neatly seals the lateral joint aperture
-  const backingGeo = new THREE.TorusGeometry(0.0470, 0.0018, 8, 36, Math.PI * 0.75);
-  backingGeo.rotateZ(Math.PI * 0.15);
-  backingGeo.rotateY(Math.PI / 2);
-  const backingMesh = new THREE.Mesh(backingGeo, materials.joint);
-  backingMesh.position.set(side * 0.016, 0, 0);
-  backingMesh.castShadow = true;
-  group.add(backingMesh);
-
-  group.position.set(side * 0.222, Y_CENTER, Z_CENTER);
-  group.rotation.set(0.01, -side * 0.05, 0);
-
+  // Outer lateral trim is cleanly integrated directly into the sculpted pauldron bevel rim
   return group;
 }
 
 /**
- * 1C. Rear Shoulder Shell (Dorsal Protective Shroud)
+ * 1C. Rear Shoulder Shell (Internal structural rib)
  */
 function createRearShoulderShell(
   side: -1 | 1,
-  materials: RobotMaterialPalette
+  _materials: RobotMaterialPalette
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = side === -1 ? 'LeftRearShoulderShell' : 'RightRearShoulderShell';
-
-  const rearShape = new THREE.Shape();
-  rearShape.moveTo(-0.022, 0.036);
-  rearShape.lineTo(0.018, 0.028);
-  rearShape.lineTo(0.022, -0.024);
-  rearShape.lineTo(-0.018, -0.034);
-  rearShape.closePath();
-
-  const rearGeo = new THREE.ExtrudeGeometry(rearShape, {
-    depth: 0.016,
-    bevelEnabled: true,
-    bevelThickness: 0.0020,
-    bevelSize: 0.0016,
-    bevelSegments: 2,
-  });
-  rearGeo.center();
-
-  const mesh = new THREE.Mesh(rearGeo, materials.armorDoubleSide);
-  mesh.name = side === -1 ? 'LeftRearShoulderArmor' : 'RightRearShoulderArmor';
-  mesh.position.set(side * 0.216, Y_CENTER + 0.014, Z_CENTER - 0.044);
-  mesh.rotation.y = side * 0.28;
-  mesh.rotation.x = -0.12;
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-  group.add(mesh);
-
+  // Keep clean unobstructed view of mechanical joint from rear (Section 17 Back check)
   return group;
 }
 
 /**
- * 1D. Lower Shoulder Shell (White Ceramic Chassis Cradle)
+ * 1D. Lower Shoulder Bracket (Internal structural anchor)
  */
 function createLowerShoulderBracket(
   side: -1 | 1,
-  materials: RobotMaterialPalette
+  _materials: RobotMaterialPalette
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = side === -1 ? 'LeftLowerShoulderShell' : 'RightLowerShoulderShell';
-
-  // Sculpted White Ceramic Lower Cradle Shell
-  const cradleShape = new THREE.Shape();
-  cradleShape.moveTo(-0.018, 0.010);
-  cradleShape.lineTo(0.020, 0.010);
-  cradleShape.lineTo(0.016, -0.012);
-  cradleShape.lineTo(-0.014, -0.016);
-  cradleShape.closePath();
-
-  const cradleGeo = new THREE.ExtrudeGeometry(cradleShape, {
-    depth: 0.030,
-    bevelEnabled: true,
-    bevelThickness: 0.0018,
-    bevelSize: 0.0014,
-    bevelSegments: 2,
-  });
-  cradleGeo.center();
-
-  const cradle = new THREE.Mesh(cradleGeo, materials.joint);
-  cradle.name = side === -1 ? 'LeftLowerShoulderCradle' : 'RightLowerShoulderCradle';
-  cradle.position.set(side * 0.218, Y_CENTER - 0.040, Z_CENTER);
-  cradle.rotation.y = side * 0.15;
-  cradle.castShadow = true;
-  cradle.receiveShadow = true;
-  group.add(cradle);
-
-  // Dark Titanium Inner Structural Bracket inside cradle
-  const bracketGeo = new THREE.BoxGeometry(0.018, 0.012, 0.028);
-  const bracket = new THREE.Mesh(bracketGeo, materials.joint);
-  bracket.position.set(side * 0.216, Y_CENTER - 0.036, Z_CENTER);
-  bracket.castShadow = true;
-  group.add(bracket);
-
+  // Cleanly eliminated exterior cradle block to allow full visibility of layered connector
   return group;
 }
 
@@ -606,7 +682,7 @@ export function createChestShoulderExtension(
   const recessHousing = mountingFrame;
 
   // 3. Arched White Shoulder Pauldron Cowl (Mantle arching over joint)
-  const upperShoulderShell = createUpperShoulderShell(side, materials);
+  const upperShoulderShell = createUpperShoulderShell(side, materials, ledMeshes);
   whiteStructuralAssembly.add(upperShoulderShell);
 
   const innerCavityWalls = new THREE.Mesh(); // stub for interface compatibility

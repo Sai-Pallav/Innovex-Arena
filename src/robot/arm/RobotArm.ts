@@ -73,10 +73,8 @@ export function createRobotArm(
   // ==========================================================================
   const upperArm = createUpperArm(side, materials);
   // Natural relaxed resting posture:
-  // Upper arm rotates forward ~3.7° (-0.065 rad) relative to torso (subtle humanoid forward bias)
-  // Y-axis rotation: side * 0.010 rad (minimal twist, arms close to body)
-  // Lateral Z-axis: 0 rad (zero lateral splay, hanging naturally beside torso)
-  upperArm.group.rotation.set(-0.065, side * 0.010, 0);
+  // Upper arm hangs naturally and flush against the shoulder connector flange
+  upperArm.group.rotation.set(0, side * 0.005, 0);
   armRoot.add(upperArm.group);
   ledMeshes.push(...upperArm.ledMeshes);
 
@@ -127,7 +125,7 @@ export function createRobotArm(
   // 6. DEFAULT ATHLETIC RESTING POSTURE
   // Sets natural relaxed angles for immediate hero rendering
   // ==========================================================================
-  elbow.setAngle(-0.297); // ~ -17.0° natural flexion bend creating visible elbow articulation
+  elbow.setAngle(-0.52); // ~ -29.8° Euler creating ~18°–20° subtle natural visual elbow flexion
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {

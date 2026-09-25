@@ -66,9 +66,9 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
       proximalLength: 0.035,
       middleLength:   0.023,
       distalLength:   0.017,
-      proximalRadius: 0.0060,
-      middleRadius:   0.0052,
-      distalRadius:   0.0044,
+      proximalRadius: 0.0054,  // Refined: reduced from 0.0060 for slimmer appearance
+      middleRadius:   0.0047,  // Refined: reduced from 0.0052
+      distalRadius:   0.0040,  // Refined: reduced from 0.0044
     },
     {
       name: 'Middle',
@@ -78,9 +78,9 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
       proximalLength: 0.039,
       middleLength:   0.026,
       distalLength:   0.018,
-      proximalRadius: 0.0064,
-      middleRadius:   0.0055,
-      distalRadius:   0.0046,
+      proximalRadius: 0.0058,  // Refined: reduced from 0.0064
+      middleRadius:   0.0050,  // Refined: reduced from 0.0055
+      distalRadius:   0.0042,  // Refined: reduced from 0.0046
     },
     {
       name: 'Ring',
@@ -90,9 +90,9 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
       proximalLength: 0.036,
       middleLength:   0.024,
       distalLength:   0.017,
-      proximalRadius: 0.0060,
-      middleRadius:   0.0052,
-      distalRadius:   0.0044,
+      proximalRadius: 0.0054,  // Refined: reduced from 0.0060
+      middleRadius:   0.0047,  // Refined: reduced from 0.0052
+      distalRadius:   0.0040,  // Refined: reduced from 0.0044
     },
     {
       name: 'Little',
@@ -102,9 +102,9 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
       proximalLength: 0.028,
       middleLength:   0.019,
       distalLength:   0.014,
-      proximalRadius: 0.0053,
-      middleRadius:   0.0045,
-      distalRadius:   0.0039,
+      proximalRadius: 0.0048,  // Refined: reduced from 0.0053
+      middleRadius:   0.0041,  // Refined: reduced from 0.0045
+      distalRadius:   0.0036,  // Refined: reduced from 0.0039
     },
   ];
 }
@@ -234,8 +234,9 @@ export function createHand(
 
   // ════════════════════════════════════════════════════════════
   // 2. INTERNAL TITANIUM CHASSIS CORE & TRANSVERSE KNUCKLE BAR
+  //    Refined for more elegant proportions
   // ════════════════════════════════════════════════════════════
-  const palmGeo = new THREE.BoxGeometry(0.038, 0.032, 0.012);
+  const palmGeo = new THREE.BoxGeometry(0.036, 0.030, 0.011);  // Refined: slightly narrower and slimmer
   const palmChassis = new THREE.Mesh(palmGeo, materials.joint);
   palmChassis.name = 'PalmChassis';
   palmChassis.position.set(0, -0.020, -0.001);
@@ -243,19 +244,19 @@ export function createHand(
   palmChassis.receiveShadow = true;
   handGroup.add(palmChassis);
 
-  // Bold Transverse Knuckle Chassis Bar (forms the dark horizontal knuckle band)
-  const knuckleBarGeo = new THREE.BoxGeometry(0.048, 0.0060, 0.010);
+  // Refined Transverse Knuckle Chassis Bar - slimmer and more elegant
+  const knuckleBarGeo = new THREE.BoxGeometry(0.046, 0.0052, 0.009);  // Refined dimensions
   const knuckleBar = new THREE.Mesh(knuckleBarGeo, materials.joint);
   knuckleBar.name = 'TransverseKnuckleBar';
   knuckleBar.position.set(0, -0.0380, 0.0018);
   knuckleBar.castShadow = true;
   handGroup.add(knuckleBar);
 
-  // CNC weight-reduction pockets on palmar face
+  // Refined CNC weight-reduction pockets - smaller and more subtle
   for (let p = 0; p < 3; p++) {
-    const pockGeo = new THREE.BoxGeometry(0.009, 0.011, 0.003);
+    const pockGeo = new THREE.BoxGeometry(0.008, 0.010, 0.0028);  // Refined: smaller pockets
     const pock = new THREE.Mesh(pockGeo, materials.joint);
-    pock.position.set((p - 1) * 0.011, -0.020, -0.007);
+    pock.position.set((p - 1) * 0.010, -0.020, -0.0068);
     handGroup.add(pock);
   }
 
@@ -317,13 +318,13 @@ export function createHand(
 
   // ════════════════════════════════════════════════════════════
   // 4. METACARPOPHALANGEAL (MCP) KNUCKLE PINS
-  //    Distinct dark transverse hinge pins bridging each knuckle arch.
+  //    Refined for more elegant mechanical appearance
   // ════════════════════════════════════════════════════════════
   const fingerSpecs = getFingerSpecs(side);
 
   for (const spec of fingerSpecs) {
-    // Main knuckle barrel (dark titanium)
-    const kGeo = new THREE.CylinderGeometry(0.0040, 0.0040, 0.0096, 18);
+    // Refined main knuckle barrel - slimmer profile
+    const kGeo = new THREE.CylinderGeometry(0.0036, 0.0036, 0.0090, 20);  // Refined dimensions
     kGeo.rotateZ(Math.PI / 2);
     const knuckle = new THREE.Mesh(kGeo, materials.joint);
     knuckle.position.set(spec.spreadX, spec.offsetY + 0.0010, spec.offsetZ);
@@ -331,21 +332,21 @@ export function createHand(
     handGroup.add(knuckle);
     knuckles.push(knuckle);
 
-    // Precision metallic end caps on both sides
+    // Refined precision metallic end caps - more subtle
     for (const cSide of [-1, 1]) {
-      const capGeo = new THREE.CylinderGeometry(0.0048, 0.0048, 0.0009, 16);
+      const capGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.0008, 18);  // Refined
       capGeo.rotateZ(Math.PI / 2);
       const cap = new THREE.Mesh(capGeo, materials.metallic);
       cap.position.set(
-        spec.spreadX + cSide * 0.0052,
+        spec.spreadX + cSide * 0.0048,
         spec.offsetY + 0.0010,
         spec.offsetZ
       );
       handGroup.add(cap);
       knuckleCaps.push(cap);
 
-      // Inner titanium cap hub
-      const capHubGeo = new THREE.CylinderGeometry(0.0025, 0.0025, 0.0011, 12);
+      // Refined inner titanium cap hub
+      const capHubGeo = new THREE.CylinderGeometry(0.0023, 0.0023, 0.0010, 14);  // Refined
       capHubGeo.rotateZ(Math.PI / 2);
       const capHub = new THREE.Mesh(capHubGeo, materials.joint);
       capHub.position.copy(cap.position);
