@@ -103,7 +103,10 @@ function createLateralCowlGeometry(
   shape.moveTo(-halfW * 0.70, halfL);
   shape.lineTo(halfW * 0.70, halfL * 0.88);
   shape.quadraticCurveTo(halfW * 1.02, 0, halfW * 0.65, -halfL * 0.85);
-  shape.lineTo(-halfW * 0.70, -halfL);
+  shape.lineTo(halfW * 0.50, -halfL);
+  // Supracondylar relief arch — curves upward to cleanly frame the rotary condyle bearing
+  shape.quadraticCurveTo(0, -halfL + 0.012, -halfW * 0.50, -halfL);
+  shape.lineTo(-halfW * 0.65, -halfL * 0.85);
   shape.quadraticCurveTo(-halfW * 1.02, 0, -halfW * 0.70, halfL);
   shape.closePath();
 

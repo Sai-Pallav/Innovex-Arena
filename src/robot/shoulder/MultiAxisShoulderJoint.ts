@@ -564,421 +564,83 @@ function positionLinkBetweenPoints(
  * extending downward (-Y) as a heavy-duty load-bearing trunnion mount.
  */
 /**
- * Creates the refined layered mechanical connector between the shoulder joint and upper arm.
- * Adheres strictly to SURGICAL REFINEMENT 02 — CONNECTOR CONTINUITY:
- *   SHOULDER JOINT (pivot & bearing at Y = 0 to -0.0465)
- *          ↓
- *   SHORT BLACK STRUCTURAL NECK (Y = -0.020 to -0.0535, with lateral bearing saddle & front/rear trunnion webs)
- *          ↓
- *   BLACK/PURPLE MECHANICAL COLLAR (Y = -0.0535 to -0.0635)
- *          ↓
- *   UPPER-ARM MOUNT (Y = -0.0635 to -0.0775)
+ * Creates the shoulder socket receiver and mounting bridge on armMount.
+ * Provides a precision trunnion socket at (0, 0, 0) to Y = -0.018 that receives the
+ * rotating upper arm trunnion adapter with zero gap and continuous structural support.
  */
-function createShoulderToArmConnector(
+function createShoulderSocketReceiver(
   side: -1 | 1,
-  materials: RobotMaterialPalette,
-  ledMeshes: THREE.Mesh[]
+  materials: RobotMaterialPalette
 ): {
-  flangeGroup: THREE.Group;
-  flangeMesh: THREE.Mesh;
+  socketGroup: THREE.Group;
+  armMountingFlange: THREE.Mesh;
 } {
-  const flangeGroup = new THREE.Group();
-  flangeGroup.name = side === -1 ? 'LeftShoulderToArmConnector' : 'RightShoulderToArmConnector';
+  const socketGroup = new THREE.Group();
+  socketGroup.name = side === -1 ? 'LeftShoulderSocketReceiver' : 'RightShoulderSocketReceiver';
 
-  const inwardOffset = 0.012; // 12mm inward shift toward chest/torso
+  const bridgeOffset = side * 0.012; // 12mm bridge toward secondaryAxisPivot
 
-  // ==========================================================================
-  // SECTION 1: TRUNNION FORK & UPPER STRUCTURAL ANCHOR (Y = 0 to -0.024)
-  // Anchors solidly to the fixed shoulder axis pivot at X = +side * inwardOffset
-  // and fills the transition between the horizontal pivot and vertical neck.
-  // ==========================================================================
-  const yokeHubGeo = new THREE.CylinderGeometry(0.022, 0.022, 0.018, 32);
-  yokeHubGeo.rotateZ(Math.PI / 2);
-  const yokeHub = new THREE.Mesh(yokeHubGeo, materials.joint);
-  yokeHub.position.set(side * inwardOffset, 0, 0);
-  yokeHub.castShadow = true;
-  flangeGroup.add(yokeHub);
+  // 1. Structural bridge hub connecting from secondaryAxisPivot into the arm mount center
+  const bridgeHubGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.016, 32);
+  bridgeHubGeo.rotateZ(Math.PI / 2);
+  const bridgeHub = new THREE.Mesh(bridgeHubGeo, materials.joint);
+  bridgeHub.position.set(bridgeOffset * 0.5, 0, 0);
+  bridgeHub.castShadow = true;
+  socketGroup.add(bridgeHub);
 
-  const yokeRingGeo = new THREE.TorusGeometry(0.026, 0.0022, 8, 36);
-  yokeRingGeo.rotateY(Math.PI / 2);
-  const yokeRing = new THREE.Mesh(yokeRingGeo, materials.joint);
-  yokeRing.position.set(side * (inwardOffset + 0.006), 0, 0);
-  yokeRing.castShadow = true;
-  flangeGroup.add(yokeRing);
-
-  const axleBushingGeo = new THREE.TorusGeometry(0.020, 0.0012, 6, 28);
+  // Polished metallic axle ring on the bridge
+  const axleBushingGeo = new THREE.TorusGeometry(0.022, 0.0012, 6, 28);
   axleBushingGeo.rotateY(Math.PI / 2);
   const axleBushing = new THREE.Mesh(axleBushingGeo, materials.metallic);
-  axleBushing.position.set(side * (inwardOffset + 0.008), 0, 0);
-  flangeGroup.add(axleBushing);
+  axleBushing.position.set(bridgeOffset * 0.75, 0, 0);
+  socketGroup.add(axleBushing);
 
-  // Substantial structural transition block bridging from the pivot inward to the vertical neck load line.
-  // Depth matches the neck diameter (0.054m in Z) to eliminate see-through hollow gaps in front/rear.
-  const neckBridgeGeo = new THREE.BoxGeometry(0.032, 0.018, 0.054);
-  const neckBridge = new THREE.Mesh(neckBridgeGeo, materials.joint);
-  neckBridge.name = 'ConnectorNeckBridge';
-  neckBridge.position.set(side * (inwardOffset * 0.45), -0.016, 0);
-  neckBridge.castShadow = true;
-  neckBridge.receiveShadow = true;
-  flangeGroup.add(neckBridge);
+  // 2. Downward-facing hemispherical/cylindrical socket cup at (0, 0, 0)
+  // Receives the rotating trunnion boss of the upper arm adapter
+  const socketCupGeo = new THREE.CylinderGeometry(0.0275, 0.0275, 0.016, 32);
+  const socketCup = new THREE.Mesh(socketCupGeo, materials.joint);
+  socketCup.name = 'ShoulderSocketCup';
+  socketCup.position.set(0, -0.008, 0);
+  socketCup.castShadow = true;
+  socketGroup.add(socketCup);
 
-  // Front and rear contoured trunnion webs extending into the neck for load-bearing continuity
-  for (const zSign of [-1, 1]) {
-    const webGeo = new THREE.BoxGeometry(0.026, 0.018, 0.006);
-    const web = new THREE.Mesh(webGeo, materials.joint);
-    web.position.set(side * (inwardOffset * 0.45), -0.022, zSign * 0.027);
-    web.castShadow = true;
-    flangeGroup.add(web);
+  // Internal bore cavity
+  const boreGeo = new THREE.CylinderGeometry(0.0245, 0.0245, 0.014, 28);
+  const boreMesh = new THREE.Mesh(boreGeo, materials.joint);
+  boreMesh.position.set(0, -0.009, 0);
+  socketGroup.add(boreMesh);
 
-    const webDetailGeo = new THREE.BoxGeometry(0.018, 0.012, 0.0012);
-    const webDetail = new THREE.Mesh(webDetailGeo, materials.metallic);
-    webDetail.position.set(side * (inwardOffset * 0.45), -0.022, zSign * 0.0302);
-    flangeGroup.add(webDetail);
+  // 3. Socket terminal mounting rim & flange at Y = -0.016
+  const flangeGeo = new THREE.CylinderGeometry(0.0285, 0.0285, 0.0035, 32);
+  const armMountingFlange = new THREE.Mesh(flangeGeo, materials.joint);
+  armMountingFlange.name = 'ShoulderArmMountingFlange';
+  armMountingFlange.position.set(0, -0.016, 0);
+  armMountingFlange.castShadow = true;
+  socketGroup.add(armMountingFlange);
+
+  // Polished metallic retaining bezel ring
+  const bezelGeo = new THREE.TorusGeometry(0.0285, 0.0008, 6, 32);
+  bezelGeo.rotateX(Math.PI / 2);
+  const bezel = new THREE.Mesh(bezelGeo, materials.metallic);
+  bezel.position.set(0, -0.016, 0);
+  socketGroup.add(bezel);
+
+  // 8 radial fasteners on the socket rim
+  const socketBoltCount = 8;
+  const boltR = 0.0255;
+  for (let b = 0; b < socketBoltCount; b++) {
+    const angle = (b / socketBoltCount) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0016, 8);
+    const bolt = new THREE.Mesh(boltGeo, materials.metallic);
+    bolt.position.set(Math.sin(angle) * boltR, -0.016, Math.cos(angle) * boltR);
+    socketGroup.add(bolt);
   }
 
-  // ==========================================================================
-  // SECTION 2: SHORT BLACK STRUCTURAL NECK & LATERAL BEARING SADDLE (Y = -0.020 to -0.0535)
-  // Continuous load-bearing structural body connecting shoulder joint into collar.
-  // ==========================================================================
-  const neckRadius = 0.0340;
-  const neckHeight = 0.0335;
-  const neckY = -0.0370;
-
-  // 1. Primary cylindrical load-bearing neck
-  const neckGeo = new THREE.CylinderGeometry(neckRadius * 0.98, neckRadius, neckHeight, 36);
-  const structuralNeck = new THREE.Mesh(neckGeo, materials.joint);
-  structuralNeck.name = 'ConnectorStructuralNeck_Collar';
-  structuralNeck.position.set(0, neckY, 0);
-  structuralNeck.castShadow = true;
-  structuralNeck.receiveShadow = true;
-  flangeGroup.add(structuralNeck);
-
-  // 2. Lateral structural bearing saddle (occupies the transition pocket under the shoulder bearing housing)
-  // Extends from neck body (X ≈ side * 0.010) out to the outer lateral rim of collar & bearing (X ≈ side * 0.0355)
-  // Spans Y = -0.0325 down to -0.0535 flush with top of collar, completely eliminating see-through gap in side view.
-  const saddleWidth = 0.026;
-  const saddleHeight = 0.021;
-  const saddleDepth = 0.038;
-  const saddleGeo = new THREE.BoxGeometry(saddleWidth, saddleHeight, saddleDepth);
-  const saddle = new THREE.Mesh(saddleGeo, materials.joint);
-  saddle.name = 'ConnectorBearingSaddle';
-  saddle.position.set(side * 0.0225, -0.0430, 0);
-  saddle.castShadow = true;
-  saddle.receiveShadow = true;
-  flangeGroup.add(saddle);
-
-  // Lateral machined reinforcement rib on saddle
-  const saddleRibGeo = new THREE.BoxGeometry(0.0016, saddleHeight * 0.72, saddleDepth * 0.75);
-  const saddleRib = new THREE.Mesh(saddleRibGeo, materials.metallic);
-  saddleRib.position.set(side * (0.0225 + saddleWidth * 0.48), -0.0430, 0);
-  flangeGroup.add(saddleRib);
-
-  // Twin chrome alignment pins on lateral saddle face
-  for (const pZ of [-0.009, 0.009]) {
-    const pinGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0024, 8);
-    pinGeo.rotateZ(Math.PI / 2);
-    const pin = new THREE.Mesh(pinGeo, materials.metallic);
-    pin.position.set(side * (0.0225 + saddleWidth * 0.49), -0.0430, pZ);
-    flangeGroup.add(pin);
-  }
-
-  // Vertical machined structural ribs / cooling louvers around neck
-  const grooveCount = 14;
-  for (let g = 0; g < grooveCount; g++) {
-    const angle = (g / grooveCount) * Math.PI * 2;
-    // Skip grooves that would clip into the lateral saddle
-    const cosVal = Math.cos(angle);
-    const sinVal = Math.sin(angle);
-    if (side * sinVal > 0.45 && Math.abs(cosVal) < 0.70) continue;
-
-    const grooveGeo = new THREE.BoxGeometry(0.0015, neckHeight * 0.78, 0.0014);
-    const groove = new THREE.Mesh(grooveGeo, materials.jointDoubleSide);
-    groove.position.set(
-      sinVal * (neckRadius * 0.99),
-      neckY,
-      cosVal * (neckRadius * 0.99)
-    );
-    groove.rotation.y = angle;
-    flangeGroup.add(groove);
-  }
-
-  // Horizontal metallic reinforcement collar band
-  const bandGeo = new THREE.TorusGeometry(neckRadius * 0.99, 0.0008, 6, 36);
-  bandGeo.rotateX(Math.PI / 2);
-  const midBand = new THREE.Mesh(bandGeo, materials.metallic);
-  midBand.position.set(0, neckY, 0);
-  flangeGroup.add(midBand);
-
-  // Symmetrical hex socket cap fasteners
-  for (const zSign of [-1, 1]) {
-    for (const fX of [-0.009, 0.009]) {
-      const boltGeo = new THREE.CylinderGeometry(0.0009, 0.0009, 0.0018, 6);
-      boltGeo.rotateX(Math.PI / 2);
-      const bolt = new THREE.Mesh(boltGeo, materials.metallic);
-      bolt.position.set(fX, neckY + 0.007, zSign * (neckRadius * 0.99));
-      flangeGroup.add(bolt);
-    }
-  }
-
-  // ==========================================================================
-  // SECTION 3: REFINED MECHANICAL COLLAR (BLACK / PURPLE / BLACK) (Y = -0.0535 to -0.0635)
-  // Continuous turntable bearing collar: Top collar + purple LED halo + Bottom collar
-  // ==========================================================================
-  const bearingOuterR = 0.0360;
-  const bearingBoreR = 0.0210;
-
-  // LAYER 1 of Collar: Top Black Bearing Collar (Y = -0.0545, thickness 0.0028, top at -0.0531)
-  const topRingShape = new THREE.Shape();
-  topRingShape.absarc(0, 0, bearingOuterR, 0, Math.PI * 2, false);
-  const topRingHole = new THREE.Path();
-  topRingHole.absarc(0, 0, bearingBoreR, 0, Math.PI * 2, true);
-  topRingShape.holes.push(topRingHole);
-
-  const topRingGeo = new THREE.ExtrudeGeometry(topRingShape, {
-    depth: 0.0028,
-    bevelEnabled: true,
-    bevelThickness: 0.0006,
-    bevelSize: 0.0006,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  topRingGeo.center();
-
-  const topRing = new THREE.Mesh(topRingGeo, materials.joint);
-  topRing.name = 'RotatoryTopBlackCollar';
-  topRing.rotation.x = Math.PI / 2;
-  topRing.position.set(0, -0.0545, 0);
-  topRing.castShadow = true;
-  topRing.receiveShadow = true;
-  flangeGroup.add(topRing);
-
-  // Polished metallic top race rim
-  const topRimGeo = new THREE.TorusGeometry(bearingOuterR * 0.97, 0.0008, 8, 36);
-  topRimGeo.rotateX(Math.PI / 2);
-  const topRim = new THREE.Mesh(topRimGeo, materials.metallic);
-  topRim.position.set(0, -0.0531, 0);
-  flangeGroup.add(topRim);
-
-  // 16 Micro-machined radial calibration notches
-  for (let n = 0; n < 16; n++) {
-    const nAngle = (n / 16) * Math.PI * 2;
-    const notchGeo = new THREE.BoxGeometry(0.0009, 0.0005, 0.0024);
-    const notch = new THREE.Mesh(notchGeo, materials.joint);
-    notch.position.set(
-      Math.sin(nAngle) * (bearingOuterR * 0.93),
-      -0.0531,
-      Math.cos(nAngle) * (bearingOuterR * 0.93)
-    );
-    notch.rotation.y = nAngle;
-    flangeGroup.add(notch);
-  }
-
-  // LAYER 2 of Collar: Vibrant Purple LED Accent Ring (Y = -0.0580)
-  const purpleBandGeo = new THREE.TorusGeometry(bearingOuterR * 0.99, 0.0015, 12, 48);
-  purpleBandGeo.rotateX(Math.PI / 2);
-  const purpleBandMesh = new THREE.Mesh(purpleBandGeo, materials.purpleEmissive);
-  purpleBandMesh.name = side === -1 ? 'ConnectorRotatoryPurpleLed_L' : 'ConnectorRotatoryPurpleLed_R';
-  purpleBandMesh.position.set(0, -0.0580, 0);
-  flangeGroup.add(purpleBandMesh);
-  ledMeshes.push(purpleBandMesh);
-
-  const purpleBandBloom = new THREE.Mesh(
-    new THREE.TorusGeometry(bearingOuterR * 0.99, 0.0026, 10, 48).rotateX(Math.PI / 2),
-    materials.purpleBloom
-  );
-  purpleBandBloom.position.copy(purpleBandMesh.position);
-  flangeGroup.add(purpleBandBloom);
-
-  // Internal bearing raceway
-  const internalRaceGeo = new THREE.CylinderGeometry(bearingOuterR * 0.94, bearingOuterR * 0.94, 0.0044, 32);
-  const internalRace = new THREE.Mesh(internalRaceGeo, materials.joint);
-  internalRace.position.set(0, -0.0580, 0);
-  flangeGroup.add(internalRace);
-
-  const metallicRaceTrackGeo = new THREE.TorusGeometry(bearingOuterR * 0.95, 0.0006, 6, 36);
-  metallicRaceTrackGeo.rotateX(Math.PI / 2);
-  const metallicRaceTrack = new THREE.Mesh(metallicRaceTrackGeo, materials.metallic);
-  metallicRaceTrack.position.set(0, -0.0580, 0);
-  flangeGroup.add(metallicRaceTrack);
-
-  // Symmetrical front & rear index clamps
-  for (const zDir of [1, -1]) {
-    const clampWidth = 0.0062;
-    const clampHeight = 0.0050;
-    const clampDepth = 0.0024;
-
-    const clampGeo = new THREE.BoxGeometry(clampWidth, clampHeight, clampDepth);
-    const indexClamp = new THREE.Mesh(clampGeo, materials.joint);
-    indexClamp.position.set(0, -0.0580, zDir * (bearingOuterR * 0.985));
-    indexClamp.castShadow = true;
-    flangeGroup.add(indexClamp);
-
-    const clampFaceGeo = new THREE.BoxGeometry(clampWidth * 0.88, clampHeight * 0.86, 0.0005);
-    const clampFace = new THREE.Mesh(clampFaceGeo, materials.metallic);
-    clampFace.position.set(0, -0.0580, zDir * (bearingOuterR * 0.985 + clampDepth * 0.48));
-    flangeGroup.add(clampFace);
-
-    const pinGeo = new THREE.CylinderGeometry(0.0006, 0.0006, 0.0014, 8);
-    pinGeo.rotateX(Math.PI / 2);
-    const pin = new THREE.Mesh(pinGeo, materials.metallic);
-    pin.position.set(0, -0.0580, zDir * (bearingOuterR * 0.985 + clampDepth * 0.50));
-    flangeGroup.add(pin);
-  }
-
-  // LAYER 3 of Collar: Bottom Black Bearing Collar (Y = -0.0615, thickness 0.0028, bottom at -0.0629)
-  const botRingGeo = new THREE.ExtrudeGeometry(topRingShape, {
-    depth: 0.0028,
-    bevelEnabled: true,
-    bevelThickness: 0.0006,
-    bevelSize: 0.0006,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  botRingGeo.center();
-
-  const botRing = new THREE.Mesh(botRingGeo, materials.joint);
-  botRing.name = 'RotatoryBottomBlackCollar';
-  botRing.rotation.x = Math.PI / 2;
-  botRing.position.set(0, -0.0615, 0);
-  botRing.castShadow = true;
-  botRing.receiveShadow = true;
-  flangeGroup.add(botRing);
-
-  // Polished metallic bottom race rim
-  const botRimGeo = new THREE.TorusGeometry(bearingOuterR * 0.97, 0.0008, 8, 36);
-  botRimGeo.rotateX(Math.PI / 2);
-  const botRim = new THREE.Mesh(botRimGeo, materials.metallic);
-  botRim.position.set(0, -0.0629, 0);
-  flangeGroup.add(botRim);
-
-  // ==========================================================================
-  // SECTION 4: STRUCTURAL ARM MOUNT & UPPER ARM DOCK (Y = -0.0630 to -0.0775)
-  // Continuous 3D dark mounting interface; upper arm visibly originates from it
-  // ==========================================================================
-  const mountR = 0.0355;
-
-  // 1. Upper Mount Transition Plate (Y = -0.0645, thickness 0.0026, top face at -0.0632 flush to botRing)
-  const mountPlateShape = new THREE.Shape();
-  mountPlateShape.absarc(0, 0, mountR, 0, Math.PI * 2, false);
-  const mountPlateHole = new THREE.Path();
-  mountPlateHole.absarc(0, 0, bearingBoreR, 0, Math.PI * 2, true);
-  mountPlateShape.holes.push(mountPlateHole);
-
-  const mountPlateGeo = new THREE.ExtrudeGeometry(mountPlateShape, {
-    depth: 0.0026,
-    bevelEnabled: true,
-    bevelThickness: 0.0006,
-    bevelSize: 0.0006,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  mountPlateGeo.center();
-
-  const mountPlate = new THREE.Mesh(mountPlateGeo, materials.joint);
-  mountPlate.name = 'ArmMountPlate';
-  mountPlate.rotation.x = Math.PI / 2;
-  mountPlate.position.set(0, -0.0645, 0);
-  mountPlate.castShadow = true;
-  mountPlate.receiveShadow = true;
-  flangeGroup.add(mountPlate);
-
-  // 2. Bilateral Structural Mounting Struts / Lugs
-  for (const sX of [-1, 1]) {
-    const lugWidth = 0.0068;
-    const lugHeight = 0.0100;
-    const lugDepth = 0.0240;
-
-    const lugGeo = new THREE.BoxGeometry(lugWidth, lugHeight, lugDepth);
-    const lug = new THREE.Mesh(lugGeo, materials.joint);
-    lug.name = sX < 0 ? 'ArmMountStructuralLug_L' : 'ArmMountStructuralLug_R';
-    lug.position.set(sX * 0.0245, -0.0700, 0);
-    lug.castShadow = true;
-    lug.receiveShadow = true;
-    flangeGroup.add(lug);
-
-    // Lateral flute detail
-    const fluteGeo = new THREE.BoxGeometry(0.0010, lugHeight * 0.70, lugDepth * 0.65);
-    const flute = new THREE.Mesh(fluteGeo, materials.metallic);
-    flute.position.set(sX * (0.0245 + lugWidth * 0.48), -0.0700, 0);
-    flangeGroup.add(flute);
-
-    // Chrome cross-pins
-    for (const pZ of [-0.007, 0.007]) {
-      const pinGeo = new THREE.CylinderGeometry(0.0008, 0.0008, lugWidth * 1.25, 8);
-      pinGeo.rotateZ(Math.PI / 2);
-      const pin = new THREE.Mesh(pinGeo, materials.metallic);
-      pin.position.set(sX * 0.0245, -0.0700, pZ);
-      flangeGroup.add(pin);
-    }
-  }
-
-  // Central cylindrical core column of the mount (seamlessly spans Y = -0.0655 to -0.0750)
-  const mountCoreGeo = new THREE.CylinderGeometry(0.0270, 0.0285, 0.0110, 32);
-  const mountCore = new THREE.Mesh(mountCoreGeo, materials.joint);
-  mountCore.position.set(0, -0.0700, 0);
-  mountCore.castShadow = true;
-  flangeGroup.add(mountCore);
-
-  // 12 Hex Socket Cap Screws around perimeter mating collar
-  const boltCount = 12;
-  const boltPitchR = 0.0285;
-  for (let b = 0; b < boltCount; b++) {
-    const angle = (b / boltCount) * Math.PI * 2;
-    const socketGeo = new THREE.CylinderGeometry(0.0009, 0.0009, 0.0020, 8);
-    const socket = new THREE.Mesh(socketGeo, materials.metallic);
-    socket.position.set(
-      Math.sin(angle) * boltPitchR,
-      -0.0690,
-      Math.cos(angle) * boltPitchR
-    );
-    flangeGroup.add(socket);
-  }
-
-  // 3. Lower Docking Interface Flange receiving Upper Arm at Y = -0.076 to -0.0775
-  const dockPlateR = 0.0382;
-  const dockPlateShape = new THREE.Shape();
-  dockPlateShape.absarc(0, 0, dockPlateR, 0, Math.PI * 2, false);
-  const dockPlateHole = new THREE.Path();
-  dockPlateHole.absarc(0, 0, bearingBoreR, 0, Math.PI * 2, true);
-  dockPlateShape.holes.push(dockPlateHole);
-
-  const dockPlateGeo = new THREE.ExtrudeGeometry(dockPlateShape, {
-    depth: 0.0028,
-    bevelEnabled: true,
-    bevelThickness: 0.0006,
-    bevelSize: 0.0006,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  dockPlateGeo.center();
-
-  const flangeMesh = new THREE.Mesh(dockPlateGeo, materials.joint);
-  flangeMesh.name = side === -1 ? 'ArmMountingFlange_L' : 'ArmMountingFlange_R';
-  flangeMesh.rotation.x = Math.PI / 2;
-  flangeMesh.position.set(0, -0.0760, 0);
-  flangeMesh.castShadow = true;
-  flangeMesh.receiveShadow = true;
-  flangeGroup.add(flangeMesh);
-
-  // Polished Metallic Interface Gasket Rim at Y = -0.0775
-  const bottomRimGeo = new THREE.TorusGeometry(dockPlateR * 0.97, 0.0008, 6, 36);
-  bottomRimGeo.rotateX(Math.PI / 2);
-  const bottomRim = new THREE.Mesh(bottomRimGeo, materials.metallic);
-  bottomRim.position.set(0, -0.0775, 0);
-  flangeGroup.add(bottomRim);
-
-  // Hollow Central Load-Bearing Sleeve extending down into humerus core
-  const sleeveLen = 0.020;
-  const sleeveGeo = new THREE.CylinderGeometry(bearingBoreR * 0.96, bearingBoreR * 0.92, sleeveLen, 28, 1, true);
-  const sleeveMesh = new THREE.Mesh(sleeveGeo, materials.joint);
-  sleeveMesh.position.set(0, -0.086, 0);
-  flangeGroup.add(sleeveMesh);
-
-  return {
-    flangeGroup,
-    flangeMesh,
-  };
+  return { socketGroup, armMountingFlange };
 }
+
+
+
 
 /**
  * Creates the complete Part 4 Multi-Axis Shoulder Joint / Bearing Assembly.
@@ -1062,8 +724,8 @@ export function createMultiAxisShoulderJoint(
   armMount.position.set(-side * 0.012, 0, 0);
   secondaryAxisPivot.add(armMount);
 
-  const { flangeGroup, flangeMesh: armMountingFlange } = createShoulderToArmConnector(side, materials, ledMeshes);
-  armMount.add(flangeGroup);
+  const { socketGroup, armMountingFlange } = createShoulderSocketReceiver(side, materials);
+  armMount.add(socketGroup);
 
   return {
     foundation,

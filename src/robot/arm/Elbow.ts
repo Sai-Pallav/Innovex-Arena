@@ -22,21 +22,21 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ELBOW_CONFIG = {
-  hingeRadius:      0.0320,   // transverse hinge core outer radius (64 mm dia)
-  hingeWidth:       0.0660,   // total axle span along X (66 mm matching upper arm distal cuff)
-  discOuterRadius:  0.0350,   // circular actuator disc outer bezel radius (70 mm outer dia)
-  discThickness:    0.0062,   // actuator side cover thickness
-  emissiveRingR:    0.0268,   // purple accent ring radius
-  emissiveRingTube: 0.0022,   // accent ring tube thickness
-  hubCapRadius:     0.0135,   // machined hub cap radius
-  axleRadius:       0.0105,   // central axle pin radius
-  axleLength:       0.0700,   // axle pin total length
+  hingeRadius:      0.0285,   // transverse hinge core outer radius (57.0 mm dia, clean flush transition)
+  hingeWidth:       0.0540,   // total axle span along X (54.0 mm, cleanly nested within cuff borders)
+  discOuterRadius:  0.0310,   // circular actuator disc outer bezel radius (62.0 mm outer dia, compact and flush)
+  discThickness:    0.0048,   // actuator side cover thickness
+  emissiveRingR:    0.0235,   // signature purple accent ring radius (47.0 mm dia)
+  emissiveRingTube: 0.0018,   // accent ring tube thickness
+  hubCapRadius:     0.0115,   // machined hub cap radius
+  axleRadius:       0.0088,   // central axle pin radius
+  axleLength:       0.0560,   // axle pin total length
 
   // Angular limits (radians) — rotation.x on forearmPivot
   neutralAngle:  0.00,
   minBend:       0.08,        // slight hyperextension guard
   maxBend:      -2.18,        // ≈ 125 ° maximum anatomical flexion
-  restingBend:  -0.52,        // natural subtle relaxed posture (~18°–20° visual flexion spec)
+  restingBend:  -0.36,        // natural subtle relaxed posture (~14° visual flexion)
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -111,10 +111,10 @@ function createActuatorDisc(
   outerBezel.name = `${prefix}_OuterBezel`;
   group.add(outerBezel);
 
-  // Retaining rim torus
+  // Retaining rim torus — compact, crisp machined bezel rim
   const bezelRimGeo = new THREE.TorusGeometry(
     ELBOW_CONFIG.discOuterRadius - 0.0014,
-    0.0028, 10, 40
+    0.0016, 10, 40
   );
   bezelRimGeo.rotateY(Math.PI / 2);
   const bezelRim = new THREE.Mesh(bezelRimGeo, materials.joint);
@@ -297,7 +297,7 @@ export function createElbow(
   elbowRoot.add(upperHousing);
 
   // Upper mounting block — interfaces with upper arm spar
-  const upperConnectorGeo = new THREE.BoxGeometry(0.036, 0.024, 0.032);
+  const upperConnectorGeo = new THREE.BoxGeometry(0.030, 0.022, 0.028);
   const upperConnector = new THREE.Mesh(upperConnectorGeo, materials.joint);
   upperConnector.name = 'ElbowUpperConnector';
   upperConnector.position.set(0, 0.020, 0);
@@ -305,22 +305,16 @@ export function createElbow(
   upperConnector.receiveShadow = true;
   upperHousing.add(upperConnector);
 
-  // Upper collar socket flange (mates with UpperArm elbowSocketCuff)
-  const upperCollarGeo = new THREE.CylinderGeometry(0.0305, 0.0325, 0.012, 28);
+  // Upper collar socket flange (mates flush with UpperArm elbowSocketCuff)
+  const upperCollarGeo = new THREE.CylinderGeometry(0.0305, 0.0318, 0.009, 32);
   const upperCollar = new THREE.Mesh(upperCollarGeo, materials.joint);
-  upperCollar.position.set(0, 0.026, 0);
+  upperCollar.position.set(0, 0.0225, 0);
   upperCollar.castShadow = true;
   upperHousing.add(upperCollar);
 
-  const upperCollarRingGeo = new THREE.TorusGeometry(0.0310, 0.0012, 6, 28);
-  upperCollarRingGeo.rotateX(Math.PI / 2);
-  const upperCollarRing = new THREE.Mesh(upperCollarRingGeo, materials.metallic);
-  upperCollarRing.position.set(0, 0.031, 0);
-  upperHousing.add(upperCollarRing);
-
   // ── CNC Structural Side Mounting Plates (Level 2 Medium Structure) ────────
   // Monolithic load-bearing plates with lightening pockets and linkage attachment lugs
-  const forkWidth = 0.0085;
+  const forkWidth = 0.0080;
   const forkSpan = ELBOW_CONFIG.hingeWidth * 0.5 - forkWidth * 0.5;
 
   for (const fSide of [-1, 1]) {
@@ -376,16 +370,37 @@ export function createElbow(
     upperHousing.add(forkGroup);
   }
 
-  // Clevis Structural Bridge Bracket (flush cross-member connecting side plates)
-  const upperElbowGuardGeo = new THREE.BoxGeometry(
-    ELBOW_CONFIG.hingeWidth * 0.66, 0.010, 0.020
+  // Monolithic Anterior Clevis Shield & Transverse Cowl
+  // Fully encloses the front quadrant above the hinge barrel, eliminating the open see-through gap
+  const anteriorShieldGeo = new THREE.BoxGeometry(
+    ELBOW_CONFIG.hingeWidth * 0.68,
+    0.016,
+    0.020
   );
-  const upperElbowGuard = new THREE.Mesh(upperElbowGuardGeo, materials.joint);
-  upperElbowGuard.name = 'UpperElbowClevisBridge';
-  upperElbowGuard.position.set(0, 0.016, 0.003);
+  const upperElbowGuard = new THREE.Mesh(anteriorShieldGeo, materials.joint);
+  upperElbowGuard.name = 'ElbowAnteriorClevisShield';
+  upperElbowGuard.position.set(0, 0.017, 0.015);
   upperElbowGuard.castShadow = true;
   upperElbowGuard.receiveShadow = true;
   upperHousing.add(upperElbowGuard);
+
+  // Precision-machined metallic front accent plate with dual hex fasteners
+  const shieldFaceGeo = new THREE.BoxGeometry(
+    ELBOW_CONFIG.hingeWidth * 0.54,
+    0.010,
+    0.0012
+  );
+  const shieldFace = new THREE.Mesh(shieldFaceGeo, materials.metallic);
+  shieldFace.position.set(0, 0.017, 0.0252);
+  upperHousing.add(shieldFace);
+
+  for (const bX of [-0.011, 0.011]) {
+    const boltGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0016, 8);
+    boltGeo.rotateX(Math.PI / 2);
+    const bolt = new THREE.Mesh(boltGeo, materials.metallic);
+    bolt.position.set(bX, 0.017, 0.0260);
+    upperHousing.add(bolt);
+  }
 
   // ════════════════════════════════════════════════════════════
   // 2. DOMINANT CENTRAL TRANSVERSE HINGE BARREL (Level 1 Dominant Feature)
@@ -408,18 +423,6 @@ export function createElbow(
   mainHingeBarrel.castShadow = true;
   mainHingeBarrel.receiveShadow = true;
   hingeCore.add(mainHingeBarrel);
-
-  // Dual precision-machined metallic bearing tracks on barrel
-  for (const bSide of [-1, 1]) {
-    const trackGeo = new THREE.TorusGeometry(
-      ELBOW_CONFIG.hingeRadius * 0.902,
-      0.0012, 8, 36
-    );
-    trackGeo.rotateY(Math.PI / 2);
-    const trackMesh = new THREE.Mesh(trackGeo, materials.metallic);
-    trackMesh.position.set(bSide * (barrelSpan * 0.38), 0, 0);
-    hingeCore.add(trackMesh);
-  }
 
   // ════════════════════════════════════════════════════════════
   // 3. CENTRAL TRANSVERSE AXLE PIN ASSEMBLY
@@ -546,27 +549,21 @@ export function createElbow(
   lowerHousing.add(knuckleMesh);
 
   // Lower mounting stem dropping toward forearm proximal collar
-  const stemGeo = new THREE.BoxGeometry(ELBOW_CONFIG.hingeWidth * 0.44, 0.020, 0.028);
+  const stemGeo = new THREE.BoxGeometry(ELBOW_CONFIG.hingeWidth * 0.44, 0.018, 0.026);
   const stemMesh = new THREE.Mesh(stemGeo, materials.joint);
   stemMesh.position.set(0, -0.008, 0);
   stemMesh.castShadow = true;
   lowerHousing.add(stemMesh);
 
   // Lower docking collar — interfaces flush with Forearm.ts proximal collar
-  const lowCollarGeo = new THREE.CylinderGeometry(0.0305, 0.0325, 0.010, 28);
+  const lowCollarGeo = new THREE.CylinderGeometry(0.0300, 0.0326, 0.012, 28);
   const lowCollar = new THREE.Mesh(lowCollarGeo, materials.joint);
   lowCollar.position.set(0, -0.014, 0);
   lowCollar.castShadow = true;
   lowerHousing.add(lowCollar);
 
-  const lowCollarRingGeo = new THREE.TorusGeometry(0.0310, 0.0012, 6, 28);
-  lowCollarRingGeo.rotateX(Math.PI / 2);
-  const lowCollarRing = new THREE.Mesh(lowCollarRingGeo, materials.metallic);
-  lowCollarRing.position.set(0, -0.010, 0);
-  lowerHousing.add(lowCollarRing);
-
   // ── Olecranon Armor Shield ─────────────────────────────────────────────────
-  // Posterior protector — the "elbow tip" form, cleanly protecting the flexion gap.
+  // Posterior protector — the "elbow tip" form, dark titanium structural knuckle.
   const olecWidth = ELBOW_CONFIG.hingeWidth * 0.58;
   const olecGeo = new THREE.CylinderGeometry(
     ELBOW_CONFIG.hingeRadius * 0.74,
@@ -575,7 +572,7 @@ export function createElbow(
     Math.PI * 0.15, Math.PI * 0.70
   );
   olecGeo.rotateZ(Math.PI / 2);
-  const olecranonMesh = new THREE.Mesh(olecGeo, materials.armorDoubleSide);
+  const olecranonMesh = new THREE.Mesh(olecGeo, materials.joint);
   olecranonMesh.name = 'ElbowOlecranonArmor';
   olecranonMesh.position.set(0, -0.003, -ELBOW_CONFIG.hingeRadius * 0.84);
   olecranonMesh.rotation.x = -0.16;

@@ -42,6 +42,8 @@ export function createArmAssembly(
   rightUpperArm: THREE.Group;
   leftForearm: THREE.Group;
   rightForearm: THREE.Group;
+  leftWrist: THREE.Group;
+  rightWrist: THREE.Group;
   leftHand: THREE.Group;
   rightHand: THREE.Group;
 } {
@@ -89,8 +91,10 @@ export function createArmAssembly(
     rightUpperArm: rightArm.upperArm.group,
     leftForearm: leftArm.elbow.forearmPivot,
     rightForearm: rightArm.elbow.forearmPivot,
-    leftHand: leftArm.hand.group,
-    rightHand: rightArm.hand.group,
+    leftWrist: leftArm.wrist.group,
+    rightWrist: rightArm.wrist.group,
+    leftHand: leftArm.hand?.group ?? leftArm.wrist.group,
+    rightHand: rightArm.hand?.group ?? rightArm.wrist.group,
   };
 }
 
@@ -152,9 +156,7 @@ export function createArmAssembly(
  * - Elbow.ts         → createElbow()
  * - Forearm.ts       → createForearm()
  * - Wrist.ts         → createWrist()
- * - Hand.ts          → createHand()
- * - Finger.ts        → createFinger()
- * - RobotArm.ts      → createRobotArm() (assembles all above)
+ * - RobotArm.ts      → createRobotArm() (assembles shoulder to wrist interface)
  * 
  * ANIMATION CONTROLLERS:
  * - ArmAnimationController.ts

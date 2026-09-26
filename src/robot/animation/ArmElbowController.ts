@@ -9,6 +9,8 @@ interface ActiveArmState {
   rightUpperPitch: number;
   leftUpperRoll: number;
   rightUpperRoll: number;
+  leftElbowRoll: number;
+  rightElbowRoll: number;
 }
 
 export class ArmElbowController {
@@ -29,6 +31,8 @@ export class ArmElbowController {
   private smoothedRightUpperPitch: number;
   private smoothedLeftUpperRoll: number;
   private smoothedRightUpperRoll: number;
+  private smoothedLeftElbowRoll: number;
+  private smoothedRightElbowRoll: number;
 
   // Wrist stabilization states
   private leftWristPitch: number = 0;
@@ -47,6 +51,8 @@ export class ArmElbowController {
       rightUpperPitch: pA.rightUpperPitch,
       leftUpperRoll: pA.leftUpperRoll,
       rightUpperRoll: pA.rightUpperRoll,
+      leftElbowRoll: pA.leftElbowRoll,
+      rightElbowRoll: pA.rightElbowRoll,
     };
     this.startPoseState = { ...this.currentPoseState };
 
@@ -56,6 +62,8 @@ export class ArmElbowController {
     this.smoothedRightUpperPitch = pA.rightUpperPitch;
     this.smoothedLeftUpperRoll = pA.leftUpperRoll;
     this.smoothedRightUpperRoll = pA.rightUpperRoll;
+    this.smoothedLeftElbowRoll = pA.leftElbowRoll;
+    this.smoothedRightElbowRoll = pA.rightElbowRoll;
 
     this.scheduleNextTransition();
   }
@@ -128,23 +136,28 @@ export class ArmElbowController {
         this.currentPoseState.rightUpperRoll =
           this.startPoseState.rightUpperRoll +
           (targetPose.rightUpperRoll - this.startPoseState.rightUpperRoll) * ease;
+        this.currentPoseState.leftElbowRoll =
+          this.startPoseState.leftElbowRoll +
+          (targetPose.leftElbowRoll - this.startPoseState.leftElbowRoll) * ease;
+        this.currentPoseState.rightElbowRoll =
+          this.startPoseState.rightElbowRoll +
+          (targetPose.rightElbowRoll - this.startPoseState.rightElbowRoll) * ease;
       }
     }
 
     // 2. Micro-motion and Mechanical Settling for Elbows
-    // Layer 4 idle adjustment: very slow asynchronous sine offset
-    const elbowIdleL = -(Math.sin(time * 0.32) * 0.012 + breathOffset * 0.04 - lookPitch * 0.02);
-    const elbowIdleR = -(Math.cos(time * 0.28 + 1.2) * 0.012 + breathOffset * 0.04 - lookPitch * 0.02);
+    // Layer 4 idle adjustment: gentle symmetrical breathing & look pitch offset
+    const elbowIdle = -(Math.sin(time * 0.30) * 0.008 + breathOffset * 0.04 - lookPitch * 0.02);
 
     const targetLeftElbow = THREE.MathUtils.clamp(
-      this.currentPoseState.leftElbow + elbowIdleL,
-      -0.62, // ~ -35° maximum subtle forward bend
-      -0.42  // ~ -24° minimum subtle forward bend
+      this.currentPoseState.leftElbow + elbowIdle,
+      -0.48, // ~ -27.5° maximum subtle forward bend
+      -0.28  // ~ -16.0° minimum subtle forward bend
     );
     const targetRightElbow = THREE.MathUtils.clamp(
-      this.currentPoseState.rightElbow + elbowIdleR,
-      -0.62,
-      -0.42
+      this.currentPoseState.rightElbow + elbowIdle,
+      -0.48,
+      -0.28
     );
 
     // Damped interpolation for mechanical inertia
@@ -152,12 +165,18 @@ export class ArmElbowController {
     this.smoothedLeftElbow += (targetLeftElbow - this.smoothedLeftElbow) * damp;
     this.smoothedRightElbow += (targetRightElbow - this.smoothedRightElbow) * damp;
 
-    // Upper Arm follow-through
+    // Elbow roll (inward angle) settling
+    const targetLeftElbowRoll = this.currentPoseState.leftElbowRoll;
+    const targetRightElbowRoll = this.currentPoseState.rightElbowRoll;
+    this.smoothedLeftElbowRoll += (targetLeftElbowRoll - this.smoothedLeftElbowRoll) * damp;
+    this.smoothedRightElbowRoll += (targetRightElbowRoll - this.smoothedRightElbowRoll) * damp;
+
+    // Upper Arm follow-through (symmetrically mirrored around centerline)
     const armFollowYaw = lookYaw * 0.035;
     const targetLeftPitch = this.currentPoseState.leftUpperPitch + breathOffset * 0.05;
     const targetRightPitch = this.currentPoseState.rightUpperPitch + breathOffset * 0.05;
-    const targetLeftRoll = this.currentPoseState.leftUpperRoll + armFollowYaw;
-    const targetRightRoll = this.currentPoseState.rightUpperRoll + armFollowYaw;
+    const targetLeftRoll = this.currentPoseState.leftUpperRoll - armFollowYaw * 0.5;
+    const targetRightRoll = this.currentPoseState.rightUpperRoll + armFollowYaw * 0.5;
 
     this.smoothedLeftUpperPitch += (targetLeftPitch - this.smoothedLeftUpperPitch) * damp;
     this.smoothedRightUpperPitch += (targetRightPitch - this.smoothedRightUpperPitch) * damp;
@@ -167,37 +186,18 @@ export class ArmElbowController {
     // 3. Wrist Stabilization & Micro-reaction (±2-5°)
     const wSmooth = 1.0 - Math.exp(-wristCfg.damping * dt);
 
-    const targetLeftWPitch = THREE.MathUtils.clamp(
-      Math.cos(time * 0.45) * 0.018 + breathOffset * 0.05 - lookPitch * wristCfg.cursorReactFactor,
-      -wristCfg.pitchLimit,
-      wristCfg.pitchLimit
-    );
-    const targetLeftWRoll = THREE.MathUtils.clamp(
-      Math.sin(time * 0.38) * 0.012 + lookYaw * wristCfg.cursorReactFactor,
-      -wristCfg.rollLimit,
-      wristCfg.rollLimit
-    );
-    const targetLeftWYaw = THREE.MathUtils.clamp(
-      Math.cos(time * 0.25) * 0.010,
-      -wristCfg.yawLimit,
-      wristCfg.yawLimit
-    );
+    const wristPitchOsc = Math.sin(time * 0.38) * 0.012 + breathOffset * 0.05 - lookPitch * wristCfg.cursorReactFactor;
+    const wristRollOsc = Math.sin(time * 0.32) * 0.008;
+    const wristYawOsc = Math.cos(time * 0.26) * 0.006;
 
-    const targetRightWPitch = THREE.MathUtils.clamp(
-      Math.sin(time * 0.42 + 1.5) * 0.018 + breathOffset * 0.05 - lookPitch * wristCfg.cursorReactFactor,
-      -wristCfg.pitchLimit,
-      wristCfg.pitchLimit
-    );
-    const targetRightWRoll = THREE.MathUtils.clamp(
-      Math.cos(time * 0.35 + 1.0) * 0.012 + lookYaw * wristCfg.cursorReactFactor,
-      -wristCfg.rollLimit,
-      wristCfg.rollLimit
-    );
-    const targetRightWYaw = THREE.MathUtils.clamp(
-      Math.sin(time * 0.22 + 0.8) * 0.010,
-      -wristCfg.yawLimit,
-      wristCfg.yawLimit
-    );
+    const targetLeftWPitch = THREE.MathUtils.clamp(wristPitchOsc, -wristCfg.pitchLimit, wristCfg.pitchLimit);
+    const targetRightWPitch = targetLeftWPitch;
+
+    const targetLeftWRoll = THREE.MathUtils.clamp(wristRollOsc + lookYaw * wristCfg.cursorReactFactor, -wristCfg.rollLimit, wristCfg.rollLimit);
+    const targetRightWRoll = THREE.MathUtils.clamp(-wristRollOsc + lookYaw * wristCfg.cursorReactFactor, -wristCfg.rollLimit, wristCfg.rollLimit);
+
+    const targetLeftWYaw = THREE.MathUtils.clamp(wristYawOsc, -wristCfg.yawLimit, wristCfg.yawLimit);
+    const targetRightWYaw = THREE.MathUtils.clamp(-wristYawOsc, -wristCfg.yawLimit, wristCfg.yawLimit);
 
     this.leftWristPitch += (targetLeftWPitch - this.leftWristPitch) * wSmooth;
     this.leftWristRoll += (targetLeftWRoll - this.leftWristRoll) * wSmooth;
@@ -215,6 +215,8 @@ export class ArmElbowController {
         rightUpperPitch: this.smoothedRightUpperPitch,
         leftUpperRoll: this.smoothedLeftUpperRoll,
         rightUpperRoll: this.smoothedRightUpperRoll,
+        leftElbowRoll: this.smoothedLeftElbowRoll,
+        rightElbowRoll: this.smoothedRightElbowRoll,
       },
       leftWrist: {
         pitch: this.leftWristPitch,

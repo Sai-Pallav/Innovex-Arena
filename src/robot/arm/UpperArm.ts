@@ -50,78 +50,202 @@ export interface UpperArmNodes {
 }
 
 /**
- * 1. Shoulder-to-Arm Adapter Collar mating flush to shoulder mounting flange.
- * Centered vertically along the humerus load line at (0, 0, 0).
+ * 1. Unified Shoulder-to-Arm Mechanical Turntable & Mounting Adapter.
+ * Bridges seamlessly from the shoulder joint pivot socket (Y = -0.016) down to
+ * the humerus white ceramic armor shell (yTop = -0.0775) with 0.000mm air gap.
+ *
+ * All components reside inside upperArmGroup and rotate together as a single rigid body:
+ * - Upper Trunnion Hub & Neck (Y = -0.016 to -0.046) with structural webs & conduit detail
+ * - Bearing Turntable & Housing (Y = -0.046 to -0.062) with metallic races & recessed Purple LED Halo Ring
+ * - Lower CNC Mounting Flange (Y = -0.062 to -0.072) with 12 perimeter hex socket cap screws
+ * - Docking Interface Collar (Y = -0.072 to -0.0775) expanding to R=38.8mm with compression gasket seal
+ * - Internal retention spar extending down to Y = -0.115
  */
 function createShoulderArmAdapter(
   side: -1 | 1,
-  materials: RobotMaterialPalette
+  materials: RobotMaterialPalette,
+  ledMeshes: THREE.Mesh[]
 ): {
   adapterGroup: THREE.Group;
   adapterCollar: THREE.Mesh;
   trunnionCore: THREE.Mesh;
+  purpleLedRing: THREE.Mesh;
+  dockingCollar: THREE.Mesh;
 } {
   const adapterGroup = new THREE.Group();
   adapterGroup.name = side === -1 ? 'LeftShoulderArmAdapter' : 'RightShoulderArmAdapter';
 
-  const flangeRadius = 0.0382;
-  const boreRadius = 0.0200;
-  const adapterDepth = 0.0028;
+  // --------------------------------------------------------------------------
+  // SECTION 1: UPPER TRUNNION HUB & STRUCTURAL NECK (Y = -0.016 to -0.046)
+  // Enters and seats into shoulder socket receiver at (0, 0, 0)
+  // --------------------------------------------------------------------------
+  // 1a. Upper spherical trunnion boss fitting into shoulder pivot socket cup
+  const trunnionBossGeo = new THREE.SphereGeometry(0.024, 24, 16);
+  trunnionBossGeo.scale(1.0, 0.75, 1.0);
+  const trunnionBoss = new THREE.Mesh(trunnionBossGeo, materials.joint);
+  trunnionBoss.name = 'AdapterTrunnionBoss';
+  trunnionBoss.position.set(0, -0.018, 0);
+  trunnionBoss.castShadow = true;
+  adapterGroup.add(trunnionBoss);
 
-  // Upward-facing CNC Mating Flange docked flush to Arm Mount at Y = -0.0775
-  const collarShape = new THREE.Shape();
-  collarShape.absarc(0, 0, flangeRadius, 0, Math.PI * 2, false);
-  const boreHole = new THREE.Path();
-  boreHole.absarc(0, 0, boreRadius, 0, Math.PI * 2, true);
-  collarShape.holes.push(boreHole);
+  // 1b. Load-bearing conical structural neck bridging from trunnion into turntable
+  const neckGeo = new THREE.CylinderGeometry(0.025, 0.032, 0.024, 32);
+  const structuralNeck = new THREE.Mesh(neckGeo, materials.joint);
+  structuralNeck.name = 'AdapterStructuralNeck';
+  structuralNeck.position.set(0, -0.034, 0);
+  structuralNeck.castShadow = true;
+  structuralNeck.receiveShadow = true;
+  adapterGroup.add(structuralNeck);
 
-  const collarGeo = new THREE.ExtrudeGeometry(collarShape, {
-    depth: adapterDepth,
-    bevelEnabled: true,
-    bevelThickness: 0.0006,
-    bevelSize: 0.0006,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  collarGeo.center();
+  // 1c. Dual anterior/posterior reinforcement gussets for heavy-duty mecha load line
+  for (const zSign of [-1, 1]) {
+    const gussetGeo = new THREE.BoxGeometry(0.014, 0.022, 0.008);
+    const gusset = new THREE.Mesh(gussetGeo, materials.joint);
+    gusset.position.set(0, -0.034, zSign * 0.020);
+    gusset.castShadow = true;
+    adapterGroup.add(gusset);
 
-  const adapterCollar = new THREE.Mesh(collarGeo, materials.joint);
-  adapterCollar.name = 'AdapterMatingCollar';
-  adapterCollar.rotation.x = Math.PI / 2;
-  adapterCollar.position.set(0, -0.0775, 0);
+    const fastenerGeo = new THREE.CylinderGeometry(0.0010, 0.0010, 0.0015, 10);
+    fastenerGeo.rotateX(Math.PI / 2);
+    const fastener = new THREE.Mesh(fastenerGeo, materials.metallic);
+    fastener.position.set(0, -0.034, zSign * 0.0245);
+    adapterGroup.add(fastener);
+  }
+
+  // 1d. Metallic cable conduit collar / hydraulic hard-line ring
+  const conduitCollarGeo = new THREE.TorusGeometry(0.0275, 0.0012, 8, 32);
+  conduitCollarGeo.rotateX(Math.PI / 2);
+  const conduitCollar = new THREE.Mesh(conduitCollarGeo, materials.metallic);
+  conduitCollar.position.set(0, -0.028, 0);
+  adapterGroup.add(conduitCollar);
+
+  // --------------------------------------------------------------------------
+  // SECTION 2: PRECISION TURNTABLE BEARING & PURPLE LED HALO (Y = -0.046 to -0.062)
+  // --------------------------------------------------------------------------
+  // 2a. Top retention race ring
+  const topRaceGeo = new THREE.CylinderGeometry(0.0345, 0.0355, 0.004, 36);
+  const topRace = new THREE.Mesh(topRaceGeo, materials.joint);
+  topRace.name = 'AdapterTopBearingRace';
+  topRace.position.set(0, -0.048, 0);
+  topRace.castShadow = true;
+  adapterGroup.add(topRace);
+
+  // Polished metallic bearing race bezel above LED ring
+  const topRaceRimGeo = new THREE.TorusGeometry(0.0352, 0.0009, 8, 36);
+  topRaceRimGeo.rotateX(Math.PI / 2);
+  const topRaceRim = new THREE.Mesh(topRaceRimGeo, materials.metallic);
+  topRaceRim.position.set(0, -0.0498, 0);
+  adapterGroup.add(topRaceRim);
+
+  // 2b. Central turntable core & recessed channel
+  const turntableGeo = new THREE.CylinderGeometry(0.0362, 0.0362, 0.007, 36);
+  const adapterCollar = new THREE.Mesh(turntableGeo, materials.joint);
+  adapterCollar.name = 'AdapterTurntableCore';
+  adapterCollar.position.set(0, -0.0545, 0);
   adapterCollar.castShadow = true;
   adapterCollar.receiveShadow = true;
   adapterGroup.add(adapterCollar);
 
-  // Polished Metallic Crossed-Roller Bearing Race
-  const raceGeo = new THREE.TorusGeometry(flangeRadius * 0.96, 0.0008, 8, 36);
-  raceGeo.rotateX(Math.PI / 2);
-  const race = new THREE.Mesh(raceGeo, materials.metallic);
-  race.position.set(0, -0.0775 + adapterDepth * 0.45, 0);
-  adapterGroup.add(race);
+  // 2c. Glowing Purple LED Halo Ring (Single master LED ring)
+  const purpleLedGeo = new THREE.TorusGeometry(0.0366, 0.0013, 8, 48);
+  purpleLedGeo.rotateX(Math.PI / 2);
+  const purpleLedRing = new THREE.Mesh(purpleLedGeo, materials.purpleEmissive);
+  purpleLedRing.name = side === -1 ? 'LeftBicepRotationalLed' : 'RightBicepRotationalLed';
+  purpleLedRing.position.set(0, -0.0545, 0);
+  adapterGroup.add(purpleLedRing);
+  ledMeshes.push(purpleLedRing);
 
-  // 12 Hex Socket Head Cap Screws mating with connector flange
+  // Purple bloom mesh for intense mecha glow
+  const purpleBloomGeo = new THREE.TorusGeometry(0.0366, 0.0024, 8, 48);
+  purpleBloomGeo.rotateX(Math.PI / 2);
+  const purpleBloomMesh = new THREE.Mesh(purpleBloomGeo, materials.purpleBloom);
+  purpleBloomMesh.position.set(0, -0.0545, 0);
+  adapterGroup.add(purpleBloomMesh);
+
+  // 2d. Polished metallic bearing race bezel below LED ring
+  const botRaceRimGeo = new THREE.TorusGeometry(0.0362, 0.0009, 8, 36);
+  botRaceRimGeo.rotateX(Math.PI / 2);
+  const botRaceRim = new THREE.Mesh(botRaceRimGeo, materials.metallic);
+  botRaceRim.position.set(0, -0.0582, 0);
+  adapterGroup.add(botRaceRim);
+
+  // 2e. 8 perimeter castellated notches / indexing teeth around turntable
+  const notchCount = 8;
+  const notchR = 0.0364;
+  for (let n = 0; n < notchCount; n++) {
+    const angle = (n / notchCount) * Math.PI * 2;
+    const notchGeo = new THREE.BoxGeometry(0.0024, 0.0065, 0.0024);
+    const notch = new THREE.Mesh(notchGeo, materials.joint);
+    notch.position.set(Math.sin(angle) * notchR, -0.0545, Math.cos(angle) * notchR);
+    notch.rotation.y = angle;
+    adapterGroup.add(notch);
+  }
+
+  // --------------------------------------------------------------------------
+  // SECTION 3: LOWER CNC FLANGE & FASTENER RING (Y = -0.062 to -0.072)
+  // --------------------------------------------------------------------------
+  const flangeGeo = new THREE.CylinderGeometry(0.0372, 0.0382, 0.010, 36);
+  const lowerFlange = new THREE.Mesh(flangeGeo, materials.joint);
+  lowerFlange.name = 'AdapterLowerCncFlange';
+  lowerFlange.position.set(0, -0.0670, 0);
+  lowerFlange.castShadow = true;
+  lowerFlange.receiveShadow = true;
+  adapterGroup.add(lowerFlange);
+
+  // 12 Hex Socket Head Cap Screws seated countersunk into top shelf of lower flange
   const boltCount = 12;
-  const boltPitchR = 0.0285;
+  const boltPitchR = 0.0335;
   for (let b = 0; b < boltCount; b++) {
     const angle = (b / boltCount) * Math.PI * 2;
-    const socketGeo = new THREE.CylinderGeometry(0.0009, 0.0009, 0.0020, 10);
+    const socketGeo = new THREE.CylinderGeometry(0.0010, 0.0010, 0.0020, 10);
     const socket = new THREE.Mesh(socketGeo, materials.metallic);
     socket.position.set(
       Math.sin(angle) * boltPitchR,
-      -0.0775 + adapterDepth * 0.45,
+      -0.0620,
       Math.cos(angle) * boltPitchR
     );
     adapterGroup.add(socket);
   }
 
-  // Central Rotary Trunnion Core extending down into the arm spar
-  const trunnionGeo = new THREE.CylinderGeometry(0.0175, 0.0155, 0.024, 28);
+  // --------------------------------------------------------------------------
+  // SECTION 4: DOCKING INTERFACE COLLAR & GASKET SEAL (Y = -0.072 to -0.0775)
+  // Perfectly seals against white armor shell at yTop = -0.0775 with 0.000mm air gap!
+  // --------------------------------------------------------------------------
+  // Expands smoothly from radius 0.0382m to 0.0388m to match the exact outer profile of humerus shell
+  const dockingGeo = new THREE.CylinderGeometry(0.0382, 0.0388, 0.0055, 36);
+  const dockingCollar = new THREE.Mesh(dockingGeo, materials.joint);
+  dockingCollar.name = side === -1 ? 'LeftBlackPlateBetweenShellAndRotational' : 'RightBlackPlateBetweenShellAndRotational';
+  dockingCollar.position.set(0, -0.07475, 0);
+  dockingCollar.castShadow = true;
+  dockingCollar.receiveShadow = true;
+  adapterGroup.add(dockingCollar);
+
+  // Polished metallic reveal accent ring just above the joint seam
+  const revealRingGeo = new THREE.TorusGeometry(0.0385, 0.0007, 6, 36);
+  revealRingGeo.rotateX(Math.PI / 2);
+  const revealRing = new THREE.Mesh(revealRingGeo, materials.metallic);
+  revealRing.position.set(0, -0.0755, 0);
+  adapterGroup.add(revealRing);
+
+  // Dark compression gasket seal seated right at the mating line (Y = -0.0775)
+  const gasketGeo = new THREE.TorusGeometry(0.0387, 0.0008, 6, 36);
+  gasketGeo.rotateX(Math.PI / 2);
+  const gasket = new THREE.Mesh(gasketGeo, materials.joint);
+  gasket.name = 'AdapterCompressionGasket';
+  gasket.position.set(0, -0.0775, 0);
+  adapterGroup.add(gasket);
+
+  // --------------------------------------------------------------------------
+  // SECTION 5: INTERNAL STRUCTURAL RETENTION SPAR CORE (Y = -0.065 to -0.115)
+  // Locks the adapter deep into the upper arm internal armature spar
+  // --------------------------------------------------------------------------
+  const trunnionGeo = new THREE.CylinderGeometry(0.0185, 0.0160, 0.040, 24);
   const trunnionCore = new THREE.Mesh(trunnionGeo, materials.joint);
-  trunnionCore.position.set(0, -0.090, 0);
+  trunnionCore.name = 'AdapterInternalTrunnionCore';
+  trunnionCore.position.set(0, -0.095, 0);
   adapterGroup.add(trunnionCore);
 
-  return { adapterGroup, adapterCollar, trunnionCore };
+  return { adapterGroup, adapterCollar, trunnionCore, purpleLedRing, dockingCollar };
 }
 
 /**
@@ -145,7 +269,7 @@ function createUpperArmCoherentArmor(
   const indices: number[] = [];
 
   const yTop = -0.0775;
-  const totalLength = 0.1470; // 147 mm humerus armor, terminating at y = -0.2245m for lengthened upper arm
+  const totalLength = 0.1385; // Terminating smoothly at y = -0.2160m to interface seamlessly with elbow clevis
   const thickness = 0.0030;  // 3.0 mm real physical wall thickness
 
   let startAngle = 0;
@@ -226,12 +350,12 @@ function createUpperArmCoherentArmor(
       }
     }
 
-    // Distal Upper Elbow Guard clearance
-    if (v > 0.82) {
-      const tDist = (v - 0.82) / 0.18;
-      rx += tDist * 0.0010;
-      rz += tDist * 0.0012;
-      y += tDist * 0.0016;
+    // Distal Upper Elbow Transition (sleek inward funnel into the elbow joint: ╲│╱)
+    if (v > 0.72) {
+      const tDist = (v - 0.72) / 0.28;
+      const sideBias = 1.0 - Math.max(0, (cosA - 0.20) / 0.80);
+      // Smoothly funnel inward (╲│╱) to interface seamlessly with elbow clevis and socket cuff
+      rx -= sideBias * 0.0016 * Math.pow(tDist, 1.2);
     }
 
     const rFactor = layer === 0 ? 1.0 : (1.0 - thickness / Math.max(rx, rz));
@@ -356,82 +480,6 @@ function createUpperArmCoherentArmor(
 }
 
 /**
- * Creates internal retention collar capping the top of the humerus armor at Y = -0.0620.
- * Eliminates duplicate floating rings that previously cut through the circular shoulder bearing.
- */
-function createBicepRotationalJoint(
-  side: -1 | 1,
-  materials: RobotMaterialPalette,
-  ledMeshes: THREE.Mesh[]
-): {
-  rotationalGroup: THREE.Group;
-  blackPlate: THREE.Mesh;
-  segmentedRing: THREE.Mesh;
-  purpleRing: THREE.Mesh;
-} {
-  const rotationalGroup = new THREE.Group();
-  rotationalGroup.name = side === -1 ? 'LeftBicepRotationalJoint' : 'RightBicepRotationalJoint';
-
-  // 1. Internal capping plate seated flush at top of armor (Y = -0.0555)
-  const plateShape = new THREE.Shape();
-  const plateOuterR = 0.0388;
-  const plateBoreR = 0.0210;
-  plateShape.absarc(0, 0, plateOuterR, 0, Math.PI * 2, false);
-  const plateHole = new THREE.Path();
-  plateHole.absarc(0, 0, plateBoreR, 0, Math.PI * 2, true);
-  plateShape.holes.push(plateHole);
-
-  const plateGeo = new THREE.ExtrudeGeometry(plateShape, {
-    depth: 0.0024,
-    bevelEnabled: true,
-    bevelThickness: 0.0006,
-    bevelSize: 0.0006,
-    bevelSegments: 2,
-    curveSegments: 36,
-  });
-  plateGeo.center();
-
-  const blackPlate = new THREE.Mesh(plateGeo, materials.joint);
-  blackPlate.name = side === -1 ? 'LeftBlackPlateBetweenShellAndRotational' : 'RightBlackPlateBetweenShellAndRotational';
-  blackPlate.rotation.x = Math.PI / 2;
-  blackPlate.position.set(0, -0.0555, 0);
-  blackPlate.castShadow = true;
-  blackPlate.receiveShadow = true;
-  rotationalGroup.add(blackPlate);
-
-  // Metallic precision raceway rim seated on the inner plate
-  const raceRimGeo = new THREE.TorusGeometry(0.0360, 0.0008, 6, 36);
-  raceRimGeo.rotateX(Math.PI / 2);
-  const raceRim = new THREE.Mesh(raceRimGeo, materials.metallic);
-  raceRim.position.set(0, -0.0550, 0);
-  rotationalGroup.add(raceRim);
-
-  // 2. Internal alignment sleeve extending into humerus core
-  const sleeveR = 0.0210;
-  const sleeveGeo = new THREE.CylinderGeometry(sleeveR, sleeveR * 0.96, 0.012, 28);
-  const segmentedRing = new THREE.Mesh(sleeveGeo, materials.joint);
-  segmentedRing.position.set(0, -0.064, 0);
-  segmentedRing.castShadow = true;
-  rotationalGroup.add(segmentedRing);
-
-  // Concentric internal purple accent ring (contained inside armor collar)
-  const purpleTorusGeo = new THREE.TorusGeometry(sleeveR * 0.98, 0.0010, 6, 28);
-  purpleTorusGeo.rotateX(Math.PI / 2);
-  const purpleRing = new THREE.Mesh(purpleTorusGeo, materials.purpleEmissive);
-  purpleRing.name = side === -1 ? 'LeftBicepRotationalLed' : 'RightBicepRotationalLed';
-  purpleRing.position.set(0, -0.060, 0);
-  rotationalGroup.add(purpleRing);
-  ledMeshes.push(purpleRing);
-
-  return {
-    rotationalGroup,
-    blackPlate,
-    segmentedRing,
-    purpleRing,
-  };
-}
-
-/**
  * 3. Main Upper Arm Assembly Builder.
  */
 export function createUpperArm(
@@ -444,9 +492,14 @@ export function createUpperArm(
   const ledMeshes: THREE.Mesh[] = [];
 
   // ==========================================================================
-  // SECTION 1: SHOULDER ARM ADAPTER (Mates to shoulder flange)
+  // SECTION 1: SHOULDER ARM ADAPTER & PRECISION TURNTABLE
+  // Seamlessly connects shoulder trunnion into humerus armor with 0.000mm air gap.
   // ==========================================================================
-  const { adapterGroup, adapterCollar, trunnionCore } = createShoulderArmAdapter(side, materials);
+  const { adapterGroup, adapterCollar, trunnionCore, purpleLedRing, dockingCollar } = createShoulderArmAdapter(
+    side,
+    materials,
+    ledMeshes
+  );
   upperArmGroup.add(adapterGroup);
 
   const armCenterX = 0;
@@ -573,19 +626,37 @@ export function createUpperArm(
   distalElbowMount.position.set(0, -0.243, 0);
   mechanicalCore.add(distalElbowMount);
 
-  const clevisCuffGeo = new THREE.CylinderGeometry(0.0275, 0.0305, 0.016, 28);
+  // Mating CNC docking cuff extending from Y = +0.0270m down to +0.0180m (meeting white armor at Y = -0.2160m)
+  const clevisCuffGeo = new THREE.CylinderGeometry(0.0318, 0.0305, 0.009, 32);
   const elbowSocketCuff = new THREE.Mesh(clevisCuffGeo, materials.joint);
   elbowSocketCuff.name = 'UpperArmElbowSocketCuff';
-  elbowSocketCuff.position.set(0, 0.009, 0);
+  elbowSocketCuff.position.set(0, 0.0225, 0);
   elbowSocketCuff.castShadow = true;
   elbowSocketCuff.receiveShadow = true;
   distalElbowMount.add(elbowSocketCuff);
 
-  const cuffRimGeo = new THREE.TorusGeometry(0.0290, 0.0010, 6, 28);
-  cuffRimGeo.rotateX(Math.PI / 2);
-  const cuffRim = new THREE.Mesh(cuffRimGeo, materials.metallic);
-  cuffRim.position.set(0, 0.015, 0);
-  distalElbowMount.add(cuffRim);
+  // Compression gasket seal at Y = +0.0270m meeting the white ceramic armor with 0.000mm air gap
+  const cuffGasketGeo = new THREE.TorusGeometry(0.0317, 0.0008, 6, 36);
+  cuffGasketGeo.rotateX(Math.PI / 2);
+  const cuffGasket = new THREE.Mesh(cuffGasketGeo, materials.joint);
+  cuffGasket.position.set(0, 0.0270, 0);
+  distalElbowMount.add(cuffGasket);
+
+  // Metallic reveal accent ring
+  const cuffBezelGeo = new THREE.TorusGeometry(0.0315, 0.0006, 6, 36);
+  cuffBezelGeo.rotateX(Math.PI / 2);
+  const cuffBezel = new THREE.Mesh(cuffBezelGeo, materials.metallic);
+  cuffBezel.position.set(0, 0.0260, 0);
+  distalElbowMount.add(cuffBezel);
+
+  // 8 radial fasteners on the cuff face
+  for (let b = 0; b < 8; b++) {
+    const angle = (b / 8) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0016, 8);
+    const bolt = new THREE.Mesh(boltGeo, materials.metallic);
+    bolt.position.set(Math.sin(angle) * 0.0285, 0.0225, Math.cos(angle) * 0.0285);
+    distalElbowMount.add(bolt);
+  }
 
   // ==========================================================================
   // SECTION 3: SCULPTED WHITE CERAMIC COHERENT ARMOR
@@ -667,19 +738,6 @@ export function createUpperArm(
     ventilationChannel.add(slat);
   }
 
-  // ==========================================================================
-  // SECTION 1B: BICEP ROTATIONAL JOINT & BLACK TRANSITION PLATE
-  // As shown in reference image:
-  // - Black Plate sits between white shell and rotational drive ring
-  // - Segmented rotational ring with radial notches & glowing purple LED line
-  // ==========================================================================
-  const { rotationalGroup, blackPlate, segmentedRing, purpleRing } = createBicepRotationalJoint(
-    side,
-    materials,
-    ledMeshes
-  );
-  upperArmGroup.add(rotationalGroup);
-
   // 4b. Stepped Horizontal Louvers Ladder beside purple status strip
   const louverLadderCount = 7;
   for (let i = 0; i < louverLadderCount; i++) {
@@ -704,13 +762,6 @@ export function createUpperArm(
   antSeam.position.set(0, -0.1365, 0.0345);
   armorGroup.add(antSeam);
 
-  // 5c. Top Collar Metallic Bezel Rim (Crisp transition line beneath black plate)
-  const topCollarBezelGeo = new THREE.TorusGeometry(0.0388 * 0.98, 0.0007, 6, 36);
-  topCollarBezelGeo.rotateX(Math.PI / 2);
-  const topCollarBezel = new THREE.Mesh(topCollarBezelGeo, materials.metallic);
-  topCollarBezel.position.set(0, -0.0560, 0);
-  armorGroup.add(topCollarBezel);
-
   // 6. Vertical Seam Ventilation Slots on White Armor Shell
   const slotCount = 8;
   for (let s = 0; s < slotCount; s++) {
@@ -723,16 +774,16 @@ export function createUpperArm(
 
   // Compatibility nodes
   const bicepSubGroup = armorGroup;
-  const upperCollar = adapterCollar;
+  const upperCollar = dockingCollar;
   const armatureCore = armatureSpar;
   const bicepShell = anteriorArmor;
   const topDomeCap = trunnionCore;
-  const topSocketRim = cuffRim;
+  const topSocketRim = elbowSocketCuff;
 
   return {
     group: upperArmGroup,
     adapterGroup,
-    adapterCollar,
+    adapterCollar: dockingCollar,
     mechanicalCore,
     armatureSpar,
     armorGroup,
@@ -753,9 +804,9 @@ export function createUpperArm(
     topSocketRim,
     elbowSocketCuff,
     panelSeam,
-    rotationalJoint: rotationalGroup,
-    rotationalRing: segmentedRing,
-    rotationalLedRing: purpleRing,
-    blackPlateBetweenShellAndRotational: blackPlate,
+    rotationalJoint: adapterGroup,
+    rotationalRing: adapterCollar,
+    rotationalLedRing: purpleLedRing,
+    blackPlateBetweenShellAndRotational: dockingCollar,
   };
 }

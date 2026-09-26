@@ -56,36 +56,43 @@ export const ANIMATION_CONFIG = {
   // 3. ARM POSTURES & PARTIAL FOLD
   // ==========================================
   arm: {
-    // Poses with natural resting subtle flexion matching reference image:
-    // Upper arms slope forward ~7.5 deg with natural lateral clearing roll (-0.038 / +0.038 rad)
-    // and subtle natural elbow flexion bend of ~ -16.0 deg (-0.28 rad, 10°–20° spec)
+    // Poses with natural resting subtle flexion & relaxed outward-inward articulation:
+    // Upper arms angle slightly outward from torso (~5.2° = 0.092 rad roll)
+    // Forearms turn slightly back inward toward torso centerline (~10.4° relative to upper arm = 0.182 rad roll, ~5.2° net inward in torso space)
+    // Combined subtle elbow articulation ~10.4° directional change at elbow
     poses: {
       poseA: {
-        name: 'PoseA_RightDominant',
-        leftElbow: -0.52,                     // ~ -29.8 deg Euler (produces ~18°–20° visual hinge flexion)
-        rightElbow: -0.52,
-        leftUpperPitch: -0.13,                // ~ -7.45 deg forward pitch (0°–10° spec)
+        name: 'PoseA_SymmetricRelaxed',
+        leftElbow: -0.38,                     // ~ -21.8 deg Euler (softened, subtle, relaxed natural flexion)
+        rightElbow: -0.38,
+        leftUpperPitch: -0.13,                // ~ -7.45 deg forward pitch
         rightUpperPitch: -0.13,
-        leftUpperRoll: -0.038,                // natural lateral clearing angle (outward)
-        rightUpperRoll: 0.038,
+        leftUpperRoll: -0.098,                // ~ -5.61 deg subtle outward deviation from torso
+        rightUpperRoll: 0.098,                // ~ +5.61 deg subtle outward deviation from torso
+        leftElbowRoll: 0.155,                 // ~ +8.88 deg softened inward return relative to upper arm
+        rightElbowRoll: -0.155,               // ~ -8.88 deg softened inward return relative to upper arm
       },
       poseB: {
-        name: 'PoseB_LeftDominant',
-        leftElbow: -0.54,                     // subtle organic variation (-30.9 deg Euler)
-        rightElbow: -0.50,                    // subtle organic variation (-28.6 deg Euler)
-        leftUpperPitch: -0.14,
-        rightUpperPitch: -0.12,
-        leftUpperRoll: -0.035,
-        rightUpperRoll: 0.040,
-      },
-      poseC: {
-        name: 'PoseC_Balanced',
-        leftElbow: -0.52,
-        rightElbow: -0.52,
+        name: 'PoseB_SymmetricRelaxed',
+        leftElbow: -0.38,
+        rightElbow: -0.38,
         leftUpperPitch: -0.13,
         rightUpperPitch: -0.13,
-        leftUpperRoll: -0.038,
-        rightUpperRoll: 0.038,
+        leftUpperRoll: -0.098,
+        rightUpperRoll: 0.098,
+        leftElbowRoll: 0.155,
+        rightElbowRoll: -0.155,
+      },
+      poseC: {
+        name: 'PoseC_SymmetricRelaxed',
+        leftElbow: -0.38,
+        rightElbow: -0.38,
+        leftUpperPitch: -0.13,
+        rightUpperPitch: -0.13,
+        leftUpperRoll: -0.098,
+        rightUpperRoll: 0.098,
+        leftElbowRoll: 0.155,
+        rightElbowRoll: -0.155,
       },
     },
     poseIntervalMin: 14.0,                    // Infrequent pose transitions (seconds)

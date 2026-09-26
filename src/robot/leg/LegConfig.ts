@@ -45,17 +45,17 @@ export const LEG_CONFIG = {
     lateralArmor: {
       width: 0.042,
       thickness: 0.015,
-      cowlLength: 0.178,
+      cowlLength: 0.156, // Leaves crisp 5mm clearance above knee rotary condyle disc
     },
     medialArmor: {
       width: 0.034,
       thickness: 0.012,
-      cowlLength: 0.165,
+      cowlLength: 0.156,
     },
     ledStrip: {
       width: 0.0032,
       depth: 0.0025,
-      length: 0.170,
+      length: 0.150,
     },
   },
 
@@ -68,13 +68,13 @@ export const LEG_CONFIG = {
     centerCapRadius: 0.010,
     centralAxleRadius: 0.007,
     centralAxleLength: 0.060,
-    // Central white faceted knee cover
+    // Central white faceted knee cover (Bearing's White Armor)
     patella: {
       width: 0.028,
       height: 0.046,
       thickness: 0.010,
-      offsetZ: 0.0298,
-      yOffset: 0.000,
+      offsetZ: 0.0358, // Aligned flush with frontal depth plane of thigh suprapatellar arch
+      yOffset: 0.0010, // Creates calibrated 5.0mm dark mechanical gap to upper thigh arch
       rotX: 0.000,
     },
     // Structural dark knee housing

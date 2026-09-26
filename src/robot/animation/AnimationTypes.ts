@@ -43,6 +43,8 @@ export interface ArmPoseAngles {
   rightUpperPitch: number;
   leftUpperRoll: number;
   rightUpperRoll: number;
+  leftElbowRoll: number;
+  rightElbowRoll: number;
 }
 
 export interface WristOffset {

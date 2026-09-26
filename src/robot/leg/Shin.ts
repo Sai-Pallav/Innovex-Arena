@@ -327,10 +327,10 @@ export function createShin(
   );
   const anteriorKeelArmor = new THREE.Mesh(keelGeo, materials.armor);
   anteriorKeelArmor.name = side === -1 ? 'ShinAnteriorKeel_L' : 'ShinAnteriorKeel_R';
-  // Positioned with top shelf ~7mm below knee patella shield, matching reference
+  // Positioned with top shelf ~6mm below knee patella shield, matching reference
   anteriorKeelArmor.position.set(
     0,
-    -0.105,
+    -0.110,
     cfg.frame.spineDepth * 0.5 + cfg.anteriorKeel.thickness * 0.4
   );
   anteriorKeelArmor.castShadow = true;
@@ -343,7 +343,7 @@ export function createShin(
   ledStrip.name = side === -1 ? 'ShinLedStrip_L' : 'ShinLedStrip_R';
   ledStrip.position.set(
     0,
-    -0.105,
+    -0.110,
     cfg.frame.spineDepth * 0.5 + cfg.anteriorKeel.thickness * 0.4 + 0.012
   );
   shinGroup.add(ledStrip);

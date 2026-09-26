@@ -9,7 +9,7 @@ export interface KneeNodes {
   lateralDisc: THREE.Mesh;
   medialDisc: THREE.Mesh;
   accentRingLateral: THREE.Mesh;
-  accentRingMedial: THREE.Mesh;
+  accentRingMedial?: THREE.Mesh;
   patellaShield: THREE.Mesh;
   patellaLed?: THREE.Mesh;
   centralPin: THREE.Mesh;
@@ -315,24 +315,35 @@ export function createKnee(
   ) || centralPin;
 
   // =========================================================================
-  // 4. CONCENTRIC PURPLE EMISSIVE ACCENT RINGS (Circular face indicator)
+  // 4. CONCENTRIC PURPLE EMISSIVE ACCENT RINGS (Bilateral Rotary Face Indicators)
   // =========================================================================
   const kneeAccentGroup = new THREE.Group();
   const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0016, 12, 32);
+  const ringBloomGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0022, 12, 32);
 
-  // Lateral accent ring
+  // Lateral accent ring (Outer Flank)
   const accentRingLateral = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRingLateral.name = side === -1 ? 'KneeAccentRingLat_L' : 'KneeAccentRingLat_R';
   accentRingLateral.rotation.y = Math.PI / 2;
-  accentRingLateral.position.x = side * (cfg.outerDiscSpacing * 0.5 + cfg.discWidth * 0.5 + 0.0006);
+  accentRingLateral.position.x = side * (cfg.outerDiscSpacing * 0.5 + cfg.discWidth * 0.5 + 0.0008);
   kneeAccentGroup.add(accentRingLateral);
 
-  // Medial accent ring
+  const ringBloomLat = new THREE.Mesh(ringBloomGeo, materials.purpleBloom);
+  ringBloomLat.rotation.y = Math.PI / 2;
+  ringBloomLat.position.copy(accentRingLateral.position);
+  kneeAccentGroup.add(ringBloomLat);
+
+  // Medial accent ring (Inner Flank)
   const accentRingMedial = new THREE.Mesh(ringGeo, materials.purpleEmissive);
   accentRingMedial.name = side === -1 ? 'KneeAccentRingMed_L' : 'KneeAccentRingMed_R';
   accentRingMedial.rotation.y = Math.PI / 2;
-  accentRingMedial.position.x = -side * (cfg.outerDiscSpacing * 0.5 + cfg.discWidth * 0.5 + 0.0006);
+  accentRingMedial.position.x = -side * (cfg.outerDiscSpacing * 0.5 + cfg.discWidth * 0.5 + 0.0008);
   kneeAccentGroup.add(accentRingMedial);
+
+  const ringBloomMed = new THREE.Mesh(ringBloomGeo, materials.purpleBloom);
+  ringBloomMed.rotation.y = Math.PI / 2;
+  ringBloomMed.position.copy(accentRingMedial.position);
+  kneeAccentGroup.add(ringBloomMed);
 
   const mergedKneeAccents = mergeGroupMeshesByMaterial(
     kneeAccentGroup,
@@ -362,24 +373,37 @@ export function createKnee(
   patellaShield.receiveShadow = true;
   kneeGroup.add(patellaShield);
 
-  // Horizontal purple glowing LED bar/slit centered across white knee cover
-  const ledGeo = new THREE.BoxGeometry(0.015, 0.0022, 0.0025);
-  const patellaLed = new THREE.Mesh(ledGeo, materials.purpleEmissive);
+  // Precision Horizontal Capsule / Pill Purple Glowing LED Slit in Dark Recessed Bezel
+  // Surface at y = -0.0065, x = 0 is at Z = (thickness * 0.5 + 0.0022 [bevel]) + 0.0040 [ridge] + 0.0020 [curve] ≈ 0.0127m
+  const frontZ = cfg.patella.thickness * 0.5 + 0.0084; // 0.0129m
+  const bezelGeo = new THREE.BoxGeometry(0.0130, 0.0034, 0.0022);
+  const patellaBezel = new THREE.Mesh(bezelGeo, materials.joint);
+  patellaBezel.name = 'PatellaLedBezel';
+  patellaBezel.position.set(0, -0.0065, frontZ - 0.0004);
+  patellaShield.add(patellaBezel);
+
+  // Capsule geometry with smooth hemispherical ends matching reference crop
+  // Width matching reference (~9.5mm total length, ~2mm height)
+  const ledCapsuleGeo = new THREE.CapsuleGeometry(0.0011, 0.0075, 8, 16);
+  ledCapsuleGeo.rotateZ(Math.PI / 2); // Orient horizontally
+  const patellaLed = new THREE.Mesh(ledCapsuleGeo, materials.purpleEmissive);
   patellaLed.name = side === -1 ? 'PatellaLed_L' : 'PatellaLed_R';
-  patellaLed.position.set(
-    0,
-    cfg.patella.yOffset - 0.0105 * Math.sin(rotX),
-    cfg.patella.offsetZ + 0.0105 * Math.cos(rotX)
-  );
-  patellaLed.rotation.x = rotX;
-  kneeGroup.add(patellaLed);
+  patellaLed.position.set(0, -0.0065, frontZ + 0.0008);
+  patellaShield.add(patellaLed);
   ledMeshes.push(patellaLed);
 
-  const patellaBloomGeo = new THREE.BoxGeometry(0.017, 0.0035, 0.0020);
-  const patellaBloom = new THREE.Mesh(patellaBloomGeo, materials.purpleBloom);
-  patellaBloom.position.copy(patellaLed.position);
-  patellaBloom.rotation.x = rotX;
-  kneeGroup.add(patellaBloom);
+  // Glowing hot core matching high-intensity emissive line in reference
+  const coreCapsuleGeo = new THREE.CapsuleGeometry(0.0006, 0.0065, 8, 16);
+  coreCapsuleGeo.rotateZ(Math.PI / 2);
+  const patellaCore = new THREE.Mesh(coreCapsuleGeo, materials.whiteCoreEmissive);
+  patellaCore.position.set(0, -0.0065, frontZ + 0.0011);
+  patellaShield.add(patellaCore);
+
+  const bloomCapsuleGeo = new THREE.CapsuleGeometry(0.0020, 0.0085, 8, 16);
+  bloomCapsuleGeo.rotateZ(Math.PI / 2);
+  const patellaBloom = new THREE.Mesh(bloomCapsuleGeo, materials.purpleBloom);
+  patellaBloom.position.set(0, -0.0065, frontZ + 0.0010);
+  patellaShield.add(patellaBloom);
 
   // =========================================================================
   // 6. SHIN PIVOT & LOWER DARK STRUCTURE (Articulated lower connection)

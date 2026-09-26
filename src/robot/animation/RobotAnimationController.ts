@@ -52,10 +52,10 @@ export class RobotAnimationController {
   private leftPoseOverrides = {
     upperArm: { x: 0, z: 0 },
     elbowBend: 0,
+    elbowRoll: 0,
     wrist: { pitch: 0, roll: 0, yaw: 0 },
     thumb: { proxCurl: 0, splay: 0 },
     fingers: [
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
       { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
       { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
       { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
@@ -66,10 +66,10 @@ export class RobotAnimationController {
   private rightPoseOverrides = {
     upperArm: { x: 0, z: 0 },
     elbowBend: 0,
+    elbowRoll: 0,
     wrist: { pitch: 0, roll: 0, yaw: 0 },
     thumb: { proxCurl: 0, splay: 0 },
     fingers: [
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
       { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
       { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
       { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
@@ -305,12 +305,13 @@ export class RobotAnimationController {
       lOver.upperArm.x = armState.pose.leftUpperPitch;
       lOver.upperArm.z = armState.pose.leftUpperRoll;
       lOver.elbowBend = armState.pose.leftElbowBend;
+      lOver.elbowRoll = armState.pose.leftElbowRoll;
       lOver.wrist.pitch = armState.leftWrist.pitch;
       lOver.wrist.roll = armState.leftWrist.roll;
       lOver.wrist.yaw = armState.leftWrist.yaw;
       lOver.thumb.proxCurl = handState.leftHand.thumbPitch;
       lOver.thumb.splay = handState.leftHand.thumbYaw;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 4; i++) {
         const src = handState.leftHand.fingers[i];
         const dst = lOver.fingers[i];
         if (src && dst) {
@@ -326,12 +327,13 @@ export class RobotAnimationController {
       rOver.upperArm.x = armState.pose.rightUpperPitch;
       rOver.upperArm.z = armState.pose.rightUpperRoll;
       rOver.elbowBend = armState.pose.rightElbowBend;
+      rOver.elbowRoll = armState.pose.rightElbowRoll;
       rOver.wrist.pitch = armState.rightWrist.pitch;
       rOver.wrist.roll = armState.rightWrist.roll;
       rOver.wrist.yaw = armState.rightWrist.yaw;
       rOver.thumb.proxCurl = handState.rightHand.thumbPitch;
       rOver.thumb.splay = handState.rightHand.thumbYaw;
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 4; i++) {
         const src = handState.rightHand.fingers[i];
         const dst = rOver.fingers[i];
         if (src && dst) {
@@ -357,8 +359,16 @@ export class RobotAnimationController {
         this.baseRightUpperArmRot.z + armState.pose.rightUpperRoll
       );
 
-      this.nodes.leftForearm.rotation.x = armState.pose.leftElbowBend;
-      this.nodes.rightForearm.rotation.x = armState.pose.rightElbowBend;
+      this.nodes.leftForearm.rotation.set(
+        armState.pose.leftElbowBend,
+        this.baseLeftForearmRot.y,
+        armState.pose.leftElbowRoll
+      );
+      this.nodes.rightForearm.rotation.set(
+        armState.pose.rightElbowBend,
+        this.baseRightForearmRot.y,
+        armState.pose.rightElbowRoll
+      );
 
       this.nodes.leftHand.rotation.set(
         this.baseLeftHandRot.x + armState.leftWrist.pitch,

@@ -12,7 +12,7 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 //     ↓  Polished Metallic Retaining Ring
 //     ↓  Precision Internal Flexion Axle Pin & Bearing Races
 //     ↓  Stepped Carpal Transition Collar
-//     ↓  Distal Hand Mount (Interfaces flush with Hand.ts carpal cuff)
+//     ↓  Distal Precision Titanium Trunnion & 8-Bolt Interface Cap
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface WristNodes {
@@ -154,7 +154,7 @@ export function createWrist(
   }
 
   // ════════════════════════════════════════════════════════════
-  // 5. STEPPED CARPAL DOCKING COLLAR & DISTAL HAND MOUNT
+  // 5. STEPPED DOCKING COLLAR & PRECISION TITANIUM 8-BOLT INTERFACE
   // ════════════════════════════════════════════════════════════
   const transitGeo = new THREE.CylinderGeometry(0.0215, 0.0205, 0.006, 26);
   const transitCollar = new THREE.Mesh(transitGeo, materials.joint);
@@ -179,10 +179,37 @@ export function createWrist(
   distalSocket.position.set(0, -0.028, 0);
   mechanicsGroup.add(distalSocket);
 
-  // Dedicated Hand Mounting Anchor (at the outer face of the distal socket)
+  // Precision Machined Distal Face Endplate
+  const endPlateGeo = new THREE.CylinderGeometry(0.0165, 0.0175, 0.002, 24);
+  const endPlate = new THREE.Mesh(endPlateGeo, materials.metallic);
+  endPlate.position.set(0, -0.0295, 0);
+  endPlate.castShadow = true;
+  mechanicsGroup.add(endPlate);
+
+  // Central recessed trunnion bore
+  const trunnionCoreGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0025, 16);
+  const trunnionCore = new THREE.Mesh(trunnionCoreGeo, materials.joint);
+  trunnionCore.position.set(0, -0.030, 0);
+  mechanicsGroup.add(trunnionCore);
+
+  // 8 Machined Titanium Bolt Pattern around the distal interface
+  const boltR = 0.0125;
+  for (let b = 0; b < 8; b++) {
+    const angle = (b / 8) * Math.PI * 2;
+    const boltGeo = new THREE.CylinderGeometry(0.0011, 0.0011, 0.0025, 6);
+    const bolt = new THREE.Mesh(boltGeo, materials.joint);
+    bolt.position.set(
+      Math.sin(angle) * boltR,
+      -0.030,
+      Math.cos(angle) * boltR
+    );
+    mechanicsGroup.add(bolt);
+  }
+
+  // Dedicated Distal Mounting Anchor (flush at interface endplate)
   const distalHandMount = new THREE.Group();
   distalHandMount.name = side === -1 ? 'LeftDistalHandMount' : 'RightDistalHandMount';
-  distalHandMount.position.set(0, -0.028, 0);
+  distalHandMount.position.set(0, -0.030, 0);
   mechanicsGroup.add(distalHandMount);
 
   // Interface compatibility dummies (invisible/empty to avoid visual intrusion)

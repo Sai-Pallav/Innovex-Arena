@@ -7,6 +7,8 @@ export interface ArmControlOverrides {
   shoulderJoint?: { x?: number; y?: number; z?: number };
   upperArm?: { x?: number; y?: number; z?: number };
   elbowBend?: number;
+  elbowRoll?: number;
+  elbow?: { x?: number; y?: number; z?: number };
   wrist?: { pitch?: number; yaw?: number; roll?: number };
   thumb?: { proxCurl?: number; distCurl?: number; splay?: number };
   fingers?: Array<{ proxCurl?: number; midCurl?: number; distCurl?: number; splay?: number }>;
@@ -78,9 +80,6 @@ export class ArmAnimationController {
   private leftBaseBrachioPos: THREE.Vector3;
   private rightBaseBrachioPos: THREE.Vector3;
 
-  private leftBaseDorsalPos: THREE.Vector3;
-  private rightBaseDorsalPos: THREE.Vector3;
-
   private leftBaseWristStyloidLPos: THREE.Vector3;
   private rightBaseWristStyloidLPos: THREE.Vector3;
   private leftBaseWristStyloidRPos: THREE.Vector3;
@@ -151,9 +150,6 @@ export class ArmAnimationController {
     this.leftBaseBrachioPos = leftArm.forearm.brachioradialis ? leftArm.forearm.brachioradialis.position.clone() : new THREE.Vector3();
     this.rightBaseBrachioPos = rightArm.forearm.brachioradialis ? rightArm.forearm.brachioradialis.position.clone() : new THREE.Vector3();
 
-    this.leftBaseDorsalPos = leftArm.hand.dorsalArmor.position.clone();
-    this.rightBaseDorsalPos = rightArm.hand.dorsalArmor.position.clone();
-
     this.leftBaseWristStyloidLPos = leftArm.wrist.styloidArmorLeft ? leftArm.wrist.styloidArmorLeft.position.clone() : new THREE.Vector3();
     this.rightBaseWristStyloidLPos = rightArm.wrist.styloidArmorLeft ? rightArm.wrist.styloidArmorLeft.position.clone() : new THREE.Vector3();
     this.leftBaseWristStyloidRPos = leftArm.wrist.styloidArmorRight ? leftArm.wrist.styloidArmorRight.position.clone() : new THREE.Vector3();
@@ -165,14 +161,8 @@ export class ArmAnimationController {
     this.leftBaseWristSwivelPos = leftArm.wrist.swivelCollar ? leftArm.wrist.swivelCollar.position.clone() : new THREE.Vector3();
     this.rightBaseWristSwivelPos = rightArm.wrist.swivelCollar ? rightArm.wrist.swivelCollar.position.clone() : new THREE.Vector3();
 
-    // Cache pad & cap Z positions and disc subnode X positions
+    // Cache disc subnode X positions
     [leftArm, rightArm].forEach((arm) => {
-      (arm.hand?.palmarPads || []).forEach((pad: any) => {
-        pad.userData.baseZ = pad.position.z;
-      });
-      (arm.hand?.knuckleCaps || []).forEach((cap: any) => {
-        cap.userData.baseZ = cap.position.z;
-      });
 
       if (arm.elbow.lateralDiscNodes) {
         const l = arm.elbow.lateralDiscNodes;
@@ -234,45 +224,14 @@ export class ArmAnimationController {
     overrides.elbowBend = bendAngle;
   }
 
+  public setElbowRoll(side: -1 | 1, rollAngle: number): void {
+    const overrides = side === -1 ? this.leftOverrides : this.rightOverrides;
+    overrides.elbowRoll = rollAngle;
+  }
+
   public setWristRotation(side: -1 | 1, pitch?: number, yaw?: number, roll?: number): void {
     const overrides = side === -1 ? this.leftOverrides : this.rightOverrides;
     overrides.wrist = { pitch, yaw, roll };
-  }
-
-  public setThumbPose(side: -1 | 1, proxCurl?: number, distCurl?: number, splay?: number): void {
-    const overrides = side === -1 ? this.leftOverrides : this.rightOverrides;
-    overrides.thumb = { proxCurl, distCurl, splay };
-  }
-
-  public setFingerPose(
-    side: -1 | 1,
-    fingerIndex: number,
-    proxCurl?: number,
-    midCurl?: number,
-    distCurl?: number,
-    splay?: number
-  ): void {
-    const overrides = side === -1 ? this.leftOverrides : this.rightOverrides;
-    if (!overrides.fingers) overrides.fingers = [];
-    overrides.fingers[fingerIndex] = { proxCurl, midCurl, distCurl, splay };
-  }
-
-  /**
-   * Sets a unified grip amount [0, 1] across all fingers and thumb on one hand.
-   */
-  public setHandGrip(side: -1 | 1, gripAmount: number): void {
-    const curl = THREE.MathUtils.clamp(gripAmount, 0, 1);
-    for (let f = 0; f < 4; f++) {
-      this.setFingerPose(
-        side,
-        f,
-        curl * 0.85,
-        curl * 1.10,
-        curl * 0.75,
-        0
-      );
-    }
-    this.setThumbPose(side, curl * 0.65, curl * 0.80, curl * 0.30);
   }
 
   public setPoseOverrides(side: 'left' | 'right' | -1 | 1, overrides: ArmControlOverrides): void {
@@ -355,8 +314,6 @@ export class ArmAnimationController {
     const baseMedDisc = isLeft ? this.leftBaseMedDiscPos : this.rightBaseMedDiscPos;
     const basePin = isLeft ? this.leftBasePinPos : this.rightBasePinPos;
     const baseForearmPivot = isLeft ? this.leftBaseForearmPivotPos : this.rightBaseForearmPivotPos;
-
-    const baseDorsal = isLeft ? this.leftBaseDorsalPos : this.rightBaseDorsalPos;
 
     // 1. SHOULDER & BICEP MULTI-STAGE MECHANICAL OPEN VIEW (CAD Engineering Hierarchy)
     // Stage A: Shoulder Pauldron Armor Shell lifts upward & out to reveal internal mechanism
@@ -549,26 +506,6 @@ export class ArmAnimationController {
       // Swivel collar sleeve moves slightly upward in +Y towards forearm
       arm.wrist.swivelCollar.position.y = baseSwivel.y + exp * 0.008;
     }
-
-    // 3. HAND EXPLODED VIEW
-    // Dorsal Armor Shield separates forward along +Z
-    arm.hand.dorsalArmor.position.set(
-      baseDorsal.x,
-      baseDorsal.y,
-      baseDorsal.z + exp * 0.024
-    );
-
-    // Segmented Palmar Friction Grip Pads separate backward along -Z
-    (arm.hand?.palmarPads || []).forEach((pad: any) => {
-      const bZ = pad.userData.baseZ !== undefined ? pad.userData.baseZ : pad.position.z;
-      pad.position.z = bZ - exp * 0.012;
-    });
-
-    // MCP Knuckle Caps separate along +Z
-    (arm.hand?.knuckleCaps || []).forEach((cap: any) => {
-      const bZ = cap.userData.baseZ !== undefined ? cap.userData.baseZ : cap.position.z;
-      cap.position.z = bZ + exp * 0.012;
-    });
   }
 
   private updateArmKinematics(
@@ -620,10 +557,21 @@ export class ArmAnimationController {
       );
     }
 
-    // 3. Elbow Kinematics (articulates forearmPivot around the central horizontal hinge axis)
+    // 3. Elbow Kinematics (articulates forearmPivot around the central horizontal hinge axis & carrying angle)
     const elbowPivot = arm.elbow.forearmPivot || arm.elbow.group;
-    if (overrides.elbowBend !== undefined) {
-      elbowPivot.rotation.set(overrides.elbowBend, baseElbow.y, baseElbow.z);
+    const targetRoll =
+      overrides.elbowRoll !== undefined
+        ? overrides.elbowRoll
+        : (overrides.elbow?.z !== undefined ? overrides.elbow.z : baseElbow.z);
+    const targetYaw =
+      overrides.elbow?.y !== undefined ? overrides.elbow.y : baseElbow.y;
+
+    if (overrides.elbowBend !== undefined || overrides.elbowRoll !== undefined || overrides.elbow !== undefined) {
+      const bend =
+        overrides.elbowBend !== undefined
+          ? overrides.elbowBend
+          : (overrides.elbow?.x !== undefined ? overrides.elbow.x : baseElbow.x);
+      elbowPivot.rotation.set(bend, targetYaw, targetRoll);
     } else {
       const elbowDelta =
         Math.sin(this.time * 0.36 + timePhase) * 0.018 +
@@ -632,7 +580,7 @@ export class ArmAnimationController {
       elbowPivot.rotation.set(
         baseElbow.x + elbowDelta,
         baseElbow.y,
-        baseElbow.z
+        targetRoll
       );
     }
 
@@ -676,7 +624,7 @@ export class ArmAnimationController {
     }
 
     // 6. Thumb Kinematics
-    if (arm.hand && arm.hand.thumb && arm.hand.thumb.proximalGroup) {
+    if (arm.hand && arm.hand.thumb && arm.hand.thumb.proximal) {
       this.updateThumbKinematics(
         arm.hand.thumb,
         overrides.thumb,
@@ -698,9 +646,6 @@ export class ArmAnimationController {
     if (!finger || !finger.proximal || !finger.proximal.group) return;
     const isLeft = side === -1;
     // Progressive natural relaxation angles matching reference pose:
-    // Fingers hang downward with natural relaxed anatomical curvature
-    // matching "SIDE POSITION" and "RELAXED FINGERS" from reference image
-    // Slightly curved posture creating natural powered-down humanoid robot appearance
     const restingLeft = [
       { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 }, // Index - slightly curved
       { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 }, // Middle - most extended
@@ -708,16 +653,15 @@ export class ArmAnimationController {
       { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 }, // Little - most curled
     ];
     const restingRight = [
-      { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 }, // Index - slightly curved
-      { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 }, // Middle - most extended
-      { prox: 0.29, mid: 0.48, dist: 0.33, splay: -0.012 }, // Ring - progressive curl
-      { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 }, // Little - most curled
+      { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 },
+      { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 },
+      { prox: 0.29, mid: 0.48, dist: 0.33, splay: -0.012 },
+      { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 },
     ];
 
     const target = isLeft ? restingLeft[idx] : restingRight[idx];
 
-    // Procedural organic resting micro-motion:
-    // Dual-harmonic subtle wave cascaded across fingers for lifelike mechanical relaxation
+    // Procedural organic resting micro-motion
     const speed = 0.45 + idx * 0.06;
     const phase = idx * 0.42 + timePhase;
     const amp = 0.008 - idx * 0.001;
@@ -727,18 +671,14 @@ export class ArmAnimationController {
       Math.sin(this.time * speed * 2.0 + phase * 0.7) * (amp * 0.25) +
       breathOffset * 0.004;
 
-    // Overrides are additive deltas on top of resting posture (or user grip command)
     const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.3;
     const addMid = override?.midCurl !== undefined ? override.midCurl : wave * 0.5;
     const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.4;
     const addSplay = override?.splay !== undefined ? override.splay : Math.sin(this.time * 0.25 + phase) * 0.002;
 
-    // Segmented bending: positive rotation around X axis flexes fingers naturally toward palm (-Z)
     finger.proximal.group.rotation.x = target.prox + addProx;
     finger.middle.group.rotation.x = target.mid + addMid;
     finger.distal.group.rotation.x = target.dist + addDist;
-
-    // Subtle natural lateral splay along Z axis
     finger.proximal.group.rotation.z = -side * (target.splay + addSplay);
   }
 
@@ -759,9 +699,6 @@ export class ArmAnimationController {
     const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.05;
     const addSplay = override?.splay !== undefined ? override.splay : 0;
 
-    // Natural relaxed thumb posture matching reference image:
-    // Thumb rests along medial palm margin with slight separation and natural curl
-    // Creating humanoid robot powered-down appearance
     thumb.group.rotation.set(0.16 + wave * 0.02, -side * 0.08, -side * (0.22 + addSplay));
     thumb.proximal.group.rotation.x = 0.24 + addProx;
     thumb.proximal.group.rotation.z = -side * 0.05;
