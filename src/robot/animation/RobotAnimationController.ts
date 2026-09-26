@@ -4,7 +4,6 @@ import { InputController } from './InputController';
 import { LookController } from './LookController';
 import { ShoulderController } from './ShoulderController';
 import { ArmElbowController } from './ArmElbowController';
-import { HandFingerController } from './HandFingerController';
 import { TorsoWaistController } from './TorsoWaistController';
 import { IdleSuspensionController } from './IdleSuspensionController';
 import { EmissiveController } from './EmissiveController';
@@ -22,7 +21,6 @@ export class RobotAnimationController {
   public lookController: LookController;
   public shoulderController: ShoulderController;
   public armElbowController: ArmElbowController;
-  public handFingerController: HandFingerController;
   public torsoWaistController: TorsoWaistController;
   public idleSuspensionController: IdleSuspensionController;
   public emissiveController: EmissiveController;
@@ -54,13 +52,6 @@ export class RobotAnimationController {
     elbowBend: 0,
     elbowRoll: 0,
     wrist: { pitch: 0, roll: 0, yaw: 0 },
-    thumb: { proxCurl: 0, splay: 0 },
-    fingers: [
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-    ],
   };
 
   private rightPoseOverrides = {
@@ -68,13 +59,6 @@ export class RobotAnimationController {
     elbowBend: 0,
     elbowRoll: 0,
     wrist: { pitch: 0, roll: 0, yaw: 0 },
-    thumb: { proxCurl: 0, splay: 0 },
-    fingers: [
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-      { proxCurl: 0, midCurl: 0, distCurl: 0, splay: 0 },
-    ],
   };
 
   constructor(nodes: RobotNodes) {
@@ -85,7 +69,6 @@ export class RobotAnimationController {
     this.lookController = new LookController();
     this.shoulderController = new ShoulderController();
     this.armElbowController = new ArmElbowController();
-    this.handFingerController = new HandFingerController();
     this.torsoWaistController = new TorsoWaistController();
     this.idleSuspensionController = new IdleSuspensionController();
     this.emissiveController = new EmissiveController();
@@ -294,11 +277,6 @@ export class RobotAnimationController {
       reducedMotion
     );
 
-    // ==============================================================
-    // PRIORITY 8: Hand & Finger Coordinated Micro-Animation
-    // ==============================================================
-    const handState = this.handFingerController.update(this.time, breathOffset, reducedMotion);
-
     if (this.armController) {
       // Direct pass-through to high-fidelity ArmAnimationController
       const lOver = this.leftPoseOverrides;
@@ -309,18 +287,6 @@ export class RobotAnimationController {
       lOver.wrist.pitch = armState.leftWrist.pitch;
       lOver.wrist.roll = armState.leftWrist.roll;
       lOver.wrist.yaw = armState.leftWrist.yaw;
-      lOver.thumb.proxCurl = handState.leftHand.thumbPitch;
-      lOver.thumb.splay = handState.leftHand.thumbYaw;
-      for (let i = 0; i < 4; i++) {
-        const src = handState.leftHand.fingers[i];
-        const dst = lOver.fingers[i];
-        if (src && dst) {
-          dst.proxCurl = src.proximalCurl;
-          dst.midCurl = src.middleCurl;
-          dst.distCurl = src.distalCurl;
-          dst.splay = src.splay;
-        }
-      }
       this.armController.setPoseOverrides('left', lOver);
 
       const rOver = this.rightPoseOverrides;
@@ -331,18 +297,6 @@ export class RobotAnimationController {
       rOver.wrist.pitch = armState.rightWrist.pitch;
       rOver.wrist.roll = armState.rightWrist.roll;
       rOver.wrist.yaw = armState.rightWrist.yaw;
-      rOver.thumb.proxCurl = handState.rightHand.thumbPitch;
-      rOver.thumb.splay = handState.rightHand.thumbYaw;
-      for (let i = 0; i < 4; i++) {
-        const src = handState.rightHand.fingers[i];
-        const dst = rOver.fingers[i];
-        if (src && dst) {
-          dst.proxCurl = src.proximalCurl;
-          dst.midCurl = src.middleCurl;
-          dst.distCurl = src.distalCurl;
-          dst.splay = src.splay;
-        }
-      }
       this.armController.setPoseOverrides('right', rOver);
 
       this.armController.update(dt, breathOffset, headYaw, headPitch);

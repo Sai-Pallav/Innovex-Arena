@@ -42,7 +42,6 @@ import { createUpperArm, UpperArmNodes } from './UpperArm';
 import { createElbow, ElbowNodes } from './Elbow';
 import { createForearm, ForearmNodes } from './Forearm';
 import { createWrist, WristNodes } from './Wrist';
-import { createHand, HandNodes } from './Hand';
 
 export interface RobotArmNodes {
   root: THREE.Group;
@@ -50,7 +49,7 @@ export interface RobotArmNodes {
   elbow: ElbowNodes;
   forearm: ForearmNodes;
   wrist: WristNodes;
-  hand: HandNodes;
+  hand?: null;
   elbowPivot: THREE.Group;
   wristPivot: THREE.Group;
   ledMeshes: THREE.Mesh[];
@@ -113,14 +112,9 @@ export function createRobotArm(
   ledMeshes.push(...wrist.ledMeshes);
 
   // ==========================================================================
-  // 5. ARTICULATED HUMANOID MECHA HAND
-  // Mounted directly to wrist.distalHandMount (flush against 8-bolt plate).
-  // 4 articulated 3-phalanx digits + opposable thumb with thenar swivel.
+  // 5. TERMINAL WRIST INTERFACE (HAND COMPLETELY REMOVED)
+  // Wrist interface preserved as immutable hardpoint endpoint.
   // ==========================================================================
-  const hand = createHand(side, materials);
-  hand.group.position.set(0, 0, 0);
-  wrist.distalHandMount.add(hand.group);
-  ledMeshes.push(...hand.ledMeshes);
 
   // ==========================================================================
   // 6. DEFAULT ATHLETIC RESTING POSTURE
@@ -150,7 +144,7 @@ export function createRobotArm(
     elbow,
     forearm,
     wrist,
-    hand,
+    hand: null,
     elbowPivot: elbow.forearmPivot,
     wristPivot: wrist.wristPivot,
     ledMeshes,

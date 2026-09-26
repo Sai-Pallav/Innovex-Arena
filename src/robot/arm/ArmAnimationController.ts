@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { RobotArmNodes } from './RobotArm';
-import { FingerNodes, ThumbNodes } from './Finger';
 
 export interface ArmControlOverrides {
   shoulder?: { x?: number; y?: number; z?: number };
@@ -10,8 +9,6 @@ export interface ArmControlOverrides {
   elbowRoll?: number;
   elbow?: { x?: number; y?: number; z?: number };
   wrist?: { pitch?: number; yaw?: number; roll?: number };
-  thumb?: { proxCurl?: number; distCurl?: number; splay?: number };
-  fingers?: Array<{ proxCurl?: number; midCurl?: number; distCurl?: number; splay?: number }>;
 }
 
 /**
@@ -599,112 +596,6 @@ export class ArmAnimationController {
         baseWrist.z + wYaw
       );
     }
-
-    // 5. Hand Fingers Kinematics (Guarded if arm terminates at wrist interface)
-    if (arm.hand && arm.hand.indexFinger) {
-      const fingers = [
-        arm.hand.indexFinger,
-        arm.hand.middleFinger,
-        arm.hand.ringFinger,
-        arm.hand.littleFinger,
-      ];
-
-      fingers.forEach((finger, idx) => {
-        if (finger) {
-          this.updateFingerKinematics(
-            finger,
-            idx,
-            overrides.fingers ? overrides.fingers[idx] : undefined,
-            side,
-            timePhase,
-            breathOffset
-          );
-        }
-      });
-    }
-
-    // 6. Thumb Kinematics
-    if (arm.hand && arm.hand.thumb && arm.hand.thumb.proximal) {
-      this.updateThumbKinematics(
-        arm.hand.thumb,
-        overrides.thumb,
-        side,
-        timePhase,
-        breathOffset
-      );
-    }
-  }
-
-  private updateFingerKinematics(
-    finger: FingerNodes,
-    idx: number,
-    override: { proxCurl?: number; midCurl?: number; distCurl?: number; splay?: number } | undefined,
-    side: -1 | 1,
-    timePhase: number,
-    breathOffset: number
-  ): void {
-    if (!finger || !finger.proximal || !finger.proximal.group) return;
-    const isLeft = side === -1;
-    // Progressive natural relaxation angles matching reference pose:
-    const restingLeft = [
-      { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 }, // Index - slightly curved
-      { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 }, // Middle - most extended
-      { prox: 0.29, mid: 0.48, dist: 0.33, splay: -0.012 }, // Ring - progressive curl
-      { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 }, // Little - most curled
-    ];
-    const restingRight = [
-      { prox: 0.22, mid: 0.38, dist: 0.26, splay:  0.022 },
-      { prox: 0.26, mid: 0.44, dist: 0.30, splay:  0.008 },
-      { prox: 0.29, mid: 0.48, dist: 0.33, splay: -0.012 },
-      { prox: 0.34, mid: 0.54, dist: 0.37, splay: -0.028 },
-    ];
-
-    const target = isLeft ? restingLeft[idx] : restingRight[idx];
-
-    // Procedural organic resting micro-motion
-    const speed = 0.45 + idx * 0.06;
-    const phase = idx * 0.42 + timePhase;
-    const amp = 0.008 - idx * 0.001;
-
-    const wave =
-      Math.sin(this.time * speed + phase) * amp +
-      Math.sin(this.time * speed * 2.0 + phase * 0.7) * (amp * 0.25) +
-      breathOffset * 0.004;
-
-    const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.3;
-    const addMid = override?.midCurl !== undefined ? override.midCurl : wave * 0.5;
-    const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.4;
-    const addSplay = override?.splay !== undefined ? override.splay : Math.sin(this.time * 0.25 + phase) * 0.002;
-
-    finger.proximal.group.rotation.x = target.prox + addProx;
-    finger.middle.group.rotation.x = target.mid + addMid;
-    finger.distal.group.rotation.x = target.dist + addDist;
-    finger.proximal.group.rotation.z = -side * (target.splay + addSplay);
-  }
-
-  private updateThumbKinematics(
-    thumb: ThumbNodes,
-    override: { proxCurl?: number; distCurl?: number; splay?: number } | undefined,
-    side: -1 | 1,
-    timePhase: number,
-    breathOffset: number
-  ): void {
-    if (!thumb || !thumb.proximal || !thumb.proximal.group) return;
-    const wave =
-      Math.cos(this.time * 0.40 + timePhase) * 0.006 +
-      Math.sin(this.time * 0.80 + timePhase) * 0.004 +
-      breathOffset * 0.003;
-
-    const addProx = override?.proxCurl !== undefined ? override.proxCurl : wave * 0.05;
-    const addDist = override?.distCurl !== undefined ? override.distCurl : wave * 0.05;
-    const addSplay = override?.splay !== undefined ? override.splay : 0;
-
-    thumb.group.rotation.set(0.16 + wave * 0.02, -side * 0.08, -side * (0.22 + addSplay));
-    thumb.proximal.group.rotation.x = 0.24 + addProx;
-    thumb.proximal.group.rotation.z = -side * 0.05;
-    thumb.distal.group.rotation.x = 0.28 + addDist;
-    thumb.distal.group.rotation.z = side * 0.08;
-    if (thumb.middle) thumb.middle.group.rotation.x = 0.26 + addDist;
   }
 }
 

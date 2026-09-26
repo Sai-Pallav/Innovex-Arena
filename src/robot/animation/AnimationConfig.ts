@@ -112,21 +112,7 @@ export const ANIMATION_CONFIG = {
   },
 
   // ==========================================
-  // 5. HAND & COORDINATED FINGER MICRO-ANIMATION
-  // ==========================================
-  hand: {
-    // Subtle curl range: fingers stay relaxed and hanging straight down
-    minCurl: 0.0,
-    maxCurl: (2.0 * Math.PI) / 180,           // ~2.0° subtle micro-motion
-    cycleSpeed: 0.28,                         // Slow periodic cycle (~22s full cycle)
-    splayAmplitude: 0.004,
-    // Thumb thenar subtle micro-kinematics
-    thumbPitchFactor: 0.012,
-    thumbYawFactor: 0.008,
-  },
-
-  // ==========================================
-  // 6. ABDOMEN / WAIST MECHANICAL SUSPENSION
+  // 5. ABDOMEN / WAIST MECHANICAL SUSPENSION
   // ==========================================
   waist: {
     upperSegmentPitch: (0.5 * Math.PI) / 180, // +0.5°

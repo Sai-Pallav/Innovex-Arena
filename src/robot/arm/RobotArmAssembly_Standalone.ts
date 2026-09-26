@@ -93,8 +93,8 @@ export function createArmAssembly(
     rightForearm: rightArm.elbow.forearmPivot,
     leftWrist: leftArm.wrist.group,
     rightWrist: rightArm.wrist.group,
-    leftHand: leftArm.hand?.group ?? leftArm.wrist.group,
-    rightHand: rightArm.hand?.group ?? rightArm.wrist.group,
+    leftHand: (leftArm as any).hand?.group ?? leftArm.wrist.group,
+    rightHand: (rightArm as any).hand?.group ?? rightArm.wrist.group,
   };
 }
 
