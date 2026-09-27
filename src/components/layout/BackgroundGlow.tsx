@@ -12,10 +12,21 @@ export const BackgroundGlow: React.FC = () => {
   const location = useLocation();
 
   // Pages with dedicated, fully-calibrated atmospheric environments
+  // (either their own atmosphere component or PageAtmosphere)
   if (
     location.pathname === '/' ||
     location.pathname === '/services' ||
-    location.pathname === '/about'
+    location.pathname === '/about' ||
+    location.pathname === '/products' ||
+    location.pathname === '/classes' ||
+    location.pathname === '/events' ||
+    location.pathname === '/careers' ||
+    location.pathname === '/interns' ||
+    location.pathname === '/contact' ||
+    location.pathname === '/gallery' ||
+    location.pathname === '/blog' ||
+    location.pathname === '/admin/login' ||
+    location.pathname === '/blueprint'
   ) {
     return null;
   }

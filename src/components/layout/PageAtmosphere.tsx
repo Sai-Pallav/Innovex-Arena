@@ -17,6 +17,9 @@ export const PageAtmosphere: React.FC = () => (
   <>
     {/* ════════════════════════════════════════════════════════════
         MACRO — POSITIONED ENVIRONMENTAL LIGHT SOURCES
+        All layers are fixed to the viewport so the atmosphere
+        covers the full screen at every scroll position on every
+        page height — short or tall.
         ════════════════════════════════════════════════════════════ */}
 
     {/* ── L01  HERO ILLUMINATION FIELD ─────────────────────────────
@@ -24,9 +27,9 @@ export const PageAtmosphere: React.FC = () => (
         Peak: 0.142 with 10-stop gradual falloff                   */}
     <div
       aria-hidden="true"
-      className="contact-layer-primary absolute inset-x-0 top-0 pointer-events-none"
+      className="contact-layer-primary fixed inset-x-0 top-0 pointer-events-none z-0"
       style={{
-        height: '48%',
+        height: '55vh',
         background: `
           radial-gradient(ellipse 74% 88% at 48% 26%,
             rgba(112, 64, 242, 0.142) 0%,
@@ -43,15 +46,15 @@ export const PageAtmosphere: React.FC = () => (
       }}
     />
 
-    {/* ── L02  MID-CONTENT DEPTH FIELD ─────────────────────────────
+    {/* ── L02  MID-VIEWPORT DEPTH FIELD ────────────────────────────
         Position: y=56%, x=58% (right-bias)
         Peak: 0.082 with 9-stop gradual falloff                    */}
     <div
       aria-hidden="true"
-      className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
+      className="contact-layer-secondary fixed inset-x-0 pointer-events-none z-0"
       style={{
-        top: '38%',
-        height: '42%',
+        top: '30vh',
+        height: '50vh',
         background: `
           radial-gradient(ellipse 76% 88% at 58% 46%,
             rgba(98, 52, 218, 0.082) 0%,
@@ -67,15 +70,15 @@ export const PageAtmosphere: React.FC = () => (
       }}
     />
 
-    {/* ── L03  LOWER / CTA RESOLUTION FIELD ────────────────────────
-        Position: y=88%, x=50% (centered)
+    {/* ── L03  LOWER VIEWPORT RESOLUTION FIELD ─────────────────────
+        Position: y=80vh, x=50% (centered)
         Peak: 0.088 with 8-stop gradual falloff                    */}
     <div
       aria-hidden="true"
-      className="svc-layer-lower absolute inset-x-0 pointer-events-none"
+      className="svc-layer-lower fixed inset-x-0 pointer-events-none z-0"
       style={{
-        top: '74%',
-        height: '26%',
+        top: '60vh',
+        height: '40vh',
         background: `
           radial-gradient(ellipse 82% 88% at 50% 50%,
             rgba(98, 52, 218, 0.088) 0%,
@@ -95,10 +98,10 @@ export const PageAtmosphere: React.FC = () => (
         ════════════════════════════════════════════════════════════ */}
 
     {/* ── L04  TECHNICAL ARCHITECTURAL GRID SUBSTRATE ─────────────
-        96px cells. Calibrated single-pass hardware-accelerated grid. */}
+        96px cells. Fixed to viewport. */}
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           linear-gradient(rgba(183, 164, 251, 0.016) 1px, transparent 1px),
@@ -115,10 +118,10 @@ export const PageAtmosphere: React.FC = () => (
         ════════════════════════════════════════════════════════════ */}
 
     {/* ── L06  PARTICLES FAR ───────────────────────────────────────
-        1px dots. Subtle far reference dots.                       */}
+        1px dots. Fixed to viewport.                               */}
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           radial-gradient(1px 1px at  5%  12%, rgba(255,255,255,0.10) 0%, transparent 100%),
@@ -134,10 +137,10 @@ export const PageAtmosphere: React.FC = () => (
     />
 
     {/* ── L07  PARTICLES MID ───────────────────────────────────────
-        1.5px dots. Mid-depth reference dots.                      */}
+        1.5px dots. Fixed to viewport.                             */}
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           radial-gradient(1.5px 1.5px at  4%  18%, rgba(255,255,255,0.15) 0%, transparent 100%),
@@ -151,11 +154,11 @@ export const PageAtmosphere: React.FC = () => (
     />
 
     {/* ── L08  PARTICLES NEAR (animated) ───────────────────────────
-        2px dots. Far-edge only (x ≤ 5% or x ≥ 95%).
+        2px dots. Far-edge only. Fixed to viewport.
         Animated: 40s slow vertical float                          */}
     <div
       aria-hidden="true"
-      className="contact-layer-particles-near absolute inset-0 pointer-events-none"
+      className="contact-layer-particles-near fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           radial-gradient(2px 2px at  3%  20%, rgba(255,255,255,0.18) 0%, transparent 100%),

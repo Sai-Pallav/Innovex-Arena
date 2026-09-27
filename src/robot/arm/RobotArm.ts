@@ -42,6 +42,7 @@ import { createUpperArm, UpperArmNodes } from './UpperArm';
 import { createElbow, ElbowNodes } from './Elbow';
 import { createForearm, ForearmNodes } from './Forearm';
 import { createWrist, WristNodes } from './Wrist';
+import { createRoboticHand, HandNodes } from './RoboticHand';
 
 export interface RobotArmNodes {
   root: THREE.Group;
@@ -49,7 +50,7 @@ export interface RobotArmNodes {
   elbow: ElbowNodes;
   forearm: ForearmNodes;
   wrist: WristNodes;
-  hand?: null;
+  hand: HandNodes | null;
   elbowPivot: THREE.Group;
   wristPivot: THREE.Group;
   ledMeshes: THREE.Mesh[];
@@ -112,17 +113,19 @@ export function createRobotArm(
   ledMeshes.push(...wrist.ledMeshes);
 
   // ==========================================================================
-  // 5. TERMINAL WRIST INTERFACE (HAND COMPLETELY REMOVED)
-  // Wrist interface preserved as immutable hardpoint endpoint.
+  // 5. NEW HAND — attaches to wrist.distalHandMount (y = -0.030, immutable)
   // ==========================================================================
+  const hand = createRoboticHand(side, materials);
+  wrist.distalHandMount.add(hand.group);
+  ledMeshes.push(...hand.ledMeshes);
 
   // ==========================================================================
   // 6. DEFAULT ATHLETIC RESTING POSTURE
   // Sets natural relaxed angles for immediate hero rendering
   // Subtle outward upper arm + clear elbow articulation + softened inward forearm return
   // ==========================================================================
-  elbow.setAngle(-0.38); // ~ -21.8° Euler creating subtle, relaxed natural visual elbow flexion
-  elbow.forearmPivot.rotation.z = -side * 0.155; // ~ 8.88° inward return relative to upper arm (natural wrist placement beside hips)
+  elbow.setAngle(side === -1 ? -0.40 : -0.30);
+  elbow.forearmPivot.rotation.z = side === -1 ? 0.120 : -0.045;
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {
@@ -144,7 +147,7 @@ export function createRobotArm(
     elbow,
     forearm,
     wrist,
-    hand: null,
+    hand,
     elbowPivot: elbow.forearmPivot,
     wristPivot: wrist.wristPivot,
     ledMeshes,

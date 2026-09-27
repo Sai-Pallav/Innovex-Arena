@@ -1,19 +1,9 @@
 import React, { useState } from 'react';
 import {
-  Rocket,
-  TrendingUp,
-  Laptop,
-  Coffee,
   MapPin,
   Clock,
   CheckCircle2,
   Send,
-  GraduationCap,
-  Users,
-  Code,
-  Award,
-  Briefcase,
-  ChevronRight,
 } from 'lucide-react';
 import { CAREER_PERKS, JOB_POSITIONS } from '../data/siteData';
 import { Button } from '../components/ui/Button';
@@ -23,7 +13,9 @@ import { Textarea } from '../components/ui/Textarea';
 import { DynamicProjectsList } from '../components/modules/DynamicProjectsList';
 import { JobApplicationFormData } from '../types';
 import { useToast } from '../components/ui/Toast';
+import { IconRenderer } from '../components/ui/IconRenderer';
 import { PageAtmosphere } from '../components/layout/PageAtmosphere';
+
 export const CareersPage: React.FC = () => {
   const [selectedRole, setSelectedRole] = useState<string>(JOB_POSITIONS[0]?.title || 'Backend Developer (Node.js)');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,25 +42,6 @@ export const CareersPage: React.FC = () => {
     ],
     message: '',
   });
-
-  const getPerkIcon = (iconName: string) => {
-    switch (iconName) {
-      case 'GraduationCap':
-        return <GraduationCap className="w-5 h-5 text-[#b7a4fb]" />;
-      case 'Users':
-        return <Users className="w-5 h-5 text-[#ba9cff]" />;
-      case 'Code':
-        return <Code className="w-5 h-5 text-[#b7a4fb]" />;
-      case 'Award':
-        return <Award className="w-5 h-5 text-[#ba9cff]" />;
-      case 'Laptop':
-        return <Laptop className="w-5 h-5 text-[#b7a4fb]" />;
-      case 'Briefcase':
-        return <Briefcase className="w-5 h-5 text-[#ba9cff]" />;
-      default:
-        return <Rocket className="w-5 h-5 text-[#b7a4fb]" />;
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,15 +79,15 @@ export const CareersPage: React.FC = () => {
   };
 
   return (
-    <div className="relative pt-24 pb-16 space-y-20">
+    <div className="relative isolate overflow-hidden pt-24 sm:pt-28 pb-16 space-y-14 sm:space-y-20">
       <PageAtmosphere />
 
       {/* 1. HERO */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-3 animate-fade-up">
-        <h1 className="font-rebond font-medium text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-5 animate-fade-up">
+        <h1 className="font-rebond font-medium text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white leading-[1.08]">
           Join <span className="cosmic-text-gradient">Innovex Arena</span>
         </h1>
-        <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
+        <p className="text-base sm:text-lg text-[#c8bfec] max-w-2xl mx-auto leading-relaxed">
           Start your career journey with us. We&apos;re looking for passionate individuals who want to make an impact in the tech world.
         </p>
       </section>
@@ -130,12 +103,12 @@ export const CareersPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {CAREER_PERKS.map((perk, i) => (
             <CyberCard key={i} glow="cyan" className="p-5 group">
               <div className="flex items-start gap-3.5">
-                <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_15px_rgba(147,130,255,0.25)] transition-all">
-                  {getPerkIcon(perk.iconName)}
+                <div className="w-10 h-10 rounded-buttons bg-white/[0.04] border border-white/[0.12] flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_15px_rgba(147,130,255,0.25)] transition-all text-[#b7a4fb]">
+                  <IconRenderer name={perk.iconName} className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-rebond text-base font-medium text-white mb-1.5">
@@ -152,7 +125,7 @@ export const CareersPage: React.FC = () => {
       </section>
 
       {/* 3. OPEN POSITIONS */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-10">
+      <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2">
           <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Open <span className="cosmic-text-gradient">Positions</span>
@@ -164,7 +137,7 @@ export const CareersPage: React.FC = () => {
 
         <div className="space-y-5">
           {JOB_POSITIONS.map((role) => (
-            <CyberCard key={role.id} glow="purple" className="p-5 sm:p-6">
+            <CyberCard key={role.id} glow="purple" hoverEffect={false} className="p-5 sm:p-6">
               <div className="space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-white/[0.06]">
@@ -243,7 +216,7 @@ export const CareersPage: React.FC = () => {
       </section>
 
       {/* 4. APPLICATION FORM */}
-      <section id="apply-form" className="px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto space-y-8">
+      <section id="apply-form" className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-10">
         <div className="text-center space-y-2">
           <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
             Apply for a <span className="cosmic-text-gradient">Position</span>
@@ -283,13 +256,13 @@ export const CareersPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
               <div className="space-y-1.5">
-                <label className="text-xs font-medium uppercase tracking-wider text-[#9b96b0] block">
-                  Position <span className="text-[#b7a4fb] font-medium">*</span>
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] block">
+                  Position <span className="text-[#b7a4fb] font-bold">*</span>
                 </label>
                 <select
                   value={formData.position}
                   onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                  className="w-full px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/[0.12] text-sm text-white focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 transition-all cursor-pointer"
+                  className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-sm text-white shadow-[inset_0_0_16px_rgba(255,255,255,0.02)] focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 focus:shadow-[0_0_20px_rgba(147,130,255,0.15)] focus:bg-white/[0.07] hover:border-white/[0.22] transition-all duration-200 cursor-pointer"
                 >
                   {JOB_POSITIONS.map((r) => (
                     <option key={r.id} value={r.title} className="bg-[#0a0118] text-white">
@@ -310,13 +283,13 @@ export const CareersPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, college: e.target.value })}
               />
               <div className="space-y-1.5">
-                <label className="text-xs font-medium uppercase tracking-wider text-[#9b96b0] block">
-                  Year of Study <span className="text-[#b7a4fb] font-medium">*</span>
+                <label className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] block">
+                  Year of Study <span className="text-[#b7a4fb] font-bold">*</span>
                 </label>
                 <select
                   value={formData.yearOfStudy}
                   onChange={(e) => setFormData({ ...formData, yearOfStudy: e.target.value })}
-                  className="w-full px-5 py-2.5 rounded-full bg-white/[0.04] border border-white/[0.12] text-sm text-white focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 transition-all cursor-pointer"
+                  className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-sm text-white shadow-[inset_0_0_16px_rgba(255,255,255,0.02)] focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 focus:shadow-[0_0_20px_rgba(147,130,255,0.15)] focus:bg-white/[0.07] hover:border-white/[0.22] transition-all duration-200 cursor-pointer"
                 >
                   <option value="1st Year" className="bg-[#0a0118] text-white">1st Year</option>
                   <option value="2nd Year" className="bg-[#0a0118] text-white">2nd Year</option>
@@ -328,8 +301,8 @@ export const CareersPage: React.FC = () => {
             </div>
 
             {/* Profile Links */}
-            <div className="space-y-4 pt-3 border-t border-white/[0.06]">
-              <h4 className="text-xs font-medium uppercase tracking-wider text-[#f4f0ff]">
+            <div className="space-y-4 pt-4 border-t border-white/[0.06]">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0]">
                 Profile Links
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -355,7 +328,7 @@ export const CareersPage: React.FC = () => {
             </div>
 
             {/* Dynamic Projects Section */}
-            <div className="pt-3 border-t border-white/[0.06]">
+            <div className="pt-4 border-t border-white/[0.06]">
               <DynamicProjectsList
                 projects={formData.projects}
                 onChange={(projects) => setFormData({ ...formData, projects })}
@@ -363,7 +336,7 @@ export const CareersPage: React.FC = () => {
             </div>
 
             {/* Cover Letter */}
-            <div className="pt-3 border-t border-white/[0.06]">
+            <div className="pt-4 border-t border-white/[0.06]">
               <Textarea
                 label="Why do you want to join? (Cover Letter)"
                 placeholder="Tell us about yourself, your skills, and why you're interested in this position..."

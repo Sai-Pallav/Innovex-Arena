@@ -1,29 +1,14 @@
 import React from 'react';
 
-/**
- * AboutAtmosphere
- *
- * Dedicated atmospheric background architecture for AboutPage (DOM height ~8270px).
- * Modeled directly after the ServicesAtmosphere:
- * - Macro: 5 positioned light sources aligned to all 10 content sections with alternating flow
- * - Meso: 96px technical grid substrate + light-zone masked grid reveal
- * - Micro: 3-tier depth particles with 40s slow vertical float
- * - Dark Valleys: Clean separation between zones ensuring 75–85% dark cinema contrast
- */
 export const AboutAtmosphere: React.FC = () => (
   <>
-    {/* ════════════════════════════════════════════════════════════
-        MACRO — POSITIONED ENVIRONMENTAL LIGHT SOURCES
-        ════════════════════════════════════════════════════════════ */}
-
     {/* ── L01  ZONE 1: ABOUT HERO & VISION/MISSION ─────────────────
-        Position: y=8.5%, x=48%
-        Peak: 0.142 with 10-stop falloff                           */}
+        Fixed to viewport — covers full screen at all scroll positions */}
     <div
       aria-hidden="true"
-      className="contact-layer-primary absolute inset-x-0 top-0 pointer-events-none"
+      className="contact-layer-primary fixed inset-x-0 top-0 pointer-events-none z-0"
       style={{
-        height: '20%',
+        height: '55vh',
         background: `
           radial-gradient(ellipse 76% 90% at 48% 40%,
             rgba(112, 64, 242, 0.142) 0%,
@@ -40,15 +25,14 @@ export const AboutAtmosphere: React.FC = () => (
       }}
     />
 
-    {/* ── L02  ZONE 2: ARCHITECTURAL CAPABILITIES & PRODUCTS ───────
-        Position: y=29%, x=40% (left-bias)
-        Peak: 0.084 with 9-stop falloff                            */}
+    {/* ── L02  MID-VIEWPORT DEPTH FIELD ────────────────────────────
+        Right-bias, covers mid-screen band */}
     <div
       aria-hidden="true"
-      className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
+      className="contact-layer-secondary fixed inset-x-0 pointer-events-none z-0"
       style={{
-        top: '19.5%',
-        height: '20.0%',
+        top: '30vh',
+        height: '50vh',
         background: `
           radial-gradient(ellipse 74% 90% at 40% 48%,
             rgba(98, 52, 218, 0.084) 0%,
@@ -64,63 +48,14 @@ export const AboutAtmosphere: React.FC = () => (
       }}
     />
 
-    {/* ── L03  ZONE 3: COHORTS & HACKATHONS/EVENTS ─────────────────
-        Position: y=49.5%, x=60% (right-bias)
-        Peak: 0.080 with 9-stop falloff                            */}
+    {/* ── L03  LOWER VIEWPORT RESOLUTION FIELD ─────────────────────
+        Covers lower screen band */}
     <div
       aria-hidden="true"
-      className="contact-layer-primary absolute inset-x-0 pointer-events-none"
+      className="svc-layer-lower fixed inset-x-0 pointer-events-none z-0"
       style={{
-        top: '40.0%',
-        height: '20.0%',
-        background: `
-          radial-gradient(ellipse 76% 90% at 60% 48%,
-            rgba(98, 52, 218, 0.080) 0%,
-            rgba(88, 46, 200, 0.054) 15%,
-            rgba(78, 40, 182, 0.033) 30%,
-            rgba(68, 34, 165, 0.018) 45%,
-            rgba(58, 28, 148, 0.009) 58%,
-            rgba(48, 22, 128, 0.004) 70%,
-            rgba(38, 16, 108, 0.001) 82%,
-            rgba(28, 10,  88, 0.000) 92%,
-            transparent               100%)
-        `,
-      }}
-    />
-
-    {/* ── L04  ZONE 4: CAREERS & ECOSYSTEM VOICES (TESTIMONIALS) ────
-        Position: y=70.5%, x=42% (left-bias)
-        Peak: 0.072 with 9-stop falloff                            */}
-    <div
-      aria-hidden="true"
-      className="contact-layer-secondary absolute inset-x-0 pointer-events-none"
-      style={{
-        top: '60.5%',
-        height: '20.0%',
-        background: `
-          radial-gradient(ellipse 74% 90% at 42% 48%,
-            rgba(92, 48, 212, 0.072) 0%,
-            rgba(82, 42, 195, 0.048) 15%,
-            rgba(72, 36, 178, 0.028) 30%,
-            rgba(62, 30, 158, 0.015) 45%,
-            rgba(52, 24, 138, 0.007) 58%,
-            rgba(42, 18, 118, 0.002) 70%,
-            rgba(32, 12,  98, 0.001) 82%,
-            rgba(22,  6,  78, 0.000) 92%,
-            transparent               100%)
-        `,
-      }}
-    />
-
-    {/* ── L05  ZONE 5: NEWSLETTER & READY-TO-CONSTRUCT CTA ─────────
-        Position: y=87.2%, x=50% (centered focal resolution)
-        Peak: 0.092 with 8-stop falloff toward terminal void       */}
-    <div
-      aria-hidden="true"
-      className="svc-layer-lower absolute inset-x-0 pointer-events-none"
-      style={{
-        top: '80.5%',
-        height: '14.0%',
+        top: '60vh',
+        height: '40vh',
         background: `
           radial-gradient(ellipse 84% 90% at 50% 46%,
             rgba(98, 52, 218, 0.092) 0%,
@@ -135,15 +70,11 @@ export const AboutAtmosphere: React.FC = () => (
       }}
     />
 
-    {/* ════════════════════════════════════════════════════════════
-        MESO — TECHNICAL ARCHITECTURAL STRUCTURE
-        ════════════════════════════════════════════════════════════ */}
-
     {/* ── L06  TECHNICAL ARCHITECTURAL GRID SUBSTRATE ─────────────
-        96px cells. Calibrated single-pass hardware-accelerated grid. */}
+        96px cells. Fixed to viewport. */}
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           linear-gradient(rgba(183, 164, 251, 0.016) 1px, transparent 1px),
@@ -155,15 +86,11 @@ export const AboutAtmosphere: React.FC = () => (
       }}
     />
 
-    {/* ════════════════════════════════════════════════════════════
-        MICRO — DEPTH PARTICLES (EDGE-WEIGHTED & CALIBRATED)
-        ════════════════════════════════════════════════════════════ */}
-
     {/* ── L08  PARTICLES FAR ───────────────────────────────────────
-        1px dots across AboutPage vertical range                   */}
+        1px dots. Fixed to viewport. */}
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           radial-gradient(1px 1px at  5%   6%, rgba(255,255,255,0.10) 0%, transparent 100%),
@@ -181,10 +108,10 @@ export const AboutAtmosphere: React.FC = () => (
     />
 
     {/* ── L09  PARTICLES MID ───────────────────────────────────────
-        1.5px dots mid-depth reference                             */}
+        1.5px dots. Fixed to viewport. */}
     <div
       aria-hidden="true"
-      className="absolute inset-0 pointer-events-none"
+      className="fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           radial-gradient(1.5px 1.5px at  4%   9%, rgba(255,255,255,0.15) 0%, transparent 100%),
@@ -201,11 +128,10 @@ export const AboutAtmosphere: React.FC = () => (
     />
 
     {/* ── L10  PARTICLES NEAR (animated) ───────────────────────────
-        2px dots. Far edge only (x ≤ 5% or x ≥ 95%).
-        Animated: 40s slow vertical float                          */}
+        2px dots. Fixed to viewport. 40s slow vertical float. */}
     <div
       aria-hidden="true"
-      className="contact-layer-particles-near absolute inset-0 pointer-events-none"
+      className="contact-layer-particles-near fixed inset-0 pointer-events-none z-0"
       style={{
         backgroundImage: `
           radial-gradient(2px 2px at  3%  10%, rgba(255,255,255,0.18) 0%, transparent 100%),

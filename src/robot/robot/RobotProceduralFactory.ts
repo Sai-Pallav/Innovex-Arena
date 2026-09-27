@@ -128,8 +128,8 @@ export function createProceduralRobot(): RobotNodes {
   const rightUpperArm = rightArmNodes.upperArm.group;
   const leftForearm = leftArmNodes.elbowPivot;
   const rightForearm = rightArmNodes.elbowPivot;
-  const leftHand = leftArmNodes.wristPivot;
-  const rightHand = rightArmNodes.wristPivot;
+  const leftHand = leftArmNodes.hand?.group ?? leftArmNodes.wristPivot;
+  const rightHand = rightArmNodes.hand?.group ?? rightArmNodes.wristPivot;
 
   // ==========================================
   // 8. MODULAR ARTICULATED ROBOT LEGS & FEET

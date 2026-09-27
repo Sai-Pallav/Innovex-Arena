@@ -63,36 +63,36 @@ export const ANIMATION_CONFIG = {
     poses: {
       poseA: {
         name: 'PoseA_SymmetricRelaxed',
-        leftElbow: -0.38,                     // ~ -21.8 deg Euler (softened, subtle, relaxed natural flexion)
-        rightElbow: -0.38,
-        leftUpperPitch: -0.13,                // ~ -7.45 deg forward pitch
-        rightUpperPitch: -0.13,
-        leftUpperRoll: -0.098,                // ~ -5.61 deg subtle outward deviation from torso
-        rightUpperRoll: 0.098,                // ~ +5.61 deg subtle outward deviation from torso
-        leftElbowRoll: 0.155,                 // ~ +8.88 deg softened inward return relative to upper arm
-        rightElbowRoll: -0.155,               // ~ -8.88 deg softened inward return relative to upper arm
+        leftElbow: -0.40,                     // Confident athletic flexion for Right Arm (Image 3)
+        rightElbow: -0.30,                    // Relaxed natural flexion for Left Arm (Image 4)
+        leftUpperPitch: -0.12,
+        rightUpperPitch: -0.06,
+        leftUpperRoll: -0.115,                // Subtle outward drape
+        rightUpperRoll: 0.150,                // Athletic outward drape providing ample clearance beside thigh
+        leftElbowRoll: 0.120,
+        rightElbowRoll: -0.045,               // Natural vertical forearm drape preventing thumb-thigh collision
       },
       poseB: {
         name: 'PoseB_SymmetricRelaxed',
-        leftElbow: -0.38,
-        rightElbow: -0.38,
+        leftElbow: -0.42,
+        rightElbow: -0.31,
         leftUpperPitch: -0.13,
-        rightUpperPitch: -0.13,
-        leftUpperRoll: -0.098,
-        rightUpperRoll: 0.098,
-        leftElbowRoll: 0.155,
-        rightElbowRoll: -0.155,
+        rightUpperPitch: -0.07,
+        leftUpperRoll: -0.118,
+        rightUpperRoll: 0.154,
+        leftElbowRoll: 0.124,
+        rightElbowRoll: -0.048,
       },
       poseC: {
         name: 'PoseC_SymmetricRelaxed',
-        leftElbow: -0.38,
-        rightElbow: -0.38,
-        leftUpperPitch: -0.13,
-        rightUpperPitch: -0.13,
-        leftUpperRoll: -0.098,
-        rightUpperRoll: 0.098,
-        leftElbowRoll: 0.155,
-        rightElbowRoll: -0.155,
+        leftElbow: -0.39,
+        rightElbow: -0.29,
+        leftUpperPitch: -0.11,
+        rightUpperPitch: -0.05,
+        leftUpperRoll: -0.112,
+        rightUpperRoll: 0.146,
+        leftElbowRoll: 0.116,
+        rightElbowRoll: -0.042,
       },
     },
     poseIntervalMin: 14.0,                    // Infrequent pose transitions (seconds)

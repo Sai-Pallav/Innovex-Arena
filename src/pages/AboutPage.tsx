@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
@@ -9,11 +9,9 @@ import {
   Calendar,
   Clock,
   MapPin,
-  Star,
   Users,
   Code,
   GraduationCap,
-  Cpu,
   Video,
   Building2,
   Layers,
@@ -28,9 +26,6 @@ import {
   Send,
   Award,
   Laptop,
-  Terminal,
-  Globe,
-  Zap,
 } from 'lucide-react';
 import {
   HERO_DATA,
@@ -175,7 +170,7 @@ export const AboutPage: React.FC = () => {
   };
 
   return (
-    <div className="home-cosmos-theme relative min-h-screen bg-[#030014] text-[#f4f0ff] pb-24 overflow-hidden selection:bg-[#5046e4]/40 selection:text-white">
+    <div className="home-cosmos-theme relative isolate min-h-screen bg-[#030014] text-[#f4f0ff] pb-24 selection:bg-[#5046e4]/40 selection:text-white">
       {/* ATMOSPHERIC BACKGROUND LAYERS */}
       <AboutAtmosphere />
 
@@ -184,12 +179,6 @@ export const AboutPage: React.FC = () => {
         id="about-hero"
         className="relative z-10 pt-32 pb-20 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto text-center flex flex-col items-center"
       >
-        {/* AI Badge Pill (Reflect: 32px radius, #060317 bg, #5046e4 border, inset violet glow) */}
-        <div className="reflect-ai-badge mb-8 cursor-default group">
-          <Sparkles className="w-3.5 h-3.5 text-[#b7a4fb] shrink-0 group-hover:scale-110 transition-transform duration-200" />
-          <span>About Innovex Arena // Mission & Philosophy</span>
-        </div>
-
         {/* Display Headline — AeonikPro / Sora 500 (Deliberately medium, not bold) */}
         <h1 className="font-aeonik font-medium text-4xl sm:text-6xl lg:text-7xl tracking-[-0.035em] text-[#f4f0ff] leading-[1.12] max-w-4xl mx-auto mb-6">
           Architecting Intelligence for{' '}
@@ -220,7 +209,7 @@ export const AboutPage: React.FC = () => {
           {HERO_DATA.stats.map((stat, i) => (
             <div
               key={i}
-              className="rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] py-6 px-4 text-center space-y-1 group hover:border-[#9382ff]/30 transition-colors"
+              className="rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] py-6 px-4 text-center space-y-1 group hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out"
             >
               <div className="font-aeonik font-medium text-3xl sm:text-4xl text-[#f4f0ff] tracking-tight inline-block">
                 <AnimatedCounter value={stat.value} duration={2000} delay={i * 80} />
@@ -241,10 +230,6 @@ export const AboutPage: React.FC = () => {
       {/* 2. VISION & MISSION SECTION */}
       <section id="vision-mission" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="reflect-ai-badge">
-            <Target className="w-3.5 h-3.5 text-[#9382ff]" />
-            <span>Foundational Blueprint</span>
-          </div>
           <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
             Vision & Mission
           </h2>
@@ -263,13 +248,14 @@ export const AboutPage: React.FC = () => {
               visionMissionVisible ? 'revealed' : ''
             } ${visionMissionHoverReady ? 'hover-ready' : ''}`}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] h-full flex flex-col justify-between group hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] h-full flex flex-col group hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+              <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
               <div className="space-y-4">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#b7a4fb] shrink-0">
+                  <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     <Eye className="w-5 h-5 stroke-[1.5]" />
                   </div>
-                  <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff]">
+                  <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
                     {VISION_MISSION.vision.title}
                   </h3>
                 </div>
@@ -289,13 +275,14 @@ export const AboutPage: React.FC = () => {
               transitionDelay: visionMissionVisible ? '120ms' : '0ms',
             }}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] h-full flex flex-col justify-between group hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] h-full flex flex-col group hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+              <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
               <div className="space-y-4">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#9382ff] shrink-0">
+                  <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#9382ff] shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     <Target className="w-5 h-5 stroke-[1.5]" />
                   </div>
-                  <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff]">
+                  <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
                     {VISION_MISSION.mission.title}
                   </h3>
                 </div>
@@ -321,10 +308,6 @@ export const AboutPage: React.FC = () => {
       {/* 3. CORE PILLARS & SERVICES (REFLECT NOTES MINIMAL FEATURE SPEC) */}
       <section id="services" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="reflect-ai-badge">
-            <Cpu className="w-3.5 h-3.5 text-[#b7a4fb]" />
-            <span>Architectural Capabilities</span>
-          </div>
           <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
             What We Engineer & Deliver
           </h2>
@@ -347,12 +330,13 @@ export const AboutPage: React.FC = () => {
                 transitionDelay: aboutCardsVisible ? `${idx * 80}ms` : '0ms',
               }}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] group flex flex-col justify-between h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] group flex flex-col justify-between h-full hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
                 <div className="flex-1 flex flex-col space-y-3">
-                  <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#f4f0ff]">
+                  <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     {getServiceIcon(srv.iconName)}
                   </div>
-                  <h3 className="font-aeonik text-lg sm:text-xl font-medium text-[#f4f0ff] leading-snug">
+                  <h3 className="font-aeonik text-lg sm:text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 leading-snug">
                     {srv.title}
                   </h3>
                   <p className="text-sm text-[#a8a6b7] leading-relaxed font-normal">
@@ -383,10 +367,6 @@ export const AboutPage: React.FC = () => {
       <section id="products" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <div className="reflect-ai-badge mb-2">
-              <Zap className="w-3.5 h-3.5 text-[#9382ff]" />
-              <span>Proprietary Technology</span>
-            </div>
             <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
               Innovation Labs Products
             </h2>
@@ -411,7 +391,8 @@ export const AboutPage: React.FC = () => {
                 productsVisible ? 'revealed' : ''
               } ${productsHoverReady ? 'hover-ready' : ''}`}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] flex flex-col justify-between group h-full hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
                 <div className="flex-1 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono uppercase tracking-wider text-[#9382ff] px-2 py-0.5 rounded-[5px] bg-[#10093a] border border-white/[0.06]">
@@ -467,10 +448,6 @@ export const AboutPage: React.FC = () => {
       <section id="classes" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <div className="reflect-ai-badge mb-2">
-              <GraduationCap className="w-3.5 h-3.5 text-[#b7a4fb]" />
-              <span>Learning Formats</span>
-            </div>
             <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
               Online & Campus Cohorts
             </h2>
@@ -495,16 +472,17 @@ export const AboutPage: React.FC = () => {
                 classesVisible ? 'revealed' : ''
               } ${classesHoverReady ? 'hover-ready' : ''}`}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] flex flex-col justify-between group h-full hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
                 <div className="flex-1 flex flex-col space-y-4">
-                  <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#f4f0ff]">
+                  <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     {mode.id === 'online' && <Video className="w-5 h-5 stroke-[1.5]" />}
                     {mode.id === 'offline' && <Building2 className="w-5 h-5 stroke-[1.5]" />}
                     {mode.id === 'hybrid' && <Layers className="w-5 h-5 stroke-[1.5]" />}
                   </div>
 
                   <div>
-                    <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] mb-1">
+                    <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1">
                       {mode.title}
                     </h3>
                     <p className="text-xs text-[#b7a4fb] font-medium">
@@ -554,10 +532,6 @@ export const AboutPage: React.FC = () => {
       <section id="events" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <div className="reflect-ai-badge mb-2">
-              <Calendar className="w-3.5 h-3.5 text-[#9382ff]" />
-              <span>Event Calendar</span>
-            </div>
             <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
               Upcoming Hackathons & Talks
             </h2>
@@ -582,7 +556,8 @@ export const AboutPage: React.FC = () => {
                 eventsVisible ? 'revealed' : ''
               } ${eventsHoverReady ? 'hover-ready' : ''}`}
             >
-              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+              <div className="rounded-[16px] bg-[#060317] p-7 sm:p-8 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] flex flex-col justify-between group h-full hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+                <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
                 <div className="flex-1 flex flex-col space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-mono text-[#9382ff] uppercase tracking-wider">
@@ -591,7 +566,7 @@ export const AboutPage: React.FC = () => {
                     <span className="text-xs font-mono text-[#918ea0]">{evt.mode}</span>
                   </div>
 
-                  <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] line-clamp-2">
+                  <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 line-clamp-2">
                     {evt.title}
                   </h3>
 
@@ -638,10 +613,6 @@ export const AboutPage: React.FC = () => {
       {/* 7. CAREERS & OPPORTUNITIES */}
       <section id="careers-internships" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="reflect-ai-badge">
-            <Briefcase className="w-3.5 h-3.5 text-[#9382ff]" />
-            <span>Opportunities</span>
-          </div>
           <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
             Build Your Career With Us
           </h2>
@@ -658,14 +629,14 @@ export const AboutPage: React.FC = () => {
           {CAREER_PERKS.map((perk, i) => (
             <div
               key={i}
-              className={`p-5 rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] text-center space-y-2 flex flex-col justify-between hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer ${
+              className={`scroll-reveal-card p-5 rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] text-center space-y-2 flex flex-col justify-between group hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer ${
                 perksVisible ? 'revealed' : ''
               } ${perksHoverReady ? 'hover-ready' : ''}`}
               style={{
                 transitionDelay: perksVisible ? `${i * 60}ms` : '0ms',
               }}
             >
-              <div className="w-8 h-8 mx-auto rounded-[5px] bg-[#10093a] border border-white/[0.06] flex items-center justify-center text-[#f4f0ff]">
+              <div className="w-8 h-8 mx-auto rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#f4f0ff] group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                 {getPerkIcon(perk.iconName)}
               </div>
               <div className="font-aeonik font-medium text-xs text-[#f4f0ff]">
@@ -689,10 +660,11 @@ export const AboutPage: React.FC = () => {
               positionsVisible ? 'revealed' : ''
             } ${positionsHoverReady ? 'hover-ready' : ''}`}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full flex-1 hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] flex flex-col justify-between group h-full flex-1 hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+              <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#b7a4fb]">
+                  <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     <Briefcase className="w-5 h-5 stroke-[1.5]" />
                   </div>
                   <div>
@@ -743,10 +715,11 @@ export const AboutPage: React.FC = () => {
               transitionDelay: positionsVisible ? '120ms' : '0ms',
             }}
           >
-            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] flex flex-col justify-between group h-full flex-1 hover:border-[#9382ff]/40 transition-[border-color] duration-150 ease-out cursor-pointer">
+            <div className="rounded-[16px] bg-[#060317] p-8 sm:p-10 border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] flex flex-col justify-between group h-full flex-1 hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out cursor-pointer relative overflow-hidden">
+              <div className="absolute inset-0 rounded-[16px] pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-200 ease-out" style={{ boxShadow: 'inset 18px -18px 48px -8px rgba(113,61,255,0.08)' }} />
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-[5px] bg-[#10093a] border border-white/[0.08] flex items-center justify-center text-[#9382ff]">
+                  <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#9382ff] group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     <Rocket className="w-5 h-5 stroke-[1.5]" />
                   </div>
                   <div>
@@ -808,10 +781,6 @@ export const AboutPage: React.FC = () => {
       {/* 8. COMMUNITY TESTIMONIALS (REFLECT CARD SPEC) */}
       <section className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="reflect-ai-badge">
-            <Star className="w-3.5 h-3.5 text-[#9382ff]" />
-            <span>Community Wall</span>
-          </div>
           <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
             Voices from the Ecosystem
           </h2>
@@ -834,10 +803,6 @@ export const AboutPage: React.FC = () => {
       {/* 9. NEWSLETTER SUBSCRIPTION (REFLECT SPEC) */}
       <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto text-center space-y-6">
         <div className="space-y-3">
-          <div className="reflect-ai-badge">
-            <Mail className="w-3.5 h-3.5 text-[#b7a4fb]" />
-            <span>Observatory Dispatch</span>
-          </div>
           <h2 className="font-aeonik font-medium text-3xl sm:text-4xl text-[#f4f0ff] tracking-[-0.03em]">
             Stay Connected with Tech Insights
           </h2>
@@ -872,7 +837,7 @@ export const AboutPage: React.FC = () => {
 
       {/* 10. BOTTOM COLLABORATION CTA BANNER */}
       <section id="contact" className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto">
-        <div className="rounded-[16px] bg-[#060317] border border-white/[0.08] shadow-[inset_0_0_24px_rgba(255,255,255,0.04)] p-10 sm:p-16 relative overflow-hidden text-center space-y-6">
+        <div className="rounded-[16px] bg-[#060317] border border-white/[0.08] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] p-10 sm:p-16 relative overflow-hidden text-center space-y-6 hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] transition-[border-color,box-shadow] duration-200 ease-out">
           <div
             className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[200px] blur-[100px] pointer-events-none"
             style={{
@@ -882,11 +847,6 @@ export const AboutPage: React.FC = () => {
           />
 
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <div className="reflect-ai-badge">
-              <Sparkles className="w-3.5 h-3.5 text-[#b7a4fb]" />
-              <span>Shape the Future</span>
-            </div>
-
             <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em] leading-tight">
               Ready to construct your future with{' '}
               <span className="cosmic-text-gradient font-medium">Innovex Arena</span>?

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotArmNodes } from './RobotArm';
+import { updateRoboticHandAnimation } from './RoboticHand';
 
 export interface ArmControlOverrides {
   shoulder?: { x?: number; y?: number; z?: number };
@@ -291,6 +292,30 @@ export class ArmAnimationController {
       lookYaw,
       lookPitch
     );
+
+    // Dynamic procedural robotic hand kinematics & organic cascading breathing
+    if (this.leftArm.hand) {
+      updateRoboticHandAnimation(
+        this.leftArm.hand,
+        -1,
+        this.time,
+        dt,
+        breathOffset,
+        lookYaw,
+        lookPitch
+      );
+    }
+    if (this.rightArm.hand) {
+      updateRoboticHandAnimation(
+        this.rightArm.hand,
+        1,
+        this.time,
+        dt,
+        breathOffset,
+        lookYaw,
+        lookPitch
+      );
+    }
   }
 
   /**

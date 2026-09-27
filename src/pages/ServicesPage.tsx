@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import {
   Trophy,
@@ -221,7 +221,7 @@ const PastEventsSection: React.FC = () => {
 
 export const ServicesPage: React.FC = () => {
   return (
-    <div className="relative pb-20">
+    <div className="relative isolate pb-20">
       <ServicesAtmosphere />
 
       <div className="pt-20 sm:pt-24 lg:pt-24 space-y-20 sm:space-y-28">

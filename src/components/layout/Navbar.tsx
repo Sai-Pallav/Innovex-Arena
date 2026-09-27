@@ -63,7 +63,7 @@ export const Navbar: React.FC = () => {
         <div
           className={`absolute inset-0 pointer-events-none transition-all duration-500 ${
             isScrolled
-              ? 'bg-gradient-to-b from-[#060212]/95 via-[#060212]/90 to-[#060212]/80 backdrop-blur-xl border-b border-white/[0.06]'
+              ? 'bg-gradient-to-b from-[#060212]/95 via-[#060212]/90 to-[#060212]/80 backdrop-blur-xl'
               : 'bg-gradient-to-b from-[#060212]/40 via-[#060212]/20 to-transparent backdrop-blur-md'
           }`}
         />

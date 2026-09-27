@@ -32,3 +32,5 @@ Thumbs.db
 # Temporary screenshots and visual audit captures
 *.png
 
+# Amazon Q / Assistant artifacts
+.amazonq/

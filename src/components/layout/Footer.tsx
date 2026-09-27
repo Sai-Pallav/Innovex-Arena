@@ -18,7 +18,7 @@ export const Footer: React.FC = () => {
           <div className="lg:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-3 group select-none">
               <div className="w-9 h-9 rounded-full bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_15px_rgba(147,130,255,0.3)] transition-all">
-                <Sparkles className="w-4.5 h-4.5 text-[#b7a4fb]" />
+                <Sparkles className="w-4 h-4 text-[#b7a4fb]" />
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5 leading-none">
