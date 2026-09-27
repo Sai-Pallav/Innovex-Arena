@@ -53,6 +53,19 @@ export interface WristOffset {
   yaw: number;
 }
 
+export interface HandFingerOffsets {
+  proximalCurl: number;
+  middleCurl: number;
+  distalCurl: number;
+  splay: number;
+}
+
+export interface HandOffsets {
+  thumbPitch: number;
+  thumbYaw: number;
+  fingers: HandFingerOffsets[];
+}
+
 export interface WaistSuspensionOffsets {
   segment01Pitch: number;
   segment02Pitch: number;

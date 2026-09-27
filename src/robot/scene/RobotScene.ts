@@ -120,6 +120,7 @@ export class RobotScene {
 
       this.isReady = true;
       (window as any).__robotScene = this;
+      (window as any).__setHandPose = (side: any, pose: any, dur?: any) => this.controller?.setHandPose(side, pose, dur);
       if (options.onLoaded) {
         options.onLoaded(this.modelSource);
       }

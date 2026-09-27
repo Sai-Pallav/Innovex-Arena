@@ -42,7 +42,7 @@ import { createUpperArm, UpperArmNodes } from './UpperArm';
 import { createElbow, ElbowNodes } from './Elbow';
 import { createForearm, ForearmNodes } from './Forearm';
 import { createWrist, WristNodes } from './Wrist';
-import { createRoboticHand, HandNodes } from './RoboticHand';
+import { createHand, HandNodes } from './Hand';
 
 export interface RobotArmNodes {
   root: THREE.Group;
@@ -50,7 +50,7 @@ export interface RobotArmNodes {
   elbow: ElbowNodes;
   forearm: ForearmNodes;
   wrist: WristNodes;
-  hand: HandNodes | null;
+  hand: HandNodes;
   elbowPivot: THREE.Group;
   wristPivot: THREE.Group;
   ledMeshes: THREE.Mesh[];
@@ -72,10 +72,9 @@ export function createRobotArm(
   // Attaches flush to the shoulder mounting flange interface.
   // ==========================================================================
   const upperArm = createUpperArm(side, materials);
-  // Natural relaxed resting posture:
-  // Upper arm angles subtly outward away from torso centerline (~5.61° = 0.098 rad)
-  // Pitch is initialized to -0.13 rad (~ -7.45°) matching AnimationConfig base pitch
-  upperArm.group.rotation.set(-0.13, 0, side * 0.098);
+  // Stage 1 Locked: Balanced, subtle outward direction relative to torso centerline (~6.0° = 0.105 rad)
+  // Pitch is calibrated to -0.12 rad for natural relaxed athletic hang with zero torso intersection
+  upperArm.group.rotation.set(-0.12, 0, side * 0.105);
   armRoot.add(upperArm.group);
   ledMeshes.push(...upperArm.ledMeshes);
 
@@ -107,25 +106,31 @@ export function createRobotArm(
   // ==========================================================================
   const wrist = createWrist(side, materials);
   wrist.group.position.set(0, 0, 0);
-  // Wrist remains clean and neutral with the forearm (neutral mechanical endpoint)
-  wrist.group.rotation.set(0, 0, 0);
+  // Natural relaxed wrist resting posture (matching reference 3D humanoid stance in Reference Images 1 & 2):
+  // Clean three-quarters anatomical hang with natural forearm pronation
+  const wristPitch = 0.08;
+  const wristRoll = side === -1 ? -0.28 : 0.28;
+  const wristYaw = side === -1 ? -0.05 : 0.05;
+  wrist.group.rotation.set(wristPitch, wristRoll, wristYaw);
   forearm.distalWristMount.add(wrist.group);
   ledMeshes.push(...wrist.ledMeshes);
 
   // ==========================================================================
-  // 5. NEW HAND — attaches to wrist.distalHandMount (y = -0.030, immutable)
+  // 5. ARTICULATED HUMANOID MECHA HAND
+  // Mounted directly to wrist.distalHandMount (flush against 8-bolt plate).
+  // 4 articulated 3-phalanx digits + opposable thumb with thenar swivel.
   // ==========================================================================
-  const hand = createRoboticHand(side, materials);
+  const hand = createHand(side, materials);
   wrist.distalHandMount.add(hand.group);
   ledMeshes.push(...hand.ledMeshes);
 
   // ==========================================================================
   // 6. DEFAULT ATHLETIC RESTING POSTURE
-  // Sets natural relaxed angles for immediate hero rendering
-  // Subtle outward upper arm + clear elbow articulation + softened inward forearm return
-  // ==========================================================================
-  elbow.setAngle(side === -1 ? -0.40 : -0.30);
-  elbow.forearmPivot.rotation.z = side === -1 ? 0.120 : -0.045;
+  // Stage 2 Locked: Elbow as true directional turning point, subtle and relaxed (~18.3° = -0.32 rad)
+  elbow.setAngle(-0.32);
+  // Stage 3 Locked: Elbow -> Forearm subtle inward return toward torso centerline
+  // Net inward angle is -side * 0.035 rad (~2.0° inward toward hips) with exact bilateral symmetry
+  elbow.forearmPivot.rotation.z = -side * 0.115;
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {

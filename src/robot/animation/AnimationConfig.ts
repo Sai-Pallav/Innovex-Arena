@@ -63,36 +63,36 @@ export const ANIMATION_CONFIG = {
     poses: {
       poseA: {
         name: 'PoseA_SymmetricRelaxed',
-        leftElbow: -0.40,                     // Confident athletic flexion for Right Arm (Image 3)
-        rightElbow: -0.30,                    // Relaxed natural flexion for Left Arm (Image 4)
-        leftUpperPitch: -0.12,
+        leftElbow: -0.36,                     // Balanced athletic flexion for Left Arm
+        rightElbow: -0.32,                    // Relaxed natural flexion for Right Arm
+        leftUpperPitch: -0.10,
         rightUpperPitch: -0.06,
-        leftUpperRoll: -0.115,                // Subtle outward drape
-        rightUpperRoll: 0.150,                // Athletic outward drape providing ample clearance beside thigh
-        leftElbowRoll: 0.120,
-        rightElbowRoll: -0.045,               // Natural vertical forearm drape preventing thumb-thigh collision
+        leftUpperRoll: -0.110,                // Subtle outward drape
+        rightUpperRoll: 0.135,                // Athletic outward drape providing ample clearance beside thigh
+        leftElbowRoll: 0.080,
+        rightElbowRoll: -0.050,               // Natural vertical forearm drape preventing thumb-thigh collision
       },
       poseB: {
         name: 'PoseB_SymmetricRelaxed',
-        leftElbow: -0.42,
-        rightElbow: -0.31,
-        leftUpperPitch: -0.13,
+        leftElbow: -0.38,
+        rightElbow: -0.33,
+        leftUpperPitch: -0.11,
         rightUpperPitch: -0.07,
-        leftUpperRoll: -0.118,
-        rightUpperRoll: 0.154,
-        leftElbowRoll: 0.124,
-        rightElbowRoll: -0.048,
+        leftUpperRoll: -0.112,
+        rightUpperRoll: 0.138,
+        leftElbowRoll: 0.084,
+        rightElbowRoll: -0.052,
       },
       poseC: {
         name: 'PoseC_SymmetricRelaxed',
-        leftElbow: -0.39,
-        rightElbow: -0.29,
-        leftUpperPitch: -0.11,
+        leftElbow: -0.35,
+        rightElbow: -0.31,
+        leftUpperPitch: -0.09,
         rightUpperPitch: -0.05,
-        leftUpperRoll: -0.112,
-        rightUpperRoll: 0.146,
-        leftElbowRoll: 0.116,
-        rightElbowRoll: -0.042,
+        leftUpperRoll: -0.108,
+        rightUpperRoll: 0.132,
+        leftElbowRoll: 0.076,
+        rightElbowRoll: -0.048,
       },
     },
     poseIntervalMin: 14.0,                    // Infrequent pose transitions (seconds)
@@ -112,7 +112,21 @@ export const ANIMATION_CONFIG = {
   },
 
   // ==========================================
-  // 5. ABDOMEN / WAIST MECHANICAL SUSPENSION
+  // 5. HAND & COORDINATED FINGER MICRO-ANIMATION
+  // ==========================================
+  hand: {
+    // Subtle curl range: fingers stay relaxed and hanging straight down
+    minCurl: 0.0,
+    maxCurl: (2.0 * Math.PI) / 180,           // ~2.0° subtle micro-motion
+    cycleSpeed: 0.28,                         // Slow periodic cycle (~22s full cycle)
+    splayAmplitude: 0.004,
+    // Thumb thenar subtle micro-kinematics
+    thumbPitchFactor: 0.012,
+    thumbYawFactor: 0.008,
+  },
+
+  // ==========================================
+  // 6. ABDOMEN / WAIST MECHANICAL SUSPENSION
   // ==========================================
   waist: {
     upperSegmentPitch: (0.5 * Math.PI) / 180, // +0.5°

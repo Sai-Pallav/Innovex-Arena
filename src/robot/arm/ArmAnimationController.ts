@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { RobotArmNodes } from './RobotArm';
-import { updateRoboticHandAnimation } from './RoboticHand';
+import { FingerNodes, ThumbNodes } from './Finger';
 
 export interface ArmControlOverrides {
   shoulder?: { x?: number; y?: number; z?: number };
@@ -10,12 +10,152 @@ export interface ArmControlOverrides {
   elbowRoll?: number;
   elbow?: { x?: number; y?: number; z?: number };
   wrist?: { pitch?: number; yaw?: number; roll?: number };
+  thumb?: { proxCurl?: number; distCurl?: number; splay?: number };
+  fingers?: Array<{ proxCurl?: number; midCurl?: number; distCurl?: number; splay?: number }>;
 }
+
+export type HandPoseName = 'relaxed' | 'fist' | 'open' | 'point' | 'grip' | 'pinch' | 'peace';
+
+export interface FingerPoseTarget {
+  prox: number;
+  mid: number;
+  dist: number;
+  splay: number;
+}
+
+export interface ThumbPoseTarget {
+  pitch: number;
+  yaw: number;
+  roll: number;
+  prox: number;
+  dist: number;
+}
+
+export interface HandPosePreset {
+  fingers: [FingerPoseTarget, FingerPoseTarget, FingerPoseTarget, FingerPoseTarget]; // Index, Middle, Ring, Little
+  thumb: ThumbPoseTarget;
+}
+
+export const HAND_POSES: Record<HandPoseName, HandPosePreset> = {
+  // 1. Signature anatomical resting athletic cascade (Reference Images 1 & 2)
+  relaxed: {
+    fingers: [
+      { prox: 0.22, mid: 0.36, dist: 0.24, splay: -0.025 }, // Index: graceful forward extension
+      { prox: 0.34, mid: 0.54, dist: 0.36, splay:  0.000 }, // Middle: progressive athletic curve
+      { prox: 0.46, mid: 0.74, dist: 0.46, splay:  0.038 }, // Ring: deeper curl receding under
+      { prox: 0.58, mid: 0.94, dist: 0.56, splay:  0.075 }, // Little: tightly tucked cascade into palm
+    ],
+    thumb: {
+      pitch: 0.36,
+      yaw: 0.22,
+      roll: 0.16,
+      prox: 0.18,
+      dist: 0.24,
+    },
+  },
+  // 2. Powerful mecha combat fist (full closure against palmar elastomer pads)
+  fist: {
+    fingers: [
+      { prox: 1.38, mid: 1.48, dist: 1.22, splay: -0.015 },
+      { prox: 1.40, mid: 1.50, dist: 1.25, splay:  0.000 },
+      { prox: 1.38, mid: 1.48, dist: 1.22, splay:  0.018 },
+      { prox: 1.35, mid: 1.45, dist: 1.18, splay:  0.035 },
+    ],
+    thumb: {
+      pitch: 0.68,
+      yaw: 0.50,
+      roll: 0.26,
+      prox: 0.60,
+      dist: 0.80,
+    },
+  },
+  // 3. Heroic flat open hand with wide transverse finger splay
+  open: {
+    fingers: [
+      { prox: 0.04, mid: 0.05, dist: 0.04, splay: -0.080 },
+      { prox: 0.02, mid: 0.03, dist: 0.02, splay: -0.015 },
+      { prox: 0.03, mid: 0.04, dist: 0.03, splay:  0.050 },
+      { prox: 0.06, mid: 0.07, dist: 0.06, splay:  0.120 },
+    ],
+    thumb: {
+      pitch: 0.18,
+      yaw: 0.10,
+      roll: 0.28,
+      prox: 0.08,
+      dist: 0.10,
+    },
+  },
+  // 4. Precision pointing gesture (Index extended, others locked in palm)
+  point: {
+    fingers: [
+      { prox: 0.02, mid: 0.03, dist: 0.02, splay: -0.020 }, // Index straight
+      { prox: 1.38, mid: 1.48, dist: 1.22, splay:  0.005 }, // Middle curled
+      { prox: 1.40, mid: 1.50, dist: 1.25, splay:  0.020 }, // Ring curled
+      { prox: 1.36, mid: 1.46, dist: 1.18, splay:  0.040 }, // Little curled
+    ],
+    thumb: {
+      pitch: 0.65,
+      yaw: 0.48,
+      roll: 0.24,
+      prox: 0.55,
+      dist: 0.75,
+    },
+  },
+  // 5. Cylindrical power grip (holding equipment, rods, handles)
+  grip: {
+    fingers: [
+      { prox: 0.95, mid: 1.15, dist: 0.85, splay: -0.020 },
+      { prox: 0.98, mid: 1.18, dist: 0.88, splay:  0.000 },
+      { prox: 0.96, mid: 1.16, dist: 0.86, splay:  0.022 },
+      { prox: 0.92, mid: 1.12, dist: 0.82, splay:  0.045 },
+    ],
+    thumb: {
+      pitch: 0.52,
+      yaw: 0.40,
+      roll: 0.22,
+      prox: 0.48,
+      dist: 0.58,
+    },
+  },
+  // 6. Dexterous fine-manipulation pinch (Thumb tip to index tip)
+  pinch: {
+    fingers: [
+      { prox: 0.68, mid: 0.92, dist: 0.70, splay:  0.010 }, // Index meets thumb tip
+      { prox: 0.42, mid: 0.65, dist: 0.48, splay:  0.020 },
+      { prox: 0.95, mid: 1.15, dist: 0.85, splay:  0.045 },
+      { prox: 1.15, mid: 1.28, dist: 0.98, splay:  0.070 },
+    ],
+    thumb: {
+      pitch: 0.60,
+      yaw: 0.48,
+      roll: 0.20,
+      prox: 0.52,
+      dist: 0.62,
+    },
+  },
+  // 7. Iconic victory / peace V-sign
+  peace: {
+    fingers: [
+      { prox: 0.04, mid: 0.05, dist: 0.03, splay: -0.090 }, // Index spread V
+      { prox: 0.04, mid: 0.05, dist: 0.03, splay:  0.090 }, // Middle spread V
+      { prox: 1.40, mid: 1.50, dist: 1.25, splay:  0.020 }, // Ring tucked
+      { prox: 1.38, mid: 1.48, dist: 1.22, splay:  0.040 }, // Little tucked
+    ],
+    thumb: {
+      pitch: 0.70,
+      yaw: 0.52,
+      roll: 0.26,
+      prox: 0.60,
+      dist: 0.80,
+    },
+  },
+};
 
 /**
  * Kinematics and animation controller for procedural robot arms and hands.
  * Adheres to Section 5:
  * - Independent control for shoulder, upper arm, elbow, wrist, thumb, and each finger segment.
+ * - Dynamic hand moulding: smooth transition between any hand poses (relaxed, fist, open, point, grip, pinch, peace).
  * - Hierarchical bending where rotating a joint moves its children naturally.
  * - Organic idle kinematics with breathing coupling and cascading finger waves.
  */
@@ -92,6 +232,17 @@ export class ArmAnimationController {
   // Manual overrides for programmatic posing
   private leftOverrides: ArmControlOverrides = {};
   private rightOverrides: ArmControlOverrides = {};
+
+  // Hand pose dynamic moulding system
+  private activePoseLeft: HandPoseName = 'relaxed';
+  private targetPoseLeft: HandPoseName = 'relaxed';
+  private poseTransitionLeft: number = 1.0;
+  private poseDurationLeft: number = 0.4;
+
+  private activePoseRight: HandPoseName = 'relaxed';
+  private targetPoseRight: HandPoseName = 'relaxed';
+  private poseTransitionRight: number = 1.0;
+  private poseDurationRight: number = 0.4;
 
   constructor(leftArm: RobotArmNodes, rightArm: RobotArmNodes) {
     this.leftArm = leftArm;
@@ -247,6 +398,39 @@ export class ArmAnimationController {
   }
 
   // ==============================================================
+  // HAND POSE MOULDING API
+  // Dynamic transitions to any hand pose: relaxed, fist, open, point, grip, pinch, peace
+  // ==============================================================
+
+  public setHandPose(
+    side: 'left' | 'right' | 'both' | -1 | 1,
+    pose: HandPoseName,
+    durationSec: number = 0.4
+  ): void {
+    if (!HAND_POSES[pose]) return;
+    if (side === 'left' || side === -1 || side === 'both') {
+      if (this.targetPoseLeft !== pose) {
+        this.activePoseLeft = this.poseTransitionLeft < 1.0 ? this.targetPoseLeft : this.activePoseLeft;
+        this.targetPoseLeft = pose;
+        this.poseTransitionLeft = 0;
+        this.poseDurationLeft = durationSec;
+      }
+    }
+    if (side === 'right' || side === 1 || side === 'both') {
+      if (this.targetPoseRight !== pose) {
+        this.activePoseRight = this.poseTransitionRight < 1.0 ? this.targetPoseRight : this.activePoseRight;
+        this.targetPoseRight = pose;
+        this.poseTransitionRight = 0;
+        this.poseDurationRight = durationSec;
+      }
+    }
+  }
+
+  public getHandPose(side: 'left' | 'right' | -1 | 1): HandPoseName {
+    return (side === 'left' || side === -1) ? this.targetPoseLeft : this.targetPoseRight;
+  }
+
+  // ==============================================================
   // REAL-TIME KINEMATICS UPDATE
   // ==============================================================
 
@@ -257,6 +441,20 @@ export class ArmAnimationController {
     lookPitch: number = 0
   ): void {
     this.time += dt;
+
+    // Update hand pose transitions
+    if (this.poseTransitionLeft < 1.0) {
+      this.poseTransitionLeft = Math.min(1.0, this.poseTransitionLeft + dt / Math.max(0.01, this.poseDurationLeft));
+      if (this.poseTransitionLeft >= 1.0) {
+        this.activePoseLeft = this.targetPoseLeft;
+      }
+    }
+    if (this.poseTransitionRight < 1.0) {
+      this.poseTransitionRight = Math.min(1.0, this.poseTransitionRight + dt / Math.max(0.01, this.poseDurationRight));
+      if (this.poseTransitionRight >= 1.0) {
+        this.activePoseRight = this.targetPoseRight;
+      }
+    }
 
     // Exploded View smooth damping interpolation
     const targetExploded = this.isExploded ? 1.0 : 0.0;
@@ -292,30 +490,6 @@ export class ArmAnimationController {
       lookYaw,
       lookPitch
     );
-
-    // Dynamic procedural robotic hand kinematics & organic cascading breathing
-    if (this.leftArm.hand) {
-      updateRoboticHandAnimation(
-        this.leftArm.hand,
-        -1,
-        this.time,
-        dt,
-        breathOffset,
-        lookYaw,
-        lookPitch
-      );
-    }
-    if (this.rightArm.hand) {
-      updateRoboticHandAnimation(
-        this.rightArm.hand,
-        1,
-        this.time,
-        dt,
-        breathOffset,
-        lookYaw,
-        lookPitch
-      );
-    }
   }
 
   /**
@@ -621,6 +795,156 @@ export class ArmAnimationController {
         baseWrist.z + wYaw
       );
     }
+
+    // 5. Hand Fingers Kinematics (Guarded if arm terminates at wrist interface)
+    if (arm.hand && arm.hand.indexFinger) {
+      const fingers = [
+        arm.hand.indexFinger,
+        arm.hand.middleFinger,
+        arm.hand.ringFinger,
+        arm.hand.littleFinger,
+      ];
+
+      fingers.forEach((finger, idx) => {
+        if (finger) {
+          this.updateFingerKinematics(
+            finger,
+            idx,
+            overrides.fingers ? overrides.fingers[idx] : undefined,
+            side,
+            timePhase,
+            breathOffset
+          );
+        }
+      });
+    }
+
+    // 6. Thumb Kinematics
+    if (arm.hand && arm.hand.thumb && arm.hand.thumb.proximal) {
+      this.updateThumbKinematics(
+        arm.hand.thumb,
+        overrides.thumb,
+        side,
+        timePhase,
+        breathOffset
+      );
+    }
+  }
+
+  private getInterpolatedFingerTarget(side: -1 | 1, idx: number): FingerPoseTarget {
+    const isLeft = side === -1;
+    const activePose = isLeft ? this.activePoseLeft : this.activePoseRight;
+    const targetPose = isLeft ? this.targetPoseLeft : this.targetPoseRight;
+    const progress = isLeft ? this.poseTransitionLeft : this.poseTransitionRight;
+
+    const fromTarget = HAND_POSES[activePose]?.fingers[idx] ?? HAND_POSES.relaxed.fingers[idx];
+    const toTarget = HAND_POSES[targetPose]?.fingers[idx] ?? HAND_POSES.relaxed.fingers[idx];
+
+    if (progress >= 1.0 || activePose === targetPose) {
+      return toTarget;
+    }
+
+    const s = progress * progress * (3.0 - 2.0 * progress);
+    return {
+      prox:  THREE.MathUtils.lerp(fromTarget.prox,  toTarget.prox,  s),
+      mid:   THREE.MathUtils.lerp(fromTarget.mid,   toTarget.mid,   s),
+      dist:  THREE.MathUtils.lerp(fromTarget.dist,  toTarget.dist,  s),
+      splay: THREE.MathUtils.lerp(fromTarget.splay, toTarget.splay, s),
+    };
+  }
+
+  private getInterpolatedThumbTarget(side: -1 | 1): ThumbPoseTarget {
+    const isLeft = side === -1;
+    const activePose = isLeft ? this.activePoseLeft : this.activePoseRight;
+    const targetPose = isLeft ? this.targetPoseLeft : this.targetPoseRight;
+    const progress = isLeft ? this.poseTransitionLeft : this.poseTransitionRight;
+
+    const fromTarget = HAND_POSES[activePose]?.thumb ?? HAND_POSES.relaxed.thumb;
+    const toTarget = HAND_POSES[targetPose]?.thumb ?? HAND_POSES.relaxed.thumb;
+
+    if (progress >= 1.0 || activePose === targetPose) {
+      return toTarget;
+    }
+
+    const s = progress * progress * (3.0 - 2.0 * progress);
+    return {
+      pitch: THREE.MathUtils.lerp(fromTarget.pitch, toTarget.pitch, s),
+      yaw:   THREE.MathUtils.lerp(fromTarget.yaw,   toTarget.yaw,   s),
+      roll:  THREE.MathUtils.lerp(fromTarget.roll,  toTarget.roll,  s),
+      prox:  THREE.MathUtils.lerp(fromTarget.prox,  toTarget.prox,  s),
+      dist:  THREE.MathUtils.lerp(fromTarget.dist,  toTarget.dist,  s),
+    };
+  }
+
+  private updateFingerKinematics(
+    finger: FingerNodes,
+    idx: number,
+    override: { proxCurl?: number; midCurl?: number; distCurl?: number; splay?: number } | undefined,
+    side: -1 | 1,
+    timePhase: number,
+    breathOffset: number
+  ): void {
+    if (!finger || !finger.proximal || !finger.proximal.group) return;
+    const radial = -side;
+
+    const target = this.getInterpolatedFingerTarget(side, idx);
+    const isTightPose = target.prox > 0.8;
+    const microScale = isTightPose ? 0.25 : 1.0;
+
+    // Procedural organic resting micro-motion
+    const speed = 0.45 + idx * 0.06;
+    const phase = idx * 0.42 + timePhase;
+    const amp = (0.006 - idx * 0.001) * microScale;
+
+    const wave =
+      Math.sin(this.time * speed + phase) * amp +
+      Math.sin(this.time * speed * 2.0 + phase * 0.7) * (amp * 0.25) +
+      breathOffset * 0.003 * microScale;
+
+    const addProx = (override?.proxCurl !== undefined ? override.proxCurl : wave * 0.3) * microScale;
+    const addMid = (override?.midCurl !== undefined ? override.midCurl : wave * 0.5) * microScale;
+    const addDist = (override?.distCurl !== undefined ? override.distCurl : wave * 0.4) * microScale;
+    const addSplay = override?.splay !== undefined ? override.splay : Math.sin(this.time * 0.25 + phase) * 0.001 * microScale;
+
+    finger.proximal.group.rotation.x = THREE.MathUtils.clamp(target.prox + addProx, 0, 1.65);
+    finger.middle.group.rotation.x = THREE.MathUtils.clamp(target.mid + addMid, 0, 1.65);
+    finger.distal.group.rotation.x = THREE.MathUtils.clamp(target.dist + addDist, 0, 1.60);
+    finger.proximal.group.rotation.z = radial * (target.splay + addSplay);
+  }
+
+  private updateThumbKinematics(
+    thumb: ThumbNodes,
+    override: { proxCurl?: number; distCurl?: number; splay?: number } | undefined,
+    side: -1 | 1,
+    timePhase: number,
+    breathOffset: number
+  ): void {
+    if (!thumb || !thumb.proximal || !thumb.proximal.group) return;
+    const radial = -side;
+
+    const target = this.getInterpolatedThumbTarget(side);
+    const isTightPose = target.prox > 0.5;
+    const microScale = isTightPose ? 0.25 : 1.0;
+
+    const wave =
+      (Math.cos(this.time * 0.40 + timePhase) * 0.005 +
+      Math.sin(this.time * 0.80 + timePhase) * 0.003 +
+      breathOffset * 0.002) * microScale;
+
+    const addProx = (override?.proxCurl !== undefined ? override.proxCurl : wave * 0.04) * microScale;
+    const addDist = (override?.distCurl !== undefined ? override.distCurl : wave * 0.04) * microScale;
+    const addSplay = override?.splay !== undefined ? override.splay : 0;
+
+    thumb.group.rotation.set(
+      target.pitch + wave * 0.015,
+      -radial * (target.yaw + addSplay * 0.15),
+      radial * (target.roll + addSplay)
+    );
+    thumb.proximal.group.rotation.x = THREE.MathUtils.clamp(target.prox + addProx, 0, 1.55);
+    thumb.proximal.group.rotation.z = 0;
+    thumb.distal.group.rotation.x = THREE.MathUtils.clamp(target.dist + addDist, 0, 1.55);
+    thumb.distal.group.rotation.z = -radial * 0.09;
+    if (thumb.middle) thumb.middle.group.rotation.x = THREE.MathUtils.clamp(target.dist + addDist, 0, 1.55);
   }
 }
 

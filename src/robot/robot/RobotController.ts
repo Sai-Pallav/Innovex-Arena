@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotNodes } from './RobotProceduralFactory';
 import { RobotAnimationController } from '../animation/RobotAnimationController';
+import { HandPoseName } from '../arm/ArmAnimationController';
 
 export class RobotController {
   public nodes: RobotNodes;
@@ -80,6 +81,18 @@ export class RobotController {
 
   public getArmController() {
     return this.animController.getArmController();
+  }
+
+  public setHandPose(
+    side: 'left' | 'right' | 'both',
+    pose: HandPoseName,
+    durationSec: number = 0.4
+  ): void {
+    this.animController.setHandPose(side, pose, durationSec);
+  }
+
+  public getHandPose(side: 'left' | 'right'): HandPoseName {
+    return this.animController.getHandPose(side);
   }
 
   public getTorsoController() {
