@@ -44,51 +44,51 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
   return [
     {
       name: 'Index',
-      spreadX: radial * 0.0242,
-      offsetY: -0.0513,
-      offsetZ:  0.0028,
-      proximalLength: 0.0436,
-      middleLength:   0.0277,
-      distalLength:   0.0206,
-      proximalRadius: 0.0068,
-      middleRadius:   0.0059,
-      distalRadius:   0.0051,
+      spreadX: radial * 0.0225,
+      offsetY: -0.0502,
+      offsetZ:  0.0022,
+      proximalLength: 0.0415,
+      middleLength:   0.0268,
+      distalLength:   0.0198,
+      proximalRadius: 0.0064,
+      middleRadius:   0.0056,
+      distalRadius:   0.0048,
     },
     {
       name: 'Middle',
-      spreadX: radial * 0.0073,
-      offsetY: -0.0543,
-      offsetZ:  0.0038,
-      proximalLength: 0.0507,
-      middleLength:   0.0330,
-      distalLength:   0.0242,
-      proximalRadius: 0.0073,
-      middleRadius:   0.0064,
-      distalRadius:   0.0054,
+      spreadX: radial * 0.0070,
+      offsetY: -0.0532,
+      offsetZ:  0.0035,
+      proximalLength: 0.0485,
+      middleLength:   0.0318,
+      distalLength:   0.0232,
+      proximalRadius: 0.0068,
+      middleRadius:   0.0060,
+      distalRadius:   0.0051,
     },
     {
       name: 'Ring',
-      spreadX: -radial * 0.0092,
-      offsetY: -0.0525,
-      offsetZ:  0.0031,
-      proximalLength: 0.0460,
-      middleLength:   0.0295,
-      distalLength:   0.0218,
-      proximalRadius: 0.0067,
-      middleRadius:   0.0058,
-      distalRadius:   0.0050,
+      spreadX: -radial * 0.0085,
+      offsetY: -0.0514,
+      offsetZ:  0.0025,
+      proximalLength: 0.0442,
+      middleLength:   0.0286,
+      distalLength:   0.0208,
+      proximalRadius: 0.0063,
+      middleRadius:   0.0055,
+      distalRadius:   0.0047,
     },
     {
       name: 'Little',
-      spreadX: -radial * 0.0254,
-      offsetY: -0.0466,
-      offsetZ:  0.0017,
-      proximalLength: 0.0342,
-      middleLength:   0.0212,
-      distalLength:   0.0159,
-      proximalRadius: 0.0057,
-      middleRadius:   0.0048,
-      distalRadius:   0.0041,
+      spreadX: -radial * 0.0235,
+      offsetY: -0.0465,
+      offsetZ:  0.0010,
+      proximalLength: 0.0332,
+      middleLength:   0.0206,
+      distalLength:   0.0152,
+      proximalRadius: 0.0054,
+      middleRadius:   0.0046,
+      distalRadius:   0.0039,
     },
   ];
 }
@@ -99,21 +99,12 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
 // 4 metacarpal ray ridges, protective knuckle hoods, and high thenar trunnion cradle.
 // ─────────────────────────────────────────────────────────────────────────────
 function getKnuckleMarginY(r: number): number {
-  // Base anatomical transverse slope calibrated to scaled finger roots
-  const base = -0.0484 + (r < 0.23 ? 0.0073 * Math.pow((0.23 - r) / 1.05, 1.4) : 0.0033 * Math.pow((r - 0.23) / 0.55, 1.3));
-
-  // 4 Scalloped Knuckle Hoods protruding over each MCP knuckle
-  const hood0 = Math.exp(-Math.pow((r - 0.75) / 0.16, 2)) * 0.0041; // Index hood -> -0.0496
-  const hood1 = Math.exp(-Math.pow((r - 0.23) / 0.17, 2)) * 0.0045; // Middle hood -> -0.0528
-  const hood2 = Math.exp(-Math.pow((r - (-0.28)) / 0.16, 2)) * 0.0042; // Ring hood -> -0.0508
-  const hood3 = Math.exp(-Math.pow((r - (-0.80)) / 0.15, 2)) * 0.0038; // Little hood -> -0.0449
-
-  // Inter-digital scallops / notches receding proximally between knuckles
-  const notch1 = Math.exp(-Math.pow((r - 0.49) / 0.12, 2)) * 0.0030;
-  const notch2 = Math.exp(-Math.pow((r - (-0.03)) / 0.13, 2)) * 0.0033;
-  const notch3 = Math.exp(-Math.pow((r - (-0.54)) / 0.12, 2)) * 0.0028;
-
-  return base - (hood0 + hood1 + hood2 + hood3) + (notch1 + notch2 + notch3);
+  // Continuous smooth anatomical metacarpal arch:
+  // Peaks at middle finger (r ≈ 0.18), gently sloping to index on radial side and pinky on ulnar side
+  // Zero jagged notches or sawteeth!
+  const base = -0.0495;
+  const arch = 0.0035 * Math.cos(r * Math.PI * 0.42);
+  return base + arch;
 }
 
 function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE.Mesh {
@@ -127,8 +118,8 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
   for (let iy = 0; iy < numY; iy++) {
     const v = iy / (numY - 1);
 
-    // Dynamic width taper: starts at 52mm at carpal collar, smoothly flares to 63mm at knuckles
-    const baseHw = 0.0260 + 0.0056 * Math.sin(v * Math.PI * 0.75);
+    // Dynamic width taper: starts at 48mm at carpal collar, smoothly flares to 56mm at knuckles
+    const baseHw = 0.0240 + 0.0045 * Math.sin(v * Math.PI * 0.75);
 
     for (let ix = 0; ix < numX; ix++) {
       const u = ix / (numX - 1);
@@ -138,11 +129,11 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
       // Inverted radial coordinate: +1 is ALWAYS the radial (thumb/index) flank, -1 is ulnar (pinky) flank
       const r = -side * nx;
 
-      // Precision circular thenar socket clearance on radial flank (v in [0.08, 0.42])
+      // Precision thenar socket clearance on radial flank (v in [0.08, 0.42])
       let socketNotch = 0;
       if (r > 0.55 && v > 0.08 && v < 0.42) {
         const socketPhase = (v - 0.08) / (0.42 - 0.08);
-        socketNotch = -Math.sin(socketPhase * Math.PI) * 0.0026;
+        socketNotch = -Math.sin(socketPhase * Math.PI) * 0.0022;
       }
 
       const hw = baseHw + (r > 0 ? socketNotch : 0);
@@ -154,20 +145,20 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
       // Continuous interpolation from carpal collar (-0.0010m) to knuckle margin
       const y = -0.0010 + v * (knuckleY - (-0.0010));
 
-      // 4 Metacarpal Ray Crests (longitudinal structural ridges leading to each knuckle hood)
-      const ray1 = Math.exp(-Math.pow((r - 0.75) / 0.16, 2)) * 0.0009; // Index ray
-      const ray2 = Math.exp(-Math.pow((r - 0.23) / 0.16, 2)) * 0.0012; // Middle ray
-      const ray3 = Math.exp(-Math.pow((r - (-0.28)) / 0.16, 2)) * 0.0011;  // Ring ray
-      const ray4 = Math.exp(-Math.pow((r - (-0.80)) / 0.15, 2)) * 0.0008;  // Little ray
+      // Subtle Metacarpal Ray Crests (gentle organic ridges leading to each finger)
+      const ray1 = Math.exp(-Math.pow((r - 0.75) / 0.20, 2)) * 0.0006; // Index ray
+      const ray2 = Math.exp(-Math.pow((r - 0.20) / 0.20, 2)) * 0.0008; // Middle ray
+      const ray3 = Math.exp(-Math.pow((r - (-0.28)) / 0.20, 2)) * 0.0007; // Ring ray
+      const ray4 = Math.exp(-Math.pow((r - (-0.80)) / 0.20, 2)) * 0.0005; // Little ray
       const metacarpalRays = (ray1 + ray2 + ray3 + ray4) * Math.sin(v * Math.PI * 0.85);
 
       // Aerodynamic compound-camber dorsal arch
-      const crownArch = Math.cos(nx * Math.PI * 0.44) * 0.0056;
+      const crownArch = Math.cos(nx * Math.PI * 0.44) * 0.0050;
       // Flank curvature curling smoothly toward the palmar side
-      const flankDrop = Math.pow(Math.abs(nx), 2.5) * 0.0102;
+      const flankDrop = Math.pow(Math.abs(nx), 2.5) * 0.0085;
 
       // Z depth profile: crowned dorsum falling off to side flanks
-      const z = 0.0124 + crownArch * (0.86 + 0.14 * Math.sin(v * Math.PI)) + metacarpalRays - flankDrop;
+      const z = 0.0120 + crownArch * (0.88 + 0.12 * Math.sin(v * Math.PI)) + metacarpalRays - flankDrop;
 
       positions.push(x, y, z);
       uvs.push(u, v);
@@ -247,14 +238,6 @@ export function createHand(
   palmChassis.castShadow = true;
   palmChassis.receiveShadow = true;
   handGroup.add(palmChassis);
-
-  // Arched Transverse Knuckle Chassis Bar
-  const knuckleBarGeo = new THREE.BoxGeometry(0.0590, 0.0060, 0.0112);
-  const knuckleBar = new THREE.Mesh(knuckleBarGeo, materials.joint);
-  knuckleBar.name = 'TransverseKnuckleBar';
-  knuckleBar.position.set(0, -0.0478, 0.0022);
-  knuckleBar.castShadow = true;
-  handGroup.add(knuckleBar);
 
   // CNC Weight-reduction pockets along palm chassis
   for (let p = 0; p < 3; p++) {
@@ -347,14 +330,14 @@ export function createHand(
   handGroup.add(dotPin);
 
   // ════════════════════════════════════════════════════════════
-  // 4. METACARPOPHALANGEAL (MCP) KNUCKLE PINS
-  //    True 3D Transverse Arch with Metallic Bearing Retainers
+  // 4. METACARPOPHALANGEAL (MCP) KNUCKLE ASSEMBLIES
+  //    Semi-recessed dark titanium joint barrels nested beneath dorsal shield
   // ════════════════════════════════════════════════════════════
   const fingerSpecs = getFingerSpecs(side);
 
   for (const spec of fingerSpecs) {
-    const kRadius = spec.proximalRadius * 0.72;
-    const kWidth = spec.proximalRadius * 1.82;
+    const kRadius = spec.proximalRadius * 0.70;
+    const kWidth = spec.proximalRadius * 1.76;
 
     // Transverse knuckle barrel
     const kGeo = new THREE.CylinderGeometry(kRadius, kRadius, kWidth, 20);
@@ -365,39 +348,11 @@ export function createHand(
     handGroup.add(knuckle);
     knuckles.push(knuckle);
 
-    // Precision MCP Knuckle Mounting Clevis / Chassis Socket (Stage 1 Mechanical Mount)
-    const clevisH = Math.max(0.0040, (-0.0454) - spec.offsetY);
-    const clevisGeo = new THREE.BoxGeometry(kWidth * 0.90, clevisH, kRadius * 2.10);
-    const clevis = new THREE.Mesh(clevisGeo, materials.joint);
-    clevis.name = `MCP_${spec.name}_Clevis`;
-    clevis.position.set(
-      spec.spreadX,
-      spec.offsetY + clevisH * 0.5,
-      spec.offsetZ - 0.0007
-    );
-    clevis.castShadow = true;
-    handGroup.add(clevis);
-
-    // Lateral clevis fork cheeks / bearing flanges flanking each knuckle
-    const cheekThick = 0.0010;
-    const cheekOffset = kWidth * 0.46;
+    // Precision flush metallic pivot caps with micro hex detail
+    const capRadius = spec.proximalRadius * 0.72;
+    const capX = kWidth * 0.50 + 0.0003;
     for (const cSide of [-1, 1]) {
-      const cheekGeo = new THREE.BoxGeometry(cheekThick, clevisH * 1.15, kRadius * 2.05);
-      const cheek = new THREE.Mesh(cheekGeo, materials.joint);
-      cheek.position.set(
-        spec.spreadX + cSide * cheekOffset,
-        spec.offsetY + clevisH * 0.4,
-        spec.offsetZ
-      );
-      cheek.castShadow = true;
-      handGroup.add(cheek);
-    }
-
-    // Precision metallic end caps with concentric micro-detailing
-    const capRadius = spec.proximalRadius * 0.82;
-    const capX = kWidth * 0.50 + 0.0005;
-    for (const cSide of [-1, 1]) {
-      const capGeo = new THREE.CylinderGeometry(capRadius, capRadius, 0.0010, 18);
+      const capGeo = new THREE.CylinderGeometry(capRadius, capRadius, 0.0007, 18);
       capGeo.rotateZ(Math.PI / 2);
       const cap = new THREE.Mesh(capGeo, materials.metallic);
       cap.position.set(
@@ -408,8 +363,8 @@ export function createHand(
       handGroup.add(cap);
       knuckleCaps.push(cap);
 
-      // Inner dark titanium hub
-      const capHubGeo = new THREE.CylinderGeometry(capRadius * 0.52, capRadius * 0.52, 0.0012, 14);
+      // Inner micro hub pin
+      const capHubGeo = new THREE.CylinderGeometry(capRadius * 0.48, capRadius * 0.48, 0.0009, 12);
       capHubGeo.rotateZ(Math.PI / 2);
       const capHub = new THREE.Mesh(capHubGeo, materials.joint);
       capHub.position.copy(cap.position);

@@ -70,11 +70,11 @@ export function createRobotArm(
   // ==========================================================================
   // 1. UPPER ARM & SHOULDER ADAPTER
   // Attaches flush to the shoulder mounting flange interface.
+  // Posture: Shoulders to elbow OUTWARD (~10.6° = 0.185 rad outward roll)
+  // Subtle internal yaw (side * 0.075 rad) aligns elbow flexion forward & inward
   // ==========================================================================
   const upperArm = createUpperArm(side, materials);
-  // Stage 1 Locked: Balanced, subtle outward direction relative to torso centerline (~6.0° = 0.105 rad)
-  // Pitch is calibrated to -0.12 rad for natural relaxed athletic hang with zero torso intersection
-  upperArm.group.rotation.set(-0.12, 0, side * 0.105);
+  upperArm.group.rotation.set(-0.14, -side * 0.14, side * 0.185);
   armRoot.add(upperArm.group);
   ledMeshes.push(...upperArm.ledMeshes);
 
@@ -91,27 +91,33 @@ export function createRobotArm(
   // ==========================================================================
   // 3. TAPERED FOREARM GAUNTLET & MECHANICAL CORE
   // Parented directly to elbow.forearmPivot — follows true 1-DOF elbow flexion.
-  // Subtle carrying angle (-side * 0.025) aligns forearm vertically beside hips.
+  // Posture: Elbow to hands INWARD (-side * 0.095 rad = ~5.4° inward return)
+  // Creates authentic athletic chevron posture with elbows as outermost lateral point.
   // ==========================================================================
   const forearm = createForearm(side, materials);
-  // Aligned flush with the elbow lower knuckle docking collar; follows elbow articulation naturally
   forearm.group.position.set(0, -0.014, 0);
-  forearm.group.rotation.set(0, 0, -side * 0.025);
+  forearm.group.rotation.set(0, 0, -side * 0.095);
   elbow.forearmPivot.add(forearm.group);
   ledMeshes.push(...forearm.ledMeshes);
 
   // ==========================================================================
   // 4. PRECISION WRIST MECHANICAL INTERFACE
   // Attached to forearm distal wrist mount.
+  // Wrist collar sits flush against forearm transition collar (0 air gap)
+  // and remains strictly coaxial with forearm cylinder (rotation.x = 0, rotation.z = 0).
+  // Flexion/pitch and yaw pivot on the internal transverse axle pin via trunnionPivot.
   // ==========================================================================
   const wrist = createWrist(side, materials);
-  wrist.group.position.set(0, 0, 0);
+  wrist.group.position.set(0, 0.0010, 0);
   // Natural relaxed wrist resting posture (matching reference 3D humanoid stance in Reference Images 1 & 2):
-  // Clean three-quarters anatomical hang with natural forearm pronation
+  // Clean three-quarters anatomical hang with natural forearm pronation (dorsal LED visible)
+  const wristRoll = side === -1 ? -0.48 : 0.48;
+  wrist.group.rotation.set(0, wristRoll, 0);
+
   const wristPitch = 0.08;
-  const wristRoll = side === -1 ? -0.28 : 0.28;
-  const wristYaw = side === -1 ? -0.05 : 0.05;
-  wrist.group.rotation.set(wristPitch, wristRoll, wristYaw);
+  const wristYaw = side === -1 ? 0.02 : -0.02;
+  wrist.trunnionPivot.rotation.set(wristPitch, 0, wristYaw);
+
   forearm.distalWristMount.add(wrist.group);
   ledMeshes.push(...wrist.ledMeshes);
 
@@ -126,11 +132,9 @@ export function createRobotArm(
 
   // ==========================================================================
   // 6. DEFAULT ATHLETIC RESTING POSTURE
-  // Stage 2 Locked: Elbow as true directional turning point, subtle and relaxed (~18.3° = -0.32 rad)
-  elbow.setAngle(-0.32);
-  // Stage 3 Locked: Elbow -> Forearm subtle inward return toward torso centerline
-  // Net inward angle is -side * 0.035 rad (~2.0° inward toward hips) with exact bilateral symmetry
-  elbow.forearmPivot.rotation.z = -side * 0.115;
+  // Elbow as true directional turning point, natural relaxed flexion (~36.7° = -0.64 rad)
+  // Strict 1-DOF orthogonal transverse hinge — zero internal knuckle shearing
+  elbow.setAngle(-0.64);
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {

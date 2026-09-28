@@ -37,20 +37,20 @@ export interface HandPosePreset {
 }
 
 export const HAND_POSES: Record<HandPoseName, HandPosePreset> = {
-  // 1. Signature anatomical resting athletic cascade (Reference Images 1 & 2)
+  // 1. Signature anatomical resting athletic cascade (Natural relaxed humanoid hand)
   relaxed: {
     fingers: [
-      { prox: 0.22, mid: 0.36, dist: 0.24, splay: -0.025 }, // Index: graceful forward extension
-      { prox: 0.34, mid: 0.54, dist: 0.36, splay:  0.000 }, // Middle: progressive athletic curve
-      { prox: 0.46, mid: 0.74, dist: 0.46, splay:  0.038 }, // Ring: deeper curl receding under
-      { prox: 0.58, mid: 0.94, dist: 0.56, splay:  0.075 }, // Little: tightly tucked cascade into palm
+      { prox: 0.40, mid: 0.58, dist: 0.38, splay: -0.025 }, // Index: graceful forward extension & gentle curve
+      { prox: 0.50, mid: 0.72, dist: 0.45, splay:  0.000 }, // Middle: progressive athletic curve
+      { prox: 0.60, mid: 0.88, dist: 0.52, splay:  0.032 }, // Ring: deeper curl receding under
+      { prox: 0.70, mid: 1.05, dist: 0.60, splay:  0.065 }, // Little: tightly tucked cascade into palm
     ],
     thumb: {
-      pitch: 0.36,
-      yaw: 0.22,
-      roll: 0.16,
-      prox: 0.18,
-      dist: 0.24,
+      pitch: 0.42,
+      yaw: 0.28,
+      roll: 0.22,
+      prox: 0.42,
+      dist: 0.48,
     },
   },
   // 2. Powerful mecha combat fist (full closure against palmar elastomer pads)
@@ -173,6 +173,8 @@ export class ArmAnimationController {
   private baseRightElbowRot: THREE.Euler;
   private baseLeftWristRot: THREE.Euler;
   private baseRightWristRot: THREE.Euler;
+  private baseLeftWristTrunnionRot: THREE.Euler;
+  private baseRightWristTrunnionRot: THREE.Euler;
 
   // Exploded View State (Technical Reference Exploded Views: Shoulder & Elbow)
   private isExploded: boolean = false;
@@ -256,6 +258,8 @@ export class ArmAnimationController {
     this.baseRightElbowRot = (rightArm.elbow.forearmPivot || rightArm.elbow.group).rotation.clone();
     this.baseLeftWristRot = leftArm.wrist.group.rotation.clone();
     this.baseRightWristRot = rightArm.wrist.group.rotation.clone();
+    this.baseLeftWristTrunnionRot = leftArm.wrist.trunnionPivot.rotation.clone();
+    this.baseRightWristTrunnionRot = rightArm.wrist.trunnionPivot.rotation.clone();
 
     // Cache initial resting positions for exploded view components
     this.leftBaseShoulderArmorPos = leftArm.shoulder.armorGroup.position.clone();
@@ -781,19 +785,25 @@ export class ArmAnimationController {
     }
 
     // 4. Wrist Kinematics (Pitch, Yaw, Roll)
+    // Note: wrist.group remains coaxial with forearm (rotation.x=0, rotation.z=0) so the cuff
+    // sits perfectly flush against the gauntlet. Pronation (roll) rotates wrist.group.rotation.y.
+    // Flexion (pitch) and deviation (yaw) articulate the internal trunnionPivot around the axle pin.
+    const baseTrunnion = isLeft ? this.baseLeftWristTrunnionRot : this.baseRightWristTrunnionRot;
     if (overrides.wrist) {
-      if (overrides.wrist.pitch !== undefined) arm.wrist.group.rotation.x = baseWrist.x + overrides.wrist.pitch;
+      if (overrides.wrist.pitch !== undefined) arm.wrist.trunnionPivot.rotation.x = baseTrunnion.x + overrides.wrist.pitch;
+      if (overrides.wrist.yaw !== undefined) arm.wrist.trunnionPivot.rotation.z = baseTrunnion.z + overrides.wrist.yaw;
       if (overrides.wrist.roll !== undefined) arm.wrist.group.rotation.y = baseWrist.y + overrides.wrist.roll;
-      if (overrides.wrist.yaw !== undefined) arm.wrist.group.rotation.z = baseWrist.z + overrides.wrist.yaw;
+      arm.wrist.group.rotation.x = baseWrist.x;
+      arm.wrist.group.rotation.z = baseWrist.z;
     } else {
       const wPitch = Math.cos(this.time * 0.55 + timePhase) * 0.022 + breathOffset * 0.08 - lookPitch * 0.02;
       const wRoll = Math.sin(this.time * 0.42 + timePhase) * 0.015 + lookYaw * 0.03;
       const wYaw = Math.cos(this.time * 0.30 + timePhase) * 0.012;
-      arm.wrist.group.rotation.set(
-        baseWrist.x + wPitch,
-        baseWrist.y + wRoll,
-        baseWrist.z + wYaw
-      );
+      arm.wrist.trunnionPivot.rotation.x = baseTrunnion.x + wPitch;
+      arm.wrist.trunnionPivot.rotation.z = baseTrunnion.z + wYaw;
+      arm.wrist.group.rotation.y = baseWrist.y + wRoll;
+      arm.wrist.group.rotation.x = baseWrist.x;
+      arm.wrist.group.rotation.z = baseWrist.z;
     }
 
     // 5. Hand Fingers Kinematics (Guarded if arm terminates at wrist interface)

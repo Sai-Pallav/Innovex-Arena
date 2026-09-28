@@ -151,13 +151,13 @@ export class ArmElbowController {
 
     const targetLeftElbow = THREE.MathUtils.clamp(
       this.currentPoseState.leftElbow + elbowIdle,
-      -0.48, // ~ -27.5° maximum subtle forward bend
-      -0.28  // ~ -16.0° minimum subtle forward bend
+      -0.85, // ~ -48.7° maximum natural flexion
+      -0.45  // ~ -25.8° minimum natural flexion
     );
     const targetRightElbow = THREE.MathUtils.clamp(
       this.currentPoseState.rightElbow + elbowIdle,
-      -0.48,
-      -0.28
+      -0.85,
+      -0.45
     );
 
     // Damped interpolation for mechanical inertia
@@ -193,7 +193,7 @@ export class ArmElbowController {
     const targetLeftWPitch = THREE.MathUtils.clamp(wristPitchOsc, -wristCfg.pitchLimit, wristCfg.pitchLimit);
     const targetRightWPitch = targetLeftWPitch;
 
-    const targetLeftWRoll = THREE.MathUtils.clamp(wristRollOsc + lookYaw * wristCfg.cursorReactFactor, -wristCfg.rollLimit, wristCfg.rollLimit);
+    const targetLeftWRoll = THREE.MathUtils.clamp(wristRollOsc - lookYaw * wristCfg.cursorReactFactor, -wristCfg.rollLimit, wristCfg.rollLimit);
     const targetRightWRoll = THREE.MathUtils.clamp(-wristRollOsc + lookYaw * wristCfg.cursorReactFactor, -wristCfg.rollLimit, wristCfg.rollLimit);
 
     const targetLeftWYaw = THREE.MathUtils.clamp(wristYawOsc, -wristCfg.yawLimit, wristCfg.yawLimit);

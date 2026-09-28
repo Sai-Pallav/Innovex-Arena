@@ -201,8 +201,9 @@ function evaluatePauldronPoint(
   // 1. Unified, elegant Section 3E lower clearance contour
   // Gentle concave clearance rise across the joint (v = 0.25 to 0.85),
   // framing the dark cylinder without any jagged teeth or awkward steps.
-  const vArch = Math.sin(v * Math.PI);
-  const clearanceAngle = Math.pow(vArch, 1.4) * 0.085 * Math.PI;
+  const vClamped = Math.max(0, Math.min(1, v));
+  const vArch = Math.sin(vClamped * Math.PI);
+  const clearanceAngle = Math.pow(Math.max(0, vArch), 1.4) * 0.085 * Math.PI;
 
   const startAngle = -0.045 * Math.PI + clearanceAngle;
   const endAngle = 1.045 * Math.PI - clearanceAngle;

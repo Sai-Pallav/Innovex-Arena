@@ -132,7 +132,7 @@ function createPhalanxArmorGeo(
       [  curW * 0.42,   curD * 0.96 + dorsalArch + tipZOff ], // 5: Dorsal ridge R
       [  curW * 0.82,   curD * 0.72 + tipZOff ],       // 6: Dorsal chamfer R
       [  curW * 1.00,   curD * 0.10 + tipZOff * 0.6 ], // 7: Lateral flank R
-      [ -curW * 0.86,  -curD * 0.32 + tipZOff * 0.4 ], // 8: Palmar-lateral R
+      [  curW * 0.86,  -curD * 0.32 + tipZOff * 0.4 ], // 8: Palmar-lateral R
       [  0.0,          -curD * 0.48 + tipZOff * 0.3 ], // 9: Palmar center inset
     ];
 
@@ -248,13 +248,13 @@ function createKnuckleHinge(
   const axle = new THREE.Mesh(axleGeo, materials.metallic);
   group.add(axle);
 
-  // Precision CNC end caps with concentric bearing retainers
+  // Precision CNC end caps with concentric bearing retainers (flush with armor profile)
   for (const cSide of [-1, 1]) {
-    const capX = cSide * spanWidth * 0.33;
+    const capX = cSide * spanWidth * 0.31;
 
     // Polished outer bearing bezel
     const capGeo = new THREE.CylinderGeometry(
-      pinRadius * 1.25, pinRadius * 1.25, 0.0012, 20
+      pinRadius * 0.96, pinRadius * 0.96, 0.0008, 20
     );
     capGeo.rotateZ(Math.PI / 2);
     const cap = new THREE.Mesh(capGeo, materials.metallic);
@@ -265,15 +265,15 @@ function createKnuckleHinge(
 
     // Inner dark titanium hub with micro hex socket
     const hubGeo = new THREE.CylinderGeometry(
-      pinRadius * 0.72, pinRadius * 0.72, 0.0014, 16
+      pinRadius * 0.60, pinRadius * 0.60, 0.0010, 16
     );
     hubGeo.rotateZ(Math.PI / 2);
     const hub = new THREE.Mesh(hubGeo, materials.joint);
-    hub.position.set(capX + cSide * 0.0002, 0, 0);
+    hub.position.set(capX + cSide * 0.0001, 0, 0);
     group.add(hub);
 
     // Concentric micro accent ring
-    const ringGeo = new THREE.TorusGeometry(pinRadius * 1.02, 0.00025, 6, 18);
+    const ringGeo = new THREE.TorusGeometry(pinRadius * 0.80, 0.0002, 6, 18);
     ringGeo.rotateY(Math.PI / 2);
     const ring = new THREE.Mesh(ringGeo, materials.metallic);
     ring.position.set(capX, 0, 0);
@@ -460,14 +460,14 @@ export function createFinger(
   // Authentic cascading athletic resting angles matching Reference Images 1 & 2:
   // Index: graceful forward extension | Middle: progressive curve | Ring: deeper curl | Little: tucked cascade
   const restPoses: Record<string, { prox: number; mid: number; dist: number; splay: number }> = {
-    Index:  { prox: 0.22, mid: 0.36, dist: 0.24, splay: -0.025 },
-    Middle: { prox: 0.34, mid: 0.54, dist: 0.36, splay:  0.000 },
-    Ring:   { prox: 0.46, mid: 0.74, dist: 0.46, splay:  0.038 },
-    Little: { prox: 0.58, mid: 0.94, dist: 0.56, splay:  0.075 },
+    Index:  { prox: 0.40, mid: 0.58, dist: 0.38, splay: -0.025 },
+    Middle: { prox: 0.50, mid: 0.72, dist: 0.45, splay:  0.000 },
+    Ring:   { prox: 0.60, mid: 0.88, dist: 0.52, splay:  0.032 },
+    Little: { prox: 0.70, mid: 1.05, dist: 0.60, splay:  0.065 },
   };
 
   const radial = -side;
-  const pose = restPoses[spec.name] ?? { prox: 0.22, mid: 0.36, dist: 0.24, splay: 0 };
+  const pose = restPoses[spec.name] ?? { prox: 0.16, mid: 0.28, dist: 0.20, splay: 0 };
   proxSeg.group.rotation.x = pose.prox;
   midSeg.group.rotation.x  = pose.mid;
   distSeg.group.rotation.x = pose.dist;
@@ -483,13 +483,11 @@ export function createFinger(
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// OPPOSABLE ARTICULATED ROBOTIC THUMB — (RE-ENGINEERED: NO BUBBLE, +18% SCALED)
+// OPPOSABLE ARTICULATED ROBOTIC THUMB (RE-ENGINEERED TO MATCH REFERENCE DESIGN)
 //
-// 1. High-mounted origin docked flush into dorsal/palm radial socket:
-//    Positioned at (radial * 0.0254, -0.0124, 0.0065)
-// 2. CMC Joint: Cylindrical rotary actuator trunnion with metallic bearing disc
-// 3. Beveled aerospace thenar mounting bracket flush with dorsal shell
-// 4. Fully articulated 2-phalanx digit with natural opposition & pronation
+// 1. Organic white ceramic thenar eminence flowing from palm chassis
+// 2. Semi-recessed dark titanium rotary actuator with flush chrome bezel
+// 3. Natural palmar abduction and opposition resting gracefully beside index
 // ─────────────────────────────────────────────────────────────────────────────
 export function createThumb(
   side: -1 | 1,
@@ -503,84 +501,65 @@ export function createThumb(
   const radial = -side;
 
   // 1. HIGH-MOUNTED THENAR ANCHOR:
-  // Docked flush into the radial socket notch of the palm & dorsal shell (+18% scaled):
-  thumbGroup.position.set(radial * 0.0254, -0.0124, 0.0065);
+  // Positioned flush with the radial corner of the carpal-palmar margin
+  thumbGroup.position.set(radial * 0.0210, -0.0140, 0.0050);
 
-  // Natural Humanoid Resting Stance matching Reference Images 1 & 2:
-  // - rotation.x: forward opposition (~20.6° = 0.36 rad)
-  // - rotation.y: natural pronation toward fingers (-radial * 0.22 rad)
-  // - rotation.z: gentle outward clearance (radial * 0.16 rad = ~9.2°)
-  thumbGroup.rotation.set(0.36, -radial * 0.22, radial * 0.16);
+  // Natural Humanoid Resting Stance:
+  // - rotation.x: forward palmar abduction (~0.42 rad / ~24°)
+  // - rotation.y: medial opposition rotation toward index (-radial * 0.28 rad)
+  // - rotation.z: slight clearance angle (radial * 0.14 rad)
+  thumbGroup.rotation.set(0.42, -radial * 0.28, radial * 0.14);
 
-  // ── 1. CMC ROTARY ACTUATOR JOINT (NO BUBBLE / SPHERICAL DOME) ─────────────
-  // Precision dark titanium cylindrical actuator trunnion with metallic bearing disc:
+  // ── 1. THENAR HOUSING & COMPACT CMC ACTUATOR ──────────────────────────────
+  // Sculpted White Ceramic Thenar Fairing blending into the palm
+  const thenarBracketGeo = new THREE.BoxGeometry(0.0130, 0.0160, 0.0110);
+  const thenarBracket = new THREE.Mesh(thenarBracketGeo, materials.armor);
+  thenarBracket.name = 'ThumbThenarBracket';
+  thenarBracket.position.set(-radial * 0.0015, 0.0020, -0.0010);
+  thenarBracket.castShadow = true;
+  thenarBracket.receiveShadow = true;
+  thumbGroup.add(thenarBracket);
 
-  // Cylindrical rotary actuator trunnion housing (+18% scaled)
-  const trunnionGeo = new THREE.CylinderGeometry(0.0084, 0.0094, 0.0096, 24);
+  // Compact dark titanium cylindrical actuator core (flush within bracket)
+  const trunnionGeo = new THREE.CylinderGeometry(0.0068, 0.0068, 0.0080, 22);
   trunnionGeo.rotateZ(Math.PI / 2);
   const baseBall = new THREE.Mesh(trunnionGeo, materials.joint);
   baseBall.name = 'ThumbCMCActuatorHousing';
   baseBall.castShadow = true;
   thumbGroup.add(baseBall);
 
-  // Chrome outer stepped bezel ring
-  const baseRingGeo = new THREE.TorusGeometry(0.0094, 0.0009, 6, 24);
+  // Flush chrome bezel ring
+  const baseRingGeo = new THREE.TorusGeometry(0.0068, 0.0006, 6, 22);
   baseRingGeo.rotateY(Math.PI / 2);
   const baseRing = new THREE.Mesh(baseRingGeo, materials.metallic);
-  baseRing.position.set(radial * 0.0048, 0, 0);
+  baseRing.position.set(radial * 0.0038, 0, 0);
   thumbGroup.add(baseRing);
 
-  // Precision metallic bearing disc faceplate with concentric detail
-  const discGeo = new THREE.CylinderGeometry(0.0087, 0.0087, 0.0016, 24);
+  // Precision metallic bearing disc
+  const discGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0008, 20);
   discGeo.rotateZ(Math.PI / 2);
   const bearingDisc = new THREE.Mesh(discGeo, materials.metallic);
-  bearingDisc.position.set(radial * 0.0050, 0, 0);
+  bearingDisc.position.set(radial * 0.0041, 0, 0);
   thumbGroup.add(bearingDisc);
 
-  // Dark titanium central pivot pin / hex bolt
-  const boltGeo = new THREE.CylinderGeometry(0.0033, 0.0033, 0.0020, 6);
-  boltGeo.rotateZ(Math.PI / 2);
-  const centerBolt = new THREE.Mesh(boltGeo, materials.joint);
-  centerBolt.position.set(radial * 0.0055, 0, 0);
-  thumbGroup.add(centerBolt);
-
-  // Precision Sculpted White Ceramic Thenar Mounting Bracket
-  // Clean aerospace-beveled structural fairing anchoring flush into dorsal socket
-  const bracketGeo = new THREE.BoxGeometry(0.0100, 0.0142, 0.0124);
-  const thenarBracket = new THREE.Mesh(bracketGeo, materials.armor);
-  thenarBracket.name = 'ThumbThenarBracket';
-  thenarBracket.position.set(-radial * 0.0021, 0.0021, -0.0007);
-  thenarBracket.castShadow = true;
-  thenarBracket.receiveShadow = true;
-  thumbGroup.add(thenarBracket);
-
-  // Cylindrical transition cowl shielding upper trunnion
-  const cowlGeo = new THREE.CylinderGeometry(0.0098, 0.0104, 0.0080, 20, 1, false, 0, Math.PI);
-  cowlGeo.rotateZ(Math.PI / 2);
-  const thenarCowl = new THREE.Mesh(cowlGeo, materials.armor);
-  thenarCowl.position.set(-radial * 0.0014, 0.0016, 0.0012);
-  thenarCowl.castShadow = true;
-  thenarCowl.receiveShadow = true;
-  thumbGroup.add(thenarCowl);
-
   // Swivel mounting collar interface
-  const collarGeo = new THREE.CylinderGeometry(0.0084, 0.0090, 0.0041, 20);
+  const collarGeo = new THREE.CylinderGeometry(0.0068, 0.0072, 0.0035, 20);
   const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
   baseCollar.name = 'ThumbSwivelCollar';
-  baseCollar.position.set(0, -0.0076, 0);
+  baseCollar.position.set(0, -0.0055, 0);
   baseCollar.castShadow = true;
   thumbGroup.add(baseCollar);
 
-  // ── 2. PROXIMAL PHALANX (+18% SCALED) ─────────────────────────────────────
-  const proxLen = 0.0390;
-  const proxRad = 0.0076;
+  // ── 2. PROXIMAL PHALANX ───────────────────────────────────────────────────
+  const proxLen = 0.0380;
+  const proxRad = 0.0072;
   const proxSeg = buildSegment('ThumbProximal', proxRad, proxLen, false, materials);
   thumbGroup.add(proxSeg.group);
 
   // Interphalangeal (IP) Mechanical Knuckle Hinge
   const ipHinge = createKnuckleHinge(
-    proxRad * 0.95,
-    proxRad * 2.15,
+    proxRad * 0.90,
+    proxRad * 2.05,
     materials
   );
   ipHinge.group.position.set(0, -proxLen, 0);
@@ -588,24 +567,24 @@ export function createThumb(
   proxSeg.hingeMesh = ipHinge.hingePin;
   proxSeg.hingeCaps  = ipHinge.caps;
 
-  // ── 3. DISTAL PHALANX & OPPOSABLE THUMBTIP (+18% SCALED) ──────────────────
-  const distLen = 0.0295;
-  const distRad = 0.0064;
+  // ── 3. DISTAL PHALANX & OPPOSABLE THUMBTIP ────────────────────────────────
+  const distLen = 0.0280;
+  const distRad = 0.0060;
   const distSeg = buildSegment('ThumbDistal', distRad, distLen, true, materials);
   distSeg.group.position.set(0, -proxLen, 0);
   proxSeg.group.add(distSeg.group);
 
-  // ── 4. NATURAL OPEN-HAND RESTING EXTENSION (MATCHING REFERENCE IMAGES 1 & 2) ──
-  // Thumb points downward-forward alongside the hand with gentle inward curve
-  proxSeg.group.rotation.x = 0.18; // gentle proximal forward tilt
+  // ── 4. NATURAL RESTING POSE (MATCHING REFERENCE IMAGES) ───────────────────
+  // Thumb rests gracefully alongside the index finger in gentle natural opposition
+  proxSeg.group.rotation.x = 0.42; // gentle forward opposition angle
   proxSeg.group.rotation.z = 0;
-  distSeg.group.rotation.x = 0.24; // gentle distal curl
-  distSeg.group.rotation.z = -radial * 0.09; // inward return towards index finger
+  distSeg.group.rotation.x = 0.48; // natural relaxed inward curl
+  distSeg.group.rotation.z = -radial * 0.08; // inward return towards index finger
 
   // Purple telemetry accent strip on lateral distal thumb
-  const thumbLedGeo = new THREE.BoxGeometry(0.0009, 0.0050, 0.0009);
+  const thumbLedGeo = new THREE.BoxGeometry(0.0008, 0.0045, 0.0008);
   const thumbLed = new THREE.Mesh(thumbLedGeo, materials.purpleEmissive);
-  thumbLed.position.set(radial * (distRad * 0.92), -distLen * 0.52, distRad * 0.20);
+  thumbLed.position.set(radial * (distRad * 0.88), -distLen * 0.50, distRad * 0.20);
   distSeg.group.add(thumbLed);
 
   return {

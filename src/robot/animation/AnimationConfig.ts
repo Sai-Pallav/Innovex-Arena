@@ -56,43 +56,43 @@ export const ANIMATION_CONFIG = {
   // 3. ARM POSTURES & PARTIAL FOLD
   // ==========================================
   arm: {
-    // Poses with natural resting subtle flexion & relaxed outward-inward articulation:
-    // Upper arms angle slightly outward from torso (~5.2° = 0.092 rad roll)
-    // Forearms turn slightly back inward toward torso centerline (~10.4° relative to upper arm = 0.182 rad roll, ~5.2° net inward in torso space)
-    // Combined subtle elbow articulation ~10.4° directional change at elbow
+    // Poses with natural resting athletic flexion & relaxed outward-inward articulation:
+    // Upper arms angle slightly outward from torso (~10.6° = 0.185 rad roll) with forward pitch (-0.14 rad)
+    // Elbows maintain natural organic relaxed flexion (~35°-40° = -0.62 to -0.68 rad)
+    // Forearms turn gracefully inward toward torso centerline
     poses: {
       poseA: {
         name: 'PoseA_SymmetricRelaxed',
-        leftElbow: -0.36,                     // Balanced athletic flexion for Left Arm
-        rightElbow: -0.32,                    // Relaxed natural flexion for Right Arm
-        leftUpperPitch: -0.10,
-        rightUpperPitch: -0.06,
-        leftUpperRoll: -0.110,                // Subtle outward drape
-        rightUpperRoll: 0.135,                // Athletic outward drape providing ample clearance beside thigh
-        leftElbowRoll: 0.080,
-        rightElbowRoll: -0.050,               // Natural vertical forearm drape preventing thumb-thigh collision
+        leftElbow: -0.62,                     // Natural organic relaxed flexion (~35.5°)
+        rightElbow: -0.62,                    // Natural organic relaxed flexion (~35.5°)
+        leftUpperPitch: -0.14,                // Forward drape (~8.0°)
+        rightUpperPitch: -0.14,               // Forward drape (~8.0°)
+        leftUpperRoll: -0.185,                // Shoulders to elbow OUTWARD (~10.6° abduction)
+        rightUpperRoll: 0.185,                // Shoulders to elbow OUTWARD (~10.6° abduction)
+        leftElbowRoll: 0.0,                   // Strict 1-DOF transverse hinge (zero internal knuckle shearing)
+        rightElbowRoll: 0.0,
       },
       poseB: {
         name: 'PoseB_SymmetricRelaxed',
-        leftElbow: -0.38,
-        rightElbow: -0.33,
-        leftUpperPitch: -0.11,
-        rightUpperPitch: -0.07,
-        leftUpperRoll: -0.112,
-        rightUpperRoll: 0.138,
-        leftElbowRoll: 0.084,
-        rightElbowRoll: -0.052,
+        leftElbow: -0.65,                     // Subtle shift (~37.2°)
+        rightElbow: -0.65,
+        leftUpperPitch: -0.15,
+        rightUpperPitch: -0.15,
+        leftUpperRoll: -0.190,                // Shoulders to elbow OUTWARD
+        rightUpperRoll: 0.190,                // Shoulders to elbow OUTWARD
+        leftElbowRoll: 0.0,
+        rightElbowRoll: 0.0,
       },
       poseC: {
         name: 'PoseC_SymmetricRelaxed',
-        leftElbow: -0.35,
-        rightElbow: -0.31,
-        leftUpperPitch: -0.09,
-        rightUpperPitch: -0.05,
-        leftUpperRoll: -0.108,
-        rightUpperRoll: 0.132,
-        leftElbowRoll: 0.076,
-        rightElbowRoll: -0.048,
+        leftElbow: -0.60,                     // Subtle shift (~34.4°)
+        rightElbow: -0.60,
+        leftUpperPitch: -0.13,
+        rightUpperPitch: -0.13,
+        leftUpperRoll: -0.180,                // Shoulders to elbow OUTWARD
+        rightUpperRoll: 0.180,                // Shoulders to elbow OUTWARD
+        leftElbowRoll: 0.0,
+        rightElbowRoll: 0.0,
       },
     },
     poseIntervalMin: 14.0,                    // Infrequent pose transitions (seconds)

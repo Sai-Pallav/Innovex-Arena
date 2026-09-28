@@ -36,7 +36,7 @@ const ELBOW_CONFIG = {
   neutralAngle:  0.00,
   minBend:       0.08,        // slight hyperextension guard
   maxBend:      -2.18,        // ≈ 125 ° maximum anatomical flexion
-  restingBend:  -0.36,        // natural subtle relaxed posture (~14° visual flexion)
+  restingBend:  -0.64,        // natural relaxed posture (~36.7° visual flexion)
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -559,6 +559,7 @@ export function createElbow(
   const lowCollarGeo = new THREE.CylinderGeometry(0.0300, 0.0326, 0.012, 28);
   const lowCollar = new THREE.Mesh(lowCollarGeo, materials.joint);
   lowCollar.position.set(0, -0.014, 0);
+  lowCollar.rotation.z = -side * 0.095;
   lowCollar.castShadow = true;
   lowerHousing.add(lowCollar);
 
