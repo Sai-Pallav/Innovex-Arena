@@ -303,7 +303,7 @@ export class RobotAnimationController {
       // Direct pass-through to high-fidelity ArmAnimationController
       const lOver = this.leftPoseOverrides;
       lOver.upperArm.x = armState.pose.leftUpperPitch;
-      lOver.upperArm.y = 0.22;
+      lOver.upperArm.y = 0.14;
       lOver.upperArm.z = armState.pose.leftUpperRoll;
       lOver.elbowBend = armState.pose.leftElbowBend;
       lOver.elbowRoll = 0.0; // Strict 1-DOF transverse hinge (zero internal knuckle shearing)

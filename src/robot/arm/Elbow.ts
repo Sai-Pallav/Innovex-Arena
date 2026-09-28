@@ -36,7 +36,7 @@ const ELBOW_CONFIG = {
   neutralAngle:  0.00,
   minBend:       0.08,        // slight hyperextension guard
   maxBend:      -2.18,        // ≈ 125 ° maximum anatomical flexion
-  restingBend:  -0.64,        // natural relaxed posture (~36.7° visual flexion)
+  restingBend:  -0.40,        // natural relaxed posture (~22.9° visual flexion)
 } as const;
 
 // ─────────────────────────────────────────────────────────────────────────────

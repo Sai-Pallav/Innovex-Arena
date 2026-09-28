@@ -40,17 +40,17 @@ export const HAND_POSES: Record<HandPoseName, HandPosePreset> = {
   // 1. Signature anatomical resting athletic cascade (Natural relaxed humanoid hand)
   relaxed: {
     fingers: [
-      { prox: 0.40, mid: 0.58, dist: 0.38, splay: -0.025 }, // Index: graceful forward extension & gentle curve
-      { prox: 0.50, mid: 0.72, dist: 0.45, splay:  0.000 }, // Middle: progressive athletic curve
-      { prox: 0.60, mid: 0.88, dist: 0.52, splay:  0.032 }, // Ring: deeper curl receding under
-      { prox: 0.70, mid: 1.05, dist: 0.60, splay:  0.065 }, // Little: tightly tucked cascade into palm
+      { prox: 0.26, mid: 0.38, dist: 0.24, splay:  0.018 }, // Index: graceful forward extension & gentle curve, fanned outward
+      { prox: 0.32, mid: 0.46, dist: 0.28, splay:  0.000 }, // Middle: progressive athletic curve, central anchor
+      { prox: 0.38, mid: 0.54, dist: 0.32, splay: -0.016 }, // Ring: progressive cascade tuck, fanned outward
+      { prox: 0.44, mid: 0.62, dist: 0.36, splay: -0.035 }, // Little: cascading tuck into palm, fanned outward
     ],
     thumb: {
-      pitch: 0.42,
-      yaw: 0.28,
-      roll: 0.22,
-      prox: 0.42,
-      dist: 0.48,
+      pitch: 0.32,
+      yaw: 0.18,
+      roll: 0.26,
+      prox: 0.28,
+      dist: 0.32,
     },
   },
   // 2. Powerful mecha combat fist (full closure against palmar elastomer pads)

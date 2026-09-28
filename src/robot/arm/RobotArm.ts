@@ -109,13 +109,13 @@ export function createRobotArm(
   // ==========================================================================
   const wrist = createWrist(side, materials);
   wrist.group.position.set(0, 0.0010, 0);
-  // Natural relaxed wrist resting posture (matching reference 3D humanoid stance in Reference Images 1 & 2):
-  // Clean three-quarters anatomical hang with natural forearm pronation (dorsal LED visible)
-  const wristRoll = side === -1 ? -0.48 : 0.48;
+  // Natural relaxed wrist resting posture (semi-pronated athletic stance):
+  // Clean three-quarters anatomical hang with natural forearm pronation (dorsal LED and knuckle hoods visible)
+  const wristRoll = side === -1 ? -0.72 : 0.72;
   wrist.group.rotation.set(0, wristRoll, 0);
 
-  const wristPitch = 0.08;
-  const wristYaw = side === -1 ? 0.02 : -0.02;
+  const wristPitch = 0.05;
+  const wristYaw = side === -1 ? 0.015 : -0.015;
   wrist.trunnionPivot.rotation.set(wristPitch, 0, wristYaw);
 
   forearm.distalWristMount.add(wrist.group);
@@ -132,9 +132,9 @@ export function createRobotArm(
 
   // ==========================================================================
   // 6. DEFAULT ATHLETIC RESTING POSTURE
-  // Elbow as true directional turning point, natural relaxed flexion (~36.7° = -0.64 rad)
+  // Elbow as true directional turning point, natural relaxed athletic flexion (~22.9° = -0.40 rad)
   // Strict 1-DOF orthogonal transverse hinge — zero internal knuckle shearing
-  elbow.setAngle(-0.64);
+  elbow.setAngle(-0.40);
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {

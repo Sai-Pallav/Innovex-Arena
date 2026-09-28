@@ -63,8 +63,8 @@ export const ANIMATION_CONFIG = {
     poses: {
       poseA: {
         name: 'PoseA_SymmetricRelaxed',
-        leftElbow: -0.62,                     // Natural organic relaxed flexion (~35.5°)
-        rightElbow: -0.62,                    // Natural organic relaxed flexion (~35.5°)
+        leftElbow: -0.40,                     // Natural organic relaxed flexion (~22.9°)
+        rightElbow: -0.40,                    // Natural organic relaxed flexion (~22.9°)
         leftUpperPitch: -0.14,                // Forward drape (~8.0°)
         rightUpperPitch: -0.14,               // Forward drape (~8.0°)
         leftUpperRoll: -0.185,                // Shoulders to elbow OUTWARD (~10.6° abduction)
@@ -74,8 +74,8 @@ export const ANIMATION_CONFIG = {
       },
       poseB: {
         name: 'PoseB_SymmetricRelaxed',
-        leftElbow: -0.65,                     // Subtle shift (~37.2°)
-        rightElbow: -0.65,
+        leftElbow: -0.44,                     // Subtle shift (~25.2°)
+        rightElbow: -0.44,
         leftUpperPitch: -0.15,
         rightUpperPitch: -0.15,
         leftUpperRoll: -0.190,                // Shoulders to elbow OUTWARD
@@ -85,8 +85,8 @@ export const ANIMATION_CONFIG = {
       },
       poseC: {
         name: 'PoseC_SymmetricRelaxed',
-        leftElbow: -0.60,                     // Subtle shift (~34.4°)
-        rightElbow: -0.60,
+        leftElbow: -0.36,                     // Subtle shift (~20.6°)
+        rightElbow: -0.36,
         leftUpperPitch: -0.13,
         rightUpperPitch: -0.13,
         leftUpperRoll: -0.180,                // Shoulders to elbow OUTWARD
