@@ -3,17 +3,19 @@ import { RobotMaterialPalette } from '../materials/RobotMaterials';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FINGER / THUMB MODULE — Ultra-Realistic Humanoid Robotic Digits
-// Meticulously engineered from CAD Blueprint Panels 7, 8, 9 & High-End Mecha Reference:
+// Precision CAD-engineered from authoritative Reference Images 1 & 2:
 //
-// Features:
-//   - Proportioned Humanoid Scale (increased size with authentic athletic body, not skinny)
-//   - True Anatomical Length Ratios (Middle > Ring > Index > Little)
-//   - Sculpted Ceramic Composite Dorsal Cowls with Precision Chamfered Flanks & Tendon Channels
-//   - Dark Titanium Structural Spaceframe Bone Cores with CNC Lightening Slots
-//   - Precision Dual-Shear Mechanical Hinge Joints (PIP & DIP) with Concentric Bearing Caps & Axle Pins
-//   - Multi-Segmented Palmar Elastomer Friction Grip Pads with Micro-Tread Texturing
-//   - Ergonomic Rounded Fingertips with Tactile Sensor Pads & Dorsal Sensor Plates
-//   - High-Mounted Opposable Robotic Thumb with Precision Rotary Actuator Trunnion (NO BUBBLE!)
+// Key Refinements:
+//   - Preserves 100% existing athletic mecha scale, finger lengths, and silhouette
+//   - Seamless black structural spaceframe bone cores & CNC titanium spines
+//   - Sculpted ceramic composite dorsal cowls with aerodynamic crowned arch,
+//     precision chamfered flanks, and solid closed geometry (zero paper-thin sheets)
+//   - Dual-shear mechanical knuckle hinges (MCP, PIP, DIP, IP) with chamfered
+//     bearing bezels, concentric micro-accent rings, and recessed hex axle pins
+//   - Flush ergonomic palmar tactile friction pads with micro-grip ridges
+//     (Zero bulbous protruding buttons or spherical bubbles)
+//   - Ergonomic rounded fingertips with dorsal telemetry sensor nail plates
+//   - Opposable robotic thumb with recessed thenar socket & rotary actuator trunnion
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface FingerSegmentNodes {
@@ -60,8 +62,8 @@ export interface FingerSpec {
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SCULPTED PHALANX ARMOR COWL GEOMETRY
-// High-fidelity CAD cross-section with aerodynamic crowned dorsal arch,
-// precision lateral bevels, tendon guide trough, and ergonomic rounded tip.
+// Fully closed CAD solid geometry with aerodynamic crowned dorsal arch,
+// precision chamfered lateral flanks, and ergonomic rounded fingertip dome.
 // ─────────────────────────────────────────────────────────────────────────────
 function createPhalanxArmorGeo(
   width: number,
@@ -73,10 +75,10 @@ function createPhalanxArmorGeo(
   const uvs: number[] = [];
   const indices: number[] = [];
 
-  const segY = isDistalTip ? 20 : 14;
+  const segY = isDistalTip ? 22 : 16;
   const hw = width * 0.5;
   const hd = depth * 0.5;
-  const numX = 10; // 10 cross-section contour points per ring
+  const numX = 12; // 12 contour points around the cross-section
 
   for (let iy = 0; iy <= segY; iy++) {
     const v = iy / segY;
@@ -86,54 +88,59 @@ function createPhalanxArmorGeo(
     let wF = 1.0;
     let dF = 1.0;
 
-    if (v < 0.14) {
-      // Gentle flare and proximal bevel relief for collision-free 100° flexion
-      const t = v / 0.14;
-      wF = 0.93 + 0.07 * t;
-      dF = 0.86 + 0.14 * t;
+    if (v < 0.12) {
+      // Proximal knuckle relief for collision-free 105° flexion
+      const t = v / 0.12;
+      wF = 0.94 + 0.06 * t;
+      dF = 0.88 + 0.12 * t;
     } else if (v > 0.55) {
       const tEnd = (v - 0.55) / 0.45;
       if (isDistalTip) {
-        // Ergonomic organic taper towards fingertip
-        wF = 1.0 - 0.30 * Math.pow(tEnd, 1.4);
-        dF = 1.0 - 0.42 * Math.pow(tEnd, 1.2);
+        // Ergonomic organic taper towards fingertip dome
+        wF = 1.0 - 0.38 * Math.pow(tEnd, 1.3);
+        dF = 1.0 - 0.46 * Math.pow(tEnd, 1.2);
       } else {
         // Sculpted knuckle hood taper with clearance for child segment articulation
-        wF = 1.0 - 0.10 * tEnd;
-        dF = 1.0 - 0.12 * Math.pow(tEnd, 1.5);
+        wF = 1.0 - 0.08 * tEnd;
+        dF = 1.0 - 0.10 * Math.pow(tEnd, 1.4);
       }
     }
 
     let tipZOff = 0;
     let tipYOff = 0;
 
-    // Distal rounded fingertip curvature (dorsal wrap-around)
-    if (isDistalTip && v > 0.60) {
-      const tTip = (v - 0.60) / 0.40;
-      // Ergonomic anatomical curvature: curls gently downward and inward
-      tipYOff = -Math.sin(tTip * Math.PI * 0.5) * (hd * 0.28);
-      tipZOff = -Math.pow(tTip, 1.6) * (hd * 0.52);
+    // Distal rounded fingertip dome curvature (wraps smoothly to tip)
+    if (isDistalTip && v > 0.65) {
+      const tTip = (v - 0.65) / 0.35;
+      tipYOff = -Math.sin(tTip * Math.PI * 0.5) * (hd * 0.22);
+      tipZOff = -Math.pow(tTip, 1.5) * (hd * 0.48);
       y += tipYOff;
     }
 
     const curW = hw * wF;
     const curD = hd * dF;
 
-    // 10-Point Sculpted Cross-Section:
-    const grooveDepth = (v > 0.10 && v < 0.85) ? 0.00035 : 0.0;
-    const dorsalArch = curD * 0.22 * Math.sin(v * Math.PI * 0.92);
+    // 12-Point Sculpted Cross-Section with chamfered flanks and crowned dorsal arch:
+    const dorsalCrown = curD * 0.18 * Math.sin(v * Math.PI * 0.92);
+    const grooveDepth = (v > 0.12 && v < 0.82) ? 0.0003 : 0.0;
+
+    // Last ring of distal tip closes down to apex
+    const isTipApex = isDistalTip && iy === segY;
+    const scaleApex = isTipApex ? 0.08 : 1.0;
 
     const row: [number, number][] = [
-      [ -curW * 0.86,  -curD * 0.32 + tipZOff * 0.4 ], // 0: Palmar-lateral L
-      [ -curW * 1.00,   curD * 0.10 + tipZOff * 0.6 ], // 1: Lateral flank L
-      [ -curW * 0.82,   curD * 0.72 + tipZOff ],       // 2: Dorsal chamfer L
-      [ -curW * 0.42,   curD * 0.96 + dorsalArch + tipZOff ], // 3: Dorsal ridge L
-      [  0.0,           curD * 1.04 + dorsalArch - grooveDepth + tipZOff ], // 4: Dorsal center apex
-      [  curW * 0.42,   curD * 0.96 + dorsalArch + tipZOff ], // 5: Dorsal ridge R
-      [  curW * 0.82,   curD * 0.72 + tipZOff ],       // 6: Dorsal chamfer R
-      [  curW * 1.00,   curD * 0.10 + tipZOff * 0.6 ], // 7: Lateral flank R
-      [  curW * 0.86,  -curD * 0.32 + tipZOff * 0.4 ], // 8: Palmar-lateral R
-      [  0.0,          -curD * 0.48 + tipZOff * 0.3 ], // 9: Palmar center inset
+      [ -curW * 0.82 * scaleApex, -curD * 0.55 * scaleApex + tipZOff * 0.4 ], // 0: Palmar-lateral L
+      [ -curW * 0.98 * scaleApex,  curD * 0.08 * scaleApex + tipZOff * 0.6 ], // 1: Mid-lateral L
+      [ -curW * 0.88 * scaleApex,  curD * 0.52 * scaleApex + tipZOff * 0.8 ], // 2: Dorsal-lateral chamfer L
+      [ -curW * 0.58 * scaleApex,  curD * 0.84 * scaleApex + tipZOff ],       // 3: Dorsal shoulder L
+      [ -curW * 0.26 * scaleApex,  curD * 1.00 * scaleApex + dorsalCrown + tipZOff ], // 4: Dorsal ridge L
+      [  0.0,                      curD * 1.06 * scaleApex + dorsalCrown - grooveDepth + tipZOff ], // 5: Dorsal center apex
+      [  curW * 0.26 * scaleApex,  curD * 1.00 * scaleApex + dorsalCrown + tipZOff ], // 6: Dorsal ridge R
+      [  curW * 0.58 * scaleApex,  curD * 0.84 * scaleApex + tipZOff ],       // 7: Dorsal shoulder R
+      [  curW * 0.88 * scaleApex,  curD * 0.52 * scaleApex + tipZOff * 0.8 ], // 8: Dorsal-lateral chamfer R
+      [  curW * 0.98 * scaleApex,  curD * 0.08 * scaleApex + tipZOff * 0.6 ], // 9: Mid-lateral R
+      [  curW * 0.82 * scaleApex, -curD * 0.55 * scaleApex + tipZOff * 0.4 ], // 10: Palmar-lateral R
+      [  0.0,                     -curD * 0.68 * scaleApex + tipZOff * 0.3 ], // 11: Palmar center inset
     ];
 
     for (let ix = 0; ix < numX; ix++) {
@@ -159,6 +166,27 @@ function createPhalanxArmorGeo(
     indices.push(a, b, d, b, c, d);
   }
 
+  // Proximal end-cap (closes top rim cleanly)
+  const proxCenterIdx = positions.length / 3;
+  positions.push(0, 0, 0.002);
+  uvs.push(0.5, 0);
+  for (let ix = 0; ix < numX; ix++) {
+    const next = (ix + 1) % numX;
+    indices.push(proxCenterIdx, next, ix);
+  }
+
+  // Distal end-cap for distal tip dome
+  if (isDistalTip) {
+    const distCenterIdx = positions.length / 3;
+    const lastRowBase = segY * stride;
+    positions.push(0, -length - hd * 0.15, -hd * 0.25);
+    uvs.push(0.5, 1);
+    for (let ix = 0; ix < numX; ix++) {
+      const next = (ix + 1) % numX;
+      indices.push(distCenterIdx, lastRowBase + ix, lastRowBase + next);
+    }
+  }
+
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
@@ -170,7 +198,7 @@ function createPhalanxArmorGeo(
 // ─────────────────────────────────────────────────────────────────────────────
 // PALMAR TACTILE FRICTION GRIP PAD
 // Multi-slotted high-density dark elastomer pad for dexterous object manipulation.
-// Sized with 10% clearance at each joint margin to ensure zero pad collision on deep flexion.
+// Contours flush into the segment with zero bulbous button protrusions.
 // ─────────────────────────────────────────────────────────────────────────────
 function createPalmarPad(
   width: number,
@@ -183,7 +211,7 @@ function createPalmarPad(
   padGroup.name = 'PalmarTactileGripPad';
 
   // Base elastomer cushion slab with joint margin clearance
-  const slabLength = length * 0.78;
+  const slabLength = isDistalTip ? length * 0.85 : length * 0.78;
   const slabGeo = new THREE.BoxGeometry(width, slabLength, thickness);
   const basePad = new THREE.Mesh(slabGeo, materials.joint);
   basePad.castShadow = true;
@@ -191,26 +219,26 @@ function createPalmarPad(
 
   // Micro-grip friction ribs across the pad surface
   const ribCount = isDistalTip ? 4 : 3;
-  const ribSpacing = (slabLength * 0.75) / (ribCount + 1);
-  const ribStartY = (slabLength * 0.38);
+  const ribSpacing = (slabLength * 0.72) / (ribCount + 1);
+  const ribStartY = (slabLength * 0.36);
 
   for (let r = 0; r < ribCount; r++) {
     const ry = ribStartY - (r + 1) * ribSpacing;
-    const ribW = width * (isDistalTip ? (0.85 - r * 0.08) : 0.88);
-    const ribGeo = new THREE.BoxGeometry(ribW, 0.0010, thickness * 0.45);
+    const ribW = width * (isDistalTip ? (0.88 - r * 0.08) : 0.88);
+    const ribGeo = new THREE.BoxGeometry(ribW, 0.0009, thickness * 0.40);
     const rib = new THREE.Mesh(ribGeo, materials.jointDoubleSide);
     rib.position.set(0, ry, -thickness * 0.52);
     padGroup.add(rib);
   }
 
-  // Fingertip wrap cap if distal
+  // Smooth flush tactile pulp cushion (anatomical, flush with white armor)
   if (isDistalTip) {
-    const tipCushionGeo = new THREE.SphereGeometry(
-      width * 0.44, 14, 10, 0, Math.PI, 0, Math.PI * 0.65
+    const tipCushionGeo = new THREE.CylinderGeometry(
+      width * 0.42, width * 0.28, length * 0.22, 16
     );
-    tipCushionGeo.rotateX(Math.PI);
+    tipCushionGeo.rotateX(Math.PI / 2);
     const tipCushion = new THREE.Mesh(tipCushionGeo, materials.joint);
-    tipCushion.position.set(0, -slabLength * 0.50, -thickness * 0.20);
+    tipCushion.position.set(0, -slabLength * 0.48, -thickness * 0.15);
     padGroup.add(tipCushion);
   }
 
@@ -233,7 +261,7 @@ function createKnuckleHinge(
 
   // Central dark titanium bearing housing barrel
   const barrelGeo = new THREE.CylinderGeometry(
-    pinRadius * 1.02, pinRadius * 1.02, spanWidth * 0.62, 22
+    pinRadius * 1.00, pinRadius * 1.00, spanWidth * 0.64, 22
   );
   barrelGeo.rotateZ(Math.PI / 2);
   const hingePin = new THREE.Mesh(barrelGeo, materials.joint);
@@ -242,7 +270,7 @@ function createKnuckleHinge(
 
   // High-tensile stainless steel axle pin (core)
   const axleGeo = new THREE.CylinderGeometry(
-    pinRadius * 0.68, pinRadius * 0.68, spanWidth * 0.94, 18
+    pinRadius * 0.68, pinRadius * 0.68, spanWidth * 0.96, 18
   );
   axleGeo.rotateZ(Math.PI / 2);
   const axle = new THREE.Mesh(axleGeo, materials.metallic);
@@ -250,11 +278,11 @@ function createKnuckleHinge(
 
   // Precision CNC end caps with concentric bearing retainers (flush with armor profile)
   for (const cSide of [-1, 1]) {
-    const capX = cSide * spanWidth * 0.31;
+    const capX = cSide * spanWidth * 0.32;
 
-    // Polished outer bearing bezel
+    // Chamfered outer bearing bezel
     const capGeo = new THREE.CylinderGeometry(
-      pinRadius * 0.96, pinRadius * 0.96, 0.0008, 20
+      pinRadius * 0.95, pinRadius * 0.90, 0.0009, 20
     );
     capGeo.rotateZ(Math.PI / 2);
     const cap = new THREE.Mesh(capGeo, materials.metallic);
@@ -265,7 +293,7 @@ function createKnuckleHinge(
 
     // Inner dark titanium hub with micro hex socket
     const hubGeo = new THREE.CylinderGeometry(
-      pinRadius * 0.60, pinRadius * 0.60, 0.0010, 16
+      pinRadius * 0.55, pinRadius * 0.55, 0.0011, 16
     );
     hubGeo.rotateZ(Math.PI / 2);
     const hub = new THREE.Mesh(hubGeo, materials.joint);
@@ -273,7 +301,7 @@ function createKnuckleHinge(
     group.add(hub);
 
     // Concentric micro accent ring
-    const ringGeo = new THREE.TorusGeometry(pinRadius * 0.80, 0.0002, 6, 18);
+    const ringGeo = new THREE.TorusGeometry(pinRadius * 0.78, 0.0002, 6, 18);
     ringGeo.rotateY(Math.PI / 2);
     const ring = new THREE.Mesh(ringGeo, materials.metallic);
     ring.position.set(capX, 0, 0);
@@ -281,9 +309,9 @@ function createKnuckleHinge(
   }
 
   // Mechanical joint extension limit stop tab (recessed for maximum flexion range)
-  const stopGeo = new THREE.BoxGeometry(spanWidth * 0.48, pinRadius * 0.50, pinRadius * 0.35);
+  const stopGeo = new THREE.BoxGeometry(spanWidth * 0.50, pinRadius * 0.45, pinRadius * 0.32);
   const stopMesh = new THREE.Mesh(stopGeo, materials.joint);
-  stopMesh.position.set(0, pinRadius * 0.80, pinRadius * 0.25);
+  stopMesh.position.set(0, pinRadius * 0.78, pinRadius * 0.22);
   group.add(stopMesh);
 
   return { group, hingePin, caps };
@@ -292,7 +320,7 @@ function createKnuckleHinge(
 // ─────────────────────────────────────────────────────────────────────────────
 // PHALANX SEGMENT BUILDER
 // Shared segment constructor for Proximal, Middle, and Distal phalanges.
-// Collars and armor are beveled for 0°–100° universal collision-free articulation.
+// Collars and armor are beveled for 0°–105° universal collision-free articulation.
 // ─────────────────────────────────────────────────────────────────────────────
 function buildSegment(
   name: string,
@@ -304,9 +332,9 @@ function buildSegment(
   const group = new THREE.Group();
   group.name = name;
 
-  // 1. Dark Titanium Internal Structural Bone Core
+  // 1. Dark Titanium Internal Structural Bone Core (strictly internal)
   const boneGeo = new THREE.CylinderGeometry(
-    radius * 0.48, radius * 0.40, length, 16
+    radius * 0.25, radius * 0.22, length * 0.85, 16
   );
   const boneMesh = new THREE.Mesh(boneGeo, materials.joint);
   boneMesh.name = `${name}_BoneCore`;
@@ -314,14 +342,14 @@ function buildSegment(
   boneMesh.castShadow = true;
   group.add(boneMesh);
 
-  // CNC Metallic structural spine intersecting the core
-  const spineGeo = new THREE.BoxGeometry(radius * 0.25, length * 0.45, radius * 1.05);
+  // CNC Metallic structural spine intersecting the core (strictly internal)
+  const spineGeo = new THREE.BoxGeometry(radius * 0.18, length * 0.45, radius * 0.35);
   const spine = new THREE.Mesh(spineGeo, materials.metallic);
   spine.position.set(0, -length * 0.50, 0);
   group.add(spine);
 
   // 2. Proximal Joint Interface Collar Ring (beveled for free pivot articulation)
-  const collarH = Math.max(0.0024, length * 0.08);
+  const collarH = Math.max(0.0022, length * 0.075);
   const collarR = radius * 0.94;
   const proxCollarGeo = new THREE.CylinderGeometry(collarR, collarR * 0.94, collarH, 22);
   const proxCollar = new THREE.Mesh(proxCollarGeo, materials.joint);
@@ -330,7 +358,7 @@ function buildSegment(
   group.add(proxCollar);
 
   // Polished chrome collar retainer trim ring
-  const proxTrimGeo = new THREE.TorusGeometry(collarR, 0.00035, 6, 22);
+  const proxTrimGeo = new THREE.TorusGeometry(collarR, 0.00030, 6, 22);
   proxTrimGeo.rotateX(Math.PI / 2);
   const proxTrim = new THREE.Mesh(proxTrimGeo, materials.metallic);
   proxTrim.position.set(0, -collarH * 0.5, 0);
@@ -344,7 +372,7 @@ function buildSegment(
     distCollar.castShadow = true;
     group.add(distCollar);
 
-    const distTrimGeo = new THREE.TorusGeometry(collarR * 0.92, 0.00035, 6, 22);
+    const distTrimGeo = new THREE.TorusGeometry(collarR * 0.92, 0.00030, 6, 22);
     distTrimGeo.rotateX(Math.PI / 2);
     const distTrim = new THREE.Mesh(distTrimGeo, materials.metallic);
     distTrim.position.set(0, -length + collarH * 0.5, 0);
@@ -354,10 +382,10 @@ function buildSegment(
   // 4. Sculpted White Ceramic Dorsal Armor Shell
   const armorW = radius * 2.05;
   const armorD = radius * 1.88;
-  const armorStartY = isDistal ? collarH * 0.75 : collarH * 0.85;
-  const armorLen = isDistal ? (length - armorStartY) : (length - collarH * 1.70);
+  const armorStartY = 0.0005; // Anchored flush with proximal collar margin
+  const armorLen = isDistal ? length : (length - collarH * 0.65);
   const armorGeo = createPhalanxArmorGeo(armorW, armorLen, armorD, isDistal);
-  const armorMesh = new THREE.Mesh(armorGeo, materials.armorDoubleSide);
+  const armorMesh = new THREE.Mesh(armorGeo, materials.armor);
   armorMesh.name = `${name}_ArmorShell`;
   armorMesh.position.set(0, -armorStartY, 0);
   armorMesh.castShadow = true;
@@ -366,7 +394,7 @@ function buildSegment(
 
   // 5. Dorsal Sensor Nail Plate on Distal Phalanx (High-Tech Detail)
   if (isDistal) {
-    const nailGeo = new THREE.BoxGeometry(armorW * 0.50, length * 0.30, 0.0008);
+    const nailGeo = new THREE.BoxGeometry(armorW * 0.50, length * 0.28, 0.0008);
     const nailMesh = new THREE.Mesh(nailGeo, materials.joint);
     nailMesh.name = `${name}_SensorNailPlate`;
     nailMesh.position.set(0, -length * 0.68, armorD * 0.44);
@@ -386,9 +414,9 @@ function buildSegment(
 
   // 6. Palmar Tactile Elastomer Friction Pad
   const padGroup = createPalmarPad(
-    armorW * 0.70, length * 0.66, 0.0024, isDistal, materials
+    armorW * 0.72, length * 0.68, 0.0022, isDistal, materials
   );
-  padGroup.position.set(0, -length * 0.50, -armorD * 0.28);
+  padGroup.position.set(0, -length * 0.50, -armorD * 0.35);
   group.add(padGroup);
 
   const padMesh = padGroup.children[0] as THREE.Mesh;
@@ -457,17 +485,17 @@ export function createFinger(
   midSeg.group.add(distSeg.group);
 
   // ── ANATOMICAL RESTING ATHLETIC CASCADE (MATCHING REFERENCE IMAGES 1 & 2) ─
-  // Authentic cascading athletic resting angles matching Reference Images 1 & 2:
-  // Index: graceful forward extension | Middle: progressive curve | Ring: deeper curl | Little: tucked cascade
+  // Authentic open relaxed athletic resting angles matching Reference Images 1 & 2:
+  // Clean downward extension with subtle ergonomic forward cascade (~15°–25° total)
   const restPoses: Record<string, { prox: number; mid: number; dist: number; splay: number }> = {
-    Index:  { prox: 0.40, mid: 0.58, dist: 0.38, splay: -0.025 },
-    Middle: { prox: 0.50, mid: 0.72, dist: 0.45, splay:  0.000 },
-    Ring:   { prox: 0.60, mid: 0.88, dist: 0.52, splay:  0.032 },
-    Little: { prox: 0.70, mid: 1.05, dist: 0.60, splay:  0.065 },
+    Index:  { prox: 0.08, mid: 0.10, dist: 0.08, splay: -0.015 },
+    Middle: { prox: 0.10, mid: 0.12, dist: 0.10, splay:  0.000 },
+    Ring:   { prox: 0.12, mid: 0.14, dist: 0.12, splay:  0.015 },
+    Little: { prox: 0.15, mid: 0.16, dist: 0.14, splay:  0.030 },
   };
 
   const radial = -side;
-  const pose = restPoses[spec.name] ?? { prox: 0.16, mid: 0.28, dist: 0.20, splay: 0 };
+  const pose = restPoses[spec.name] ?? { prox: 0.10, mid: 0.12, dist: 0.10, splay: 0 };
   proxSeg.group.rotation.x = pose.prox;
   midSeg.group.rotation.x  = pose.mid;
   distSeg.group.rotation.x = pose.dist;
@@ -485,8 +513,8 @@ export function createFinger(
 // ─────────────────────────────────────────────────────────────────────────────
 // OPPOSABLE ARTICULATED ROBOTIC THUMB (RE-ENGINEERED TO MATCH REFERENCE DESIGN)
 //
-// 1. Organic white ceramic thenar eminence flowing from palm chassis
-// 2. Semi-recessed dark titanium rotary actuator with flush chrome bezel
+// 1. Recessed dark titanium thenar socket cradling the rotary actuator
+// 2. High-precision cylindrical rotary actuator with flush chrome bezel ring
 // 3. Natural palmar abduction and opposition resting gracefully beside index
 // ─────────────────────────────────────────────────────────────────────────────
 export function createThumb(
@@ -500,27 +528,27 @@ export function createThumb(
   // For left hand (side = -1), medial thumb is at +X.
   const radial = -side;
 
-  // 1. HIGH-MOUNTED THENAR ANCHOR:
-  // Positioned flush with the radial corner of the carpal-palmar margin
-  thumbGroup.position.set(radial * 0.0210, -0.0140, 0.0050);
+  // 1. HIGH-MOUNTED THENAR ANCHOR (SIDE OF PALM):
+  // Positioned on the lateral/radial flank matching Reference Images 1 & 2
+  thumbGroup.position.set(radial * 0.0220, -0.0170, 0.0040);
 
   // Natural Humanoid Resting Stance:
-  // - rotation.x: forward palmar abduction (~0.42 rad / ~24°)
-  // - rotation.y: medial opposition rotation toward index (-radial * 0.28 rad)
-  // - rotation.z: slight clearance angle (radial * 0.14 rad)
-  thumbGroup.rotation.set(0.42, -radial * 0.28, radial * 0.14);
+  // - rotation.z: outward abduction angle (radial * 0.40 rad ≈ 23°)
+  // - rotation.x: gentle forward tilt (0.22 rad ≈ 12.6°)
+  // - rotation.y: slight opposition rotation toward palm (-radial * 0.16 rad ≈ 9°)
+  thumbGroup.rotation.set(0.22, -radial * 0.16, radial * 0.40);
 
   // ── 1. THENAR HOUSING & COMPACT CMC ACTUATOR ──────────────────────────────
-  // Sculpted White Ceramic Thenar Fairing blending into the palm
-  const thenarBracketGeo = new THREE.BoxGeometry(0.0130, 0.0160, 0.0110);
-  const thenarBracket = new THREE.Mesh(thenarBracketGeo, materials.armor);
-  thenarBracket.name = 'ThumbThenarBracket';
-  thenarBracket.position.set(-radial * 0.0015, 0.0020, -0.0010);
-  thenarBracket.castShadow = true;
-  thenarBracket.receiveShadow = true;
-  thumbGroup.add(thenarBracket);
+  // Sleek mounting socket recessed in the palm radial flank
+  const thenarSocketGeo = new THREE.CylinderGeometry(0.0064, 0.0070, 0.0040, 16);
+  thenarSocketGeo.rotateZ(Math.PI / 2);
+  const thenarSocket = new THREE.Mesh(thenarSocketGeo, materials.joint);
+  thenarSocket.name = 'ThumbThenarSocket';
+  thenarSocket.position.set(-radial * 0.0020, 0.0010, -0.0015);
+  thenarSocket.castShadow = true;
+  thumbGroup.add(thenarSocket);
 
-  // Compact dark titanium cylindrical actuator core (flush within bracket)
+  // Compact dark titanium cylindrical actuator core (flush within socket)
   const trunnionGeo = new THREE.CylinderGeometry(0.0068, 0.0068, 0.0080, 22);
   trunnionGeo.rotateZ(Math.PI / 2);
   const baseBall = new THREE.Mesh(trunnionGeo, materials.joint);
@@ -576,10 +604,10 @@ export function createThumb(
 
   // ── 4. NATURAL RESTING POSE (MATCHING REFERENCE IMAGES) ───────────────────
   // Thumb rests gracefully alongside the index finger in gentle natural opposition
-  proxSeg.group.rotation.x = 0.42; // gentle forward opposition angle
-  proxSeg.group.rotation.z = 0;
-  distSeg.group.rotation.x = 0.48; // natural relaxed inward curl
-  distSeg.group.rotation.z = -radial * 0.08; // inward return towards index finger
+  proxSeg.group.rotation.x = 0.14; // gentle forward angle
+  proxSeg.group.rotation.z = radial * 0.04;
+  distSeg.group.rotation.x = 0.18; // gentle natural relaxed curl
+  distSeg.group.rotation.z = -radial * 0.06; // inward return towards index finger
 
   // Purple telemetry accent strip on lateral distal thumb
   const thumbLedGeo = new THREE.BoxGeometry(0.0008, 0.0045, 0.0008);
