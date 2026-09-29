@@ -198,15 +198,16 @@ function evaluatePauldronPoint(
   side: -1 | 1,
   offset: number = 0
 ): THREE.Vector3 {
-  // 1. Unified, elegant Section 3E lower clearance contour
-  // Gentle concave clearance rise across the joint (v = 0.25 to 0.85),
-  // framing the dark cylinder without any jagged teeth or awkward steps.
+  // 1. Refined Hard-Surface Pauldron Cowl Extension (Towards Shoulder & Arm)
+  // Replaces the former gaping arch cutout with an athletic, protective mecha cowl.
+  // Extends smoothly over the dark titanium actuator cylinder and frames the shoulder joint,
+  // while preserving generous, pristine clearance above the lower rotary black bearing.
   const vClamped = Math.max(0, Math.min(1, v));
-  const vArch = Math.sin(vClamped * Math.PI);
-  const clearanceAngle = Math.pow(Math.max(0, vArch), 1.4) * 0.085 * Math.PI;
-
-  const startAngle = -0.045 * Math.PI + clearanceAngle;
-  const endAngle = 1.045 * Math.PI - clearanceAngle;
+  // Continuous downward extension in midspan giving complete armor coverage over shoulder joint
+  // Leaves 9mm pristine mechanical clearance above the black rotary bearing
+  const midCoverage = Math.sin(vClamped * Math.PI) * 0.070 * Math.PI;
+  const startAngle = -0.085 * Math.PI - midCoverage;
+  const endAngle = 1.085 * Math.PI + midCoverage;
   const angle = startAngle * (1 - u) + endAngle * u;
 
   const sinA = Math.sin(angle);
@@ -231,11 +232,11 @@ function evaluatePauldronPoint(
     rOuter -= Math.pow(tBevel, 1.5) * 0.0016;
   }
 
-  // 3. Lateral span X
-  // Inboard: X = -0.0340 (world X = 0.2000, flush with chest collar)
-  // Outboard: X = +0.0190 CONSTANT across u (perfect planar circle rim framing rotational ring!)
+  // 3. Lateral span X — Extended outward towards the shoulder rotational joint
+  // Inboard: X = -0.0340 (flush with chest collar at X ≈ 0.2000)
+  // Outboard: Extended to X = +0.0232 to interface flush with the metallic bearing race bezel
   const xInboard = -0.0340 + 0.0015 * Math.sin(u * Math.PI);
-  const xOutboard = 0.0190;
+  const xOutboard = 0.0236; // Aligned with the outer bearing lip (0.0235) framing the purple accent halo
   let xSpan = xInboard * (1 - v) + xOutboard * v;
 
   const radius = (layer === 0 ? rOuter : rInner) + offset;

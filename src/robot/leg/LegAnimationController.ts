@@ -172,14 +172,14 @@ export class LegAnimationController {
     const lHip = this.leftLeg.hip.group;
     lHip.rotation.x = this.baseLeftHipRot.x + (this.leftOverrides.hipPitch ?? breathKnee * 0.3);
     lHip.rotation.y = this.baseLeftHipRot.y + (this.leftOverrides.hipYaw ?? 0);
-    lHip.rotation.z = this.baseLeftHipRot.z + (this.leftOverrides.hipRoll ?? weightShift);
+    lHip.rotation.z = this.baseLeftHipRot.z + (this.leftOverrides.hipRoll ?? -weightShift);
 
     const lKnee = this.leftLeg.knee.shinPivot;
     lKnee.rotation.x = this.baseLeftKneeRot.x + (this.leftOverrides.kneePitch ?? breathKnee);
 
     const lAnkle = this.leftLeg.ankle.footPivot;
     lAnkle.rotation.x = this.baseLeftAnkleRot.x + (this.leftOverrides.anklePitch ?? breathAnkle);
-    lAnkle.rotation.z = this.baseLeftAnkleRot.z + (this.leftOverrides.ankleRoll ?? -weightShift * 0.7);
+    lAnkle.rotation.z = this.baseLeftAnkleRot.z + (this.leftOverrides.ankleRoll ?? weightShift * 0.7);
 
     // Update Right Leg
     const rHip = this.rightLeg.hip.group;

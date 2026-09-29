@@ -89,9 +89,13 @@ function createSegmentedAnteriorArmorGeometry(
 }
 
 /**
- * Creates the sculpted lateral armor cowl (Vastus Lateralis).
+ * Creates the sculpted flank armor cowl (lateral vastus lateralis & medial protector).
+ * Oriented with absolute bilateral symmetry:
+ * - Anterior high facet consistently meets anterior quad armor at +Z
+ * - Posterior lower facet meets hamstring cover at -Z
+ * - Supracondylar relief arch cleanly frames the knee rotary condyle disc at -Y
  */
-function createLateralCowlGeometry(
+function createThighFlankArmorGeometry(
   length: number,
   width: number,
   thickness: number
@@ -100,14 +104,22 @@ function createLateralCowlGeometry(
   const halfW = width * 0.5;
   const halfL = length * 0.5;
 
-  shape.moveTo(-halfW * 0.70, halfL);
-  shape.lineTo(halfW * 0.70, halfL * 0.88);
-  shape.quadraticCurveTo(halfW * 1.02, 0, halfW * 0.65, -halfL * 0.85);
-  shape.lineTo(halfW * 0.50, -halfL);
+  // In 2D shape coordinates:
+  // +X is ANTERIOR (+Z in local 3D thigh frame)
+  // -X is POSTERIOR (-Z in local 3D thigh frame)
+  // +Y is SUPERIOR (+Y in local 3D thigh frame)
+  // -Y is INFERIOR (-Y in local 3D thigh frame)
+  const antZ = halfW * 0.72;
+  const postZ = -halfW * 0.68;
+
+  shape.moveTo(antZ, halfL); // Anterior upper corner
+  shape.lineTo(postZ, halfL * 0.88); // Posterior upper slope
+  shape.quadraticCurveTo(-halfW * 1.02, 0, -halfW * 0.65, -halfL * 0.85);
+  shape.lineTo(-halfW * 0.50, -halfL);
   // Supracondylar relief arch — curves upward to cleanly frame the rotary condyle bearing
-  shape.quadraticCurveTo(0, -halfL + 0.012, -halfW * 0.50, -halfL);
-  shape.lineTo(-halfW * 0.65, -halfL * 0.85);
-  shape.quadraticCurveTo(-halfW * 1.02, 0, -halfW * 0.70, halfL);
+  shape.quadraticCurveTo(0, -halfL + 0.012, halfW * 0.50, -halfL);
+  shape.lineTo(halfW * 0.65, -halfL * 0.85);
+  shape.quadraticCurveTo(halfW * 1.02, 0, antZ, halfL);
   shape.closePath();
 
   const geo = new THREE.ExtrudeGeometry(shape, {
@@ -119,6 +131,57 @@ function createLateralCowlGeometry(
     curveSegments: 24,
   });
   geo.center();
+
+  // Rotate so 2D +X maps directly to 3D +Z (anterior) and 2D thickness maps along X
+  geo.rotateY(-Math.PI / 2);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+/**
+ * Creates the articulated white ceramic trochanter armor cowl wrapping the upper femur neck.
+ * Bridges the cylindrical hip socket flange smoothly down into the anterior quad plate,
+ * eliminating bare rectangular neck gaps while preserving mechanical clearance.
+ */
+function createTrochanterArmorGeometry(
+  side: -1 | 1,
+  radius: number,
+  height: number,
+  thickness: number
+): THREE.BufferGeometry {
+  const shape = new THREE.Shape();
+  const halfH = height * 0.5;
+  const halfW = radius * 1.08;
+
+  // Sleek faceted mecha trochanter cowl cupping the hip socket
+  shape.moveTo(0, halfH);
+  shape.quadraticCurveTo(halfW * 0.95, halfH - 0.004, halfW, halfH * 0.35);
+  shape.lineTo(halfW * 0.82, -halfH * 0.65);
+  shape.quadraticCurveTo(halfW * 0.45, -halfH, 0, -halfH + 0.004);
+  shape.quadraticCurveTo(-halfW * 0.45, -halfH, -halfW * 0.82, -halfH * 0.65);
+  shape.lineTo(-halfW, halfH * 0.35);
+  shape.quadraticCurveTo(-halfW * 0.95, halfH - 0.004, 0, halfH);
+  shape.closePath();
+
+  const geo = new THREE.ExtrudeGeometry(shape, {
+    depth: thickness,
+    bevelEnabled: true,
+    bevelThickness: 0.0032,
+    bevelSize: 0.0024,
+    bevelSegments: 3,
+    curveSegments: 24,
+  });
+  geo.center();
+
+  // Gentle 3D cylindrical curvature wrapping the femur collar
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i);
+    const z = pos.getZ(i);
+    const wrap = Math.cos((x / halfW) * (Math.PI * 0.45)) * 0.006;
+    pos.setZ(i, z + wrap);
+  }
+  geo.computeVertexNormals();
   return geo;
 }
 
@@ -298,30 +361,25 @@ export function createThigh(
 
   // =========================================================================
   // 4. ENGINEERED WHITE CERAMIC TROCHANTER SHELL COLLAR
-  // Sculpted transition cowl with beveled top rim cupping the titanium socket
+  // Sculpted transition cowl cupping upper femur neck and bridging hip flange into quad armor
   // =========================================================================
-  const trochanterShape = new THREE.Shape();
-  const tR = cfg.frame.upperCollarRadius * 1.15;
-  trochanterShape.absarc(0, 0, tR, 0, Math.PI * 2, false);
-  const trochanterHole = new THREE.Path();
-  trochanterHole.absarc(0, 0, cfg.frame.upperCollarRadius * 1.02, 0, Math.PI * 2, true);
-  trochanterShape.holes.push(trochanterHole);
-
-  const trochanterGeo = new THREE.ExtrudeGeometry(trochanterShape, {
-    depth: 0.016,
-    bevelEnabled: true,
-    bevelThickness: 0.0035,
-    bevelSize: 0.0028,
-    bevelSegments: 3,
-    curveSegments: 28,
-  });
-  trochanterGeo.center();
-
+  const trochanterGeo = createTrochanterArmorGeometry(
+    side,
+    cfg.frame.upperCollarRadius,
+    0.036,
+    0.012
+  );
   const trochanterHood = new THREE.Mesh(trochanterGeo, materials.armor);
   trochanterHood.name = side === -1 ? 'TrochanterHood_L' : 'TrochanterHood_R';
-  trochanterHood.rotation.x = Math.PI / 2;
-  trochanterHood.position.set(0, -cfg.frame.upperCollarHeight * 0.55, 0);
+  trochanterHood.position.set(
+    side * (cfg.frame.upperCollarRadius * 0.28),
+    -cfg.frame.upperCollarHeight * 0.95,
+    cfg.frame.spineDepth * 0.42
+  );
+  trochanterHood.rotation.y = side * -0.16;
+  trochanterHood.rotation.x = -0.06;
   trochanterHood.castShadow = true;
+  trochanterHood.receiveShadow = true;
   staticArmorGroup.add(trochanterHood);
 
   // =========================================================================
@@ -349,9 +407,9 @@ export function createThigh(
 
   // =========================================================================
   // 6. SCULPTED LATERAL ARMOR COWL (Vastus Lateralis)
-  // Mounted flush to outer flank, preserving visible structural edges
+  // Mounted flush to outer flank with verified bilateral mirror symmetry
   // =========================================================================
-  const latGeo = createLateralCowlGeometry(
+  const latGeo = createThighFlankArmorGeometry(
     cfg.lateralArmor.cowlLength,
     cfg.lateralArmor.width,
     cfg.lateralArmor.thickness
@@ -363,7 +421,7 @@ export function createThigh(
     -cfg.length * 0.48,
     0.002
   );
-  lateralArmor.rotation.y = side * (Math.PI / 2 - 0.12);
+  lateralArmor.rotation.set(0, 0, 0);
   lateralArmor.castShadow = true;
   lateralArmor.receiveShadow = true;
   thighGroup.add(lateralArmor);
@@ -394,7 +452,7 @@ export function createThigh(
   // 7. MEDIAL PROTECTOR PLATE
   // Preserves inner leg clearance while shielding internal wiring
   // =========================================================================
-  const medGeo = createLateralCowlGeometry(
+  const medGeo = createThighFlankArmorGeometry(
     cfg.medialArmor.cowlLength,
     cfg.medialArmor.width,
     cfg.medialArmor.thickness
@@ -406,7 +464,7 @@ export function createThigh(
     -cfg.length * 0.48,
     0.002
   );
-  medialArmor.rotation.y = -side * (Math.PI / 2 - 0.12);
+  medialArmor.rotation.set(0, 0, 0);
   staticArmorGroup.add(medialArmor);
 
   // =========================================================================

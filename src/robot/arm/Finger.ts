@@ -530,7 +530,7 @@ export function createThumb(
 
   // 1. HIGH-MOUNTED THENAR ANCHOR (SIDE OF PALM):
   // Positioned on the lateral/radial flank matching Reference Images 1 & 2
-  thumbGroup.position.set(radial * 0.0220, -0.0170, 0.0040);
+  thumbGroup.position.set(radial * 0.0190, -0.0155, 0.0034);
 
   // Natural Humanoid Resting Stance:
   // - rotation.z: outward abduction angle (radial * 0.40 rad ≈ 23°)
@@ -540,16 +540,16 @@ export function createThumb(
 
   // ── 1. THENAR HOUSING & COMPACT CMC ACTUATOR ──────────────────────────────
   // Sleek mounting socket recessed in the palm radial flank
-  const thenarSocketGeo = new THREE.CylinderGeometry(0.0064, 0.0070, 0.0040, 16);
+  const thenarSocketGeo = new THREE.CylinderGeometry(0.0052, 0.0058, 0.0034, 16);
   thenarSocketGeo.rotateZ(Math.PI / 2);
   const thenarSocket = new THREE.Mesh(thenarSocketGeo, materials.joint);
   thenarSocket.name = 'ThumbThenarSocket';
-  thenarSocket.position.set(-radial * 0.0020, 0.0010, -0.0015);
+  thenarSocket.position.set(-radial * 0.0016, 0.0008, -0.0012);
   thenarSocket.castShadow = true;
   thumbGroup.add(thenarSocket);
 
   // Compact dark titanium cylindrical actuator core (flush within socket)
-  const trunnionGeo = new THREE.CylinderGeometry(0.0068, 0.0068, 0.0080, 22);
+  const trunnionGeo = new THREE.CylinderGeometry(0.0054, 0.0054, 0.0068, 22);
   trunnionGeo.rotateZ(Math.PI / 2);
   const baseBall = new THREE.Mesh(trunnionGeo, materials.joint);
   baseBall.name = 'ThumbCMCActuatorHousing';
@@ -557,30 +557,30 @@ export function createThumb(
   thumbGroup.add(baseBall);
 
   // Flush chrome bezel ring
-  const baseRingGeo = new THREE.TorusGeometry(0.0068, 0.0006, 6, 22);
+  const baseRingGeo = new THREE.TorusGeometry(0.0054, 0.0005, 6, 22);
   baseRingGeo.rotateY(Math.PI / 2);
   const baseRing = new THREE.Mesh(baseRingGeo, materials.metallic);
-  baseRing.position.set(radial * 0.0038, 0, 0);
+  baseRing.position.set(radial * 0.0032, 0, 0);
   thumbGroup.add(baseRing);
 
   // Precision metallic bearing disc
-  const discGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0008, 20);
+  const discGeo = new THREE.CylinderGeometry(0.0044, 0.0044, 0.0006, 20);
   discGeo.rotateZ(Math.PI / 2);
   const bearingDisc = new THREE.Mesh(discGeo, materials.metallic);
-  bearingDisc.position.set(radial * 0.0041, 0, 0);
+  bearingDisc.position.set(radial * 0.0035, 0, 0);
   thumbGroup.add(bearingDisc);
 
   // Swivel mounting collar interface
-  const collarGeo = new THREE.CylinderGeometry(0.0068, 0.0072, 0.0035, 20);
+  const collarGeo = new THREE.CylinderGeometry(0.0054, 0.0058, 0.0030, 20);
   const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
   baseCollar.name = 'ThumbSwivelCollar';
-  baseCollar.position.set(0, -0.0055, 0);
+  baseCollar.position.set(0, -0.0044, 0);
   baseCollar.castShadow = true;
   thumbGroup.add(baseCollar);
 
   // ── 2. PROXIMAL PHALANX ───────────────────────────────────────────────────
-  const proxLen = 0.0380;
-  const proxRad = 0.0072;
+  const proxLen = 0.0270;
+  const proxRad = 0.0056;
   const proxSeg = buildSegment('ThumbProximal', proxRad, proxLen, false, materials);
   thumbGroup.add(proxSeg.group);
 
@@ -596,8 +596,8 @@ export function createThumb(
   proxSeg.hingeCaps  = ipHinge.caps;
 
   // ── 3. DISTAL PHALANX & OPPOSABLE THUMBTIP ────────────────────────────────
-  const distLen = 0.0280;
-  const distRad = 0.0060;
+  const distLen = 0.0200;
+  const distRad = 0.0047;
   const distSeg = buildSegment('ThumbDistal', distRad, distLen, true, materials);
   distSeg.group.position.set(0, -proxLen, 0);
   proxSeg.group.add(distSeg.group);
@@ -610,7 +610,7 @@ export function createThumb(
   distSeg.group.rotation.z = -radial * 0.06; // inward return towards index finger
 
   // Purple telemetry accent strip on lateral distal thumb
-  const thumbLedGeo = new THREE.BoxGeometry(0.0008, 0.0045, 0.0008);
+  const thumbLedGeo = new THREE.BoxGeometry(0.0007, 0.0036, 0.0007);
   const thumbLed = new THREE.Mesh(thumbLedGeo, materials.purpleEmissive);
   thumbLed.position.set(radial * (distRad * 0.88), -distLen * 0.50, distRad * 0.20);
   distSeg.group.add(thumbLed);

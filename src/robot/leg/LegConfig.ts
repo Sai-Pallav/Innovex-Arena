@@ -196,12 +196,14 @@ export const LEG_CONFIG = {
   // 3. DEFAULT REST / HEROIC STANDING STANCE
   // =========================================================================
   stance: {
-    // Natural heroic standing stance: slight outward hip flare, soft knee flex, level feet
-    hipPitch: -0.04,
-    hipRoll: 0.05,     // Slight lateral stance (~3°)
-    hipYaw: 0.03,      // Slight outward toe flare
-    kneePitch: 0.08,   // Subtle organic knee flex (~4.5°)
-    anklePitch: -0.04, // Compensates knee flex to keep sole parallel with ground
-    ankleRoll: -0.05,  // Compensates hip roll for flush ground contact
+    // Athletic heroic standing stance: assertive outward hip flare, active knee flexion, grounded level feet
+    hipPitch: -0.080,    // ~-4.6° forward thigh incline for active muscular engagement
+    hipRoll: 0.082,      // ~4.7° lateral abduction providing stable, confident A-frame stance
+    hipYaw: 0.055,       // ~3.1° outward toe flare for anatomical knee-to-toe alignment
+    hipYawLeft: 0.035,   // ~2.0° calibrated for 3/4 camera view to present anterior armor facet
+    hipYawRight: 0.065,  // ~3.7° calibrated outward flare revealing lateral cowl and condyle
+    kneePitch: 0.155,    // ~8.9° athletic knee flexion eliminating stiff/hyperextended look
+    anklePitch: -0.075,  // Perfectly balances hip pitch and knee bend to keep foot level
+    ankleRoll: -0.082,   // Counter-balances hip roll for 100% flush ground contact
   },
 };

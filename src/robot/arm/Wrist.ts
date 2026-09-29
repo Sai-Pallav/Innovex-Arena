@@ -38,9 +38,9 @@ export interface WristNodes {
  * Continuously curved, filleted quad-mesh with top and bottom chamfers.
  */
 function createSquircleCuffGeometry(
-  width: number = 0.0430,
-  depth: number = 0.0330,
-  height: number = 0.0115,
+  width: number = 0.0432,
+  depth: number = 0.0332,
+  height: number = 0.0135,
   power: number = 3.2
 ): THREE.BufferGeometry {
   const radialSegments = 48;
@@ -50,12 +50,12 @@ function createSquircleCuffGeometry(
   // Longitudinal profile definitions (y, scale)
   const profile = [
     { y:  0.0000, scale: 0.92 }, // Top lid inner rim
-    { y: -0.0007, scale: 0.985 }, // Top chamfer
-    { y: -0.0020, scale: 1.00 }, // Upper flank
-    { y: -0.0058, scale: 1.015 }, // Mid organic convex crown
-    { y: -0.0095, scale: 1.00 }, // Lower flank
-    { y: -0.0108, scale: 0.985 }, // Bottom chamfer
-    { y: -0.0115, scale: 0.93 }, // Bottom lid inner rim
+    { y: -0.0008, scale: 0.985 }, // Top chamfer
+    { y: -0.0024, scale: 1.00 }, // Upper flank
+    { y: -0.0068, scale: 1.015 }, // Mid organic convex crown
+    { y: -0.0112, scale: 1.00 }, // Lower flank
+    { y: -0.0127, scale: 0.985 }, // Bottom chamfer
+    { y: -0.0135, scale: 0.93 }, // Bottom lid inner rim
   ];
 
   const heightSegments = profile.length - 1;
@@ -195,9 +195,9 @@ export function createWrist(
   // 1. SCULPTED ERGONOMIC GAUNTLET CUFF (SUPER-ELLIPSE GEOMETRY)
   //    Dark titanium chamfered body with continuous G2 curvature
   // ════════════════════════════════════════════════════════════
-  const cuffW = 0.0430; // 43.0 mm wide (seamless taper with forearm & carpal profile)
-  const cuffD = 0.0330; // 33.0 mm deep
-  const cuffH = 0.0115; // 11.5 mm compact athletic height
+  const cuffW = 0.0448; // 44.8 mm wide (seamless taper with forearm & carpal profile)
+  const cuffD = 0.0340; // 34.0 mm deep
+  const cuffH = 0.0135; // 13.5 mm compact athletic height
 
   const cuffGeo = createSquircleCuffGeometry(cuffW, cuffD, cuffH, 3.2);
   const swivelCollar = new THREE.Mesh(cuffGeo, materials.joint);
@@ -273,9 +273,9 @@ export function createWrist(
 
   // ════════════════════════════════════════════════════════════
   // 4. TRANSVERSE FLEXION AXLE PIN & STYLOID BEARING HUBS
-  //    True anatomical wrist pivot axis at Y = -0.0100m
+  //    True anatomical wrist pivot axis at Y = -0.0110m
   // ════════════════════════════════════════════════════════════
-  const pivotY = -0.0100;
+  const pivotY = -0.0110;
 
   const coreGeo = new THREE.CylinderGeometry(0.0075, 0.0075, 0.0090, 20);
   const rotaryCore = new THREE.Mesh(coreGeo, materials.joint);
@@ -372,7 +372,7 @@ export function createWrist(
   // Dedicated Distal Mounting Anchor (flush docking against cuff bottom rim)
   const distalHandMount = new THREE.Group();
   distalHandMount.name = side === -1 ? 'LeftDistalHandMount' : 'RightDistalHandMount';
-  distalHandMount.position.set(0, -0.0026, 0);
+  distalHandMount.position.set(0, -0.0025, 0);
   trunnionPivot.add(distalHandMount);
 
   // Natural athletic resting flexion: subtle forward tilt (~2.5°)

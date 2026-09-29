@@ -100,11 +100,12 @@ export function createRobotLeg(
   // 7. DEFAULT ATHLETIC HEROIC STANDING STANCE
   // ==========================================
   const st = LEG_CONFIG.stance;
+  const yaw = side === -1 ? (st.hipYawLeft ?? st.hipYaw) : (st.hipYawRight ?? st.hipYaw);
 
   // Hip orientation: slight outward abduction and subtle rotation
   hip.group.rotation.x = st.hipPitch;
   hip.group.rotation.z = side * st.hipRoll;
-  hip.group.rotation.y = side * st.hipYaw;
+  hip.group.rotation.y = side * yaw;
 
   // Knee flexion: soft natural knee bend (~4.5°)
   knee.shinPivot.rotation.x = st.kneePitch;
