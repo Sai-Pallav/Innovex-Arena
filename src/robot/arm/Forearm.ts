@@ -127,6 +127,12 @@ function createForearmCoherentArmor(
         // Central anterior facet: prominent crowned curvature (convex aerodynamic arch)
         const tCenter = (cosA - 0.52) / 0.48;
         rz -= (1.0 - Math.pow(tCenter, 1.4) * 0.40) * 0.0024;
+
+        // Distinct recessed vertical panel line / seam down the front (matching UpperArm design system)
+        if (cosA > 0.95 && Math.abs(sinA) < 0.10) {
+          const tSeam = 1.0 - Math.abs(sinA) / 0.10;
+          rz -= tSeam * 0.0014;
+        }
       } else if (cosA > 0.15) {
         // Crisp 45° chamfered corner bevel connecting front and lateral faces
         const tChamfer = (cosA - 0.15) / 0.37;
@@ -444,28 +450,30 @@ export function createForearm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'ForearmStandardizedTechBay';
-  // Positioned flush on the anterior facet at y = -0.083m, z = 0.0285m
-  const bayX = side * 0.0010;
-  const bayZ = 0.0285;
+  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.083m, z = 0.0288m
+  // With subtle pitch rotation matching the natural forearm taper slope (~2.8°)
+  const bayX = 0;
+  const bayZ = 0.0288;
   const bayY = -0.083;
   techBayGroup.position.set(bayX, bayY, bayZ);
+  techBayGroup.rotation.x = -0.048;
   armorGroup.add(techBayGroup);
 
   // 1. Dark Titanium Recessed Tray / Cavity (sunken flush into the armor facet)
-  const bayHousingGeo = new THREE.BoxGeometry(0.0088, 0.044, 0.0020);
+  const bayHousingGeo = new THREE.BoxGeometry(0.0088, 0.042, 0.0020);
   const bayHousing = new THREE.Mesh(bayHousingGeo, materials.joint);
   bayHousing.position.set(0, 0, -0.0006);
   bayHousing.castShadow = true;
   techBayGroup.add(bayHousing);
 
   // 2. Precision Machined Metallic Thin Bezel Rim
-  const bezelFrameGeo = new THREE.BoxGeometry(0.0096, 0.045, 0.0007);
+  const bezelFrameGeo = new THREE.BoxGeometry(0.0096, 0.043, 0.0007);
   const bezelFrame = new THREE.Mesh(bezelFrameGeo, materials.metallic);
   bezelFrame.position.set(0, 0, 0.0003);
   techBayGroup.add(bezelFrame);
 
   // 3. Centered Flush Purple Emissive Accent Strip
-  const purpleRodGeo = new THREE.CapsuleGeometry(0.0013, 0.030, 8, 16);
+  const purpleRodGeo = new THREE.CapsuleGeometry(0.0013, 0.028, 8, 16);
   const ledStrip = new THREE.Mesh(purpleRodGeo, materials.purpleEmissive);
   ledStrip.name = 'ForearmPurpleLEDAccent';
   ledStrip.position.set(0, 0, 0.0004);
@@ -473,7 +481,7 @@ export function createForearm(
   ledMeshes.push(ledStrip);
 
   // High-intensity Bloom Glow (Calibrated radius to stay inside bezel)
-  const purpleBloomGeo = new THREE.CapsuleGeometry(0.0020, 0.030, 8, 16);
+  const purpleBloomGeo = new THREE.CapsuleGeometry(0.0020, 0.028, 8, 16);
   const purpleBloomMesh = new THREE.Mesh(purpleBloomGeo, materials.purpleBloom);
   purpleBloomMesh.position.copy(ledStrip.position);
   techBayGroup.add(purpleBloomMesh);
@@ -484,14 +492,43 @@ export function createForearm(
   ventilationChannel.position.set(0, 0, 0);
   techBayGroup.add(ventilationChannel);
 
-  for (const lY of [-0.020, 0.020]) {
+  for (const lY of [-0.018, 0.018]) {
     const slatGeo = new THREE.BoxGeometry(0.0050, 0.0008, 0.0010);
     const slat = new THREE.Mesh(slatGeo, materials.joint);
     slat.position.set(0, lY, 0.0002);
     ventilationChannel.add(slat);
   }
 
-  // Engineered Parting Seam between inner and outer shells (Safely inside at radius 26.5mm)
+  // 4b. Stepped Micro-Louvers Bilaterally Symmetrical flanking the purple strip
+  const louverLadderCount = 6;
+  for (let i = 0; i < louverLadderCount; i++) {
+    const lY = -0.012 + i * 0.0048;
+    for (const flSide of [-1, 1]) {
+      const louverGeo = new THREE.BoxGeometry(0.0012, 0.0016, 0.0010);
+      const louverMesh = new THREE.Mesh(louverGeo, materials.joint);
+      louverMesh.position.set(flSide * 0.0030, lY, 0.0003);
+      techBayGroup.add(louverMesh);
+    }
+  }
+
+  // 5. Engineered Anterior Center Vertical Seam Segments (Matching UpperArm design language)
+  // Upper segment: bridges from proximal collar down to the top of tech bay bezel
+  const antSeamUpperGeo = new THREE.BoxGeometry(0.0016, 0.0550, 0.0020);
+  const antSeamUpper = new THREE.Mesh(antSeamUpperGeo, materials.joint);
+  antSeamUpper.name = 'ForearmAnteriorCenterSeamUpper';
+  antSeamUpper.position.set(0, -0.0335, 0.0314);
+  antSeamUpper.rotation.x = -0.048;
+  armorGroup.add(antSeamUpper);
+
+  // Lower segment: bridges from bottom of tech bay bezel down to distal wrist collar
+  const antSeamLowerGeo = new THREE.BoxGeometry(0.0016, 0.0510, 0.0020);
+  const antSeamLower = new THREE.Mesh(antSeamLowerGeo, materials.joint);
+  antSeamLower.name = 'ForearmAnteriorCenterSeamLower';
+  antSeamLower.position.set(0, -0.1305, 0.0267);
+  antSeamLower.rotation.x = -0.048;
+  armorGroup.add(antSeamLower);
+
+  // 6. Engineered Parting Seam between inner and outer shells (Safely inside at radius 26.5mm)
   const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.115, 0.0025);
   const panelSeam = new THREE.Mesh(medSeamGeo, materials.joint);
   panelSeam.name = 'ForearmPartingSeam';

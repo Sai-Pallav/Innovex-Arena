@@ -670,9 +670,9 @@ export function createUpperArm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'UpperArmStandardizedTechBay';
-  // Positioned flush on the anterior facet at y = -0.111m, z = 0.0355m (safely within armor outer surface)
-  const bayX = side * 0.0012;
-  const bayZ = 0.0355;
+  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.111m, z = 0.0360m
+  const bayX = 0;
+  const bayZ = 0.0360;
   const bayY = -0.111;
   techBayGroup.position.set(bayX, bayY, bayZ);
   armorGroup.add(techBayGroup);
@@ -690,7 +690,7 @@ export function createUpperArm(
   bezelFrame.position.set(0, 0, 0.0003);
   techBayGroup.add(bezelFrame);
 
-  // 3. Recessed Purple Emissive Status Strip (Capsule safely contained)
+  // 3. Recessed Purple Emissive Status Strip (Capsule safely contained along centerline)
   const purpleRodGeo = new THREE.CapsuleGeometry(0.0014, 0.024, 8, 16);
   const ledStrip = new THREE.Mesh(purpleRodGeo, materials.purpleEmissive);
   ledStrip.name = 'UpperArmPurpleLEDAccent';
@@ -704,7 +704,7 @@ export function createUpperArm(
   purpleBloomMesh.position.copy(ledStrip.position);
   techBayGroup.add(purpleBloomMesh);
 
-  // 4. Micro Heat-Dissipation Louvers (Symmetric top & bottom vents)
+  // 4. Micro Heat-Dissipation Louvers (Symmetric top & bottom technical vents)
   const ventilationChannel = new THREE.Group();
   ventilationChannel.name = 'UpperArmVentilationChannel';
   ventilationChannel.position.set(0, 0, 0);
@@ -717,14 +717,16 @@ export function createUpperArm(
     ventilationChannel.add(slat);
   }
 
-  // 4b. Stepped Horizontal Louvers Ladder beside purple status strip
-  const louverLadderCount = 6;
+  // 4b. Stepped Micro-Louvers Bilaterally Symmetrical flanking the purple strip
+  const louverLadderCount = 5;
   for (let i = 0; i < louverLadderCount; i++) {
-    const lY = -0.012 + i * 0.0048;
-    const louverGeo = new THREE.BoxGeometry(0.0022, 0.0018, 0.0013);
-    const louverMesh = new THREE.Mesh(louverGeo, materials.joint);
-    louverMesh.position.set(0.0025, lY, 0.0004);
-    techBayGroup.add(louverMesh);
+    const lY = -0.010 + i * 0.0050;
+    for (const flSide of [-1, 1]) {
+      const louverGeo = new THREE.BoxGeometry(0.0012, 0.0016, 0.0010);
+      const louverMesh = new THREE.Mesh(louverGeo, materials.joint);
+      louverMesh.position.set(flSide * 0.0030, lY, 0.0003);
+      techBayGroup.add(louverMesh);
+    }
   }
 
   // 5. Engineered Parting Seam between inner and outer shells
@@ -734,22 +736,22 @@ export function createUpperArm(
   panelSeam.position.set(-side * 0.024, -0.111, 0);
   armorGroup.add(panelSeam);
 
-  // 5b. Anterior Center Vertical Seam Inlay (Backs the front groove with dark titanium depth)
-  const antSeamGeo = new THREE.BoxGeometry(0.0016, 0.138, 0.0020);
-  const antSeam = new THREE.Mesh(antSeamGeo, materials.joint);
-  antSeam.name = 'UpperArmAnteriorCenterSeam';
-  antSeam.position.set(0, -0.111, 0.0365);
-  armorGroup.add(antSeam);
+  // 5b. Engineered Anterior Center Vertical Seam Segments (Precision-interlocking with tech bay)
+  // Upper segment: bridges from proximal collar down to the top of tech bay bezel
+  const antSeamUpperGeo = new THREE.BoxGeometry(0.0016, 0.0495, 0.0020);
+  const antSeamUpper = new THREE.Mesh(antSeamUpperGeo, materials.joint);
+  antSeamUpper.name = 'UpperArmAnteriorCenterSeamUpper';
+  antSeamUpper.position.set(0, -0.0668, 0.0378);
+  armorGroup.add(antSeamUpper);
 
-  // 6. Vertical Seam Ventilation Slots on White Armor Shell
-  const slotCount = 8;
-  for (let s = 0; s < slotCount; s++) {
-    const slotY = -0.048 - s * 0.0160;
-    const slotGeo = new THREE.BoxGeometry(0.0020, 0.0045, 0.0022);
-    const slotMesh = new THREE.Mesh(slotGeo, materials.joint);
-    slotMesh.position.set(side * 0.0355, slotY, 0.005);
-    armorGroup.add(slotMesh);
-  }
+  // Lower segment: bridges from bottom of tech bay bezel down to the distal clevis cuff
+  const antSeamLowerGeo = new THREE.BoxGeometry(0.0016, 0.0495, 0.0020);
+  const antSeamLower = new THREE.Mesh(antSeamLowerGeo, materials.joint);
+  antSeamLower.name = 'UpperArmAnteriorCenterSeamLower';
+  antSeamLower.position.set(0, -0.1552, 0.0342);
+  armorGroup.add(antSeamLower);
+
+  const antSeam = antSeamUpper; // Compatibility alias
 
   // Compatibility nodes
   const bicepSubGroup = armorGroup;

@@ -134,15 +134,15 @@ function createActuatorDisc(
   backPlate.receiveShadow = true;
   outerBezel.add(backPlate);
 
-  // 12 calibration tick marks around outer bezel
+  // Precision engraved micro-indexing lines on outer bezel (flush, non-protruding)
   for (let t = 0; t < 12; t++) {
     const angle = (t / 12) * Math.PI * 2;
-    const tickGeo = new THREE.BoxGeometry(0.0018, 0.0035, 0.0013);
-    const tick = new THREE.Mesh(tickGeo, materials.joint);
+    const tickGeo = new THREE.BoxGeometry(0.0006, 0.0022, 0.0008);
+    const tick = new THREE.Mesh(tickGeo, materials.metallic);
     tick.position.set(
-      sign * 0.0028,
-      Math.sin(angle) * (ELBOW_CONFIG.discOuterRadius - 0.0024),
-      Math.cos(angle) * (ELBOW_CONFIG.discOuterRadius - 0.0024)
+      sign * 0.0016,
+      Math.sin(angle) * (ELBOW_CONFIG.discOuterRadius - 0.0018),
+      Math.cos(angle) * (ELBOW_CONFIG.discOuterRadius - 0.0018)
     );
     tick.rotation.x = angle;
     outerBezel.add(tick);
@@ -556,10 +556,9 @@ export function createElbow(
   lowerHousing.add(stemMesh);
 
   // Lower docking collar — interfaces flush with Forearm.ts proximal collar
-  const lowCollarGeo = new THREE.CylinderGeometry(0.0318, 0.0346, 0.012, 28);
+  const lowCollarGeo = new THREE.CylinderGeometry(0.0336, 0.0346, 0.008, 28);
   const lowCollar = new THREE.Mesh(lowCollarGeo, materials.joint);
-  lowCollar.position.set(0, -0.0150, 0);
-  lowCollar.rotation.z = -side * 0.095;
+  lowCollar.position.set(0, -0.0125, 0);
   lowCollar.castShadow = true;
   lowerHousing.add(lowCollar);
 

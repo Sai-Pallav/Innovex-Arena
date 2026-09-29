@@ -488,14 +488,14 @@ export function createFinger(
   // Authentic open relaxed athletic resting angles matching Reference Images 1 & 2:
   // Clean downward extension with subtle ergonomic forward cascade (~15°–25° total)
   const restPoses: Record<string, { prox: number; mid: number; dist: number; splay: number }> = {
-    Index:  { prox: 0.08, mid: 0.10, dist: 0.08, splay: -0.015 },
-    Middle: { prox: 0.10, mid: 0.12, dist: 0.10, splay:  0.000 },
-    Ring:   { prox: 0.12, mid: 0.14, dist: 0.12, splay:  0.015 },
-    Little: { prox: 0.15, mid: 0.16, dist: 0.14, splay:  0.030 },
+    Index:  { prox: 0.26, mid: 0.38, dist: 0.24, splay:  0.018 },
+    Middle: { prox: 0.32, mid: 0.46, dist: 0.28, splay:  0.000 },
+    Ring:   { prox: 0.38, mid: 0.54, dist: 0.32, splay: -0.016 },
+    Little: { prox: 0.44, mid: 0.62, dist: 0.36, splay: -0.035 },
   };
 
   const radial = -side;
-  const pose = restPoses[spec.name] ?? { prox: 0.10, mid: 0.12, dist: 0.10, splay: 0 };
+  const pose = restPoses[spec.name] ?? { prox: 0.32, mid: 0.46, dist: 0.28, splay: 0 };
   proxSeg.group.rotation.x = pose.prox;
   midSeg.group.rotation.x  = pose.mid;
   distSeg.group.rotation.x = pose.dist;
@@ -533,10 +533,10 @@ export function createThumb(
   thumbGroup.position.set(radial * 0.0215, -0.0170, 0.0038);
 
   // Natural Humanoid Resting Stance:
-  // - rotation.z: outward abduction angle (radial * 0.40 rad ≈ 23°)
-  // - rotation.x: gentle forward tilt (0.22 rad ≈ 12.6°)
-  // - rotation.y: slight opposition rotation toward palm (-radial * 0.16 rad ≈ 9°)
-  thumbGroup.rotation.set(0.22, -radial * 0.16, radial * 0.40);
+  // - rotation.z: outward abduction angle (radial * 0.26 rad ≈ 15°)
+  // - rotation.x: gentle forward tilt (0.32 rad ≈ 18.3°)
+  // - rotation.y: slight opposition rotation toward palm (-radial * 0.18 rad ≈ 10.3°)
+  thumbGroup.rotation.set(0.32, -radial * 0.18, radial * 0.26);
 
   // ── 1. THENAR HOUSING & COMPACT CMC ACTUATOR ──────────────────────────────
   // Sleek mounting socket recessed in the palm radial flank
@@ -604,9 +604,9 @@ export function createThumb(
 
   // ── 4. NATURAL RESTING POSE (MATCHING REFERENCE IMAGES) ───────────────────
   // Thumb rests gracefully alongside the index finger in gentle natural opposition
-  proxSeg.group.rotation.x = 0.14; // gentle forward angle
+  proxSeg.group.rotation.x = 0.28; // gentle forward angle
   proxSeg.group.rotation.z = radial * 0.04;
-  distSeg.group.rotation.x = 0.18; // gentle natural relaxed curl
+  distSeg.group.rotation.x = 0.32; // gentle natural relaxed curl
   distSeg.group.rotation.z = -radial * 0.06; // inward return towards index finger
 
   // Purple telemetry accent strip on lateral distal thumb

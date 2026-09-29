@@ -37,7 +37,7 @@ export interface HandPosePreset {
 }
 
 export const HAND_POSES: Record<HandPoseName, HandPosePreset> = {
-  // 1. Signature anatomical resting athletic cascade (Natural relaxed humanoid hand)
+  // 1. Signature anatomical resting athletic cascade (Natural relaxed humanoid hand matching Reference Images 1 & 2)
   relaxed: {
     fingers: [
       { prox: 0.26, mid: 0.38, dist: 0.24, splay:  0.018 }, // Index: graceful forward extension & gentle curve, fanned outward
