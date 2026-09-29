@@ -95,7 +95,7 @@ export function createRobotArm(
   // Creates authentic athletic chevron posture with elbows as outermost lateral point.
   // ==========================================================================
   const forearm = createForearm(side, materials);
-  forearm.group.position.set(0, -0.0150, 0);
+  forearm.group.position.set(0, -0.0105, 0);
   forearm.group.rotation.set(0, 0, -side * 0.095);
   elbow.forearmPivot.add(forearm.group);
   ledMeshes.push(...forearm.ledMeshes);
@@ -108,14 +108,14 @@ export function createRobotArm(
   // Flexion/pitch and yaw pivot on the internal transverse axle pin via trunnionPivot.
   // ==========================================================================
   const wrist = createWrist(side, materials);
-  wrist.group.position.set(0, 0.0010, 0);
+  wrist.group.position.set(0, 0.0000, 0);
   // Natural relaxed wrist resting posture (semi-pronated athletic stance):
-  // Clean three-quarters anatomical hang with natural forearm pronation (dorsal LED and knuckle hoods visible)
-  const wristRoll = side === -1 ? -0.72 : 0.72;
+  // Clean coaxial alignment with forearm gauntlet and subtle natural pronation
+  const wristRoll = side === -1 ? -0.16 : 0.16;
   wrist.group.rotation.set(0, wristRoll, 0);
 
-  const wristPitch = 0.05;
-  const wristYaw = side === -1 ? 0.015 : -0.015;
+  const wristPitch = 0.03;
+  const wristYaw = 0.0;
   wrist.trunnionPivot.rotation.set(wristPitch, 0, wristYaw);
 
   forearm.distalWristMount.add(wrist.group);
