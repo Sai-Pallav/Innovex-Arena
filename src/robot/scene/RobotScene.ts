@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 import { CameraManager } from './camera';
 import { createStudioLighting, SceneLights } from './lighting';
-import { loadRobotModel, LoadRobotResult } from '../robot/RobotLoader';
+import { loadRobotModel, loadRobotModelSync, LoadRobotResult } from '../robot/RobotLoader';
 import { RobotNodes } from '../robot/RobotProceduralFactory';
 import { RobotController } from '../robot/RobotController';
 import { RobotInteraction } from '../robot/RobotInteraction';
@@ -98,7 +98,61 @@ export class RobotScene {
     this.initModel(options);
   }
 
-  private async initModel(options: RobotSceneOptions): Promise<void> {
+  private initModel(options: RobotSceneOptions): void {
+    if (options.modelUrl) {
+      this.initModelAsync(options);
+    } else {
+      this.initModelSync(options);
+    }
+  }
+
+  private initModelSync(options: RobotSceneOptions): void {
+    try {
+      const result: LoadRobotResult = loadRobotModelSync();
+      this.modelSource = result.source;
+      this.mixer = result.mixer;
+
+      // Add to scene
+      this.scene.add(result.nodes.root);
+
+      // Store nodes & apply responsive heroic scaling & bottom-anchored positioning
+      this.robotNodes = result.nodes;
+      this.updateRobotTransform();
+
+      // Initialize kinematics controller
+      this.controller = new RobotController(result.nodes);
+      this.controller.setCameraContext(this.cameraManager.camera, this.container);
+
+      // Initialize Section 9 Developer Debug Mode Manager
+      this.debugManager = new DebugManager(result.nodes.root);
+
+      // Pre-warm WebGL shaders for instant zero-hitch initial render
+      try {
+        this.renderer.compile(this.scene, this.cameraManager.camera);
+      } catch (compileErr) {
+        // Fallback gracefully if compile is unsupported
+      }
+
+      // Render the very first frame immediately onto the WebGL canvas
+      this.renderer.render(this.scene, this.cameraManager.camera);
+
+      this.isReady = true;
+      (window as any).__robotScene = this;
+      (window as any).__setHandPose = (side: any, pose: any, dur?: any) => this.controller?.setHandPose(side, pose, dur);
+      if (options.onLoaded) {
+        options.onLoaded(this.modelSource);
+      }
+
+      this.start();
+    } catch (err: any) {
+      console.error('[RobotScene] Synchronous initialization failed:', err);
+      if (options.onError) {
+        options.onError(err);
+      }
+    }
+  }
+
+  private async initModelAsync(options: RobotSceneOptions): Promise<void> {
     try {
       const result: LoadRobotResult = await loadRobotModel(options.modelUrl);
       this.modelSource = result.source;
@@ -118,6 +172,15 @@ export class RobotScene {
       // Initialize Section 9 Developer Debug Mode Manager
       this.debugManager = new DebugManager(result.nodes.root);
 
+      // Pre-warm WebGL shaders
+      try {
+        this.renderer.compile(this.scene, this.cameraManager.camera);
+      } catch (compileErr) {
+        // Fallback gracefully
+      }
+
+      this.renderer.render(this.scene, this.cameraManager.camera);
+
       this.isReady = true;
       (window as any).__robotScene = this;
       (window as any).__setHandPose = (side: any, pose: any, dur?: any) => this.controller?.setHandPose(side, pose, dur);
@@ -127,7 +190,7 @@ export class RobotScene {
 
       this.start();
     } catch (err: any) {
-      console.error('[RobotScene] Initialization failed:', err);
+      console.error('[RobotScene] Async initialization failed:', err);
       if (options.onError) {
         options.onError(err);
       }

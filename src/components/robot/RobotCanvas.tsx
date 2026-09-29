@@ -11,7 +11,8 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<RobotScene | null>(null);
 
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isRendered, setIsRendered] = useState(false);
   const [isWireframe, setIsWireframe] = useState(false);
   const [isExploded, setIsExploded] = useState(false);
   const [debugStats, setDebugStats] = useState<DebugStats | null>(null);
@@ -20,23 +21,48 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
   useEffect(() => {
     if (!containerRef.current) return;
 
+    let isCancelled = false;
+    let spinnerTimer: any = null;
+
     const scene = new RobotScene({
       container: containerRef.current,
       // Load procedural engine directly with full MeshPhysicalMaterial clearcoat & bloom
       onLoaded: () => {
+        if (isCancelled) return;
+        if (spinnerTimer) clearTimeout(spinnerTimer);
         setIsLoading(false);
+        setIsRendered(true);
       },
       onError: (err) => {
+        if (isCancelled) return;
+        if (spinnerTimer) clearTimeout(spinnerTimer);
         console.error('Robot initialization error:', err);
         setIsLoading(false);
         setLoadError('Robot init error: ' + (err?.stack || err?.message || String(err)));
       },
     });
 
+    if (isCancelled) {
+      scene.dispose();
+      return;
+    }
+
     sceneRef.current = scene;
     (window as any).__robotScene = scene;
 
+    if (scene.isReady) {
+      setIsRendered(true);
+    } else {
+      spinnerTimer = setTimeout(() => {
+        if (!isCancelled && !sceneRef.current?.isReady) {
+          setIsLoading(true);
+        }
+      }, 180);
+    }
+
     return () => {
+      isCancelled = true;
+      if (spinnerTimer) clearTimeout(spinnerTimer);
       (window as any).__robotScene = null;
       scene.dispose();
       sceneRef.current = null;
@@ -47,8 +73,13 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
     <div
       className={`relative w-full h-full flex items-center justify-center select-none overflow-hidden ${className}`}
     >
-      {/* Three.js Canvas Container */}
-      <div ref={containerRef} className="absolute inset-0 w-full h-full cursor-crosshair z-10" />
+      {/* Three.js Canvas Container with smooth progressive fade-in */}
+      <div
+        ref={containerRef}
+        className={`absolute inset-0 w-full h-full cursor-crosshair z-10 transition-opacity duration-500 ease-out ${
+          isRendered ? 'opacity-100' : 'opacity-0'
+        }`}
+      />
 
       {/* Loading Overlay */}
       {isLoading && (

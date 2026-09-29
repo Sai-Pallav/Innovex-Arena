@@ -670,11 +670,13 @@ export function createUpperArm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'UpperArmStandardizedTechBay';
-  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.111m, z = 0.0360m
+  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.111m, z = 0.0363m
+  // With positive pitch rotation (+0.0492 rad / ~2.8°) matching the natural bicep surface slope
   const bayX = 0;
-  const bayZ = 0.0360;
+  const bayZ = 0.0363;
   const bayY = -0.111;
   techBayGroup.position.set(bayX, bayY, bayZ);
+  techBayGroup.rotation.x = 0.0492;
   armorGroup.add(techBayGroup);
 
   // 1. Dark Titanium Recessed Tray / Cavity Housing
@@ -736,19 +738,87 @@ export function createUpperArm(
   panelSeam.position.set(-side * 0.024, -0.111, 0);
   armorGroup.add(panelSeam);
 
+  // Helper function to evaluate exact anterior armor surface Z at Y
+  function evalUpperArmZ(y: number): number {
+    const yTop = -0.042;
+    const totalLength = 0.138;
+    const v = (yTop - y) / totalLength;
+    let radius = 0.0392 - 0.0046 * v + 0.0030 * Math.sin(Math.pow(v, 0.72) * Math.PI);
+    if (v < 0.10) {
+      const tTop = (0.10 - v) / 0.10;
+      radius -= tTop * 0.0008;
+    } else if (v > 0.88) {
+      const tBot = (v - 0.88) / 0.12;
+      radius -= tBot * 0.0012;
+    }
+    let rz = radius * 0.95;
+    rz -= (1.0 - 0.35) * 0.0020;
+    return rz;
+  }
+
+  // Helper to build a surface-conforming watertight seam inlay
+  function createConformingSeamGeo(yStart: number, yEnd: number, segs = 10): THREE.BufferGeometry {
+    const halfW = 0.0008; // 1.6mm seam width
+    const depth = 0.0018; // 1.8mm depth into the armor
+    const pos: number[] = [];
+    const idx: number[] = [];
+
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs;
+      const y = yStart + t * (yEnd - yStart);
+      const zSurface = evalUpperArmZ(y);
+      const zFront = zSurface - 0.0004; // Sits 0.4mm inside the 1.4mm recess for clean visual definition
+      const zBack = zFront - depth;
+
+      pos.push(-halfW, y, zFront);
+      pos.push(halfW, y, zFront);
+      pos.push(-halfW, y, zBack);
+      pos.push(halfW, y, zBack);
+    }
+
+    for (let i = 0; i < segs; i++) {
+      const a = i * 4;
+      const b = (i + 1) * 4;
+      // Front face
+      idx.push(a, b, a + 1);
+      idx.push(b, b + 1, a + 1);
+      // Left side
+      idx.push(a + 2, b + 2, a);
+      idx.push(b + 2, b, a);
+      // Right side
+      idx.push(a + 1, b + 1, a + 3);
+      idx.push(b + 1, b + 3, a + 3);
+    }
+    // Top end cap
+    idx.push(0, 1, 2);
+    idx.push(1, 3, 2);
+    // Bottom end cap
+    const last = segs * 4;
+    idx.push(last, last + 2, last + 1);
+    idx.push(last + 1, last + 2, last + 3);
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
   // 5b. Engineered Anterior Center Vertical Seam Segments (Precision-interlocking with tech bay)
   // Upper segment: bridges from proximal collar down to the top of tech bay bezel
-  const antSeamUpperGeo = new THREE.BoxGeometry(0.0016, 0.0495, 0.0020);
+  // Conforms 100% to 3D bicep surface curvature, terminating cleanly with 1.5mm collar margin and 1.0mm bezel margin
+  const antSeamUpperGeo = createConformingSeamGeo(-0.0435, -0.0905, 10);
   const antSeamUpper = new THREE.Mesh(antSeamUpperGeo, materials.joint);
   antSeamUpper.name = 'UpperArmAnteriorCenterSeamUpper';
-  antSeamUpper.position.set(0, -0.0668, 0.0378);
+  antSeamUpper.castShadow = true;
   armorGroup.add(antSeamUpper);
 
   // Lower segment: bridges from bottom of tech bay bezel down to the distal clevis cuff
-  const antSeamLowerGeo = new THREE.BoxGeometry(0.0016, 0.0495, 0.0020);
+  // Conforms 100% to 3D bicep taper curvature, terminating cleanly with 1.0mm bezel margin and 1.5mm cuff gasket margin
+  const antSeamLowerGeo = createConformingSeamGeo(-0.1315, -0.1785, 10);
   const antSeamLower = new THREE.Mesh(antSeamLowerGeo, materials.joint);
   antSeamLower.name = 'UpperArmAnteriorCenterSeamLower';
-  antSeamLower.position.set(0, -0.1552, 0.0342);
+  antSeamLower.castShadow = true;
   armorGroup.add(antSeamLower);
 
   const antSeam = antSeamUpper; // Compatibility alias

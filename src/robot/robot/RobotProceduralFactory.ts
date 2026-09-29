@@ -190,3 +190,42 @@ export function createProceduralRobot(): RobotNodes {
     },
   };
 }
+
+let preloadedRobot: RobotNodes | null = null;
+let isPreloading = false;
+
+/**
+ * Eagerly pre-warms the procedural robot model in memory so it mounts instantly (0ms)
+ * when the homepage opens.
+ */
+export function preloadProceduralRobot(): void {
+  if (preloadedRobot || isPreloading) return;
+  isPreloading = true;
+  try {
+    preloadedRobot = createProceduralRobot();
+  } catch (err) {
+    console.warn('[RobotProceduralFactory] Preload error:', err);
+  } finally {
+    isPreloading = false;
+  }
+}
+
+/**
+ * Retrieves the pre-warmed procedural robot or builds a fresh one immediately.
+ * Automatically schedules background preloading for subsequent navigations.
+ */
+export function getProceduralRobot(): RobotNodes {
+  if (preloadedRobot) {
+    const robot = preloadedRobot;
+    preloadedRobot = null;
+    // Schedule background pre-warming for when the user returns to the home page
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      (window as any).requestIdleCallback(() => preloadProceduralRobot());
+    } else {
+      setTimeout(() => preloadProceduralRobot(), 800);
+    }
+    return robot;
+  }
+  return createProceduralRobot();
+}
+

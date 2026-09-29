@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { createProceduralRobot, RobotNodes } from './RobotProceduralFactory';
+import { createProceduralRobot, getProceduralRobot, RobotNodes } from './RobotProceduralFactory';
 import { createRobotMaterials } from '../materials/RobotMaterials';
 
 export interface LoadRobotResult {
@@ -10,13 +10,20 @@ export interface LoadRobotResult {
 }
 
 /**
+ * Synchronously loads the procedural robot without any microtask/tick delays.
+ */
+export function loadRobotModelSync(): LoadRobotResult {
+  const proceduralNodes = getProceduralRobot();
+  return { nodes: proceduralNodes, source: 'procedural' };
+}
+
+/**
  * Loads the 3D robot model from `/models/robot.glb` with fuzzy node resolution,
  * or gracefully falls back to the in-engine procedural factory if unavailable.
  */
 export async function loadRobotModel(url?: string): Promise<LoadRobotResult> {
   if (!url) {
-    const proceduralNodes = createProceduralRobot();
-    return { nodes: proceduralNodes, source: 'procedural' };
+    return loadRobotModelSync();
   }
 
   const loader = new GLTFLoader();

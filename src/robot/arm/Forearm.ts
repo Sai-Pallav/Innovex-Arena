@@ -450,13 +450,13 @@ export function createForearm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'ForearmStandardizedTechBay';
-  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.083m, z = 0.0288m
-  // With subtle pitch rotation matching the natural forearm taper slope (~2.8°)
+  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.083m, z = 0.0287m
+  // With positive pitch rotation (+0.0714 rad / ~4.1°) matching the natural forearm taper slope
   const bayX = 0;
-  const bayZ = 0.0288;
+  const bayZ = 0.0287;
   const bayY = -0.083;
   techBayGroup.position.set(bayX, bayY, bayZ);
-  techBayGroup.rotation.x = -0.048;
+  techBayGroup.rotation.x = 0.0714;
   armorGroup.add(techBayGroup);
 
   // 1. Dark Titanium Recessed Tray / Cavity (sunken flush into the armor facet)
@@ -511,21 +511,87 @@ export function createForearm(
     }
   }
 
+  // Helper function to evaluate exact anterior gauntlet armor surface Z at Y
+  function evalForearmZ(y: number): number {
+    const yTop = -0.006;
+    const totalLength = 0.150;
+    const v = (yTop - y) / totalLength;
+    let radius = 0.0348 - 0.0096 * v + 0.0016 * Math.sin(Math.pow(v, 0.70) * Math.PI);
+    if (v < 0.10) {
+      const tTop = (0.10 - v) / 0.10;
+      radius -= tTop * 0.0006;
+    } else if (v > 0.85) {
+      const tBot = (v - 0.85) / 0.15;
+      radius -= tBot * 0.0008;
+    }
+    let rz = radius * 0.96;
+    rz -= (1.0 - 0.40) * 0.0024;
+    return rz;
+  }
+
+  // Helper to build a surface-conforming watertight seam inlay for forearm
+  function createConformingForearmSeamGeo(yStart: number, yEnd: number, segs = 10): THREE.BufferGeometry {
+    const halfW = 0.0008; // 1.6mm seam width
+    const depth = 0.0018; // 1.8mm depth into the armor
+    const pos: number[] = [];
+    const idx: number[] = [];
+
+    for (let i = 0; i <= segs; i++) {
+      const t = i / segs;
+      const y = yStart + t * (yEnd - yStart);
+      const zSurface = evalForearmZ(y);
+      const zFront = zSurface - 0.0004; // Sits 0.4mm inside the 1.4mm recess for clean visual definition
+      const zBack = zFront - depth;
+
+      pos.push(-halfW, y, zFront);
+      pos.push(halfW, y, zFront);
+      pos.push(-halfW, y, zBack);
+      pos.push(halfW, y, zBack);
+    }
+
+    for (let i = 0; i < segs; i++) {
+      const a = i * 4;
+      const b = (i + 1) * 4;
+      // Front face
+      idx.push(a, b, a + 1);
+      idx.push(b, b + 1, a + 1);
+      // Left side
+      idx.push(a + 2, b + 2, a);
+      idx.push(b + 2, b, a);
+      // Right side
+      idx.push(a + 1, b + 1, a + 3);
+      idx.push(b + 1, b + 3, a + 3);
+    }
+    // Top end cap
+    idx.push(0, 1, 2);
+    idx.push(1, 3, 2);
+    // Bottom end cap
+    const last = segs * 4;
+    idx.push(last, last + 2, last + 1);
+    idx.push(last + 1, last + 2, last + 3);
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    return geo;
+  }
+
   // 5. Engineered Anterior Center Vertical Seam Segments (Matching UpperArm design language)
   // Upper segment: bridges from proximal collar down to the top of tech bay bezel
-  const antSeamUpperGeo = new THREE.BoxGeometry(0.0016, 0.0550, 0.0020);
+  // Conforms 100% to 3D gauntlet taper curvature, terminating cleanly with 1.5mm elbow gasket margin and 1.0mm bezel margin
+  const antSeamUpperGeo = createConformingForearmSeamGeo(-0.0075, -0.0605, 10);
   const antSeamUpper = new THREE.Mesh(antSeamUpperGeo, materials.joint);
   antSeamUpper.name = 'ForearmAnteriorCenterSeamUpper';
-  antSeamUpper.position.set(0, -0.0335, 0.0314);
-  antSeamUpper.rotation.x = -0.048;
+  antSeamUpper.castShadow = true;
   armorGroup.add(antSeamUpper);
 
   // Lower segment: bridges from bottom of tech bay bezel down to distal wrist collar
-  const antSeamLowerGeo = new THREE.BoxGeometry(0.0016, 0.0510, 0.0020);
+  // Conforms 100% to 3D gauntlet taper curvature, terminating cleanly with 1.0mm bezel margin and 2.5mm wrist collar margin
+  const antSeamLowerGeo = createConformingForearmSeamGeo(-0.1055, -0.1535, 10);
   const antSeamLower = new THREE.Mesh(antSeamLowerGeo, materials.joint);
   antSeamLower.name = 'ForearmAnteriorCenterSeamLower';
-  antSeamLower.position.set(0, -0.1305, 0.0267);
-  antSeamLower.rotation.x = -0.048;
+  antSeamLower.castShadow = true;
   armorGroup.add(antSeamLower);
 
   // 6. Engineered Parting Seam between inner and outer shells (Safely inside at radius 26.5mm)

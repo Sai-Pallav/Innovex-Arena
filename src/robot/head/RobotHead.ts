@@ -34,9 +34,9 @@ export function createRobotHead(materials: RobotMaterialPalette): HeadAssemblyNo
   // Head Root Group (Independently rotated by kinematic controller per Part 20)
   const head = new THREE.Group();
   head.name = 'RobotHead';
-  head.position.set(0, 0.180, 0.005);
-  // Priority 8: 5% scale reduction for heroic torso proportion and neck integration
-  head.scale.setScalar(0.95);
+  head.position.set(0, 0.170, 0.004);
+  // Calibrated head scale for consistent humanoid head-to-torso and head-to-shoulder proportions
+  head.scale.setScalar(0.88);
 
   const ledMeshes: THREE.Mesh[] = [];
 

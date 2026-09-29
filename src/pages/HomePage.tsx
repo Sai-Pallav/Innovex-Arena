@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, ArrowRight } from 'lucide-react';
-import { RobotCanvas } from '../components/robot/RobotCanvas';
 import { AnimatedCounter } from '../components/ui/AnimatedCounter';
 import { HERO_DATA } from '../data/siteData';
+
+// Non-blocking dynamic lazy import for 3D robot chunk
+const LazyRobotCanvas = React.lazy(() => import('../components/robot/RobotCanvas'));
 
 const SPECIALIZATIONS = [
   'Workshops & Events',
@@ -14,12 +16,47 @@ const SPECIALIZATIONS = [
 
 export const HomePage: React.FC = () => {
   const [specializationIndex, setSpecializationIndex] = useState(0);
+  const [shouldMountRobot, setShouldMountRobot] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setSpecializationIndex((prev) => (prev + 1) % SPECIALIZATIONS.length);
     }, 3600);
     return () => clearInterval(timer);
+  }, []);
+
+  // Progressive Robot Initialization: Allow critical UI & hero first paint to complete before 3D load
+  useEffect(() => {
+    let idleId: number | null = null;
+    let animId: number | null = null;
+
+    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+      idleId = (window as any).requestIdleCallback(
+        () => {
+          setShouldMountRobot(true);
+        },
+        { timeout: 800 }
+      );
+    } else if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
+      animId = requestAnimationFrame(() => {
+        setTimeout(() => {
+          setShouldMountRobot(true);
+        }, 32);
+      });
+    } else {
+      setTimeout(() => {
+        setShouldMountRobot(true);
+      }, 50);
+    }
+
+    return () => {
+      if (idleId !== null && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(idleId);
+      }
+      if (animId !== null) {
+        cancelAnimationFrame(animId);
+      }
+    };
   }, []);
 
   return (
@@ -148,7 +185,13 @@ export const HomePage: React.FC = () => {
                 WebkitMaskImage: 'linear-gradient(to bottom, black 86%, transparent 100%)',
               }}
             >
-              <RobotCanvas className="w-full h-full" />
+              {shouldMountRobot ? (
+                <React.Suspense fallback={<div className="w-full h-full pointer-events-none" />}>
+                  <LazyRobotCanvas className="w-full h-full" />
+                </React.Suspense>
+              ) : (
+                <div className="w-full h-full pointer-events-none" />
+              )}
             </div>
           </div>
         </div>
