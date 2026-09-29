@@ -70,8 +70,8 @@ function createForearmCoherentArmor(
   const indices: number[] = [];
 
   const yTop = -0.006; // Originates directly flush at elbow lower housing collar (Y = -0.020m in forearmPivot)
-  const totalLength = 0.154; // Terminating at y = -0.160m to interface with dedicated wrist module
-  const thickness = 0.0026;  // 2.6 mm real physical wall thickness
+  const totalLength = 0.150; // Calibrated length interfacing seamlessly with dedicated wrist module
+  const thickness = 0.0028;  // 2.8 mm real physical wall thickness
 
   let startAngle = 0;
   let endAngle = 0;
@@ -99,18 +99,18 @@ function createForearmCoherentArmor(
     const u = ix / radialSegs;
     let y = yTop - v * totalLength;
 
-    // Athletic humanoid mecha gauntlet taper: under-elbow width ~63mm down to wrist ~47mm
-    // Harmoniously proportioned with upper arm bicep (~66mm) and elbow lower collar (~63mm)
-    let radius = 0.0315 - 0.0080 * v + 0.0015 * Math.sin(Math.pow(v, 0.65) * Math.PI);
+    // Athletic humanoid mecha gauntlet taper: under-elbow width ~68.4mm down to wrist ~48.4mm
+    // Harmoniously proportioned with upper arm bicep (~66mm), elbow actuator discs (~63.6mm span), and wrist cuff (~49.6mm)
+    let radius = 0.0348 - 0.0096 * v + 0.0016 * Math.sin(Math.pow(v, 0.70) * Math.PI);
 
-    if (v < 0.12) {
+    if (v < 0.10) {
       // Inward chamfer at proximal elbow rim to seamlessly dock with lowCollar
-      const tTop = (0.12 - v) / 0.12;
+      const tTop = (0.10 - v) / 0.10;
       radius -= tTop * 0.0006;
     } else if (v > 0.85) {
       // Inward socket bevel at distal wrist rim (\______/ )
       const tBot = (v - 0.85) / 0.15;
-      radius -= tBot * 0.0010;
+      radius -= tBot * 0.0008;
     }
 
     const angle = startAngle + u * (endAngle - startAngle);
@@ -118,8 +118,8 @@ function createForearmCoherentArmor(
     const cosA = Math.cos(angle);
 
     // Both width (rx) and depth (rz) taper gradually to create the sculpted athletic profile
-    let rx = radius * 0.98; // medial-lateral width (~61.7mm at elbow -> ~47.0mm at wrist)
-    let rz = radius * 0.95; // anterior-posterior depth (~59.8mm at elbow -> ~45.6mm at wrist)
+    let rx = radius * 0.99; // medial-lateral width (~68.4mm at elbow -> ~48.4mm at wrist)
+    let rz = radius * 0.96; // anterior-posterior depth (~66.2mm at elbow -> ~46.4mm at wrist)
 
     // 3D Facet Crowning & Crisp 45° Corner Chamfers (Eliminates flat sleeve appearance)
     if (shellType === 'primaryOuter') {
@@ -156,7 +156,15 @@ function createForearmCoherentArmor(
       rz += frontBias * 0.0008 * tElbow;
       // Lateral and medial sides smoothly funnel to meet the mechanical hinge width
       y -= sideBias * 0.0012 * tElbow;
-      rx -= sideBias * 0.0005 * Math.pow(tElbow, 1.2);
+      rx -= sideBias * 0.0008 * Math.pow(tElbow, 1.2);
+
+      // Sculpted lateral actuator disc clearance scallop
+      // Ensures circular rotary actuator disc seats cleanly with zero mesh collision
+      const lateralFactor = Math.max(0, side * sinA);
+      if (lateralFactor > 0.15) {
+        const tLat = (lateralFactor - 0.15) / 0.85;
+        rx -= tLat * 0.0026 * Math.pow(tElbow, 1.1);
+      }
     }
 
     // Distal Wrist Transition Socket (terminates in engineered collar socket)
@@ -308,7 +316,7 @@ export function createForearm(
   forearmGroup.add(mechanicalCore);
 
   // 1. Proximal Elbow Docking Collar (interfaces with Elbow lower housing)
-  const dockGeo = new THREE.CylinderGeometry(0.0295, 0.0310, 0.016, 28);
+  const dockGeo = new THREE.CylinderGeometry(0.0336, 0.0348, 0.016, 28);
   const elbowSocketCollar = new THREE.Mesh(dockGeo, materials.joint);
   elbowSocketCollar.name = 'ForearmElbowSocketCollar';
   elbowSocketCollar.position.set(0, -0.008, 0);
@@ -316,57 +324,57 @@ export function createForearm(
   mechanicalCore.add(elbowSocketCollar);
 
   // 2. Main Structural Column / Spaceframe Spine
-  const spineGeo = new THREE.BoxGeometry(0.018, 0.155, 0.022);
+  const spineGeo = new THREE.BoxGeometry(0.022, 0.150, 0.025);
   const armatureSpine = new THREE.Mesh(spineGeo, materials.joint);
   armatureSpine.name = 'ForearmArmatureSpine';
-  armatureSpine.position.set(0, -0.086, 0);
+  armatureSpine.position.set(0, -0.083, 0);
   armatureSpine.castShadow = true;
   armatureSpine.receiveShadow = true;
   mechanicalCore.add(armatureSpine);
 
   // CNC Weight-Reduction Cutouts on Spine
   for (let c = 0; c < 4; c++) {
-    const cavGeo = new THREE.BoxGeometry(0.020, 0.018, 0.016);
+    const cavGeo = new THREE.BoxGeometry(0.024, 0.017, 0.019);
     const cav = new THREE.Mesh(cavGeo, materials.joint);
-    cav.position.set(0, -0.044 - c * 0.026, 0);
+    cav.position.set(0, -0.042 - c * 0.025, 0);
     mechanicalCore.add(cav);
   }
 
   // 3. Substantial Bilateral Linear Flexor Actuator Cylinders & Chrome Piston Rods
   // Compacted load-bearing actuators nestled inside gauntlet spaceframe
   for (const aSide of [-1, 1]) {
-    const actCylGeo = new THREE.CylinderGeometry(0.0038, 0.0038, 0.055, 16);
+    const actCylGeo = new THREE.CylinderGeometry(0.0042, 0.0042, 0.054, 16);
     const actCyl = new THREE.Mesh(actCylGeo, materials.joint);
-    actCyl.position.set(aSide * 0.010, -0.072, 0.007);
+    actCyl.position.set(aSide * 0.0115, -0.070, 0.008);
     actCyl.castShadow = true;
     mechanicalCore.add(actCyl);
 
-    const actRingGeo = new THREE.TorusGeometry(0.0044, 0.0008, 6, 16);
+    const actRingGeo = new THREE.TorusGeometry(0.0048, 0.0008, 6, 16);
     const actRing = new THREE.Mesh(actRingGeo, materials.metallic);
-    actRing.position.set(aSide * 0.010, -0.056, 0.007);
+    actRing.position.set(aSide * 0.0115, -0.054, 0.008);
     mechanicalCore.add(actRing);
 
-    const pistonGeo = new THREE.CylinderGeometry(0.0024, 0.0024, 0.058, 14);
+    const pistonGeo = new THREE.CylinderGeometry(0.0026, 0.0026, 0.056, 14);
     const piston = new THREE.Mesh(pistonGeo, materials.metallic);
-    piston.position.set(aSide * 0.010, -0.120, 0.007);
+    piston.position.set(aSide * 0.0115, -0.116, 0.008);
     piston.castShadow = true;
     mechanicalCore.add(piston);
   }
 
   // 4. Internal Protected Cable Conduit Raceway
-  const cableConduitGeo = new THREE.CylinderGeometry(0.0024, 0.0024, 0.150, 10);
+  const cableConduitGeo = new THREE.CylinderGeometry(0.0025, 0.0025, 0.146, 10);
   const cableConduit = new THREE.Mesh(cableConduitGeo, materials.joint);
-  cableConduit.position.set(0, -0.086, -0.009);
+  cableConduit.position.set(0, -0.083, -0.010);
   cableConduit.castShadow = true;
   mechanicalCore.add(cableConduit);
 
-  // 5. Distal Wrist Interface Mount (Receives Dedicated Wrist Module at Y = -0.166m for balanced proportions)
+  // 5. Distal Wrist Interface Mount (Receives Dedicated Wrist Module at Y = -0.161m for balanced proportions)
   const distalWristMount = new THREE.Group();
   distalWristMount.name = side === -1 ? 'LeftDistalWristMount' : 'RightDistalWristMount';
-  distalWristMount.position.set(0, -0.166, 0);
+  distalWristMount.position.set(0, -0.161, 0);
   mechanicalCore.add(distalWristMount);
 
-  const cuffGeo = new THREE.CylinderGeometry(0.0230, 0.0238, 0.010, 28);
+  const cuffGeo = new THREE.CylinderGeometry(0.0248, 0.0254, 0.010, 28);
   const wristCuff = new THREE.Mesh(cuffGeo, materials.joint);
   wristCuff.name = 'ForearmWristCuff';
   wristCuff.position.set(0, 0.005, 0);
@@ -374,24 +382,24 @@ export function createForearm(
   wristCuff.receiveShadow = true;
   distalWristMount.add(wristCuff);
 
-  const cuffRimGeo = new THREE.TorusGeometry(0.0234, 0.0008, 6, 28);
+  const cuffRimGeo = new THREE.TorusGeometry(0.0252, 0.00085, 6, 28);
   cuffRimGeo.rotateX(Math.PI / 2);
   const cuffRim = new THREE.Mesh(cuffRimGeo, materials.metallic);
   cuffRim.position.set(0, 0.009, 0);
   distalWristMount.add(cuffRim);
 
   // Forearm -> Wrist Tapered Transition Collar (Interlocks with dedicated wrist housing)
-  const collarGeo = new THREE.CylinderGeometry(0.0232, 0.0238, 0.008, 28);
+  const collarGeo = new THREE.CylinderGeometry(0.0248, 0.0254, 0.008, 28);
   const transitionCollar = new THREE.Mesh(collarGeo, materials.joint);
   transitionCollar.name = 'ForearmWristTransitionCollar';
-  transitionCollar.position.set(0, -0.162, 0);
+  transitionCollar.position.set(0, -0.157, 0);
   transitionCollar.castShadow = true;
   forearmGroup.add(transitionCollar);
 
-  const collarRingGeo = new THREE.TorusGeometry(0.0235, 0.0008, 6, 28);
+  const collarRingGeo = new THREE.TorusGeometry(0.0252, 0.00085, 6, 28);
   collarRingGeo.rotateX(Math.PI / 2);
   const collarRing = new THREE.Mesh(collarRingGeo, materials.metallic);
-  collarRing.position.set(0, -0.162, 0);
+  collarRing.position.set(0, -0.157, 0);
   forearmGroup.add(collarRing);
 
   // ==========================================================================
@@ -422,7 +430,7 @@ export function createForearm(
   const innerArmor = posteriorArmor;
 
   // Proximal compression gasket seal ring mating flush to elbow lower collar
-  const proxGasketGeo = new THREE.TorusGeometry(0.0312, 0.0008, 6, 32);
+  const proxGasketGeo = new THREE.TorusGeometry(0.0346, 0.00095, 6, 32);
   proxGasketGeo.rotateX(Math.PI / 2);
   const proxGasket = new THREE.Mesh(proxGasketGeo, materials.joint);
   proxGasket.name = 'ForearmProximalElbowGasket';
@@ -436,10 +444,10 @@ export function createForearm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'ForearmStandardizedTechBay';
-  // Positioned flush on the anterior facet at y = -0.086m, z = 0.0258m
+  // Positioned flush on the anterior facet at y = -0.083m, z = 0.0285m
   const bayX = side * 0.0010;
-  const bayZ = 0.0258;
-  const bayY = -0.086;
+  const bayZ = 0.0285;
+  const bayY = -0.083;
   techBayGroup.position.set(bayX, bayY, bayZ);
   armorGroup.add(techBayGroup);
 
@@ -483,11 +491,11 @@ export function createForearm(
     ventilationChannel.add(slat);
   }
 
-  // Engineered Parting Seam between inner and outer shells (Safely inside at radius 24mm)
+  // Engineered Parting Seam between inner and outer shells (Safely inside at radius 26.5mm)
   const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.115, 0.0025);
   const panelSeam = new THREE.Mesh(medSeamGeo, materials.joint);
   panelSeam.name = 'ForearmPartingSeam';
-  panelSeam.position.set(-side * 0.0240, -0.090, 0);
+  panelSeam.position.set(-side * 0.0265, -0.086, 0);
   armorGroup.add(panelSeam);
 
   // Compatibility aliases

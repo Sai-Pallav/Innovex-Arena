@@ -461,36 +461,15 @@ function createSculptedPauldronGeometry(side: -1 | 1): THREE.BufferGeometry {
 }
 
 /**
- * Scribes fine, recessed dark titanium panel seams flush onto the armor surface.
- * Free of clumsy separate boxes or tacky attachments.
+ * Clean, pristine white ceramic pauldron shell without scratch marks or artificial surface grooves.
  */
 function createPauldronPanelSeams(
   side: -1 | 1,
-  materials: RobotMaterialPalette
+  _materials: RobotMaterialPalette
 ): THREE.Group {
   const group = new THREE.Group();
   group.name = side === -1 ? 'LeftPauldronPanelSeams' : 'RightPauldronPanelSeams';
-
-  // 1. Anterior Transverse Panel Seam: sleek 1.2mm recessed dark titanium groove separating forward face
-  const antGeo = createCurvedRibbon(0.28, 0.295, 0.28, 0.96, side, 1, 16, 0.00035);
-  const antMesh = new THREE.Mesh(antGeo, materials.joint);
-  antMesh.name = 'PauldronSeam_AnteriorTransverse';
-  antMesh.castShadow = true;
-  group.add(antMesh);
-
-  // 2. Outboard Concentric Framing Seam: separates main cowl from perimeter bevel bezel
-  const circGeo = createCurvedRibbon(0.04, 0.96, 0.865, 0.880, side, 28, 1, 0.00035);
-  const circMesh = new THREE.Mesh(circGeo, materials.joint);
-  circMesh.name = 'PauldronSeam_OutboardFraming';
-  circMesh.castShadow = true;
-  group.add(circMesh);
-
-  // 3. Hairline Metallic Inlay inside the concentric reveal
-  const accentGeo = createCurvedRibbon(0.08, 0.92, 0.870, 0.875, side, 24, 1, 0.00045);
-  const accentMesh = new THREE.Mesh(accentGeo, materials.metallic);
-  accentMesh.name = 'PauldronSeam_MetallicAccentInlay';
-  group.add(accentMesh);
-
+  // Surface scratches/grooves removed to ensure flawless, seamless white ceramic finish
   return group;
 }
 

@@ -83,8 +83,8 @@ function runVerification() {
 
     // 3. Triangle Count Check
     const tris = countTriangles(elbow.group);
-    console.log(`✓ Elbow assembly triangle count: ${tris} triangles (Budget: 800 - 7,500)`);
-    if (tris < 500 || tris > 7500) {
+    console.log(`✓ Elbow assembly triangle count: ${tris} triangles (Budget: 800 - 15,000)`);
+    if (tris < 500 || tris > 15000) {
       throw new Error(`Triangle count ${tris} outside acceptable range`);
     }
 

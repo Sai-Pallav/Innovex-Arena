@@ -289,32 +289,32 @@ for (const [shoulder, side, prefix] of [[leftShoulder, -1, 'Left'], [rightShould
   shoulder.add(upperArm);
 
   // Upper Arm Rotational Joint Assembly
-  const bicepRotationalRing = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.045, 0.016, 24), jointMat);
+  const bicepRotationalRing = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.016, 24), jointMat);
   bicepRotationalRing.name = `${prefix}BicepRotationalRing`;
   bicepRotationalRing.position.set(side * 0.008, -0.006, 0.008);
   upperArm.add(bicepRotationalRing);
 
-  const bicepPurpleLine = new THREE.Mesh(new THREE.TorusGeometry(0.046, 0.0016, 8, 24), violetMat);
+  const bicepPurpleLine = new THREE.Mesh(new THREE.TorusGeometry(0.039, 0.0016, 8, 24), violetMat);
   bicepPurpleLine.rotation.x = Math.PI / 2;
   bicepPurpleLine.position.set(side * 0.008, -0.006, 0.008);
   upperArm.add(bicepPurpleLine);
 
   // Black plate between white shell (bicep) and rotational ring
-  const bicepBlackPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.054, 0.053, 0.008, 24), jointMat);
+  const bicepBlackPlate = new THREE.Mesh(new THREE.CylinderGeometry(0.040, 0.040, 0.008, 24), jointMat);
   bicepBlackPlate.name = `${prefix}BicepBlackPlateBetweenShellAndRotational`;
   bicepBlackPlate.position.set(side * 0.008, -0.016, 0.008);
   upperArm.add(bicepBlackPlate);
 
   // Sculpted Bicep with Scalloped Arch Cutout (White shell)
-  const bicepGeo = new THREE.CylinderGeometry(0.052, 0.044, 0.16, 24);
+  const bicepGeo = new THREE.CylinderGeometry(0.040, 0.035, 0.17, 24);
   const bicep = new THREE.Mesh(bicepGeo, armorMat);
-  bicep.position.set(side * 0.008, -0.095, 0.008);
+  bicep.position.set(side * 0.008, -0.100, 0.008);
   upperArm.add(bicep);
 
   // Dual Elbow Rotational Discs with Purple Emissive Rings (Reference: ELBOW OVERVIEW)
   const elbow = new THREE.Group();
   elbow.name = `${prefix}Elbow`;
-  elbow.position.set(0, -0.19, 0);
+  elbow.position.set(0, -0.20, 0);
   upperArm.add(elbow);
 
   const hingePin = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.082, 16), jointMat);

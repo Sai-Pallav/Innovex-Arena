@@ -95,7 +95,7 @@ export function createRobotArm(
   // Creates authentic athletic chevron posture with elbows as outermost lateral point.
   // ==========================================================================
   const forearm = createForearm(side, materials);
-  forearm.group.position.set(0, -0.014, 0);
+  forearm.group.position.set(0, -0.0150, 0);
   forearm.group.rotation.set(0, 0, -side * 0.095);
   elbow.forearmPivot.add(forearm.group);
   ledMeshes.push(...forearm.ledMeshes);

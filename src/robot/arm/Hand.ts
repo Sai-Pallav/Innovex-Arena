@@ -48,51 +48,51 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
   return [
     {
       name: 'Index',
-      spreadX: radial * 0.0180,
-      offsetY: -0.0440,
-      offsetZ:  0.0022,
+      spreadX: radial * 0.0205,
+      offsetY: -0.0470,
+      offsetZ:  0.0024,
       proximalLength: 0.0310,
       middleLength:   0.0210,
       distalLength:   0.0150,
-      proximalRadius: 0.0052,
-      middleRadius:   0.0045,
-      distalRadius:   0.0039,
+      proximalRadius: 0.0060,
+      middleRadius:   0.0052,
+      distalRadius:   0.0044,
     },
     {
       name: 'Middle',
-      spreadX: radial * 0.0058,
-      offsetY: -0.0465,
-      offsetZ:  0.0032,
+      spreadX: radial * 0.0068,
+      offsetY: -0.0495,
+      offsetZ:  0.0035,
       proximalLength: 0.0350,
       middleLength:   0.0235,
       distalLength:   0.0165,
-      proximalRadius: 0.0055,
-      middleRadius:   0.0048,
-      distalRadius:   0.0041,
+      proximalRadius: 0.0063,
+      middleRadius:   0.0055,
+      distalRadius:   0.0047,
     },
     {
       name: 'Ring',
-      spreadX: -radial * 0.0066,
-      offsetY: -0.0450,
-      offsetZ:  0.0024,
+      spreadX: -radial * 0.0075,
+      offsetY: -0.0480,
+      offsetZ:  0.0026,
       proximalLength: 0.0330,
       middleLength:   0.0220,
       distalLength:   0.0155,
-      proximalRadius: 0.0052,
-      middleRadius:   0.0045,
-      distalRadius:   0.0039,
+      proximalRadius: 0.0060,
+      middleRadius:   0.0052,
+      distalRadius:   0.0044,
     },
     {
       name: 'Little',
-      spreadX: -radial * 0.0185,
-      offsetY: -0.0410,
-      offsetZ:  0.0012,
+      spreadX: -radial * 0.0210,
+      offsetY: -0.0440,
+      offsetZ:  0.0014,
       proximalLength: 0.0245,
       middleLength:   0.0160,
       distalLength:   0.0115,
-      proximalRadius: 0.0044,
-      middleRadius:   0.0038,
-      distalRadius:   0.0032,
+      proximalRadius: 0.0051,
+      middleRadius:   0.0044,
+      distalRadius:   0.0037,
     },
   ];
 }
@@ -151,21 +151,21 @@ function createCarpalSquircleGeo(width: number, depth: number, height: number): 
 function getKnuckleMargin(x: number, side: -1 | 1): number {
   const radial = -side;
   const fingers = [
-    { name: 'Index',  spreadX: radial * 0.0180,  yTarget: -0.0415 },
-    { name: 'Middle', spreadX: radial * 0.0058,  yTarget: -0.0440 },
-    { name: 'Ring',   spreadX: -radial * 0.0066, yTarget: -0.0425 },
-    { name: 'Little', spreadX: -radial * 0.0185, yTarget: -0.0385 },
+    { name: 'Index',  spreadX: radial * 0.0205,  yTarget: -0.0445 },
+    { name: 'Middle', spreadX: radial * 0.0068,  yTarget: -0.0470 },
+    { name: 'Ring',   spreadX: -radial * 0.0075, yTarget: -0.0455 },
+    { name: 'Little', spreadX: -radial * 0.0210, yTarget: -0.0415 },
   ];
 
   // Base continuous curvature across the metacarpal arch
-  const ulnarT = THREE.MathUtils.clamp((x * (-radial) + 0.0260) / 0.0520, 0, 1);
-  const baseLine = THREE.MathUtils.lerp(-0.0380, -0.0355, ulnarT);
+  const ulnarT = THREE.MathUtils.clamp((x * (-radial) + 0.0285) / 0.0570, 0, 1);
+  const baseLine = THREE.MathUtils.lerp(-0.0410, -0.0385, ulnarT);
 
   // Blend in the 4 knuckle hood scallops
   let hoodDelta = 0;
   for (const f of fingers) {
     const d = Math.abs(x - f.spreadX);
-    const w = 0.0062;
+    const w = 0.0070;
     const factor = Math.exp(-Math.pow(d / w, 2));
     const delta = f.yTarget - baseLine;
     hoodDelta += delta * factor;
@@ -179,15 +179,15 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
   const uvs: number[] = [];
   const indices: number[] = [];
 
-  const numY = 26; // longitudinal rings from carpal collar to knuckles
-  const numX = 24; // transverse contour points per row
+  const numY = 28; // longitudinal rings from carpal collar to knuckles
+  const numX = 26; // transverse contour points per row
 
   // 1. DORSAL SURFACE GRID
   for (let iy = 0; iy < numY; iy++) {
     const v = iy / (numY - 1);
 
-    // Dynamic width taper: starts at 44.8mm at carpal collar, smoothly flares to 52.0mm at knuckles
-    const baseHw = THREE.MathUtils.lerp(0.0224, 0.0260, Math.pow(v, 0.85));
+    // Dynamic width taper: starts at 49.6mm at carpal collar, smoothly flares to 57.0mm at knuckles
+    const baseHw = THREE.MathUtils.lerp(0.0248, 0.0285, Math.pow(v, 0.85));
 
     for (let ix = 0; ix < numX; ix++) {
       const u = ix / (numX - 1);
@@ -201,7 +201,7 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
       let socketNotch = 0;
       if (r > 0.45 && v > 0.08 && v < 0.46) {
         const socketPhase = (v - 0.08) / (0.46 - 0.08);
-        socketNotch = -Math.sin(socketPhase * Math.PI) * 0.0024;
+        socketNotch = -Math.sin(socketPhase * Math.PI) * 0.0026;
       }
 
       const hw = baseHw + (r > 0 ? socketNotch : 0);
@@ -216,20 +216,20 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
 
       // Subtle Metacarpal Ray Crests (gentle organic ridges leading to each finger)
       const ray1 = Math.exp(-Math.pow((r - 0.75) / 0.20, 2)) * 0.0006; // Index ray
-      const ray2 = Math.exp(-Math.pow((r - 0.20) / 0.20, 2)) * 0.0008; // Middle ray
-      const ray3 = Math.exp(-Math.pow((r - (-0.28)) / 0.20, 2)) * 0.0007; // Ring ray
-      const ray4 = Math.exp(-Math.pow((r - (-0.80)) / 0.20, 2)) * 0.0005; // Little ray
+      const ray2 = Math.exp(-Math.pow((r - 0.22) / 0.20, 2)) * 0.0008; // Middle ray
+      const ray3 = Math.exp(-Math.pow((r - (-0.26)) / 0.20, 2)) * 0.0007; // Ring ray
+      const ray4 = Math.exp(-Math.pow((r - (-0.78)) / 0.20, 2)) * 0.0005; // Little ray
       const metacarpalRays = (ray1 + ray2 + ray3 + ray4) * Math.sin(v * Math.PI * 0.85);
 
       // Aerodynamic compound-camber dorsal arch
-      const crownArch = Math.cos(nx * Math.PI * 0.44) * 0.0045;
+      const crownArch = Math.cos(nx * Math.PI * 0.44) * 0.0048;
 
       // Flank curvature curling down on edges to wrap smoothly around internal core
-      const flankDrop = Math.pow(Math.abs(nx), 2.2) * 0.0075;
+      const flankDrop = Math.pow(Math.abs(nx), 2.2) * 0.0080;
 
-      // Z depth profile: smoothly slopes from carpal collar (12.5mm) down to knuckle surface (7.2mm)
+      // Z depth profile: smoothly slopes from carpal collar (14.2mm) down to knuckle surface (8.4mm)
       // so the dorsal armor sits flush directly over the knuckle barrels and matches wrist cuff
-      const baseZ = THREE.MathUtils.lerp(0.0125, 0.0072, Math.pow(v, 0.92));
+      const baseZ = THREE.MathUtils.lerp(0.0142, 0.0084, Math.pow(v, 0.92));
       const z = baseZ + crownArch * (0.65 + 0.35 * (1 - v)) + metacarpalRays - flankDrop;
 
       positions.push(x, y, z);
@@ -254,7 +254,7 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
     const topIdx = iy * stride + 0;
     const x = positions[topIdx * 3];
     const y = positions[topIdx * 3 + 1];
-    positions.push(x * 0.96, y, -0.0045);
+    positions.push(x * 0.96, y, -0.0060);
     uvs.push(0, iy / (numY - 1));
   }
   const leftSkirtStart = numY * numX;
@@ -271,7 +271,7 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
     const topIdx = iy * stride + (numX - 1);
     const x = positions[topIdx * 3];
     const y = positions[topIdx * 3 + 1];
-    positions.push(x * 0.96, y, -0.0045);
+    positions.push(x * 0.96, y, -0.0060);
     uvs.push(1, iy / (numY - 1));
   }
   const rightSkirtStart = leftSkirtStart + numY;
@@ -289,7 +289,7 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
     const topIdx = ix;
     const x = positions[topIdx * 3];
     const y = positions[topIdx * 3 + 1];
-    positions.push(x * 0.96, y, -0.0020);
+    positions.push(x * 0.96, y, -0.0024);
     uvs.push(ix / (numX - 1), 0);
   }
   for (let ix = 0; ix < numX - 1; ix++) {
@@ -308,7 +308,7 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
     const x = positions[topIdx * 3];
     const y = positions[topIdx * 3 + 1];
     const z = positions[topIdx * 3 + 2];
-    positions.push(x, y - 0.0006, z - 0.0022);
+    positions.push(x, y - 0.0006, z - 0.0024);
     uvs.push(ix / (numX - 1), 1);
   }
   for (let ix = 0; ix < numX - 1; ix++) {
@@ -351,8 +351,8 @@ export function createHand(
   // 1. CARPAL INTERFACE DOCKING COLLAR
   //    Seamless squircle collar matching wrist gauntlet profile (42.8mm x 32.8mm)
   // ════════════════════════════════════════════════════════════
-  const cuffW = 0.0448;
-  const cuffD = 0.0340;
+  const cuffW = 0.0496;
+  const cuffD = 0.0388;
 
   // Polished chrome docking interface ring
   const cuffRimGeo = createCarpalSquircleGeo(cuffW, cuffD, 0.0014);
@@ -361,7 +361,7 @@ export function createHand(
   handGroup.add(cuffRim);
 
   // Dark titanium interior seal collar
-  const cuffGeo = createCarpalSquircleGeo(cuffW * 0.96, cuffD * 0.96, 0.0020);
+  const cuffGeo = createCarpalSquircleGeo(cuffW * 0.96, cuffD * 0.96, 0.0022);
   const carpalCuff = new THREE.Mesh(cuffGeo, materials.joint);
   carpalCuff.name = 'HandCarpalCuff';
   carpalCuff.position.set(0, -0.0008, 0);
@@ -373,28 +373,28 @@ export function createHand(
   //    Strictly enclosed inside white armor shell (zero flank clipping)
   // ════════════════════════════════════════════════════════════
   // Contoured internal chassis filling palm volume seamlessly
-  const palmGeo = new THREE.BoxGeometry(0.0360, 0.0340, 0.0094);
+  const palmGeo = new THREE.BoxGeometry(0.0410, 0.0370, 0.0125);
   const palmChassis = new THREE.Mesh(palmGeo, materials.joint);
   palmChassis.name = 'PalmChassis';
-  palmChassis.position.set(0, -0.0220, -0.0032);
+  palmChassis.position.set(0, -0.0240, -0.0035);
   palmChassis.castShadow = true;
   palmChassis.receiveShadow = true;
   handGroup.add(palmChassis);
 
   // Transverse Metacarpal Knuckle Anchor Bar (flush within palm contour)
-  const knuckleBarGeo = new THREE.BoxGeometry(0.0460, 0.0036, 0.0048);
+  const knuckleBarGeo = new THREE.BoxGeometry(0.0510, 0.0040, 0.0055);
   const knuckleBar = new THREE.Mesh(knuckleBarGeo, materials.joint);
   knuckleBar.name = 'MetacarpalKnuckleBed';
-  knuckleBar.position.set(0, -0.0425, 0.0005);
+  knuckleBar.position.set(0, -0.0455, 0.0005);
   knuckleBar.castShadow = true;
   knuckleBar.receiveShadow = true;
   handGroup.add(knuckleBar);
 
   // CNC Weight-reduction pockets along palmar face of chassis
   for (let p = 0; p < 3; p++) {
-    const pockGeo = new THREE.BoxGeometry(0.0070, 0.0090, 0.0020);
+    const pockGeo = new THREE.BoxGeometry(0.0080, 0.0100, 0.0024);
     const pock = new THREE.Mesh(pockGeo, materials.joint);
-    pock.position.set((p - 1) * 0.0090, -0.0220, -0.0080);
+    pock.position.set((p - 1) * 0.0105, -0.0240, -0.0095);
     handGroup.add(pock);
   }
 
@@ -402,14 +402,14 @@ export function createHand(
   const rThumb = -side;
   const rPinky = side;
   const padData = [
-    { x: rThumb * 0.0110, y: -0.0210, h: 0.0185, w: 0.0135 }, // Thenar pad
-    { x: rPinky * 0.0110, y: -0.0235, h: 0.0175, w: 0.0130 }, // Hypothenar pad
-    { x: 0,               y: -0.0390, h: 0.0060, w: 0.0350 }, // Transverse MCP palm pad
+    { x: rThumb * 0.0125, y: -0.0225, h: 0.0200, w: 0.0150 }, // Thenar pad
+    { x: rPinky * 0.0125, y: -0.0250, h: 0.0190, w: 0.0145 }, // Hypothenar pad
+    { x: 0,               y: -0.0415, h: 0.0065, w: 0.0400 }, // Transverse MCP palm pad
   ];
   for (const pd of padData) {
     const padGeo = new THREE.BoxGeometry(pd.w, pd.h, 0.0020);
     const pad = new THREE.Mesh(padGeo, materials.joint);
-    pad.position.set(pd.x, pd.y, -0.0080);
+    pad.position.set(pd.x, pd.y, -0.0095);
     pad.castShadow = true;
     handGroup.add(pad);
     palmarPads.push(pad);
@@ -417,7 +417,7 @@ export function createHand(
     // Polished metallic perimeter trim for pad
     const padTrimGeo = new THREE.BoxGeometry(pd.w + 0.0006, pd.h + 0.0006, 0.0004);
     const padTrim = new THREE.Mesh(padTrimGeo, materials.metallic);
-    padTrim.position.set(pd.x, pd.y, -0.0072);
+    padTrim.position.set(pd.x, pd.y, -0.0087);
     handGroup.add(padTrim);
   }
 
@@ -429,10 +429,10 @@ export function createHand(
 
   // Precision micro-fasteners on dorsal plate (4 hex screws + chrome washers)
   const fastenerCoords = [
-    { x: -side * 0.0135, y: -0.0070, z: 0.0125 },
-    { x:  side * 0.0135, y: -0.0070, z: 0.0125 },
-    { x: -side * 0.0170, y: -0.0330, z: 0.0078 },
-    { x:  side * 0.0170, y: -0.0330, z: 0.0078 },
+    { x: -side * 0.0150, y: -0.0075, z: 0.0138 },
+    { x:  side * 0.0150, y: -0.0075, z: 0.0138 },
+    { x: -side * 0.0185, y: -0.0355, z: 0.0088 },
+    { x:  side * 0.0185, y: -0.0355, z: 0.0088 },
   ];
   for (const f of fastenerCoords) {
     const screwGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0014, 6);
@@ -449,9 +449,9 @@ export function createHand(
   }
 
   // Signature Cybernetic Purple Telemetry Status Capsule on upper dorsum (Longitudinal Slit matching Reference Image 1)
-  const ledX = -side * 0.0042;
-  const ledY = -0.0110;
-  const ledZ = 0.0146;
+  const ledX = -side * 0.0046;
+  const ledY = -0.0120;
+  const ledZ = 0.0162;
 
   const ledBezelGeo = new THREE.BoxGeometry(0.0022, 0.0080, 0.0012);
   const ledBezel = new THREE.Mesh(ledBezelGeo, materials.metallic);
@@ -472,8 +472,8 @@ export function createHand(
   handGroup.add(bloomMesh);
 
   // Micro sensor dot / fastener adjacent to telemetry capsule (as seen in Reference Image 1)
-  const dotX = -side * 0.0082;
-  const dotY = -0.0115;
+  const dotX = -side * 0.0090;
+  const dotY = -0.0125;
   const dotGeo = new THREE.CylinderGeometry(0.0007, 0.0007, 0.0012, 12);
   dotGeo.rotateX(Math.PI / 2);
   const dotMesh = new THREE.Mesh(dotGeo, materials.joint);
@@ -493,8 +493,8 @@ export function createHand(
   const fingerSpecs = getFingerSpecs(side);
 
   for (const spec of fingerSpecs) {
-    const kRadius = spec.proximalRadius * 0.70;
-    const kWidth = spec.proximalRadius * 1.76;
+    const kRadius = spec.proximalRadius * 0.72;
+    const kWidth = spec.proximalRadius * 1.78;
 
     // Transverse knuckle barrel
     const kGeo = new THREE.CylinderGeometry(kRadius, kRadius, kWidth, 20);
@@ -506,7 +506,7 @@ export function createHand(
     knuckles.push(knuckle);
 
     // Precision flush metallic pivot caps with micro hex detail
-    const capRadius = spec.proximalRadius * 0.70;
+    const capRadius = spec.proximalRadius * 0.72;
     const capX = kWidth * 0.50 + 0.0003;
     for (const cSide of [-1, 1]) {
       const capGeo = new THREE.CylinderGeometry(capRadius, capRadius * 0.94, 0.0008, 18);
