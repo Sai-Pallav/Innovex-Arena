@@ -50,7 +50,7 @@ export class RobotAnimationController {
   private baseRightHandRot: THREE.Euler;
 
   private leftPoseOverrides = {
-    upperArm: { x: 0, y: 0.22, z: 0 },
+    upperArm: { x: 0, y: 0.08, z: 0 },
     elbowBend: 0,
     elbowRoll: 0,
     wrist: { pitch: 0, roll: 0, yaw: 0 },
@@ -64,7 +64,7 @@ export class RobotAnimationController {
   };
 
   private rightPoseOverrides = {
-    upperArm: { x: 0, y: -0.14, z: 0 },
+    upperArm: { x: 0, y: -0.08, z: 0 },
     elbowBend: 0,
     elbowRoll: 0,
     wrist: { pitch: 0, roll: 0, yaw: 0 },
@@ -303,7 +303,7 @@ export class RobotAnimationController {
       // Direct pass-through to high-fidelity ArmAnimationController
       const lOver = this.leftPoseOverrides;
       lOver.upperArm.x = armState.pose.leftUpperPitch;
-      lOver.upperArm.y = 0.14;
+      lOver.upperArm.y = 0.08;
       lOver.upperArm.z = armState.pose.leftUpperRoll;
       lOver.elbowBend = armState.pose.leftElbowBend;
       lOver.elbowRoll = 0.0; // Strict 1-DOF transverse hinge (zero internal knuckle shearing)
@@ -326,7 +326,7 @@ export class RobotAnimationController {
 
       const rOver = this.rightPoseOverrides;
       rOver.upperArm.x = armState.pose.rightUpperPitch;
-      rOver.upperArm.y = -0.14;
+      rOver.upperArm.y = -0.08;
       rOver.upperArm.z = armState.pose.rightUpperRoll;
       rOver.elbowBend = armState.pose.rightElbowBend;
       rOver.elbowRoll = 0.0; // Strict 1-DOF transverse hinge (zero internal knuckle shearing)

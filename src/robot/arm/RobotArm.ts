@@ -70,11 +70,11 @@ export function createRobotArm(
   // ==========================================================================
   // 1. UPPER ARM & SHOULDER ADAPTER
   // Attaches flush to the shoulder mounting flange interface.
-  // Posture: Shoulders to elbow OUTWARD (~10.6° = 0.185 rad outward roll)
-  // Subtle internal yaw (side * 0.075 rad) aligns elbow flexion forward & inward
+  // Posture: Controlled athletic stance (~7.4° = 0.130 rad roll, -0.08 rad pitch)
+  // Subtle internal yaw (side * 0.08 rad) aligns elbow flexion forward & inward
   // ==========================================================================
   const upperArm = createUpperArm(side, materials);
-  upperArm.group.rotation.set(-0.14, -side * 0.14, side * 0.185);
+  upperArm.group.rotation.set(-0.08, -side * 0.08, side * 0.130);
   armRoot.add(upperArm.group);
   ledMeshes.push(...upperArm.ledMeshes);
 
@@ -91,12 +91,12 @@ export function createRobotArm(
   // ==========================================================================
   // 3. TAPERED FOREARM GAUNTLET & MECHANICAL CORE
   // Parented directly to elbow.forearmPivot — follows true 1-DOF elbow flexion.
-  // Posture: Elbow to hands INWARD (-side * 0.095 rad = ~5.4° inward return)
-  // Creates authentic athletic chevron posture with elbows as outermost lateral point.
+  // Posture: Elbow to hands inward return (-side * 0.070 rad = ~4.0° inward)
+  // Creates authentic athletic chevron posture with natural clearance beside torso.
   // ==========================================================================
   const forearm = createForearm(side, materials);
   forearm.group.position.set(0, -0.0105, 0);
-  forearm.group.rotation.set(0, 0, -side * 0.095);
+  forearm.group.rotation.set(0, 0, -side * 0.070);
   elbow.forearmPivot.add(forearm.group);
   ledMeshes.push(...forearm.ledMeshes);
 
@@ -110,12 +110,12 @@ export function createRobotArm(
   const wrist = createWrist(side, materials);
   wrist.group.position.set(0, 0.0000, 0);
   // Natural relaxed wrist resting posture (semi-pronated athletic stance):
-  // Clean coaxial alignment with forearm gauntlet and subtle natural pronation
-  const wristRoll = side === -1 ? -0.16 : 0.16;
+  // Clean three-quarters anatomical hang with natural forearm pronation (dorsal LED and knuckle hoods visible)
+  const wristRoll = side === -1 ? -0.72 : 0.72;
   wrist.group.rotation.set(0, wristRoll, 0);
 
-  const wristPitch = 0.03;
-  const wristYaw = 0.0;
+  const wristPitch = 0.05;
+  const wristYaw = side === -1 ? 0.015 : -0.015;
   wrist.trunnionPivot.rotation.set(wristPitch, 0, wristYaw);
 
   forearm.distalWristMount.add(wrist.group);
@@ -132,9 +132,9 @@ export function createRobotArm(
 
   // ==========================================================================
   // 6. DEFAULT ATHLETIC RESTING POSTURE
-  // Elbow as true directional turning point, natural relaxed athletic flexion (~22.9° = -0.40 rad)
+  // Elbow as true directional turning point, natural relaxed athletic flexion (~14.9° = -0.26 rad)
   // Strict 1-DOF orthogonal transverse hinge — zero internal knuckle shearing
-  elbow.setAngle(-0.40);
+  elbow.setAngle(-0.26);
 
   // Compatibility proxies for animation systems
   const shoulderCompat = {

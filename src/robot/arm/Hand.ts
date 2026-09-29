@@ -341,8 +341,6 @@ export function createHand(
 ): HandNodes {
   const handGroup = new THREE.Group();
   handGroup.name = side === -1 ? 'LeftHandRoot' : 'RightHandRoot';
-  // Calibrated hand scale for consistent humanoid hand-to-forearm (0.62) and wrist proportions
-  handGroup.scale.setScalar(0.85);
 
   const ledMeshes: THREE.Mesh[] = [];
   const knuckles: THREE.Mesh[] = [];
