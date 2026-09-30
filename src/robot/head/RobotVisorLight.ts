@@ -23,9 +23,10 @@ export function createRobotVisorLight(materials: RobotMaterialPalette): VisorLig
   const steps = 36;
   const points: THREE.Vector3[] = [];
 
-  // Spans horizontally across the expansive visor (u from 0.05 to 0.95, v = 0.46)
+  // Spans horizontally across the expansive visor (u from 0.08 to 0.92, v = 0.46)
+  // Stops cleanly within the front visor aperture, preventing side protrusion
   for (let i = 0; i <= steps; i++) {
-    const u = 0.05 + (i / steps) * 0.90;
+    const u = 0.08 + (i / steps) * 0.84;
     const v = 0.46; // Aligned with the ear module center axis (y ≈ +0.020)
     // Offset 1.8mm proud of the glossy visor surface to prevent Z-fighting
     const pt = getVisorSurfacePoint(u, v, 0.0018);

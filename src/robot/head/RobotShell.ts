@@ -161,6 +161,19 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
     });
     templeGeo.center();
 
+    if (side === -1) {
+      templeGeo.scale(-1, 1, 1);
+      // Invert triangle winding for non-indexed geometry to preserve outward-facing normals
+      const pos = templeGeo.attributes.position;
+      for (let i = 0; i < pos.count; i += 3) {
+        const x1 = pos.getX(i + 1);
+        const y1 = pos.getY(i + 1);
+        const z1 = pos.getZ(i + 1);
+        pos.setXYZ(i + 1, pos.getX(i + 2), pos.getY(i + 2), pos.getZ(i + 2));
+        pos.setXYZ(i + 2, x1, y1, z1);
+      }
+    }
+
     // Curve temple panel to hug the rounded side of the head
     const tPos = templeGeo.attributes.position;
     for (let i = 0; i < tPos.count; i++) {
@@ -183,7 +196,8 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
     else rightTemple = templeMesh;
   }
 
-  // 4. Rear Occipital Shell (Tapered sweep to neck nape)
+  // 4. Rear Occipital Shell (Tapered sweep to neck nape, bilaterally symmetric)
+  // Right occipital shell (phi: 0.5π -> 1.5π)
   const rearShellGeo = new THREE.SphereGeometry(
     0.136,
     32,
@@ -200,6 +214,24 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
   rearShell.castShadow = true;
   rearShell.receiveShadow = true;
   armorShellGroup.add(rearShell);
+
+  // Left occipital shell (phi: 1.5π -> 2.5π) closing the missing white shell behind the left ear
+  const leftRearShellGeo = new THREE.SphereGeometry(
+    0.136,
+    32,
+    20,
+    Math.PI * 1.5,
+    Math.PI,
+    Math.PI * 0.30,
+    Math.PI * 0.50
+  );
+  const leftRearShell = new THREE.Mesh(leftRearShellGeo, materials.armorDoubleSide);
+  leftRearShell.name = 'LeftRearShell';
+  leftRearShell.position.set(0, 0.022, -0.022);
+  leftRearShell.scale.set(0.95, 1.02, 0.96);
+  leftRearShell.castShadow = true;
+  leftRearShell.receiveShadow = true;
+  armorShellGroup.add(leftRearShell);
 
   // Merge outer helmet ceramic armor pieces
   const mergedHelmetArmor = mergeGroupMeshesByMaterial(armorShellGroup, materials.armorDoubleSide, 'HelmetArmor_Merged', false);
