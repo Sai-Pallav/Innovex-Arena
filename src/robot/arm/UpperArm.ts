@@ -146,7 +146,7 @@ export interface UpperArmNodes {
   adapterGroup.add(adapterCollar);
 
   // 2c. Glowing Purple LED Halo Ring (Refined single master LED ring)
-  const purpleLedGeo = new THREE.TorusGeometry(0.0372, 0.0010, 8, 48);
+  const purpleLedGeo = new THREE.TorusGeometry(0.0358, 0.0010, 8, 48);
   purpleLedGeo.rotateX(Math.PI / 2);
   const purpleLedRing = new THREE.Mesh(purpleLedGeo, materials.purpleEmissive);
   purpleLedRing.name = side === -1 ? 'LeftBicepRotationalLed' : 'RightBicepRotationalLed';
@@ -155,14 +155,14 @@ export interface UpperArmNodes {
   ledMeshes.push(purpleLedRing);
 
   // Purple bloom mesh for intense mecha glow
-  const purpleBloomGeo = new THREE.TorusGeometry(0.0372, 0.0018, 8, 48);
+  const purpleBloomGeo = new THREE.TorusGeometry(0.0358, 0.0018, 8, 48);
   purpleBloomGeo.rotateX(Math.PI / 2);
   const purpleBloomMesh = new THREE.Mesh(purpleBloomGeo, materials.purpleBloom);
   purpleBloomMesh.position.set(0, -0.0310, 0);
   adapterGroup.add(purpleBloomMesh);
 
   // 2d. Polished metallic bearing race bezel below LED ring
-  const botRaceRimGeo = new THREE.TorusGeometry(0.0370, 0.0008, 8, 36);
+  const botRaceRimGeo = new THREE.TorusGeometry(0.0356, 0.0008, 8, 36);
   botRaceRimGeo.rotateX(Math.PI / 2);
   const botRaceRim = new THREE.Mesh(botRaceRimGeo, materials.metallic);
   botRaceRim.position.set(0, -0.0335, 0);
@@ -171,7 +171,7 @@ export interface UpperArmNodes {
   // --------------------------------------------------------------------------
   // SECTION 3: LOWER CNC FLANGE & FASTENER RING (Y = -0.034 to -0.038)
   // --------------------------------------------------------------------------
-  const flangeGeo = new THREE.CylinderGeometry(0.0375, 0.0384, 0.006, 36);
+  const flangeGeo = new THREE.CylinderGeometry(0.0362, 0.0370, 0.006, 36);
   const lowerFlange = new THREE.Mesh(flangeGeo, materials.joint);
   lowerFlange.name = 'AdapterLowerCncFlange';
   lowerFlange.position.set(0, -0.0360, 0);
@@ -181,7 +181,7 @@ export interface UpperArmNodes {
 
   // 12 Hex Socket Head Cap Screws seated countersunk into lower flange
   const boltCount = 12;
-  const boltPitchR = 0.0350;
+  const boltPitchR = 0.0338;
   for (let b = 0; b < boltCount; b++) {
     const angle = (b / boltCount) * Math.PI * 2;
     const socketGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0016, 8);
@@ -198,7 +198,7 @@ export interface UpperArmNodes {
   // SECTION 4: DOCKING INTERFACE COLLAR & GASKET SEAL (Y = -0.038 to -0.042)
   // Seals against white armor shell at yTop = -0.0420 with 0.000mm air gap
   // --------------------------------------------------------------------------
-  const dockingGeo = new THREE.CylinderGeometry(0.0384, 0.0392, 0.0045, 36);
+  const dockingGeo = new THREE.CylinderGeometry(0.0372, 0.0384, 0.0045, 36);
   const dockingCollar = new THREE.Mesh(dockingGeo, materials.joint);
   dockingCollar.name = side === -1 ? 'LeftBlackPlateBetweenShellAndRotational' : 'RightBlackPlateBetweenShellAndRotational';
   dockingCollar.position.set(0, -0.0400, 0);
@@ -207,7 +207,7 @@ export interface UpperArmNodes {
   adapterGroup.add(dockingCollar);
 
   // Dark compression gasket seal seated right at the mating line (Y = -0.0420)
-  const gasketGeo = new THREE.TorusGeometry(0.0392, 0.0008, 6, 36);
+  const gasketGeo = new THREE.TorusGeometry(0.0384, 0.0008, 6, 36);
   gasketGeo.rotateX(Math.PI / 2);
   const gasket = new THREE.Mesh(gasketGeo, materials.joint);
   gasket.name = 'AdapterCompressionGasket';
@@ -247,7 +247,7 @@ function createUpperArmCoherentArmor(
   const indices: number[] = [];
 
   const yTop = -0.0420;
-  const totalLength = 0.1380; // Extended slightly (+10mm: from 128mm to 138mm) to increase upper arm height without overdoing it
+  const totalLength = 0.1500; // Increased upper arm length by little amount (+12mm: from 138mm to 150mm)
   const thickness = 0.0030;  // 3.0 mm real physical wall thickness
 
   let startAngle = 0;
@@ -276,11 +276,11 @@ function createUpperArmCoherentArmor(
     const u = ix / radialSegs;
     let y = yTop - v * totalLength;
 
-    // Refined athletic humanoid mecha humerus profile:
-    // Root radius: 0.0392 (78.4mm dia) for refined upper transition from shoulder (prevents upper part from being larger than required)
-    // Midsection contour: subtle athletic bicep/tricep anatomical curvature (+0.0030m)
-    // Distal taper: controlled gradual taper to 0.0346 (69.2mm dia) seamlessly carrying the elbow and forearm
-    let radius = 0.0392 - 0.0046 * v + 0.0030 * Math.sin(Math.pow(v, 0.72) * Math.PI);
+    // Slim athletic humanoid mecha humerus profile with confident mecha presence:
+    // Root radius: 0.0386 (slightly increased from 0.0378, original was 0.0392)
+    // Midsection contour: refined athletic bicep/tricep anatomical curvature (+0.0024m)
+    // Distal taper: controlled gradual taper to 0.0342 (was 0.0336, original was 0.0346)
+    let radius = 0.0386 - 0.0044 * v + 0.0024 * Math.sin(Math.pow(v, 0.72) * Math.PI);
 
     if (v < 0.10) {
       // Inward chamfer at top collar (/----\ )
@@ -296,8 +296,8 @@ function createUpperArmCoherentArmor(
     const sinA = Math.sin(angle);
     const cosA = Math.cos(angle);
 
-    let rx = radius * 1.0;
-    let rz = radius * 0.95;
+    let rx = radius * 0.98; // Slightly increased width multiplier (was 0.95, original was 1.0)
+    let rz = radius * 0.98;
 
     // Anterior Facet Crowning & 45° Corner Chamfers
     if (shellType === 'primaryOuter') {
@@ -492,11 +492,11 @@ export function createUpperArm(
   mechanicalCore.position.set(armCenterX, 0, 0);
   upperArmGroup.add(mechanicalCore);
 
-  // 1. Central Faceted I-Beam Spar (Compact, robust column extended slightly for height)
-  const sparGeo = new THREE.BoxGeometry(0.024, 0.195, 0.028);
+  // 1. Central Faceted I-Beam Spar (Extended to match length 150mm)
+  const sparGeo = new THREE.BoxGeometry(0.022, 0.207, 0.026);
   const armatureSpar = new THREE.Mesh(sparGeo, materials.joint);
   armatureSpar.name = 'UpperArmStructuralSpar';
-  armatureSpar.position.set(0, -0.111, 0);
+  armatureSpar.position.set(0, -0.1170, 0);
   armatureSpar.castShadow = true;
   armatureSpar.receiveShadow = true;
   mechanicalCore.add(armatureSpar);
@@ -530,17 +530,17 @@ export function createUpperArm(
 
   // 3. Weight-Reduction Lightening Pockets
   for (let p = 0; p < 5; p++) {
-    const pocketGeo = new THREE.BoxGeometry(0.025, 0.012, 0.018);
+    const pocketGeo = new THREE.BoxGeometry(0.024, 0.012, 0.017);
     const pocket = new THREE.Mesh(pocketGeo, materials.joint);
-    pocket.position.set(0, -0.058 - p * 0.021, 0);
+    pocket.position.set(0, -0.060 - p * 0.023, 0);
     mechanicalCore.add(pocket);
   }
 
-  // 4. Bilateral Compact Machined Side Linkages (Set safely inside shell at X = ±0.016m)
+  // 4. Bilateral Compact Machined Side Linkages (Set safely inside shell)
   for (const rSide of [-1, 1]) {
     const lugGroup = new THREE.Group();
     lugGroup.name = rSide === -1 ? 'UpperArmLinkageLug_L' : 'UpperArmLinkageLug_R';
-    lugGroup.position.set(rSide * 0.016, -0.107, -0.002);
+    lugGroup.position.set(rSide * 0.015, -0.113, -0.002);
     mechanicalCore.add(lugGroup);
 
     const earGeo = new THREE.BoxGeometry(0.0035, 0.011, 0.003);
@@ -554,7 +554,7 @@ export function createUpperArm(
 
     // Slim Linkage Body (Safely tucked inside)
     const linkGroup = new THREE.Group();
-    linkGroup.position.set(rSide * 0.016, -0.134, -0.002);
+    linkGroup.position.set(rSide * 0.015, -0.141, -0.002);
     mechanicalCore.add(linkGroup);
 
     const linkBodyGeo = new THREE.BoxGeometry(0.0035, 0.032, 0.0045);
@@ -568,45 +568,45 @@ export function createUpperArm(
   }
 
   // 5. Heavy-Duty Dual Tricep Linear Actuators (High-Polish Chrome Piston Rods)
-  const actCylGeo = new THREE.CylinderGeometry(0.0068, 0.0068, 0.042, 20);
+  const actCylGeo = new THREE.CylinderGeometry(0.0065, 0.0065, 0.042, 20);
   const tricepActuator = new THREE.Mesh(actCylGeo, materials.joint);
   tricepActuator.name = 'UpperArmTricepActuator';
-  tricepActuator.position.set(0, -0.080, -0.013);
+  tricepActuator.position.set(0, -0.084, -0.013);
   tricepActuator.castShadow = true;
   mechanicalCore.add(tricepActuator);
 
   for (const cOff of [-0.011, 0.011]) {
-    const actRingGeo = new THREE.TorusGeometry(0.0073, 0.0009, 6, 20);
+    const actRingGeo = new THREE.TorusGeometry(0.0070, 0.0009, 6, 20);
     const actRing = new THREE.Mesh(actRingGeo, materials.metallic);
-    actRing.position.set(0, -0.080 + cOff, -0.013);
+    actRing.position.set(0, -0.084 + cOff, -0.013);
     mechanicalCore.add(actRing);
   }
 
   // Mirror-finish Chrome Piston Rod
-  const pistonGeo = new THREE.CylinderGeometry(0.0042, 0.0042, 0.048, 16);
+  const pistonGeo = new THREE.CylinderGeometry(0.0042, 0.0042, 0.050, 16);
   const tricepPiston = new THREE.Mesh(pistonGeo, materials.metallic);
   tricepPiston.name = 'UpperArmTricepPiston';
-  tricepPiston.position.set(0, -0.122, -0.013);
+  tricepPiston.position.set(0, -0.128, -0.013);
   tricepPiston.castShadow = true;
   mechanicalCore.add(tricepPiston);
 
-  // 6. Protected Internal Cable Routing Conduits (Safely enclosed at radius 10mm)
+  // 6. Protected Internal Cable Routing Conduits (Safely enclosed at radius 9mm)
   for (const cSide of [-1, 1]) {
-    const conduitGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.155, 10);
+    const conduitGeo = new THREE.CylinderGeometry(0.0018, 0.0018, 0.167, 10);
     const conduit = new THREE.Mesh(conduitGeo, materials.joint);
-    conduit.position.set(cSide * 0.010, -0.111, -0.008);
+    conduit.position.set(cSide * 0.009, -0.1170, -0.008);
     conduit.castShadow = true;
     mechanicalCore.add(conduit);
   }
 
-  // 7. Distal Elbow Mount Clevis Housing (Receives Elbow.ts at Y = -0.2020m for balanced proportions)
+  // 7. Distal Elbow Mount Clevis Housing (Receives Elbow.ts at Y = -0.2140m for extended length)
   const distalElbowMount = new THREE.Group();
   distalElbowMount.name = side === -1 ? 'LeftDistalElbowMount' : 'RightDistalElbowMount';
-  distalElbowMount.position.set(0, -0.2020, 0);
+  distalElbowMount.position.set(0, -0.2140, 0);
   mechanicalCore.add(distalElbowMount);
 
-  // Mating CNC docking cuff extending from Y = +0.0220m down to +0.0060m (meeting white armor at Y = -0.1800m)
-  const clevisCuffGeo = new THREE.CylinderGeometry(0.0346, 0.0330, 0.016, 32);
+  // Mating CNC docking cuff extending from Y = +0.0220m down to +0.0060m (meeting white armor at Y = -0.1920m)
+  const clevisCuffGeo = new THREE.CylinderGeometry(0.0342, 0.0328, 0.016, 32);
   const elbowSocketCuff = new THREE.Mesh(clevisCuffGeo, materials.joint);
   elbowSocketCuff.name = 'UpperArmElbowSocketCuff';
   elbowSocketCuff.position.set(0, 0.0140, 0);
@@ -615,14 +615,14 @@ export function createUpperArm(
   distalElbowMount.add(elbowSocketCuff);
 
   // Compression gasket seal at Y = +0.0220m meeting the white ceramic armor with 0.000mm air gap
-  const cuffGasketGeo = new THREE.TorusGeometry(0.0345, 0.0008, 6, 36);
+  const cuffGasketGeo = new THREE.TorusGeometry(0.0341, 0.0008, 6, 36);
   cuffGasketGeo.rotateX(Math.PI / 2);
   const cuffGasket = new THREE.Mesh(cuffGasketGeo, materials.joint);
   cuffGasket.position.set(0, 0.0220, 0);
   distalElbowMount.add(cuffGasket);
 
   // Metallic reveal accent ring
-  const cuffBezelGeo = new THREE.TorusGeometry(0.0342, 0.0006, 6, 36);
+  const cuffBezelGeo = new THREE.TorusGeometry(0.0338, 0.0006, 6, 36);
   cuffBezelGeo.rotateX(Math.PI / 2);
   const cuffBezel = new THREE.Mesh(cuffBezelGeo, materials.metallic);
   cuffBezel.position.set(0, 0.0210, 0);
@@ -633,7 +633,7 @@ export function createUpperArm(
     const angle = (b / 8) * Math.PI * 2;
     const boltGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0016, 8);
     const bolt = new THREE.Mesh(boltGeo, materials.metallic);
-    bolt.position.set(Math.sin(angle) * 0.0320, 0.0140, Math.cos(angle) * 0.0320);
+    bolt.position.set(Math.sin(angle) * 0.0318, 0.0140, Math.cos(angle) * 0.0318);
     distalElbowMount.add(bolt);
   }
 
@@ -670,13 +670,13 @@ export function createUpperArm(
   // ==========================================================================
   const techBayGroup = new THREE.Group();
   techBayGroup.name = 'UpperArmStandardizedTechBay';
-  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.111m, z = 0.0363m
-  // With positive pitch rotation (+0.0492 rad / ~2.8°) matching the natural bicep surface slope
+  // Positioned flush along the true anterior mechanical centerline at x = 0, y = -0.1170m, z = 0.0366m
+  // With positive pitch rotation (+0.0430 rad / ~2.5°) matching the natural bicep surface slope
   const bayX = 0;
-  const bayZ = 0.0363;
-  const bayY = -0.111;
+  const bayZ = 0.0366;
+  const bayY = -0.1170;
   techBayGroup.position.set(bayX, bayY, bayZ);
-  techBayGroup.rotation.x = 0.0492;
+  techBayGroup.rotation.x = 0.0430;
   armorGroup.add(techBayGroup);
 
   // 1. Dark Titanium Recessed Tray / Cavity Housing
@@ -732,18 +732,18 @@ export function createUpperArm(
   }
 
   // 5. Engineered Parting Seam between inner and outer shells
-  const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.138, 0.0025);
+  const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.1500, 0.0025);
   const panelSeam = new THREE.Mesh(medSeamGeo, materials.joint);
   panelSeam.name = 'UpperArmPartingSeam';
-  panelSeam.position.set(-side * 0.024, -0.111, 0);
+  panelSeam.position.set(-side * 0.023, -0.1170, 0);
   armorGroup.add(panelSeam);
 
   // Helper function to evaluate exact anterior armor surface Z at Y
   function evalUpperArmZ(y: number): number {
     const yTop = -0.042;
-    const totalLength = 0.138;
+    const totalLength = 0.150;
     const v = (yTop - y) / totalLength;
-    let radius = 0.0392 - 0.0046 * v + 0.0030 * Math.sin(Math.pow(v, 0.72) * Math.PI);
+    let radius = 0.0386 - 0.0044 * v + 0.0024 * Math.sin(Math.pow(v, 0.72) * Math.PI);
     if (v < 0.10) {
       const tTop = (0.10 - v) / 0.10;
       radius -= tTop * 0.0008;
@@ -751,7 +751,7 @@ export function createUpperArm(
       const tBot = (v - 0.88) / 0.12;
       radius -= tBot * 0.0012;
     }
-    let rz = radius * 0.95;
+    let rz = radius * 0.98;
     rz -= (1.0 - 0.35) * 0.0020;
     return rz;
   }
@@ -807,7 +807,7 @@ export function createUpperArm(
   // 5b. Engineered Anterior Center Vertical Seam Segments (Precision-interlocking with tech bay)
   // Upper segment: bridges from proximal collar down to the top of tech bay bezel
   // Conforms 100% to 3D bicep surface curvature, terminating cleanly with 1.5mm collar margin and 1.0mm bezel margin
-  const antSeamUpperGeo = createConformingSeamGeo(-0.0435, -0.0905, 10);
+  const antSeamUpperGeo = createConformingSeamGeo(-0.0435, -0.0965, 10);
   const antSeamUpper = new THREE.Mesh(antSeamUpperGeo, materials.joint);
   antSeamUpper.name = 'UpperArmAnteriorCenterSeamUpper';
   antSeamUpper.castShadow = true;
@@ -815,7 +815,7 @@ export function createUpperArm(
 
   // Lower segment: bridges from bottom of tech bay bezel down to the distal clevis cuff
   // Conforms 100% to 3D bicep taper curvature, terminating cleanly with 1.0mm bezel margin and 1.5mm cuff gasket margin
-  const antSeamLowerGeo = createConformingSeamGeo(-0.1315, -0.1785, 10);
+  const antSeamLowerGeo = createConformingSeamGeo(-0.1375, -0.1905, 10);
   const antSeamLower = new THREE.Mesh(antSeamLowerGeo, materials.joint);
   antSeamLower.name = 'UpperArmAnteriorCenterSeamLower';
   antSeamLower.castShadow = true;
