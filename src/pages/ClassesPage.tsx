@@ -20,11 +20,11 @@ export const ClassesPage: React.FC = () => {
 
       {/* 1. HERO BANNER */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto text-center space-y-5 animate-fade-up">
-        <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.12]">
+        <h1 className="type-display text-white">
           Online & Offline <span className="cosmic-text-gradient">Class Ecosystem</span>
         </h1>
 
-        <p className="text-sm sm:text-base md:text-lg text-[#9b96b0] max-w-3xl mx-auto leading-relaxed font-normal">
+        <p className="type-lead text-[#9b96b0] max-w-3xl mx-auto font-normal">
           Accelerate your software engineering, cloud, and AI career through your preferred format. Choose between 100% live interactive online classes with 24/7 AI tutoring, or immersive in-person classroom labs with dual-monitor workstation rigs and desk-side mentors.
         </p>
 

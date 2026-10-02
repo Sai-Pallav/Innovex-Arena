@@ -94,13 +94,13 @@ export const LearningModesSection: React.FC = () => {
     <section id="classes" className="relative px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-16 sm:space-y-20">
       {/* 1. SECTION HEADER */}
       <div className="text-center space-y-3 max-w-3xl mx-auto">
-        <h2 className="font-rebond font-medium text-2xl sm:text-4xl lg:text-5xl text-white tracking-tight leading-tight">
+        <h2 className="type-heading-lg text-white">
           Master Tech Your Way: <br className="hidden sm:inline" />
           <span className="cosmic-text-gradient">
             Online, Offline Campus, or Hybrid
           </span>
         </h2>
-        <p className="text-xs sm:text-sm md:text-base text-[#9b96b0] leading-relaxed max-w-2xl mx-auto">
+        <p className="type-lead text-[#9b96b0] max-w-2xl mx-auto font-normal">
           Whether you learn from your home desk with global peers or code side-by-side with mentors in our physical campus labs, you get the exact same industry-grade syllabus, real-world capstones, and tier-1 hiring network.
         </p>
       </div>
@@ -186,7 +186,7 @@ export const LearningModesSection: React.FC = () => {
 
               {/* Title & Tagline */}
               <div>
-                <h3 className="font-rebond text-xl sm:text-2xl font-medium mb-1.5 transition-colors duration-200 min-h-[2rem] text-white group-hover:text-[#b7a4fb]">
+                <h3 className="type-heading-sm text-white group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1.5 min-h-[2rem]">
                   {mode.title}
                 </h3>
                 <p className="text-xs sm:text-sm text-[#b7a4fb] font-medium leading-snug min-h-[2.5rem]">
@@ -270,7 +270,7 @@ export const LearningModesSection: React.FC = () => {
                 <ShieldCheck className="w-4 h-4 text-[#b7a4fb]" />
                 Zero Compromise Standard
               </span>
-              <h3 className="font-rebond text-xl sm:text-2xl font-medium text-white tracking-tight">
+              <h3 className="type-heading-sm text-white">
                 Guaranteed In Every Mode Without Exception
               </h3>
             </div>
@@ -289,7 +289,7 @@ export const LearningModesSection: React.FC = () => {
                   <div className="text-xs font-medium text-[#b7a4fb] font-mono tracking-tight">
                     {pillar.metric}
                   </div>
-                  <h4 className="font-rebond text-sm font-medium text-white">
+                  <h4 className="type-card-title text-white">
                     {pillar.title}
                   </h4>
                   <p className="text-xs text-[#9b96b0] leading-relaxed">
@@ -306,7 +306,7 @@ export const LearningModesSection: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1">
-            <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
+            <h3 className="type-heading-sm text-white">
               Side-by-Side Mode Breakdown
             </h3>
             <p className="text-xs sm:text-sm text-[#9b96b0]">
@@ -402,7 +402,7 @@ export const LearningModesSection: React.FC = () => {
                 Interactive Self-Assessment
               </span>
             </div>
-            <h3 className="font-rebond text-xl sm:text-2xl font-medium text-white tracking-tight">
+            <h3 className="type-heading-sm text-white">
               Not Sure Which Format Fits You? Take the 10-Second Test
             </h3>
             <p className="text-xs sm:text-sm text-[#9b96b0] max-w-2xl">
@@ -476,7 +476,7 @@ export const LearningModesSection: React.FC = () => {
               <span className="inline-block px-3 py-0.5 rounded-full text-[10px] font-mono font-medium bg-white/[0.04] border border-white/[0.12] text-[#b7a4fb] shadow-[inset_0_-7px_11px_rgba(164,143,255,0.12)]">
                 {recommendation.badge}
               </span>
-              <h4 className="font-rebond text-base sm:text-lg font-medium text-white flex items-center gap-2">
+              <h4 className="type-card-title text-white flex items-center gap-2">
                 Your Best Fit: <span className="cosmic-text-gradient">{recommendation.mode}</span>
               </h4>
               <p className="text-xs text-[#9b96b0] max-w-xl">
@@ -501,7 +501,7 @@ export const LearningModesSection: React.FC = () => {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-1">
-            <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
+            <h3 className="type-heading-sm text-white">
               Our Physical Campus Innovation Labs
             </h3>
             <p className="text-xs sm:text-sm text-[#9b96b0]">
@@ -534,7 +534,7 @@ export const LearningModesSection: React.FC = () => {
                 </div>
 
                 <div>
-                  <h4 className="font-rebond text-lg font-medium text-white">
+                  <h4 className="type-card-title text-white">
                     {hub.city} — {hub.area}
                   </h4>
                   <p className="text-xs text-[#9b96b0] mt-1 leading-relaxed">
@@ -592,7 +592,7 @@ export const LearningModesSection: React.FC = () => {
       {/* 8. ALUMNI VOICES: ONLINE VS OFFLINE PERSPECTIVES */}
       <div className="space-y-6">
         <div className="text-center space-y-1.5">
-          <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
+          <h3 className="type-heading-sm text-white">
             How Students Excelled in Both Formats
           </h3>
           <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto">
@@ -616,11 +616,11 @@ export const LearningModesSection: React.FC = () => {
               </div>
 
               <div className="pt-3 border-t border-white/[0.06] flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.12] flex items-center justify-center font-rebond text-xs font-medium text-white shrink-0">
+                <div className="w-8 h-8 rounded-full bg-white/[0.06] border border-white/[0.12] flex items-center justify-center type-overline text-white shrink-0">
                   {item.avatarInitial}
                 </div>
                 <div>
-                  <h4 className="font-rebond text-xs font-medium text-white">{item.name}</h4>
+                  <h4 className="type-overline text-white">{item.name}</h4>
                   <p className="text-[10px] text-[#9b96b0]">{item.role}</p>
                 </div>
               </div>
@@ -632,7 +632,7 @@ export const LearningModesSection: React.FC = () => {
       {/* 9. FREQUENTLY ASKED QUESTIONS (FAQ ACCORDION) */}
       <div className="space-y-6 max-w-4xl mx-auto">
         <div className="text-center space-y-1.5">
-          <h3 className="font-rebond text-xl sm:text-3xl font-medium text-white tracking-tight">
+          <h3 className="type-heading-sm text-white">
             Frequently Asked Questions About Class Formats
           </h3>
           <p className="text-xs sm:text-sm text-[#9b96b0]">
@@ -688,7 +688,7 @@ export const LearningModesSection: React.FC = () => {
         <div className="aurora-divider-line absolute top-0 left-0 right-0" />
         <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
 
-        <h4 className="font-rebond text-lg sm:text-2xl font-medium text-white tracking-tight">
+        <h4 className="type-heading-sm text-white">
           Still Undecided? Talk 1-on-1 with our Academic Directors
         </h4>
         <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">

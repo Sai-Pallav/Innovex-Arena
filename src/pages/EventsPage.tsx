@@ -25,10 +25,10 @@ export const EventsPage: React.FC = () => {
 
       {/* 1. HERO */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-3 animate-fade-up">
-        <h1 className="font-rebond font-medium text-3xl sm:text-5xl tracking-tight text-white leading-tight">
+        <h1 className="type-display text-white">
           Events & <span className="cosmic-text-gradient">Programs</span>
         </h1>
-        <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
+        <p className="type-lead text-[#9b96b0] max-w-2xl mx-auto font-normal">
           Join our workshops, hackathons, and training programs to learn, build, and grow with the tech community.
         </p>
       </section>
@@ -55,10 +55,10 @@ export const EventsPage: React.FC = () => {
       {/* 3. UPCOMING EVENTS */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Upcoming <span className="cosmic-text-gradient">Events</span>
           </h2>
-          <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
+          <p className="type-body text-[#9b96b0] max-w-2xl mx-auto">
             Don&apos;t miss out on these exciting opportunities to learn and grow.
           </p>
         </div>
@@ -72,12 +72,12 @@ export const EventsPage: React.FC = () => {
             >
               <div className="flex-1 space-y-4">
                 {/* Title */}
-                <h3 className="font-rebond font-medium text-lg text-white group-hover:text-[#b7a4fb] transition-colors leading-tight">
+                <h3 className="type-card-title text-white group-hover:text-[#b7a4fb] transition-colors">
                   {evt.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-[#9b96b0] leading-relaxed line-clamp-2">
+                <p className="type-body-sm text-[#9b96b0] line-clamp-2">
                   {evt.description}
                 </p>
 
@@ -131,10 +131,10 @@ export const EventsPage: React.FC = () => {
       {/* 4. PAST EVENTS */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Past <span className="cosmic-text-gradient">Events</span>
           </h2>
-          <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
+          <p className="type-body text-[#9b96b0] max-w-2xl mx-auto">
             A look back at our successful events and programs.
           </p>
         </div>
@@ -144,7 +144,7 @@ export const EventsPage: React.FC = () => {
             <CyberCard key={i} glow="purple" className="p-5">
               <div className="space-y-3">
                 {/* Title */}
-                <h3 className="font-rebond text-base font-medium text-white leading-tight">
+                <h3 className="type-card-title text-white">
                   {evt.title}
                 </h3>
 
@@ -175,10 +175,10 @@ export const EventsPage: React.FC = () => {
           <div className="aurora-divider-line absolute top-0 left-0 right-0" />
           <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
 
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Want to <span className="cosmic-text-gradient">Host an Event?</span>
           </h2>
-          <p className="text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">
+          <p className="type-body text-[#9b96b0] max-w-xl mx-auto">
             Partner with us to bring workshops, hackathons, or training programs to your institution or organization.
           </p>
           <div className="pt-2">

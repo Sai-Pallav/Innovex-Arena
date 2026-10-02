@@ -51,13 +51,13 @@ export const BlueprintPage: React.FC = () => {
 
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white font-mono">
+              <h1 className="type-display font-mono text-white tracking-tight">
                 AAA Humanoid Robotic Arm <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400">
                   Mechanical Wireframe Reference
                 </span>
               </h1>
-              <p className="text-sm sm:text-base text-slate-400 font-sans leading-relaxed">
+              <p className="type-lead text-slate-400 font-sans">
                 Production-ready technical engineering blueprint from shoulder to fingertips for humanoid robotics
                 manufacturing, precision 3D hard-surface Blender modeling, and WebGL Three.js implementation.
                 Benchmarked against Tesla Optimus Gen 2, Apple Robotics, and Figure 02 aerospace architectures.
@@ -69,7 +69,7 @@ export const BlueprintPage: React.FC = () => {
               <a
                 href="/blueprints/aaa_robot_arm_blueprint_9panels.jpg"
                 download="INX-R9-AAA-ROBOTIC-ARM-BLUEPRINT-16K.jpg"
-                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 font-bold text-xs sm:text-sm rounded-lg shadow-[0_0_25px_rgba(0,240,255,0.3)] transition-all font-mono"
+                className="flex items-center space-x-2 px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-slate-950 type-button font-medium rounded-lg shadow-[0_0_25px_rgba(0,240,255,0.3)] transition-all font-mono"
               >
                 <Download className="w-4 h-4" />
                 <span>Export 16K Blueprint</span>
@@ -78,7 +78,7 @@ export const BlueprintPage: React.FC = () => {
                 href="/ROBOTIC_ARM_BLUEPRINT_SPEC.md"
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center space-x-2 px-4 py-2.5 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 font-semibold text-xs sm:text-sm rounded-lg transition-all font-mono"
+                className="flex items-center space-x-2 px-4 py-2.5 bg-slate-900/80 hover:bg-slate-800 border border-cyan-500/30 hover:border-cyan-400 text-cyan-300 type-button font-medium rounded-lg transition-all font-mono"
               >
                 <FileText className="w-4 h-4" />
                 <span>View Full CAD Spec</span>
@@ -126,7 +126,7 @@ export const BlueprintPage: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Crosshair className="w-5 h-5 text-cyan-400" />
-              <h2 className="text-lg font-bold text-white font-mono uppercase tracking-wider">
+              <h2 className="type-heading font-medium text-white font-mono uppercase tracking-wider">
                 Interactive 9-Panel CAD Engineering Board
               </h2>
             </div>
@@ -146,7 +146,7 @@ export const BlueprintPage: React.FC = () => {
               <div className="flex items-center justify-between border-b border-cyan-500/20 pb-3">
                 <div className="flex items-center space-x-2">
                   <Zap className="w-5 h-5 text-cyan-400" />
-                  <h3 className="text-base font-bold text-white font-mono uppercase">
+                  <h3 className="type-card-title font-medium text-white font-mono uppercase">
                     Joint Kinematic & Actuator Allocation Matrix
                   </h3>
                 </div>
@@ -230,7 +230,7 @@ export const BlueprintPage: React.FC = () => {
             <div className="bg-[#050B18] border border-cyan-500/30 rounded-xl p-6 space-y-4">
               <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3">
                 <Sliders className="w-5 h-5 text-teal-400" />
-                <h3 className="text-base font-bold text-white font-mono uppercase">
+                <h3 className="type-card-title font-medium text-white font-mono uppercase">
                   Blender 3D Modeling & Quad Topology Protocol
                 </h3>
               </div>
@@ -273,7 +273,7 @@ export const BlueprintPage: React.FC = () => {
             <div className="bg-[#050B18] border border-cyan-500/30 rounded-xl p-6 space-y-4">
               <div className="flex items-center space-x-2 border-b border-cyan-500/20 pb-3">
                 <Shield className="w-5 h-5 text-indigo-400" />
-                <h3 className="text-base font-bold text-white font-mono uppercase">
+                <h3 className="type-card-title font-medium text-white font-mono uppercase">
                   Manufacturing Materials Stack
                 </h3>
               </div>

@@ -43,11 +43,11 @@ export const Dialog: React.FC<DialogProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between mb-5">
           <div>
-            <h3 className="font-rebond text-lg font-bold text-white tracking-tight">
+            <h3 className="type-heading-sm text-white">
               {title}
             </h3>
             {description && (
-              <p className="text-xs text-[#9b96b0] mt-1 leading-relaxed">
+              <p className="type-body-sm text-[#9b96b0] mt-1">
                 {description}
               </p>
             )}

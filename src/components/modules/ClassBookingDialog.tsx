@@ -117,7 +117,7 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
         </div>
 
         {/* Highlights banner based on selected type */}
-        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs text-slate-300 flex items-start gap-2.5">
+        <div className="p-3 rounded-xl bg-white/[0.02] border border-white/[0.06] type-body-sm text-slate-300 flex items-start gap-2.5">
           {bookingType === 'online-demo' ? (
             <>
               <Laptop className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
@@ -137,14 +137,14 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           {/* Track Selection */}
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">
-              Interested Technology Track
+          <div className="space-y-1.5">
+            <label className="block type-overline text-[#9b96b0]">
+              Interested Technology Track <span className="text-[#b7a4fb] font-medium">*</span>
             </label>
             <select
               value={formData.track}
               onChange={(e) => setFormData({ ...formData, track: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.1] text-foreground focus:outline-none focus:border-cyan-400 transition-colors"
+              className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-white type-body-sm focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 transition-colors cursor-pointer"
               required
             >
               <option value="Generative AI & LLM Systems" className="bg-[#0b101d] text-white">
@@ -167,14 +167,14 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
 
           {/* Campus Location (Only if campus tour) */}
           {bookingType === 'campus-tour' && (
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
-                Select Campus Hub
+            <div className="space-y-1.5">
+              <label className="block type-overline text-[#9b96b0]">
+                Select Campus Hub <span className="text-[#b7a4fb] font-medium">*</span>
               </label>
               <select
                 value={formData.campusCity}
                 onChange={(e) => setFormData({ ...formData, campusCity: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.1] text-foreground focus:outline-none focus:border-purple-400 transition-colors"
+                className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-white type-body-sm focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 transition-colors cursor-pointer"
                 required
               >
                 {CAMPUS_HUBS.map((hub) => (
@@ -213,14 +213,14 @@ export const ClassBookingDialog: React.FC<ClassBookingDialogProps> = ({
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               required
             />
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">
+            <div className="space-y-1.5">
+              <label className="block type-overline text-[#9b96b0]">
                 Preferred Slot
               </label>
               <select
                 value={formData.timeSlot}
                 onChange={(e) => setFormData({ ...formData, timeSlot: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-lg bg-white/[0.04] border border-white/[0.1] text-foreground focus:outline-none focus:border-cyan-400 transition-colors"
+                className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-white type-body-sm focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 transition-colors cursor-pointer"
               >
                 <option value="11:00 AM - 12:30 PM (Morning Slot)" className="bg-[#0b101d] text-white">
                   Morning (11:00 AM - 12:30 PM)

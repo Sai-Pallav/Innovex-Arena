@@ -39,7 +39,7 @@ export const AdminLoginPage: React.FC = () => {
       <div className="w-full max-w-md space-y-5 animate-fade-up relative z-10">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-[#9b96b0] hover:text-[#ba9cff] transition-colors group"
+          className="inline-flex items-center gap-2 type-overline text-[#9b96b0] hover:text-[#ba9cff] transition-colors group"
         >
           <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-1" /> Back to Home
         </Link>
@@ -56,10 +56,10 @@ export const AdminLoginPage: React.FC = () => {
             <div className="w-12 h-12 mx-auto rounded-full bg-[#713dff]/15 border border-[#713dff]/30 flex items-center justify-center text-[#ba9cff] mb-2 shadow-[0_0_20px_rgba(113,61,255,0.3)]">
               <Shield className="w-5 h-5" />
             </div>
-            <h2 className="font-rebond font-medium text-xl sm:text-2xl text-white tracking-tight">
+            <h2 className="type-heading-sm text-white">
               {isModeSignUp ? 'Request Admin Access' : 'Admin Sign In'}
             </h2>
-            <p className="text-xs text-[#9b96b0] leading-relaxed max-w-xs mx-auto">
+            <p className="type-body-sm text-[#9b96b0] max-w-xs mx-auto">
               Access the management console for hackathons, positions, and platform inquiries.
             </p>
           </div>
@@ -75,7 +75,7 @@ export const AdminLoginPage: React.FC = () => {
             />
 
             <div className="space-y-1.5 relative">
-              <label className="block text-xs font-medium uppercase tracking-wider text-[#9b96b0]">
+              <label className="block type-overline text-[#9b96b0]">
                 Password <span className="text-[#e59cff]">*</span>
               </label>
               <div className="relative">

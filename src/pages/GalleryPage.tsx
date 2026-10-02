@@ -35,10 +35,10 @@ export const GalleryPage: React.FC = () => {
 
       {/* 1. HERO */}
       <section className="relative px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
-        <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
+        <h1 className="type-display text-white">
           Our <span className="cosmic-text-gradient">Gallery</span>
         </h1>
-        <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
+        <p className="type-lead text-[#9b96b0] max-w-2xl mx-auto font-normal">
           Explore moments from our workshops, hackathons, and events. See the innovation and creativity in action.
         </p>
       </section>
@@ -86,10 +86,10 @@ export const GalleryPage: React.FC = () => {
                   </span>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-5 space-y-1.5">
-                  <h3 className="font-rebond font-medium text-base text-white group-hover:text-[#ba9cff] transition-colors">
+                  <h3 className="type-card-title text-white group-hover:text-[#ba9cff] transition-colors">
                     {item.title}
                   </h3>
-                  <p className="text-xs text-[#9b96b0] line-clamp-2">
+                  <p className="type-body-sm text-[#9b96b0] line-clamp-2">
                     {item.description}
                   </p>
                 </div>
@@ -144,10 +144,10 @@ export const GalleryPage: React.FC = () => {
                   </button>
                 </div>
               </div>
-              <h2 className="font-rebond font-medium text-xl sm:text-2xl text-white">
+              <h2 className="type-heading-sm text-white">
                 {selectedItem.title}
               </h2>
-              <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed">
+              <p className="type-body text-[#9b96b0]">
                 {selectedItem.description}
               </p>
             </div>

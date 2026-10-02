@@ -3,6 +3,77 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    /* ==========================================================================
+       CORE TYPOGRAPHY TOKEN SYSTEM — SINGLE SOURCE OF TRUTH
+       ========================================================================== */
+
+    /* Font Families */
+    --font-display: 'Sora', 'Plus Jakarta Sans', -apple-system, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Font Weights */
+    --font-weight-regular: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    /* Fluid Responsive Font Scales (Continuous clamp from 360px mobile to 1440px desktop) */
+    --text-display: clamp(2.25rem, 4.5vw + 0.75rem, 4.25rem);       /* 36px -> 68px */
+    --text-heading-lg: clamp(1.85rem, 3vw + 0.8rem, 3.25rem);       /* 30px -> 52px */
+    --text-heading: clamp(1.5rem, 2vw + 0.75rem, 2.25rem);          /* 24px -> 36px */
+    --text-heading-sm: clamp(1.2rem, 1.2vw + 0.75rem, 1.625rem);    /* 19px -> 26px */
+    --text-card-title: clamp(1.0625rem, 0.4vw + 0.875rem, 1.25rem); /* 17px -> 20px */
+    --text-lead: clamp(1rem, 0.35vw + 0.875rem, 1.125rem);          /* 16px -> 18px */
+    --text-body: 0.9375rem;                                         /* 15px */
+    --text-body-sm: 0.875rem;                                       /* 14px */
+    --text-caption: 0.75rem;                                        /* 12px */
+    --text-overline: 0.6875rem;                                     /* 11px */
+
+    /* Line Heights */
+    --leading-display: 1.12;
+    --leading-heading-lg: 1.18;
+    --leading-heading: 1.22;
+    --leading-heading-sm: 1.32;
+    --leading-card-title: 1.35;
+    --leading-lead: 1.6;
+    --leading-body: 1.65;
+    --leading-body-sm: 1.55;
+    --leading-caption: 1.4;
+
+    /* Letter Spacings */
+    --tracking-display: -0.035em;
+    --tracking-heading-lg: -0.03em;
+    --tracking-heading: -0.025em;
+    --tracking-heading-sm: -0.015em;
+    --tracking-card-title: -0.012em;
+    --tracking-lead: -0.01em;
+    --tracking-body: -0.005em;
+    --tracking-caption: 0.01em;
+    --tracking-overline: 0.08em;
+
+    /* Design Tokens — Colors */
+    --color-void-canvas: #030014;
+    --color-midnight-surface: #060317;
+    --color-deep-indigo: #10093a;
+    --color-night-violet: #0a0118;
+    --color-lilac-white: #f4f0ff;
+    --color-pearl: #ffffff;
+    --color-ash: #a8a6b7;
+    --color-ash-lilac: #9b96b0;
+    --color-fog: #918ea0;
+    --color-dim-fog: #85808c;
+    --color-steel: #54525f;
+    --color-mercury: #cdccd0;
+    --color-dusk: #72707b;
+    --color-lavender-accent: #9382ff;
+    --color-iris: #5046e4;
+    --color-ultraviolet-core: #713dff;
+    --color-lilac-beam: #b7a4fb;
+    --color-horizon-glow: #8562ff;
+  }
+
   html {
     scroll-behavior: smooth;
     color-scheme: dark;
@@ -12,7 +83,7 @@
   body {
     background-color: #060212;
     color: #f4f0ff;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: var(--font-body);
     overflow-x: hidden;
     selection-background-color: rgba(113, 61, 255, 0.3);
   }
@@ -293,7 +364,122 @@
   /* Display Typography (Reflect AeonikPro / Wope Rebond Grotesque / Sora) */
   .font-rebond,
   .font-aeonik {
-    font-family: 'Sora', 'Plus Jakarta Sans', -apple-system, sans-serif;
+    font-family: var(--font-display);
+  }
+
+  /* ==========================================================================
+     UNIFIED SEMANTIC TYPOGRAPHY SYSTEM ROLES
+     ========================================================================== */
+
+  .type-display {
+    font-family: var(--font-display);
+    font-size: var(--text-display);
+    line-height: var(--leading-display);
+    letter-spacing: var(--tracking-display);
+    font-weight: 500;
+  }
+
+  .type-heading-lg {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-lg);
+    line-height: var(--leading-heading-lg);
+    letter-spacing: var(--tracking-heading-lg);
+    font-weight: 500;
+  }
+
+  .type-heading {
+    font-family: var(--font-display);
+    font-size: var(--text-heading);
+    line-height: var(--leading-heading);
+    letter-spacing: var(--tracking-heading);
+    font-weight: 500;
+  }
+
+  .type-heading-sm {
+    font-family: var(--font-display);
+    font-size: var(--text-heading-sm);
+    line-height: var(--leading-heading-sm);
+    letter-spacing: var(--tracking-heading-sm);
+    font-weight: 500;
+  }
+
+  .type-card-title {
+    font-family: var(--font-display);
+    font-size: var(--text-card-title);
+    line-height: var(--leading-card-title);
+    letter-spacing: var(--tracking-card-title);
+    font-weight: 500;
+  }
+
+  .type-lead {
+    font-family: var(--font-body);
+    font-size: var(--text-lead);
+    line-height: var(--leading-lead);
+    letter-spacing: var(--tracking-lead);
+    font-weight: 400;
+  }
+
+  .type-body {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: var(--leading-body);
+    letter-spacing: var(--tracking-body);
+    font-weight: 400;
+  }
+
+  .type-body-sm {
+    font-family: var(--font-body);
+    font-size: var(--text-body-sm);
+    line-height: var(--leading-body-sm);
+    letter-spacing: normal;
+    font-weight: 400;
+  }
+
+  .type-caption {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    line-height: var(--leading-caption);
+    letter-spacing: var(--tracking-caption);
+    font-weight: 400;
+  }
+
+  .type-overline {
+    font-family: var(--font-display);
+    font-size: var(--text-overline);
+    line-height: 1.25;
+    letter-spacing: var(--tracking-overline);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  .type-badge {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    line-height: var(--leading-caption);
+    letter-spacing: var(--tracking-caption);
+    font-weight: 500;
+  }
+
+  .type-button {
+    font-family: var(--font-body);
+    font-size: var(--text-body-sm);
+    line-height: 1;
+    font-weight: 500;
+  }
+
+  .type-stat-number {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 2vw + 1rem, 2.5rem);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+  }
+
+  .type-stat-label {
+    font-family: var(--font-body);
+    font-size: var(--text-caption);
+    line-height: var(--leading-caption);
+    font-weight: 400;
   }
 
   /* Reflect Notes Cosmic Accent Gradient Text (Pink to Violet to Blue) */

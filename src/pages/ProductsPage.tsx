@@ -27,10 +27,10 @@ export const ProductsPage: React.FC = () => {
 
       {/* 1. HERO */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
-        <h1 className="font-rebond font-medium text-3xl sm:text-5xl tracking-tight text-white leading-[1.15]">
+        <h1 className="type-display text-white">
           Our <span className="cosmic-text-gradient">Products</span>
         </h1>
-        <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
+        <p className="type-lead text-[#9b96b0] max-w-2xl mx-auto font-normal">
           Explore the innovative solutions we&apos;ve built using AI, cloud computing, and emerging technologies.
         </p>
       </section>
@@ -87,7 +87,7 @@ export const ProductsPage: React.FC = () => {
                 </div>
 
                 <div className="mb-3">
-                  <h3 className="font-rebond font-medium text-xl sm:text-2xl text-white group-hover:text-[#b7a4fb] transition-colors tracking-tight">
+                  <h3 className="type-heading-sm text-white group-hover:text-[#b7a4fb] transition-colors">
                     {product.name}
                   </h3>
                   <p className="text-xs font-mono text-[#b7a4fb]/90 mt-1 uppercase tracking-wider font-medium">
@@ -95,13 +95,13 @@ export const ProductsPage: React.FC = () => {
                   </p>
                 </div>
 
-                <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed mb-4">
+                <p className="type-body-sm text-[#9b96b0] mb-4">
                   {product.description}
                 </p>
 
                 {/* Features List */}
                 <div className="space-y-2 pt-3 border-t border-white/[0.06] mb-4">
-                  <h4 className="text-xs font-medium uppercase tracking-wider text-white flex items-center gap-2">
+                  <h4 className="type-overline text-white flex items-center gap-2">
                     <Layers className="w-3.5 h-3.5 text-[#b7a4fb]" /> Key Capabilities
                   </h4>
                   <ul className="space-y-1.5">
@@ -116,7 +116,7 @@ export const ProductsPage: React.FC = () => {
 
                 {/* Tech Stack Badges - 999px Pills */}
                 <div className="space-y-2 pt-3 border-t border-white/[0.06]">
-                  <h4 className="text-xs font-medium uppercase tracking-wider text-white flex items-center gap-2">
+                  <h4 className="type-overline text-white flex items-center gap-2">
                     <Code2 className="w-3.5 h-3.5 text-[#b7a4fb]" /> Technologies
                   </h4>
                   <div className="flex flex-wrap gap-1.5 pt-1">
@@ -154,10 +154,10 @@ export const ProductsPage: React.FC = () => {
           <div className="aurora-divider-line absolute top-0 left-0 right-0" />
           <div className="absolute bottom-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-[#9382ff]/50 to-transparent pointer-events-none" />
 
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Have a <span className="cosmic-text-gradient">Project Idea?</span>
           </h2>
-          <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto leading-relaxed">
+          <p className="type-body text-[#9b96b0] max-w-xl mx-auto">
             Let&apos;s collaborate and build something amazing together. We&apos;re always looking for innovative projects to work on.
           </p>
           <div className="pt-2">

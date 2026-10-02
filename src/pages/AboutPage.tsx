@@ -180,7 +180,7 @@ export const AboutPage: React.FC = () => {
         className="relative z-10 pt-32 pb-20 md:pt-40 md:pb-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto text-center flex flex-col items-center"
       >
         {/* Display Headline — AeonikPro / Sora 500 (Deliberately medium, not bold) */}
-        <h1 className="font-aeonik font-medium text-4xl sm:text-6xl lg:text-7xl tracking-[-0.035em] text-[#f4f0ff] leading-[1.12] max-w-4xl mx-auto mb-6">
+        <h1 className="type-display text-[#f4f0ff] max-w-4xl mx-auto mb-6">
           Architecting Intelligence for{' '}
           <span className="cosmic-text-gradient font-medium">
             Next-Gen Creators
@@ -188,7 +188,7 @@ export const AboutPage: React.FC = () => {
         </h1>
 
         {/* Editorial Subtitle — Inter V 400 at 18px, #a8a6b7 */}
-        <p className="text-base sm:text-lg text-[#a8a6b7] max-w-2xl mx-auto font-normal leading-[1.56] mb-10">
+        <p className="type-lead text-[#a8a6b7] max-w-2xl mx-auto mb-10">
           We are a technology incubator building AI systems, cloud-native architectures, and immersive engineering cohorts designed to turn ambitious developers into world-class builders.
         </p>
 
@@ -211,10 +211,10 @@ export const AboutPage: React.FC = () => {
               key={i}
               className="rounded-[16px] bg-[#060317] border border-white/[0.06] shadow-[inset_0_0_24px_rgba(255,255,255,0.04),0_4px_24px_rgba(0,0,0,0.45)] py-6 px-4 text-center space-y-1 group hover:border-[#b7a4fb]/35 hover:shadow-[inset_0_0_22px_rgba(183,164,251,0.07),0_8px_28px_rgba(0,0,0,0.55),0_0_20px_rgba(113,61,255,0.11)] hover:-translate-y-1 transition-[border-color,box-shadow,transform] duration-200 ease-out"
             >
-              <div className="font-aeonik font-medium text-3xl sm:text-4xl text-[#f4f0ff] tracking-tight inline-block">
+              <div className="type-stat-number text-[#f4f0ff] inline-block">
                 <AnimatedCounter value={stat.value} duration={2000} delay={i * 80} />
               </div>
-              <div className="text-xs text-[#a8a6b7] font-normal tracking-normal">
+              <div className="type-stat-label text-[#a8a6b7]">
                 {stat.label}
               </div>
             </div>
@@ -230,10 +230,10 @@ export const AboutPage: React.FC = () => {
       {/* 2. VISION & MISSION SECTION */}
       <section id="vision-mission" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+          <h2 className="type-heading-lg text-[#f4f0ff]">
             Vision & Mission
           </h2>
-          <p className="text-base text-[#918ea0] max-w-xl mx-auto font-normal leading-relaxed">
+          <p className="type-body text-[#918ea0] max-w-xl mx-auto">
             Pioneering technology innovation and empowering the next generation of engineers through experiential building.
           </p>
         </div>
@@ -255,11 +255,11 @@ export const AboutPage: React.FC = () => {
                   <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     <Eye className="w-5 h-5 stroke-[1.5]" />
                   </div>
-                  <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
+                  <h3 className="type-card-title text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
                     {VISION_MISSION.vision.title}
                   </h3>
                 </div>
-                <p className="text-sm sm:text-base text-[#a8a6b7] leading-relaxed font-normal">
+                <p className="type-body-sm text-[#a8a6b7]">
                   {VISION_MISSION.vision.description}
                 </p>
               </div>
@@ -282,7 +282,7 @@ export const AboutPage: React.FC = () => {
                   <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#9382ff] shrink-0 group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     <Target className="w-5 h-5 stroke-[1.5]" />
                   </div>
-                  <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
+                  <h3 className="type-card-title text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
                     {VISION_MISSION.mission.title}
                   </h3>
                 </div>
@@ -308,10 +308,10 @@ export const AboutPage: React.FC = () => {
       {/* 3. CORE PILLARS & SERVICES (REFLECT NOTES MINIMAL FEATURE SPEC) */}
       <section id="services" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+          <h2 className="type-heading-lg text-[#f4f0ff]">
             What We Engineer & Deliver
           </h2>
-          <p className="text-base text-[#918ea0] max-w-xl mx-auto font-normal leading-relaxed">
+          <p className="type-body text-[#918ea0] max-w-xl mx-auto">
             Full-spectrum software infrastructure, practical developer education, and real-world incubation.
           </p>
         </div>
@@ -336,10 +336,10 @@ export const AboutPage: React.FC = () => {
                   <div className="w-10 h-10 rounded-[5px] bg-white/[0.04] border border-white/[0.12] flex items-center justify-center text-[#b7a4fb] group-hover:scale-105 group-hover:border-[#9382ff]/60 group-hover:shadow-[0_0_16px_rgba(147,130,255,0.25)] transition-[transform,border-color,box-shadow] duration-150 ease-out">
                     {getServiceIcon(srv.iconName)}
                   </div>
-                  <h3 className="font-aeonik text-lg sm:text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 leading-snug">
+                  <h3 className="type-card-title text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200">
                     {srv.title}
                   </h3>
-                  <p className="text-sm text-[#a8a6b7] leading-relaxed font-normal">
+                  <p className="type-body-sm text-[#a8a6b7]">
                     {srv.description}
                   </p>
                 </div>
@@ -367,7 +367,7 @@ export const AboutPage: React.FC = () => {
       <section id="products" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+            <h2 className="type-heading-lg text-[#f4f0ff]">
               Innovation Labs Products
             </h2>
             <p className="text-base text-[#918ea0] max-w-xl font-normal leading-relaxed">
@@ -401,7 +401,7 @@ export const AboutPage: React.FC = () => {
                     <span className="text-xs font-mono text-[#918ea0]">{prod.category}</span>
                   </div>
 
-                  <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors">
+                  <h3 className="type-card-title text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors">
                     {prod.name}
                   </h3>
                   <p className="text-xs text-[#b7a4fb] font-medium leading-snug">
@@ -448,7 +448,7 @@ export const AboutPage: React.FC = () => {
       <section id="classes" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+            <h2 className="type-heading-lg text-[#f4f0ff]">
               Online & Campus Cohorts
             </h2>
             <p className="text-base text-[#918ea0] max-w-xl font-normal leading-relaxed">
@@ -482,7 +482,7 @@ export const AboutPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1">
+                    <h3 className="type-card-title text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 mb-1">
                       {mode.title}
                     </h3>
                     <p className="text-xs text-[#b7a4fb] font-medium">
@@ -532,7 +532,7 @@ export const AboutPage: React.FC = () => {
       <section id="events" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div className="space-y-2">
-            <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+            <h2 className="type-heading-lg text-[#f4f0ff]">
               Upcoming Hackathons & Talks
             </h2>
             <p className="text-base text-[#918ea0] max-w-xl font-normal leading-relaxed">
@@ -566,7 +566,7 @@ export const AboutPage: React.FC = () => {
                     <span className="text-xs font-mono text-[#918ea0]">{evt.mode}</span>
                   </div>
 
-                  <h3 className="font-aeonik text-xl font-medium text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 line-clamp-2">
+                  <h3 className="type-card-title text-[#f4f0ff] group-hover:text-[#b7a4fb] transition-colors duration-200 line-clamp-2">
                     {evt.title}
                   </h3>
 
@@ -613,10 +613,10 @@ export const AboutPage: React.FC = () => {
       {/* 7. CAREERS & OPPORTUNITIES */}
       <section id="careers-internships" className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+          <h2 className="type-heading-lg text-[#f4f0ff]">
             Build Your Career With Us
           </h2>
-          <p className="text-base text-[#918ea0] max-w-xl mx-auto font-normal leading-relaxed">
+          <p className="type-body text-[#918ea0] max-w-xl mx-auto">
             Work on real-world AI systems, gain guidance from senior architects, and launch your engineering trajectory.
           </p>
         </div>
@@ -668,7 +668,7 @@ export const AboutPage: React.FC = () => {
                     <Briefcase className="w-5 h-5 stroke-[1.5]" />
                   </div>
                   <div>
-                    <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff]">
+                    <h3 className="type-card-title text-[#f4f0ff]">
                       Open Positions
                     </h3>
                     <p className="text-xs text-[#918ea0] font-normal">
@@ -723,7 +723,7 @@ export const AboutPage: React.FC = () => {
                     <Rocket className="w-5 h-5 stroke-[1.5]" />
                   </div>
                   <div>
-                    <h3 className="font-aeonik text-xl sm:text-2xl font-medium text-[#f4f0ff]">
+                    <h3 className="type-card-title text-[#f4f0ff]">
                       Available Internships
                     </h3>
                     <p className="text-xs text-[#918ea0] font-normal">
@@ -781,10 +781,10 @@ export const AboutPage: React.FC = () => {
       {/* 8. COMMUNITY TESTIMONIALS (REFLECT CARD SPEC) */}
       <section className="relative z-10 py-24 px-4 sm:px-6 lg:px-8 max-w-[1248px] mx-auto space-y-14">
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em]">
+          <h2 className="type-heading-lg text-[#f4f0ff]">
             Voices from the Ecosystem
           </h2>
-          <p className="text-base text-[#918ea0] max-w-xl mx-auto font-normal leading-relaxed">
+          <p className="type-body text-[#918ea0] max-w-xl mx-auto">
             Real feedback from graduates, hackathon participants, and partner college directors.
           </p>
         </div>
@@ -803,7 +803,7 @@ export const AboutPage: React.FC = () => {
       {/* 9. NEWSLETTER SUBSCRIPTION (REFLECT SPEC) */}
       <section className="relative z-10 py-20 px-4 sm:px-6 lg:px-8 max-w-3xl mx-auto text-center space-y-6">
         <div className="space-y-3">
-          <h2 className="font-aeonik font-medium text-3xl sm:text-4xl text-[#f4f0ff] tracking-[-0.03em]">
+          <h2 className="type-heading-lg text-[#f4f0ff]">
             Stay Connected with Tech Insights
           </h2>
           <p className="text-sm sm:text-base text-[#a8a6b7] max-w-lg mx-auto font-normal leading-relaxed">
@@ -847,7 +847,7 @@ export const AboutPage: React.FC = () => {
           />
 
           <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-            <h2 className="font-aeonik font-medium text-3xl sm:text-5xl text-[#f4f0ff] tracking-[-0.03em] leading-tight">
+            <h2 className="type-heading-lg text-[#f4f0ff] leading-tight">
               Ready to construct your future with{' '}
               <span className="cosmic-text-gradient font-medium">Innovex Arena</span>?
             </h2>

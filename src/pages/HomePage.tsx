@@ -113,13 +113,13 @@ export const HomePage: React.FC = () => {
           {/* ------------------------------------------------------------------- */}
           <div className="w-full lg:max-w-[48%] xl:max-w-[46%] 2xl:max-w-[45%] flex flex-col items-start text-left z-20 relative space-y-2.5 sm:space-y-3.5 xl:space-y-4 my-auto">
             {/* 1. About Innovex Arena Pill Badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.1] text-xs font-medium text-[#c4b5fd] shadow-[0_0_15px_rgba(139,92,246,0.12)]">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/[0.1] type-badge text-[#c4b5fd] shadow-[0_0_15px_rgba(139,92,246,0.12)]">
               <Sparkles className="w-3.5 h-3.5 text-[#b7a4fb]" />
               <span>About Innovex Arena</span>
             </div>
 
             {/* 2. Primary Headline (Dominant, Balanced, Crisp Line Measure) */}
-            <h1 className="font-aeonik font-bold text-3xl sm:text-4xl lg:text-5xl xl:text-[3.35rem] 2xl:text-[3.65rem] tracking-[-0.035em] text-white leading-[1.10]">
+            <h1 className="type-display text-white">
               Fueling the Future of{' '}
               <br className="hidden sm:inline" />
               <span className="bg-gradient-to-r from-[#c084fc] via-[#a855f7] to-[#60a5fa] bg-clip-text text-transparent">
@@ -128,23 +128,23 @@ export const HomePage: React.FC = () => {
             </h1>
 
             {/* 3. Subheading Tagline */}
-            <h2 className="text-sm sm:text-base font-medium text-[#c4b5fd]/90 tracking-tight">
+            <h2 className="type-heading-sm text-[#c4b5fd]/90">
               Fueling the Future of Creators
             </h2>
 
             {/* 4. Supporting Description (Readable, Tighter Editorial Width) */}
-            <p className="text-xs sm:text-sm lg:text-[14.5px] text-[#9b96b0] leading-[1.65] max-w-lg lg:max-w-[430px] xl:max-w-[470px] font-normal">
+            <p className="type-body text-[#9b96b0] max-w-lg lg:max-w-[430px] xl:max-w-[470px]">
               A tech-driven startup building AI-based products, cloud solutions, and empowering the next generation through workshops, hackathons, and training programs.
             </p>
 
             {/* 5. Specialization Pill (Clean Transition, No Trailing Pipe Cursor - Priority 11) */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#09041a]/95 border border-violet-500/25 text-xs sm:text-sm text-zinc-300 shadow-[0_4px_18px_rgba(0,0,0,0.4)]">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#09041a]/95 border border-violet-500/25 text-zinc-300 shadow-[0_4px_18px_rgba(0,0,0,0.4)]">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-60" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
               </span>
-              <span className="text-[#9b96b0] font-normal text-xs">Specialized in:</span>
-              <span className="font-semibold text-white text-xs sm:text-sm transition-colors duration-200">
+              <span className="text-[#9b96b0] font-normal type-caption">Specialized in:</span>
+              <span className="font-medium text-white type-body-sm transition-colors duration-200">
                 {SPECIALIZATIONS[specializationIndex]}
               </span>
             </div>
@@ -152,18 +152,18 @@ export const HomePage: React.FC = () => {
             {/* 6. Action CTA Buttons Group (Priority 12 Hierarchy) */}
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 pt-1.5">
               <Link to="/services">
-                <button className="px-6 py-2.5 sm:py-3 rounded-full bg-white text-[#060212] font-semibold text-xs sm:text-sm hover:bg-[#f4f0ff] transition-[background-color,box-shadow,transform] duration-200 flex items-center gap-2 shadow-[0_0_24px_rgba(255,255,255,0.22),0_4px_16px_rgba(0,0,0,0.4)] hover:shadow-[0_0_36px_rgba(255,255,255,0.38)] active:scale-[0.98] cursor-pointer group">
+                <button className="px-6 py-2.5 sm:py-3 rounded-full bg-white text-[#060212] font-medium type-button hover:bg-[#f4f0ff] transition-[background-color,box-shadow,transform] duration-200 flex items-center gap-2 shadow-[0_0_24px_rgba(255,255,255,0.22),0_4px_16px_rgba(0,0,0,0.4)] hover:shadow-[0_0_36px_rgba(255,255,255,0.38)] active:scale-[0.98] cursor-pointer group">
                   <span>Explore Services</span>
                   <ArrowRight className="w-4 h-4 text-[#060212] group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
               <Link to="/events">
-                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-colors duration-200 active:scale-[0.98] cursor-pointer">
+                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium type-button transition-colors duration-200 active:scale-[0.98] cursor-pointer">
                   View Events
                 </button>
               </Link>
               <Link to="/classes">
-                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium text-xs sm:text-sm transition-colors duration-200 active:scale-[0.98] cursor-pointer">
+                <button className="px-5 py-2.5 sm:py-3 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-[#d4c8ff] hover:text-white border border-white/[0.10] hover:border-violet-400/35 font-medium type-button transition-colors duration-200 active:scale-[0.98] cursor-pointer">
                   Explore Classes
                 </button>
               </Link>
@@ -211,10 +211,10 @@ export const HomePage: React.FC = () => {
                 
                 <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-b from-violet-600/08 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
                 
-                <div className="text-xl sm:text-2xl lg:text-[1.85rem] xl:text-[2.1rem] font-bold font-aeonik text-white tracking-tight leading-none">
+                <div className="type-stat-number text-white inline-block">
                   <AnimatedCounter value={stat.value} />
                 </div>
-                <div className="text-[11px] sm:text-xs text-[#9b96b0] font-medium mt-1">
+                <div className="type-stat-label text-[#9b96b0] mt-1">
                   {stat.label}
                 </div>
               </div>

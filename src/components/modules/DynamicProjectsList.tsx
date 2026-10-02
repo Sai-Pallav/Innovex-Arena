@@ -40,10 +40,10 @@ export const DynamicProjectsList: React.FC<DynamicProjectsListProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
         <div className="flex-1">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] mb-1.5">
+          <h4 className="type-overline text-[#9b96b0] mb-1.5">
             Featured Projects & Portfolio Repositories
           </h4>
-          <p className="text-xs text-[#9b96b0] leading-relaxed">
+          <p className="type-body-sm text-[#9b96b0]">
             Highlight your best live apps, open-source repositories, or hackathon prototypes.
           </p>
         </div>
@@ -62,7 +62,7 @@ export const DynamicProjectsList: React.FC<DynamicProjectsListProps> = ({
       {/* Projects List */}
       {projects.length === 0 ? (
         <div className="p-5 rounded-cards border border-dashed border-white/[0.08] bg-white/[0.02] text-center">
-          <p className="text-xs text-[#9b96b0]">
+          <p className="type-body-sm text-[#9b96b0]">
             No projects added yet. Click &quot;Add Project&quot; to showcase your work!
           </p>
         </div>
@@ -75,7 +75,7 @@ export const DynamicProjectsList: React.FC<DynamicProjectsListProps> = ({
             >
               {/* Project Header */}
               <div className="flex items-center justify-between pb-2.5 border-b border-white/[0.06]">
-                <span className="font-mono text-xs font-medium text-[#b7a4fb] tracking-wide">
+                <span className="font-mono type-caption text-[#b7a4fb]">
                   Project #{index + 1}
                 </span>
                 <button

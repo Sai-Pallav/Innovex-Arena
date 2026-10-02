@@ -85,10 +85,10 @@ export const InternshipsPage: React.FC = () => {
 
       {/* 1. HERO */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-5 animate-fade-up">
-        <h1 className="font-rebond font-medium text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white leading-[1.08]">
+        <h1 className="type-display text-white">
           Internship <span className="cosmic-text-gradient">Program</span>
         </h1>
-        <p className="text-base sm:text-lg text-[#c8bfec] max-w-2xl mx-auto leading-relaxed">
+        <p className="type-lead text-[#c8bfec] max-w-2xl mx-auto font-normal">
           Kickstart your tech career with hands-on experience. Learn from industry experts and work on real-world projects that make an impact.
         </p>
       </section>
@@ -96,10 +96,10 @@ export const InternshipsPage: React.FC = () => {
       {/* 2. WHY INTERN WITH US? */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Why <span className="cosmic-text-gradient">Intern With Us?</span>
           </h2>
-          <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
+          <p className="type-body text-[#9b96b0] max-w-2xl mx-auto">
             We offer more than just internships – we offer a launchpad for your career.
           </p>
         </div>
@@ -112,10 +112,10 @@ export const InternshipsPage: React.FC = () => {
                   <IconRenderer name={perk.iconName} className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-rebond text-base font-medium text-white mb-1.5">
+                  <h3 className="type-card-title text-white mb-1.5">
                     {perk.title}
                   </h3>
-                  <p className="text-xs text-[#9b96b0] leading-relaxed">
+                  <p className="type-body-sm text-[#9b96b0]">
                     {perk.description}
                   </p>
                 </div>
@@ -128,10 +128,10 @@ export const InternshipsPage: React.FC = () => {
       {/* 3. AVAILABLE INTERNSHIPS */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Available <span className="cosmic-text-gradient">Internships</span>
           </h2>
-          <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
+          <p className="type-body text-[#9b96b0] max-w-2xl mx-auto">
             Explore our current internship openings managed by admin.
           </p>
         </div>
@@ -143,7 +143,7 @@ export const InternshipsPage: React.FC = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-4 border-b border-white/[0.06]">
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-rebond text-lg sm:text-xl font-medium text-white mb-2">
+                    <h3 className="type-heading-sm text-white mb-2">
                       {role.title}
                     </h3>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-[#9b96b0]">
@@ -177,14 +177,14 @@ export const InternshipsPage: React.FC = () => {
                 </div>
 
                 {/* Description */}
-                <p className="text-sm text-[#9b96b0] leading-relaxed">
+                <p className="type-body text-[#9b96b0]">
                   {role.description}
                 </p>
 
                 {/* Requirements & Responsibilities */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
                   <div>
-                    <h4 className="font-rebond font-medium text-white uppercase tracking-wider text-[11px] mb-3">
+                    <h4 className="type-overline text-white mb-3">
                       Requirements
                     </h4>
                     <ul className="space-y-2">
@@ -197,7 +197,7 @@ export const InternshipsPage: React.FC = () => {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-rebond font-medium text-white uppercase tracking-wider text-[11px] mb-3">
+                    <h4 className="type-overline text-white mb-3">
                       Responsibilities
                     </h4>
                     <ul className="space-y-2">
@@ -219,10 +219,10 @@ export const InternshipsPage: React.FC = () => {
       {/* 4. INTERNSHIP APPLICATION FORM */}
       <section id="apply-form" className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto space-y-10">
         <div className="text-center space-y-2">
-          <h2 className="font-rebond font-medium text-2xl sm:text-3xl text-white tracking-tight">
+          <h2 className="type-heading-lg text-white">
             Apply for <span className="cosmic-text-gradient">Internship</span>
           </h2>
-          <p className="text-sm text-[#9b96b0] max-w-2xl mx-auto">
+          <p className="type-body text-[#9b96b0] max-w-2xl mx-auto">
             Fill out the form below and we&apos;ll review your application.
           </p>
         </div>
@@ -257,13 +257,13 @@ export const InternshipsPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               />
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] block">
-                  Internship Position <span className="text-[#b7a4fb] font-bold">*</span>
+                <label className="type-overline text-[#9b96b0] block">
+                  Internship Position <span className="text-[#b7a4fb] font-medium">*</span>
                 </label>
                 <select
                   value={formData.position}
                   onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                  className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-sm text-white shadow-[inset_0_0_16px_rgba(255,255,255,0.02)] focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 focus:shadow-[0_0_20px_rgba(147,130,255,0.15)] focus:bg-white/[0.07] hover:border-white/[0.22] transition-all duration-200 cursor-pointer"
+                  className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] type-body-sm text-white shadow-[inset_0_0_16px_rgba(255,255,255,0.02)] focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 focus:shadow-[0_0_20px_rgba(147,130,255,0.15)] focus:bg-white/[0.07] hover:border-white/[0.22] transition-all duration-200 cursor-pointer"
                 >
                   {INTERN_POSITIONS.map((r) => (
                     <option key={r.id} value={r.title} className="bg-[#0a0118] text-white">
@@ -284,13 +284,13 @@ export const InternshipsPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, college: e.target.value })}
               />
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0] block">
-                  Year of Study <span className="text-[#b7a4fb] font-bold">*</span>
+                <label className="type-overline text-[#9b96b0] block">
+                  Year of Study <span className="text-[#b7a4fb] font-medium">*</span>
                 </label>
                 <select
                   value={formData.yearOfStudy}
                   onChange={(e) => setFormData({ ...formData, yearOfStudy: e.target.value })}
-                  className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-sm text-white shadow-[inset_0_0_16px_rgba(255,255,255,0.02)] focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 focus:shadow-[0_0_20px_rgba(147,130,255,0.15)] focus:bg-white/[0.07] hover:border-white/[0.22] transition-all duration-200 cursor-pointer"
+                  className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] type-body-sm text-white shadow-[inset_0_0_16px_rgba(255,255,255,0.02)] focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 focus:shadow-[0_0_20px_rgba(147,130,255,0.15)] focus:bg-white/[0.07] hover:border-white/[0.22] transition-all duration-200 cursor-pointer"
                 >
                   <option value="1st Year" className="bg-[#0a0118] text-white">1st Year</option>
                   <option value="2nd Year" className="bg-[#0a0118] text-white">2nd Year</option>
@@ -303,7 +303,7 @@ export const InternshipsPage: React.FC = () => {
 
             {/* Profile Links */}
             <div className="space-y-4 pt-4 border-t border-white/[0.06]">
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[#9b96b0]">
+              <h4 className="type-overline text-[#9b96b0]">
                 Profile Links
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

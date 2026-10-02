@@ -167,7 +167,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
     <div className="relative w-full space-y-8 select-none">
       {/* Section Header with Clean Centered Title (Pause Button & Label Removed) */}
       <div className="text-center space-y-2 max-w-2xl mx-auto px-4 sm:px-6">
-        <h2 className="font-rebond font-medium text-2xl sm:text-3xl lg:text-4xl text-white tracking-[-0.015em]">
+        <h2 className="type-heading-lg text-white">
           {title.includes('Community Says') ? (
             <>
               What Our{' '}
@@ -179,7 +179,7 @@ export const TestimonialsInfiniteMarquee: React.FC<TestimonialsInfiniteMarqueePr
             title
           )}
         </h2>
-        <p className="text-xs sm:text-sm text-[#9b96b0] max-w-xl mx-auto">{subtitle}</p>
+        <p className="type-body text-[#9b96b0] max-w-xl mx-auto">{subtitle}</p>
       </div>
 
       {/* Infinite Carousel Showcase Wrapper with Left and Right Side Buttons */}

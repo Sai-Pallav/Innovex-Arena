@@ -58,20 +58,20 @@ export const EventRegistrationDialog: React.FC<EventRegistrationDialogProps> = (
       title="Event Registration"
       description={`Secure your slot for ${event.title}`}
     >
-      <div className="mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] space-y-2 text-xs text-muted-foreground">
-        <div className="flex flex-wrap items-center gap-2 text-foreground font-medium">
-          <div className="flex items-center gap-1.5 text-primary">
+      <div className="mb-5 p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] space-y-2 type-caption text-[#9b96b0]">
+        <div className="flex flex-wrap items-center gap-2 text-white font-medium">
+          <div className="flex items-center gap-1.5 text-[#b7a4fb]">
             <Calendar className="w-3.5 h-3.5" />
-            <span className="text-foreground">{event.date}</span>
+            <span className="text-white">{event.date}</span>
           </div>
           <span className="text-white/20">•</span>
-          <div className="flex items-center gap-1.5 text-primary">
+          <div className="flex items-center gap-1.5 text-[#b7a4fb]">
             <Clock className="w-3.5 h-3.5" />
             <span>{event.time}</span>
           </div>
         </div>
         <div className="flex items-center gap-1.5 text-slate-300">
-          <MapPin className="w-3.5 h-3.5 text-primary" />
+          <MapPin className="w-3.5 h-3.5 text-[#b7a4fb]" />
           <span>{event.location} ({event.mode})</span>
         </div>
       </div>
@@ -111,21 +111,21 @@ export const EventRegistrationDialog: React.FC<EventRegistrationDialogProps> = (
             required
           />
           <div className="space-y-1.5">
-            <label className="block text-xs font-medium uppercase tracking-wider text-slate-400">
-              Year of Study <span className="text-primary">*</span>
+            <label className="block type-overline text-[#9b96b0]">
+              Year of Study <span className="text-[#b7a4fb] font-medium">*</span>
             </label>
             <select
               value={formData.yearOfStudy}
               onChange={(e) => setFormData({ ...formData, yearOfStudy: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-xl bg-[#0b101e]/80 border border-white/[0.08] text-foreground text-sm focus:outline-none focus:border-cyan-400/40 focus:ring-1 focus:ring-cyan-400/20 transition-all cursor-pointer"
+              className="w-full px-5 py-2.5 rounded-inputs bg-white/[0.04] border border-white/[0.12] text-white type-body-sm focus:outline-none focus:border-[#9382ff]/60 focus:ring-2 focus:ring-[#9382ff]/20 transition-all cursor-pointer"
               required
             >
-              <option value="1st Year">1st Year</option>
-              <option value="2nd Year">2nd Year</option>
-              <option value="3rd Year">3rd Year</option>
-              <option value="4th Year">4th Year</option>
-              <option value="Postgraduate">Postgraduate</option>
-              <option value="Working Professional">Working Professional</option>
+              <option value="1st Year" className="bg-[#0b101d] text-white">1st Year</option>
+              <option value="2nd Year" className="bg-[#0b101d] text-white">2nd Year</option>
+              <option value="3rd Year" className="bg-[#0b101d] text-white">3rd Year</option>
+              <option value="4th Year" className="bg-[#0b101d] text-white">4th Year</option>
+              <option value="Postgraduate" className="bg-[#0b101d] text-white">Postgraduate</option>
+              <option value="Working Professional" className="bg-[#0b101d] text-white">Working Professional</option>
             </select>
           </div>
         </div>

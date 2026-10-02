@@ -21,10 +21,10 @@ export const BlogPage: React.FC = () => {
 
       {/* 1. HERO */}
       <section className="relative px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-4 animate-fade-up">
-        <h1 className="font-rebond font-medium text-3xl sm:text-5xl lg:text-6xl tracking-tight text-white leading-[1.15]">
+        <h1 className="type-display text-white">
           Blog & <span className="cosmic-text-gradient">News</span>
         </h1>
-        <p className="text-sm sm:text-base text-[#9b96b0] max-w-2xl mx-auto leading-relaxed">
+        <p className="type-lead text-[#9b96b0] max-w-2xl mx-auto font-normal">
           Stay updated with the latest tech articles, event announcements, industry insights, and company updates.
         </p>
       </section>
@@ -78,11 +78,11 @@ export const BlogPage: React.FC = () => {
                     <span>{post.published_at}</span>
                   </div>
 
-                  <h3 className="font-rebond font-medium text-lg text-white group-hover:text-[#ba9cff] transition-colors line-clamp-2">
+                  <h3 className="type-card-title text-white group-hover:text-[#ba9cff] transition-colors line-clamp-2">
                     {post.title}
                   </h3>
 
-                  <p className="text-xs text-[#9b96b0] line-clamp-3 leading-relaxed">
+                  <p className="type-body-sm text-[#9b96b0] line-clamp-3">
                     {post.excerpt}
                   </p>
                 </div>
@@ -136,7 +136,7 @@ export const BlogPage: React.FC = () => {
                 </span>
               </div>
 
-              <h2 className="font-rebond font-medium text-xl sm:text-2xl text-white leading-tight">
+              <h2 className="type-heading-sm text-white">
                 {selectedPost.title}
               </h2>
 
@@ -144,7 +144,7 @@ export const BlogPage: React.FC = () => {
                 {selectedPost.excerpt}
               </p>
 
-              <div className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed whitespace-pre-line space-y-2">
+              <div className="type-body text-[#9b96b0] whitespace-pre-line space-y-2">
                 {selectedPost.content}
               </div>
             </div>

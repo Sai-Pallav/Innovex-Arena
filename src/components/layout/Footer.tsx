@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5 leading-none">
-                  <span className="font-rebond font-black text-base tracking-tight text-white">
+                  <span className="font-rebond font-semibold text-base tracking-tight text-white">
                     INNOVEX
                   </span>
                   <span className="font-rebond font-medium text-base tracking-tight cosmic-text-gradient">
@@ -34,7 +34,7 @@ export const Footer: React.FC = () => {
                 </span>
               </div>
             </Link>
-            <p className="text-xs sm:text-sm text-[#9b96b0] leading-relaxed max-w-sm font-normal">
+            <p className="type-body-sm text-[#9b96b0] max-w-sm">
               A tech-driven startup building AI-based products, cloud solutions, and empowering the next generation through workshops, hackathons, and training programs.
             </p>
             {/* Social Icons - 999px pills */}
@@ -71,10 +71,10 @@ export const Footer: React.FC = () => {
 
           {/* Column 2: Company */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
+            <h4 className="type-overline text-white">
               Company
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-[#9b96b0]">
+            <ul className="space-y-2 type-caption text-[#9b96b0]">
               {FOOTER_SECTIONS.company.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="hover:text-[#b7a4fb] transition-colors">
@@ -87,10 +87,10 @@ export const Footer: React.FC = () => {
 
           {/* Column 3: Services */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
+            <h4 className="type-overline text-white">
               Services
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-[#9b96b0]">
+            <ul className="space-y-2 type-caption text-[#9b96b0]">
               {FOOTER_SECTIONS.services.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="hover:text-[#b7a4fb] transition-colors">
@@ -103,10 +103,10 @@ export const Footer: React.FC = () => {
 
           {/* Column 4: Resources */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
+            <h4 className="type-overline text-white">
               Resources
             </h4>
-            <ul className="space-y-2 text-xs sm:text-sm text-[#9b96b0]">
+            <ul className="space-y-2 type-caption text-[#9b96b0]">
               {FOOTER_SECTIONS.resources.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="hover:text-[#b7a4fb] transition-colors">
@@ -119,10 +119,10 @@ export const Footer: React.FC = () => {
 
           {/* Column 5: Contact */}
           <div className="space-y-3">
-            <h4 className="font-rebond font-medium text-xs uppercase tracking-wider text-white">
+            <h4 className="type-overline text-white">
               Contact
             </h4>
-            <ul className="space-y-2.5 text-xs sm:text-sm text-[#9b96b0]">
+            <ul className="space-y-2.5 type-caption text-[#9b96b0]">
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-[#b7a4fb] shrink-0" />
                 <a href={`mailto:${CONTACT_DETAILS.email}`} className="hover:text-[#b7a4fb] transition-colors">

@@ -65,10 +65,10 @@ export const ContactPage: React.FC = () => {
 
       {/* 1. HERO HEADER */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto text-center space-y-5 animate-fade-up">
-        <h1 className="font-rebond font-medium text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white leading-[1.08]">
+        <h1 className="type-display text-white">
           Get in <span className="cosmic-text-gradient">Touch</span>
         </h1>
-        <p className="text-base sm:text-lg text-[#c8bfec] max-w-2xl mx-auto leading-relaxed">
+        <p className="type-lead text-[#c8bfec] max-w-2xl mx-auto font-normal">
           Have a question or want to work together? We&apos;d love to hear from you. Reach out and we&apos;ll get back to you as soon as possible.
         </p>
       </section>
@@ -80,10 +80,10 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-5">
             <CyberCard glow="cyan" hoverEffect={false} className="p-6 sm:p-8 flex flex-col cursor-default">
               <div className="mb-5">
-                <h2 className="font-rebond text-2xl sm:text-3xl font-medium text-white tracking-tight mb-2">
+                <h2 className="type-heading-lg text-white mb-2">
                   Contact Information
                 </h2>
-                <p className="text-sm text-[#c8bfec] leading-relaxed">
+                <p className="type-body text-[#c8bfec]">
                   Feel free to reach out through any of the following channels.
                 </p>
               </div>
@@ -158,10 +158,10 @@ export const ContactPage: React.FC = () => {
           <div className="lg:col-span-7">
             <CyberCard glow="purple" hoverEffect={false} className="p-6 sm:p-8 flex flex-col cursor-default">
               <div className="mb-5">
-                <h2 className="font-rebond text-2xl sm:text-3xl font-medium text-white tracking-tight mb-2">
+                <h2 className="type-heading-lg text-white mb-2">
                   Send us a Message
                 </h2>
-                <p className="text-sm text-[#c8bfec] leading-relaxed">
+                <p className="type-body text-[#c8bfec]">
                   Fill out the form and our team will get back to you within 24 hours.
                 </p>
               </div>
@@ -228,10 +228,10 @@ export const ContactPage: React.FC = () => {
                   <Calendar className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-rebond font-medium text-lg text-white group-hover:text-[#b7a4fb] transition-colors mb-1">
+                  <h3 className="type-card-title text-white group-hover:text-[#b7a4fb] transition-colors mb-1">
                     Register for Events
                   </h3>
-                  <p className="text-sm text-[#c8bfec]">
+                  <p className="type-body-sm text-[#c8bfec]">
                     Join our upcoming workshops, hackathons, and programs
                   </p>
                 </div>
@@ -249,10 +249,10 @@ export const ContactPage: React.FC = () => {
                   <Users className="w-6 h-6" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-rebond font-medium text-lg text-white group-hover:text-[#ba9cff] transition-colors mb-1">
+                  <h3 className="type-card-title text-white group-hover:text-[#ba9cff] transition-colors mb-1">
                     Join Our Team
                   </h3>
-                  <p className="text-sm text-[#c8bfec]">
+                  <p className="type-body-sm text-[#c8bfec]">
                     Explore internship, fellowship, and career opportunities
                   </p>
                 </div>
