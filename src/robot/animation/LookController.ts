@@ -76,6 +76,19 @@ export class LookController {
   private tempParentQuat = new THREE.Quaternion();
   private tempInvParentQuat = new THREE.Quaternion();
 
+  private resultAngles: HierarchicalGazeAngles = {
+    headYaw: 0,
+    headPitch: 0,
+    headRoll: 0,
+    neckYaw: 0,
+    neckPitch: 0,
+    chestYaw: 0,
+    chestPitch: 0,
+    shouldersYaw: 0,
+    waistYaw: 0,
+    waistPitch: 0,
+  };
+
   private cachedRect: DOMRect | null = null;
   private boundUpdateRect = () => {
     if (this.container) {
@@ -239,21 +252,22 @@ export class LookController {
     // Relative yaw displacement from idle forward orientation for torso reaction
     const yawDeltaFromIdle = this.currentYaw - idleYaw;
 
-    return {
-      headYaw: this.currentYaw * cfg.headRatio,
-      headPitch: this.currentPitch * headPitchRatio,
-      headRoll: this.currentRoll * 0.70,
+    const res = this.resultAngles;
+    res.headYaw = this.currentYaw * cfg.headRatio;
+    res.headPitch = this.currentPitch * headPitchRatio;
+    res.headRoll = this.currentRoll * 0.70;
 
-      neckYaw: this.currentYaw * cfg.neckRatio,
-      neckPitch: this.currentPitch * neckPitchRatio,
+    res.neckYaw = this.currentYaw * cfg.neckRatio;
+    res.neckPitch = this.currentPitch * neckPitchRatio;
 
-      chestYaw: this.currentYaw * cfg.chestRatio,
-      chestPitch: this.currentPitch * chestPitchRatio,
+    res.chestYaw = this.currentYaw * cfg.chestRatio;
+    res.chestPitch = this.currentPitch * chestPitchRatio;
 
-      shouldersYaw: yawDeltaFromIdle * cfg.shouldersRatio,
-      waistYaw: yawDeltaFromIdle * cfg.waistRatio,
-      waistPitch: this.currentPitch * cfg.waistRatio,
-    };
+    res.shouldersYaw = yawDeltaFromIdle * cfg.shouldersRatio;
+    res.waistYaw = yawDeltaFromIdle * cfg.waistRatio;
+    res.waistPitch = this.currentPitch * cfg.waistRatio;
+
+    return res;
   }
 
   public getCurrentHeadYaw(): number {

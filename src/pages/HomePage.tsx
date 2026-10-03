@@ -14,48 +14,65 @@ const SPECIALIZATIONS = [
   'Student Mentorship',
 ];
 
-export const HomePage: React.FC = () => {
-  const [specializationIndex, setSpecializationIndex] = useState(0);
-  const [shouldMountRobot, setShouldMountRobot] = useState(false);
+const SpecializationPill: React.FC = React.memo(() => {
+  const [index, setIndex] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setSpecializationIndex((prev) => (prev + 1) % SPECIALIZATIONS.length);
+      setIndex((prev) => (prev + 1) % SPECIALIZATIONS.length);
     }, 3600);
     return () => clearInterval(timer);
   }, []);
 
-  // Progressive Robot Initialization: Allow critical UI & hero first paint to complete before 3D load
+  return (
+    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#09041a]/95 border border-violet-500/25 text-zinc-300 shadow-[0_4px_18px_rgba(0,0,0,0.4)]">
+      <span className="relative flex h-2 w-2">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-60" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
+      </span>
+      <span className="text-[#9b96b0] font-normal type-caption">Specialized in:</span>
+      <span className="font-medium text-white type-body-sm transition-colors duration-200">
+        {SPECIALIZATIONS[index]}
+      </span>
+    </div>
+  );
+});
+
+const HeroStatsRow: React.FC = React.memo(() => {
+  return (
+    <div className="w-full mt-2.5 sm:mt-3.5 lg:mt-3.5 relative z-20 flex-shrink-0">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 xl:gap-4">
+        {HERO_DATA.stats.map((stat, idx) => (
+          <div
+            key={idx}
+            className="relative group p-3 sm:p-4 xl:p-4.5 rounded-xl sm:rounded-2xl bg-[#060217]/90 border border-white/[0.08] hover:border-violet-500/35 transition-[border-color,transform] duration-200 flex flex-col items-center justify-center text-center shadow-[0_8px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 cursor-pointer"
+          >
+            {/* Subtle Top Card Hairline Beam */}
+            <div className="absolute top-0 inset-x-4 h-px bg-gradient-to-r from-transparent via-violet-400/25 to-transparent group-hover:via-violet-400/50 transition-colors pointer-events-none" />
+
+            <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-b from-violet-600/08 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+
+            <div className="type-stat-number text-white inline-block">
+              <AnimatedCounter value={stat.value} duration={2400} startImmediately />
+            </div>
+            <div className="type-stat-label text-[#9b96b0] mt-1">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+});
+
+export const HomePage: React.FC = () => {
+  const [shouldMountRobot, setShouldMountRobot] = useState(false);
+
+  // Fast, Non-Blocking Robot Mount: mounts on the first animation frame after hero DOM paint
   useEffect(() => {
-    let idleId: number | null = null;
-    let animId: number | null = null;
-
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      idleId = (window as any).requestIdleCallback(
-        () => {
-          setShouldMountRobot(true);
-        },
-        { timeout: 800 }
-      );
-    } else if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
-      animId = requestAnimationFrame(() => {
-        setTimeout(() => {
-          setShouldMountRobot(true);
-        }, 32);
-      });
-    } else {
-      setTimeout(() => {
-        setShouldMountRobot(true);
-      }, 50);
-    }
-
+    const animId = requestAnimationFrame(() => {
+      setShouldMountRobot(true);
+    });
     return () => {
-      if (idleId !== null && typeof window !== 'undefined' && 'cancelIdleCallback' in window) {
-        (window as any).cancelIdleCallback(idleId);
-      }
-      if (animId !== null) {
-        cancelAnimationFrame(animId);
-      }
+      cancelAnimationFrame(animId);
     };
   }, []);
 
@@ -138,16 +155,7 @@ export const HomePage: React.FC = () => {
             </p>
 
             {/* 5. Specialization Pill (Clean Transition, No Trailing Pipe Cursor - Priority 11) */}
-            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#09041a]/95 border border-violet-500/25 text-zinc-300 shadow-[0_4px_18px_rgba(0,0,0,0.4)]">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-violet-500" />
-              </span>
-              <span className="text-[#9b96b0] font-normal type-caption">Specialized in:</span>
-              <span className="font-medium text-white type-body-sm transition-colors duration-200">
-                {SPECIALIZATIONS[specializationIndex]}
-              </span>
-            </div>
+            <SpecializationPill />
 
             {/* 6. Action CTA Buttons Group (Priority 12 Hierarchy) */}
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3.5 pt-1.5">
@@ -199,28 +207,7 @@ export const HomePage: React.FC = () => {
         {/* ===================================================================== */}
         {/* 3. FOUR STATISTICS CARDS ROW (Integrated Hero Foundation - Priority 13) */}
         {/* ===================================================================== */}
-        <div className="w-full mt-2.5 sm:mt-3.5 lg:mt-3.5 relative z-20 flex-shrink-0">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3.5 xl:gap-4">
-            {HERO_DATA.stats.map((stat, idx) => (
-              <div
-                key={idx}
-                className="relative group p-3 sm:p-4 xl:p-4.5 rounded-xl sm:rounded-2xl bg-[#060217]/90 border border-white/[0.08] hover:border-violet-500/35 transition-[border-color,transform] duration-200 flex flex-col items-center justify-center text-center shadow-[0_8px_24px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.06)] hover:-translate-y-0.5 cursor-pointer"
-              >
-                {/* Subtle Top Card Hairline Beam */}
-                <div className="absolute top-0 inset-x-4 h-px bg-gradient-to-r from-transparent via-violet-400/25 to-transparent group-hover:via-violet-400/50 transition-colors pointer-events-none" />
-                
-                <div className="absolute inset-0 rounded-xl sm:rounded-2xl bg-gradient-to-b from-violet-600/08 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-                
-                <div className="type-stat-number text-white inline-block">
-                  <AnimatedCounter value={stat.value} />
-                </div>
-                <div className="type-stat-label text-[#9b96b0] mt-1">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        <HeroStatsRow />
       </section>
     </div>
   );

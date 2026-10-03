@@ -2,7 +2,8 @@ import * as THREE from 'three';
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { TORSO_CONFIG } from './TorsoConfig';
-import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { mergeGroupMeshesByMaterial, mergeAllGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 // ─── Public interfaces (strictly preserved for animation controller compatibility) ────
 
@@ -52,19 +53,19 @@ function createSpineUpperMount(materials: RobotMaterialPalette): {
   const tmpMetallic = new THREE.Group();
 
   // Precision spherical gimbal pivot ball entering the chest gimbal yoke
-  const ballGeo = new THREE.SphereGeometry(0.024, 28, 24);
+  const ballGeo = geoCache.get('SpineUpperMount_Ball', () => new THREE.SphereGeometry(0.024, 28, 24));
   const gimbalBall = new THREE.Mesh(ballGeo, materials.metallic);
   gimbalBall.position.set(0, -0.076, 0.008);
   tmpMetallic.add(gimbalBall);
 
   // Precision cylindrical neck column anchoring into Vertebra 01 core
-  const neckGeo = new THREE.CylinderGeometry(0.024, 0.026, 0.016, 32);
+  const neckGeo = geoCache.get('SpineUpperMount_Neck', () => new THREE.CylinderGeometry(0.024, 0.026, 0.016, 32));
   const neckCollar = new THREE.Mesh(neckGeo, materials.joint);
   neckCollar.position.set(0, -0.074, 0.008);
   tmpJoint.add(neckCollar);
 
   // Stepped ground metallic retaining race
-  const raceGeo = new THREE.CylinderGeometry(0.028, 0.028, 0.004, 32);
+  const raceGeo = geoCache.get('SpineUpperMount_Race', () => new THREE.CylinderGeometry(0.028, 0.028, 0.004, 32));
   const retainRace = new THREE.Mesh(raceGeo, materials.metallic);
   retainRace.position.set(0, -0.072, 0.008);
   tmpMetallic.add(retainRace);
@@ -82,7 +83,7 @@ function createSpineUpperMount(materials: RobotMaterialPalette): {
   }
 
   // Purple optical indicator ring recessed at chest-to-spine interface (Section 15)
-  const ledRingGeo = new THREE.TorusGeometry(0.0285, 0.0014, 8, 32);
+  const ledRingGeo = geoCache.get('SpineUpperMount_LedRing', () => new THREE.TorusGeometry(0.0285, 0.0014, 8, 32));
   const ledRing = new THREE.Mesh(ledRingGeo, materials.purpleEmissive);
   ledRing.rotation.x = Math.PI / 2;
   ledRing.position.set(0, -0.072, 0.008);
@@ -478,7 +479,16 @@ function createVertebraModule(
     ledMeshes.push(rearLens);
   }
 
-  return { group, primaryMesh: coreMesh, armorMesh };
+  // High-performance static batching: merge all sub-meshes within this rigid vertebra module
+  const mergedMeshes = mergeAllGroupMeshesByMaterial(group, { namePrefix: group.name || `VertebraModule_0${index + 1}` });
+  const mergedArmor = mergedMeshes.find((m) => m.material === materials.armor);
+  const mergedJoint = mergedMeshes.find((m) => m.material === materials.joint);
+  const mergedLed = mergedMeshes.find((m) => m.material === materials.purpleEmissive);
+  if (mergedLed) {
+    ledMeshes.push(mergedLed);
+  }
+
+  return { group, primaryMesh: mergedJoint || coreMesh, armorMesh: mergedArmor || armorMesh };
 }
 
 // ─── 3. HEAVY-DUTY HYDRAULIC ACTUATOR & TRIANGULATED LINKAGE ────────────────
@@ -520,19 +530,19 @@ function createSingleActuatorPole(
   const barrelLen = totalLen * 0.48;
 
   // 1. Upper Spherical Rod-End Bearing (Uniball)
-  const uniballGeo = new THREE.SphereGeometry(barrelRadius * 1.08, 20, 16);
+  const uniballGeo = geoCache.get(`ActuatorUniball_${barrelRadius.toFixed(4)}`, () => new THREE.SphereGeometry(barrelRadius * 1.08, 20, 16));
   const uniball = new THREE.Mesh(uniballGeo, materials.metallic);
   uniball.position.set(0, 0, 0);
   uniball.castShadow = true;
   actGroup.add(uniball);
 
-  const uniballHousingGeo = new THREE.CylinderGeometry(barrelRadius * 1.18, barrelRadius * 1.18, 0.014, 24);
+  const uniballHousingGeo = geoCache.get(`ActuatorUniballHousing_${barrelRadius.toFixed(4)}`, () => new THREE.CylinderGeometry(barrelRadius * 1.18, barrelRadius * 1.18, 0.014, 24));
   const uniballHousing = new THREE.Mesh(uniballHousingGeo, materials.joint);
   uniballHousing.position.set(0, -0.006, 0);
   actGroup.add(uniballHousing);
 
   // 2. Heavy-Duty Cylinder Barrel Body (Dark Titanium)
-  const barrelGeo = new THREE.CylinderGeometry(barrelRadius, barrelRadius, barrelLen, 32);
+  const barrelGeo = geoCache.get(`ActuatorBarrel_${barrelRadius.toFixed(4)}_${barrelLen.toFixed(4)}`, () => new THREE.CylinderGeometry(barrelRadius, barrelRadius, barrelLen, 32));
   const barrel = new THREE.Mesh(barrelGeo, materials.joint);
   barrel.position.set(0, -0.012 - barrelLen * 0.5, 0);
   barrel.castShadow = true;
@@ -540,8 +550,8 @@ function createSingleActuatorPole(
   actGroup.add(barrel);
 
   // Top and bottom machined lock rings
+  const ringGeo = geoCache.get(`ActuatorRing_${barrelRadius.toFixed(4)}`, () => new THREE.CylinderGeometry(barrelRadius * 1.08, barrelRadius * 1.08, 0.004, 32));
   for (const pos of [-0.014, -0.010 - barrelLen]) {
-    const ringGeo = new THREE.CylinderGeometry(barrelRadius * 1.08, barrelRadius * 1.08, 0.004, 32);
     const ring = new THREE.Mesh(ringGeo, materials.metallic);
     ring.position.set(0, pos, 0);
     actGroup.add(ring);
@@ -549,7 +559,7 @@ function createSingleActuatorPole(
 
   // 3. Illuminated Violet Power Core (Single, seamless cylindrical glowing band - no vertical dividing bars)
   const coreLen = barrelLen * 0.44;
-  const coreGeo = new THREE.CylinderGeometry(barrelRadius * 1.015, barrelRadius * 1.015, coreLen, 32);
+  const coreGeo = geoCache.get(`ActuatorCore_${barrelRadius.toFixed(4)}_${coreLen.toFixed(4)}`, () => new THREE.CylinderGeometry(barrelRadius * 1.015, barrelRadius * 1.015, coreLen, 32));
   const powerCore = new THREE.Mesh(coreGeo, materials.purpleEmissive);
   powerCore.name = `${name}_PowerCore`;
   powerCore.position.set(0, -0.012 - barrelLen * 0.5, 0);
@@ -557,15 +567,15 @@ function createSingleActuatorPole(
   ledMeshes.push(powerCore);
 
   // Recessed metallic collar rings framing top and bottom of the single illuminated core
+  const collarGeo = geoCache.get(`ActuatorCollar_${barrelRadius.toFixed(4)}`, () => new THREE.CylinderGeometry(barrelRadius * 1.035, barrelRadius * 1.035, 0.0022, 32));
   for (const cY of [-0.012 - barrelLen * 0.5 + coreLen * 0.5, -0.012 - barrelLen * 0.5 - coreLen * 0.5]) {
-    const collarGeo = new THREE.CylinderGeometry(barrelRadius * 1.035, barrelRadius * 1.035, 0.0022, 32);
     const collar = new THREE.Mesh(collarGeo, materials.metallic);
     collar.position.set(0, cY, 0);
     actGroup.add(collar);
   }
 
   // High-pressure 90° hydraulic union elbow fitting
-  const unionGeo = new THREE.BoxGeometry(0.0065, 0.0085, 0.0065);
+  const unionGeo = geoCache.get('ActuatorUnion', () => new THREE.BoxGeometry(0.0065, 0.0085, 0.0065));
   const unionMesh = new THREE.Mesh(unionGeo, materials.metallic);
   unionMesh.position.set(0, -0.016, -barrelRadius - 0.0018);
   actGroup.add(unionMesh);
@@ -581,7 +591,7 @@ function createSingleActuatorPole(
   group.add(hose);
 
   // 4. Heavy Gland Seal Collar at barrel base
-  const sealGeo = new THREE.CylinderGeometry(barrelRadius * 0.96, barrelRadius * 0.96, 0.006, 28);
+  const sealGeo = geoCache.get(`ActuatorSeal_${barrelRadius.toFixed(4)}`, () => new THREE.CylinderGeometry(barrelRadius * 0.96, barrelRadius * 0.96, 0.006, 28));
   const seal = new THREE.Mesh(sealGeo, materials.joint);
   seal.position.set(0, -0.012 - barrelLen - 0.003, 0);
   actGroup.add(seal);
@@ -589,7 +599,7 @@ function createSingleActuatorPole(
   // 5. Mirror-Polished Chrome Telescoping Piston Rod (Fully connects upper barrel down to lower waist mount)
   const rodStartY = -0.012 - barrelLen - 0.006;
   const rodLen = Math.abs(-totalLen - rodStartY);
-  const rodGeo = new THREE.CylinderGeometry(rodRadius, rodRadius, rodLen, 24);
+  const rodGeo = geoCache.get(`ActuatorRod_${rodRadius.toFixed(4)}_${rodLen.toFixed(4)}`, () => new THREE.CylinderGeometry(rodRadius, rodRadius, rodLen, 24));
   const rod = new THREE.Mesh(rodGeo, materials.metallic);
   rod.name = `${name}_PistonRod`;
   rod.position.set(0, rodStartY - rodLen * 0.5, 0);
@@ -597,12 +607,12 @@ function createSingleActuatorPole(
   actGroup.add(rod);
 
   // 6. Lower Spherical Uniball End Seating into Waist Plinth
-  const lowerUniballGeo = new THREE.SphereGeometry(rodRadius * 1.5, 18, 14);
+  const lowerUniballGeo = geoCache.get(`ActuatorLowerUniball_${rodRadius.toFixed(4)}`, () => new THREE.SphereGeometry(rodRadius * 1.5, 18, 14));
   const lowerUniball = new THREE.Mesh(lowerUniballGeo, materials.metallic);
   lowerUniball.position.set(0, -totalLen + 0.008, 0);
   actGroup.add(lowerUniball);
 
-  const lowerCuffGeo = new THREE.CylinderGeometry(rodRadius * 1.55, rodRadius * 1.55, 0.004, 20);
+  const lowerCuffGeo = geoCache.get(`ActuatorLowerCuff_${rodRadius.toFixed(4)}`, () => new THREE.CylinderGeometry(rodRadius * 1.55, rodRadius * 1.55, 0.004, 20));
   const lowerCuff = new THREE.Mesh(lowerCuffGeo, materials.joint);
   lowerCuff.position.set(0, -totalLen + 0.008, 0);
   actGroup.add(lowerCuff);
@@ -621,14 +631,14 @@ function createSingleActuatorPole(
     const linkDir = new THREE.Vector3().subVectors(linkEnd, linkStart).normalize();
     linkGroup.quaternion.setFromUnitVectors(new THREE.Vector3(0, 0, 1), linkDir);
 
-    const tieRodGeo = new THREE.CylinderGeometry(0.0034, 0.0034, linkLen * 0.72, 14);
+    const tieRodGeo = geoCache.get(`ActuatorTieRod_${linkLen.toFixed(4)}`, () => new THREE.CylinderGeometry(0.0034, 0.0034, linkLen * 0.72, 14));
     const tieRod = new THREE.Mesh(tieRodGeo, materials.metallic);
     tieRod.rotation.x = Math.PI / 2;
     tieRod.position.set(0, 0, linkLen * 0.5);
     linkGroup.add(tieRod);
 
+    const ballGeo = geoCache.get('ActuatorBall', () => new THREE.SphereGeometry(0.0048, 12, 10));
     for (const zOffset of [0, linkLen]) {
-      const ballGeo = new THREE.SphereGeometry(0.0048, 12, 10);
       const ball = new THREE.Mesh(ballGeo, materials.joint);
       ball.position.set(0, 0, zOffset);
       linkGroup.add(ball);
@@ -636,7 +646,14 @@ function createSingleActuatorPole(
     group.add(linkGroup);
   }
 
-  return { group, barrelMesh: barrel };
+  const mergedPole = mergeAllGroupMeshesByMaterial(group, { namePrefix: name });
+  const barrelMerged = mergedPole.find((m) => m.material === materials.joint) || barrel;
+  const poleLed = mergedPole.find((m) => m.material === materials.purpleEmissive);
+  if (poleLed) {
+    ledMeshes.push(poleLed);
+  }
+
+  return { group, barrelMesh: barrelMerged };
 }
 
 /**
@@ -699,7 +716,15 @@ function createSideActuatorAssembly(
   );
   clusterGroup.add(innerPole.group);
 
-  return { group: clusterGroup, primaryMesh: outerPole.barrelMesh };
+  // High-performance static batching: merge outer and inner poles into shared meshes per material per side
+  const mergedCluster = mergeAllGroupMeshesByMaterial(clusterGroup, { namePrefix: clusterGroup.name });
+  const barrelMerged = mergedCluster.find((m) => m.material === materials.joint) || outerPole.barrelMesh;
+  const clusterLed = mergedCluster.find((m) => m.material === materials.purpleEmissive);
+  if (clusterLed) {
+    ledMeshes.push(clusterLed);
+  }
+
+  return { group: clusterGroup, primaryMesh: barrelMerged as THREE.Mesh };
 }
 
 // ─── 4. SLEW BEARING WAIST TRANSITION DECK & PLINTHS ────────────────────────
@@ -721,14 +746,14 @@ function createWaistTransitionDeck(
 
   // 1. Primary Slew Bearing Turntable Deck Plate (Machined dark titanium)
   const deckY = -0.208;
-  const deckGeo = new THREE.CylinderGeometry(0.086, 0.090, 0.012, 48);
+  const deckGeo = geoCache.get('Waist_DeckPlate', () => new THREE.CylinderGeometry(0.086, 0.090, 0.012, 48));
   const deck = new THREE.Mesh(deckGeo, materials.joint);
   deck.scale.set(1.06, 1.0, 0.88);
   deck.position.set(0, deckY, 0);
   deckGroup.add(deck);
 
   // Concentric bearing race groove ring (mirror metallic)
-  const rimGeo = new THREE.TorusGeometry(0.085, 0.0014, 8, 48);
+  const rimGeo = geoCache.get('Waist_DeckRim', () => new THREE.TorusGeometry(0.085, 0.0014, 8, 48));
   const rim = new THREE.Mesh(rimGeo, materials.metallic);
   rim.rotation.x = Math.PI / 2;
   rim.scale.set(1.06, 0.88, 1.0);
@@ -737,10 +762,10 @@ function createWaistTransitionDeck(
 
   // Bolt Circle: 20 precision hex socket fasteners
   const boltCount = 20;
+  const boltGeo = geoCache.get('Waist_DeckBolt', () => new THREE.CylinderGeometry(0.0016, 0.0016, 0.0024, 6));
   for (let b = 0; b < boltCount; b++) {
     const angle = (b / boltCount) * Math.PI * 2;
     if (Math.abs(Math.sin(angle)) > 0.82 && Math.cos(angle) > 0) continue; // Skip front clamp areas
-    const boltGeo = new THREE.CylinderGeometry(0.0016, 0.0016, 0.0024, 6);
     const bolt = new THREE.Mesh(boltGeo, materials.metallic);
     bolt.position.set(
       Math.sin(angle) * 0.080 * 1.05,
@@ -751,12 +776,12 @@ function createWaistTransitionDeck(
   }
 
   // 2. Central Lower Lumbar Socket (Receiver cup for Vertebra 05)
-  const socketGeo = new THREE.CylinderGeometry(0.038, 0.042, 0.018, 32);
+  const socketGeo = geoCache.get('Waist_LumbarSocket', () => new THREE.CylinderGeometry(0.038, 0.042, 0.018, 32));
   const lumbarSocket = new THREE.Mesh(socketGeo, materials.joint);
   lumbarSocket.position.set(0, deckY + 0.006, 0);
   deckGroup.add(lumbarSocket);
 
-  const socketRimGeo = new THREE.TorusGeometry(0.039, 0.0014, 8, 32);
+  const socketRimGeo = geoCache.get('Waist_LumbarSocketRim', () => new THREE.TorusGeometry(0.039, 0.0014, 8, 32));
   const socketRim = new THREE.Mesh(socketRimGeo, materials.metallic);
   socketRim.rotation.x = Math.PI / 2;
   socketRim.position.set(0, deckY + 0.014, 0);
@@ -771,23 +796,24 @@ function createWaistTransitionDeck(
     { x: dualCfg?.inner.lowerMount.x || 0.052, z: dualCfg?.inner.lowerMount.z || 0.012, isOuter: false },
   ];
 
+  const pinGeo = geoCache.get('Waist_PlinthPin', () => new THREE.CylinderGeometry(0.0032, 0.0032, 0.022, 16));
+  const ribGeo = geoCache.get('Waist_PlinthRib', () => new THREE.BoxGeometry(0.020, 0.010, 0.007));
+
   for (const side of [-1, 1] as const) {
     for (const mount of mountPositions) {
       const pWidth = mount.isOuter ? 0.018 : 0.014;
-      const plinthGeo = new THREE.BoxGeometry(pWidth, 0.020, 0.020);
+      const plinthGeo = geoCache.get(`Waist_Plinth_${pWidth}`, () => new THREE.BoxGeometry(pWidth, 0.020, 0.020));
       const plinth = new THREE.Mesh(plinthGeo, materials.joint);
       plinth.position.set(side * mount.x, deckY + 0.008, mount.z);
       plinth.rotation.z = -side * (mount.isOuter ? 0.12 : 0.06);
       deckGroup.add(plinth);
 
-      const pinGeo = new THREE.CylinderGeometry(0.0032, 0.0032, 0.022, 16);
       const pin = new THREE.Mesh(pinGeo, materials.metallic);
       pin.rotation.z = Math.PI / 2;
       pin.position.set(side * mount.x, deckY + 0.008, mount.z);
       deckGroup.add(pin);
 
       // Gusset rib anchoring plinth to central lumbar hub
-      const ribGeo = new THREE.BoxGeometry(0.020, 0.010, 0.007);
       const rib = new THREE.Mesh(ribGeo, materials.joint);
       rib.position.set(side * (mount.x * 0.68), deckY + 0.004, mount.z * 0.68);
       rib.rotation.y = -side * 0.28;
@@ -818,15 +844,15 @@ function createWaistTransitionDeck(
   }
   const arcCurve = new THREE.CatmullRomCurve3(arcPoints);
 
-  const neonBarGeo = new THREE.TubeGeometry(arcCurve, 32, 0.0026, 10, false);
+  const neonBarGeo = geoCache.get('Waist_NeonBar', () => new THREE.TubeGeometry(arcCurve, 32, 0.0026, 10, false));
   const neonBar = new THREE.Mesh(neonBarGeo, materials.purpleEmissive);
   neonBar.name = 'WaistFrontPurpleNeonBar';
   group.add(neonBar);
   ledMeshes.push(neonBar);
 
   // White Ceramic Clamp Hoods wrapping the neon bar ends
+  const hoodGeo = geoCache.get('Waist_NeonHood', () => new THREE.BoxGeometry(0.016, 0.018, 0.018));
   for (const side of [-1, 1] as const) {
-    const hoodGeo = new THREE.BoxGeometry(0.016, 0.018, 0.018);
     const hood = new THREE.Mesh(hoodGeo, materials.armor);
     hood.name = side === -1 ? 'WaistNeonClampHood_Left' : 'WaistNeonClampHood_Right';
     const hX = side * Math.sin(MAX_ANGLE) * ARC_R * 1.05;
@@ -838,7 +864,7 @@ function createWaistTransitionDeck(
   }
 
   // Continuous Neon Ring directly below deck
-  const neonRingGeo = new THREE.TorusGeometry(0.087, 0.0016, 8, 44);
+  const neonRingGeo = geoCache.get('Waist_NeonRing', () => new THREE.TorusGeometry(0.087, 0.0016, 8, 44));
   const neonRing = new THREE.Mesh(neonRingGeo, materials.purpleEmissive);
   neonRing.name = 'WaistTurntableNeonRing';
   neonRing.rotation.x = Math.PI / 2;
@@ -846,6 +872,12 @@ function createWaistTransitionDeck(
   neonRing.position.set(0, deckY - 0.006, 0);
   group.add(neonRing);
   ledMeshes.push(neonRing);
+
+  const finalMergedDeck = mergeAllGroupMeshesByMaterial(group, { namePrefix: 'WaistTransitionDeck' });
+  const deckLed = finalMergedDeck.find((m) => m.material === materials.purpleEmissive);
+  if (deckLed) {
+    ledMeshes.push(deckLed);
+  }
 
   return group;
 }

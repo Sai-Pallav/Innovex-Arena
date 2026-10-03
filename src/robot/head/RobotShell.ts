@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { ROBOT_CONFIG, ROBOT_ACCENT } from '../config';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface ShellNodes {
   group: THREE.Group;
@@ -106,7 +107,7 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
 
   const armorShellGroup = new THREE.Group();
 
-  const crownGeo = createCrownGeometry();
+  const crownGeo = geoCache.get('HelmetCrownGeo', () => createCrownGeometry());
   const crown = new THREE.Mesh(crownGeo, materials.armorDoubleSide);
   crown.name = 'Crown';
   crown.castShadow = true;
@@ -115,19 +116,21 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
 
   // 2. Forehead Brow Trim / Visor Cowl Gasket
   // Recessed dark titanium trim tracing the sweeping brow arch above visor
-  const browTrimCurvePoints: THREE.Vector3[] = [];
-  for (let i = 0; i <= 36; i++) {
-    const t = i / 36;
-    const angle = (t - 0.5) * 2.10;
-    const cosPhi = Math.cos(angle);
-    const sinPhi = Math.sin(angle);
-    const x = 0.128 * sinPhi;
-    const y = 0.092 - 0.036 * (1.0 - cosPhi);
-    const z = -0.008 + 0.152 * cosPhi;
-    browTrimCurvePoints.push(new THREE.Vector3(x, y, z));
-  }
-  const browTrimCurve = new THREE.CatmullRomCurve3(browTrimCurvePoints);
-  const browTrimGeo = new THREE.TubeGeometry(browTrimCurve, 36, 0.0028, 8, false);
+  const browTrimGeo = geoCache.get('HelmetBrowTrimGeo', () => {
+    const browTrimCurvePoints: THREE.Vector3[] = [];
+    for (let i = 0; i <= 36; i++) {
+      const t = i / 36;
+      const angle = (t - 0.5) * 2.10;
+      const cosPhi = Math.cos(angle);
+      const sinPhi = Math.sin(angle);
+      const x = 0.128 * sinPhi;
+      const y = 0.092 - 0.036 * (1.0 - cosPhi);
+      const z = -0.008 + 0.152 * cosPhi;
+      browTrimCurvePoints.push(new THREE.Vector3(x, y, z));
+    }
+    const browTrimCurve = new THREE.CatmullRomCurve3(browTrimCurvePoints);
+    return new THREE.TubeGeometry(browTrimCurve, 36, 0.0028, 8, false);
+  });
   const browTrim = new THREE.Mesh(browTrimGeo, materials.joint);
   browTrim.name = 'BrowTrim';
   group.add(browTrim);
@@ -138,51 +141,54 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
   let rightTemple!: THREE.Mesh;
 
   for (const side of [-1, 1]) {
-    const templeShape = new THREE.Shape();
-    // Above ear module
-    templeShape.moveTo(0.006, 0.062);
-    // Sweeps towards occipital rear
-    templeShape.quadraticCurveTo(-0.035, 0.055, -0.062, 0.044);
-    // Down towards nape
-    templeShape.lineTo(-0.062, -0.040);
-    // Under ear towards jawline
-    templeShape.quadraticCurveTo(-0.025, -0.040, -0.012, -0.038);
-    templeShape.lineTo(0.006, -0.022);
-    // Smooth circular arch cutout framing ear module (radius = 0.045)
-    templeShape.absarc(0.0, 0.020, 0.045, -Math.PI * 0.44, Math.PI * 0.54, false);
-    templeShape.closePath();
+    const templeGeo = geoCache.get(`HelmetTempleGeo_${side}`, () => {
+      const templeShape = new THREE.Shape();
+      // Above ear module
+      templeShape.moveTo(0.006, 0.062);
+      // Sweeps towards occipital rear
+      templeShape.quadraticCurveTo(-0.035, 0.055, -0.062, 0.044);
+      // Down towards nape
+      templeShape.lineTo(-0.062, -0.040);
+      // Under ear towards jawline
+      templeShape.quadraticCurveTo(-0.025, -0.040, -0.012, -0.038);
+      templeShape.lineTo(0.006, -0.022);
+      // Smooth circular arch cutout framing ear module (radius = 0.045)
+      templeShape.absarc(0.0, 0.020, 0.045, -Math.PI * 0.44, Math.PI * 0.54, false);
+      templeShape.closePath();
 
-    const templeGeo = new THREE.ExtrudeGeometry(templeShape, {
-      depth: 0.010,
-      bevelEnabled: true,
-      bevelThickness: 0.0035,
-      bevelSize: 0.0025,
-      bevelSegments: 3,
-    });
-    templeGeo.center();
+      const g = new THREE.ExtrudeGeometry(templeShape, {
+        depth: 0.010,
+        bevelEnabled: true,
+        bevelThickness: 0.0035,
+        bevelSize: 0.0025,
+        bevelSegments: 3,
+      });
+      g.center();
 
-    if (side === -1) {
-      templeGeo.scale(-1, 1, 1);
-      // Invert triangle winding for non-indexed geometry to preserve outward-facing normals
-      const pos = templeGeo.attributes.position;
-      for (let i = 0; i < pos.count; i += 3) {
-        const x1 = pos.getX(i + 1);
-        const y1 = pos.getY(i + 1);
-        const z1 = pos.getZ(i + 1);
-        pos.setXYZ(i + 1, pos.getX(i + 2), pos.getY(i + 2), pos.getZ(i + 2));
-        pos.setXYZ(i + 2, x1, y1, z1);
+      if (side === -1) {
+        g.scale(-1, 1, 1);
+        // Invert triangle winding for non-indexed geometry to preserve outward-facing normals
+        const pos = g.attributes.position;
+        for (let i = 0; i < pos.count; i += 3) {
+          const x1 = pos.getX(i + 1);
+          const y1 = pos.getY(i + 1);
+          const z1 = pos.getZ(i + 1);
+          pos.setXYZ(i + 1, pos.getX(i + 2), pos.getY(i + 2), pos.getZ(i + 2));
+          pos.setXYZ(i + 2, x1, y1, z1);
+        }
       }
-    }
 
-    // Curve temple panel to hug the rounded side of the head
-    const tPos = templeGeo.attributes.position;
-    for (let i = 0; i < tPos.count; i++) {
-      const px = tPos.getX(i);
-      const pz = tPos.getZ(i);
-      // Subtle spherical curvature
-      tPos.setZ(i, pz - (px * px) * 0.85);
-    }
-    templeGeo.computeVertexNormals();
+      // Curve temple panel to hug the rounded side of the head
+      const tPos = g.attributes.position;
+      for (let i = 0; i < tPos.count; i++) {
+        const px = tPos.getX(i);
+        const pz = tPos.getZ(i);
+        // Subtle spherical curvature
+        tPos.setZ(i, pz - (px * px) * 0.85);
+      }
+      g.computeVertexNormals();
+      return g;
+    });
 
     const templeMesh = new THREE.Mesh(templeGeo, materials.armorDoubleSide);
     templeMesh.name = side === -1 ? 'LeftTemplePanel' : 'RightTemplePanel';
@@ -198,7 +204,7 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
 
   // 4. Rear Occipital Shell (Tapered sweep to neck nape, bilaterally symmetric)
   // Right occipital shell (phi: 0.5π -> 1.5π)
-  const rearShellGeo = new THREE.SphereGeometry(
+  const rearShellGeo = geoCache.get('HelmetRearShellGeo_R', () => new THREE.SphereGeometry(
     0.136,
     32,
     20,
@@ -206,7 +212,7 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
     Math.PI,
     Math.PI * 0.30,
     Math.PI * 0.50
-  );
+  ));
   const rearShell = new THREE.Mesh(rearShellGeo, materials.armorDoubleSide);
   rearShell.name = 'RearShell';
   rearShell.position.set(0, 0.022, -0.022);
@@ -216,7 +222,7 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
   armorShellGroup.add(rearShell);
 
   // Left occipital shell (phi: 1.5π -> 2.5π) closing the missing white shell behind the left ear
-  const leftRearShellGeo = new THREE.SphereGeometry(
+  const leftRearShellGeo = geoCache.get('HelmetRearShellGeo_L', () => new THREE.SphereGeometry(
     0.136,
     32,
     20,
@@ -224,7 +230,7 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
     Math.PI,
     Math.PI * 0.30,
     Math.PI * 0.50
-  );
+  ));
   const leftRearShell = new THREE.Mesh(leftRearShellGeo, materials.armorDoubleSide);
   leftRearShell.name = 'LeftRearShell';
   leftRearShell.position.set(0, 0.022, -0.022);
@@ -234,8 +240,13 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
   armorShellGroup.add(leftRearShell);
 
   // Merge outer helmet ceramic armor pieces
-  const mergedHelmetArmor = mergeGroupMeshesByMaterial(armorShellGroup, materials.armorDoubleSide, 'HelmetArmor_Merged', false);
-  if (mergedHelmetArmor) {
+  const cachedMergedHelmetArmorGeo = geoCache.get('HelmetArmorMergedGeo', () => {
+    const merged = mergeGroupMeshesByMaterial(armorShellGroup, materials.armorDoubleSide, 'HelmetArmor_Merged', false);
+    return merged ? merged.geometry : null;
+  });
+  if (cachedMergedHelmetArmorGeo) {
+    const mergedHelmetArmor = new THREE.Mesh(cachedMergedHelmetArmorGeo, materials.armorDoubleSide);
+    mergedHelmetArmor.name = 'HelmetArmor_Merged';
     mergedHelmetArmor.castShadow = true;
     mergedHelmetArmor.receiveShadow = true;
     group.add(mergedHelmetArmor);
@@ -255,16 +266,16 @@ export function createRobotShell(materials: RobotMaterialPalette): ShellNodes {
   }
   const napeCurve = new THREE.CatmullRomCurve3(napePoints);
 
-  const napeBloomGeo = new THREE.TubeGeometry(napeCurve, 16, 0.0036, 8, false);
+  const napeBloomGeo = geoCache.get('HelmetNapeBloomGeo', () => new THREE.TubeGeometry(napeCurve, 16, 0.0036, 8, false));
   const napeBloom = new THREE.Mesh(napeBloomGeo, materials.purpleBloom);
   napeLEDGroup.add(napeBloom);
 
-  const napeLEDGeo = new THREE.TubeGeometry(napeCurve, 16, 0.0018, 8, false);
+  const napeLEDGeo = geoCache.get('HelmetNapeLEDGeo', () => new THREE.TubeGeometry(napeCurve, 16, 0.0018, 8, false));
   const rearNapeLED = new THREE.Mesh(napeLEDGeo, materials.purpleEmissive);
   rearNapeLED.name = 'RearNapeLED';
   napeLEDGroup.add(rearNapeLED);
 
-  const napeCoreGeo = new THREE.TubeGeometry(napeCurve, 16, 0.0008, 6, false);
+  const napeCoreGeo = geoCache.get('HelmetNapeCoreGeo', () => new THREE.TubeGeometry(napeCurve, 16, 0.0008, 6, false));
   const napeCore = new THREE.Mesh(napeCoreGeo, materials.whiteCoreEmissive);
   napeLEDGroup.add(napeCore);
 

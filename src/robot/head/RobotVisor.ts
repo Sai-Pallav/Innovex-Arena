@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { ROBOT_CONFIG } from '../config';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface VisorAssemblyNodes {
   group: THREE.Group;
@@ -57,36 +58,39 @@ export function createRobotVisor(materials: RobotMaterialPalette): VisorAssembly
   const vSegments = 36;
 
   // 1. Glossy Black Face Visor Surface (Part 4 & 5)
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
+  const visorGeo = geoCache.get('BlackVisorGeo', () => {
+    const positions: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
-  for (let iv = 0; iv <= vSegments; iv++) {
-    const v = iv / vSegments;
-    for (let iu = 0; iu <= uSegments; iu++) {
-      const u = iu / uSegments;
-      const pt = getVisorSurfacePoint(u, v, 0.0);
-      positions.push(pt.x, pt.y, pt.z);
-      uvs.push(u, v);
+    for (let iv = 0; iv <= vSegments; iv++) {
+      const v = iv / vSegments;
+      for (let iu = 0; iu <= uSegments; iu++) {
+        const u = iu / uSegments;
+        const pt = getVisorSurfacePoint(u, v, 0.0);
+        positions.push(pt.x, pt.y, pt.z);
+        uvs.push(u, v);
+      }
     }
-  }
 
-  for (let iv = 0; iv < vSegments; iv++) {
-    for (let iu = 0; iu < uSegments; iu++) {
-      const a = iv * (uSegments + 1) + iu;
-      const b = (iv + 1) * (uSegments + 1) + iu;
-      const c = (iv + 1) * (uSegments + 1) + (iu + 1);
-      const d = iv * (uSegments + 1) + (iu + 1);
-      indices.push(a, b, d);
-      indices.push(b, c, d);
+    for (let iv = 0; iv < vSegments; iv++) {
+      for (let iu = 0; iu < uSegments; iu++) {
+        const a = iv * (uSegments + 1) + iu;
+        const b = (iv + 1) * (uSegments + 1) + iu;
+        const c = (iv + 1) * (uSegments + 1) + (iu + 1);
+        const d = iv * (uSegments + 1) + (iu + 1);
+        indices.push(a, b, d);
+        indices.push(b, c, d);
+      }
     }
-  }
 
-  const visorGeo = new THREE.BufferGeometry();
-  visorGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  visorGeo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  visorGeo.setIndex(indices);
-  visorGeo.computeVertexNormals();
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    g.setIndex(indices);
+    g.computeVertexNormals();
+    return g;
+  });
 
   const visorMesh = new THREE.Mesh(visorGeo, materials.visor);
   visorMesh.name = 'BlackVisor';
@@ -97,68 +101,70 @@ export function createRobotVisor(materials: RobotMaterialPalette): VisorAssembly
   // 2. Visor Outer Frame / Gasket Rim (Part 4 Layering)
   // Thin dark titanium perimeter frame sealing the visor into the white armor
   // Filleted corners eliminate sharp tangent turnarounds and duplicate-knot spikes
-  const frameCurvePoints: THREE.Vector3[] = [];
-  const cu = 0.045; // Corner radius in u parameter space
-  const cv = 0.065; // Corner radius in v parameter space
-  const cornerSteps = 6;
-  const edgeStepsU = 24;
-  const edgeStepsV = 14;
+  const frameGeo = geoCache.get('VisorOuterFrameGeo', () => {
+    const frameCurvePoints: THREE.Vector3[] = [];
+    const cu = 0.045; // Corner radius in u parameter space
+    const cv = 0.065; // Corner radius in v parameter space
+    const cornerSteps = 6;
+    const edgeStepsU = 24;
+    const edgeStepsV = 14;
 
-  // Top brow edge (u: cu -> 1 - cu, v = 0)
-  for (let i = 0; i <= edgeStepsU; i++) {
-    const t = i / edgeStepsU;
-    const u = cu + t * (1 - 2 * cu);
-    frameCurvePoints.push(getVisorSurfacePoint(u, 0.0, -0.001));
-  }
-  // Top-left corner (u: 1 - cu -> 1, v: 0 -> cv)
-  for (let i = 1; i <= cornerSteps; i++) {
-    const angle = (i / cornerSteps) * (Math.PI * 0.5);
-    const u = (1 - cu) + cu * Math.sin(angle);
-    const v = cv * (1 - Math.cos(angle));
-    frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
-  }
-  // Left temple down (u = 1, v: cv -> 1 - cv)
-  for (let i = 1; i <= edgeStepsV; i++) {
-    const t = i / edgeStepsV;
-    const v = cv + t * (1 - 2 * cv);
-    frameCurvePoints.push(getVisorSurfacePoint(1.0, v, -0.001));
-  }
-  // Bottom-left corner (u: 1 -> 1 - cu, v: 1 - cv -> 1)
-  for (let i = 1; i <= cornerSteps; i++) {
-    const angle = (i / cornerSteps) * (Math.PI * 0.5);
-    const u = 1.0 - cu * (1 - Math.cos(angle));
-    const v = (1 - cv) + cv * Math.sin(angle);
-    frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
-  }
-  // Bottom jaw edge (u: 1 - cu -> cu, v = 1)
-  for (let i = 1; i <= edgeStepsU; i++) {
-    const t = i / edgeStepsU;
-    const u = (1 - cu) - t * (1 - 2 * cu);
-    frameCurvePoints.push(getVisorSurfacePoint(u, 1.0, -0.001));
-  }
-  // Bottom-right corner (u: cu -> 0, v: 1 -> 1 - cv)
-  for (let i = 1; i <= cornerSteps; i++) {
-    const angle = (i / cornerSteps) * (Math.PI * 0.5);
-    const u = cu * (1 - Math.sin(angle));
-    const v = 1.0 - cv * (1 - Math.cos(angle));
-    frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
-  }
-  // Right temple up (u = 0, v: 1 - cv -> cv)
-  for (let i = 1; i <= edgeStepsV; i++) {
-    const t = i / edgeStepsV;
-    const v = (1 - cv) - t * (1 - 2 * cv);
-    frameCurvePoints.push(getVisorSurfacePoint(0.0, v, -0.001));
-  }
-  // Top-right corner (u: 0 -> cu, v: cv -> 0)
-  for (let i = 1; i < cornerSteps; i++) {
-    const angle = (i / cornerSteps) * (Math.PI * 0.5);
-    const u = cu * (1 - Math.cos(angle));
-    const v = cv * (1 - Math.sin(angle));
-    frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
-  }
+    // Top brow edge (u: cu -> 1 - cu, v = 0)
+    for (let i = 0; i <= edgeStepsU; i++) {
+      const t = i / edgeStepsU;
+      const u = cu + t * (1 - 2 * cu);
+      frameCurvePoints.push(getVisorSurfacePoint(u, 0.0, -0.001));
+    }
+    // Top-left corner (u: 1 - cu -> 1, v: 0 -> cv)
+    for (let i = 1; i <= cornerSteps; i++) {
+      const angle = (i / cornerSteps) * (Math.PI * 0.5);
+      const u = (1 - cu) + cu * Math.sin(angle);
+      const v = cv * (1 - Math.cos(angle));
+      frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
+    }
+    // Left temple down (u = 1, v: cv -> 1 - cv)
+    for (let i = 1; i <= edgeStepsV; i++) {
+      const t = i / edgeStepsV;
+      const v = cv + t * (1 - 2 * cv);
+      frameCurvePoints.push(getVisorSurfacePoint(1.0, v, -0.001));
+    }
+    // Bottom-left corner (u: 1 -> 1 - cu, v: 1 - cv -> 1)
+    for (let i = 1; i <= cornerSteps; i++) {
+      const angle = (i / cornerSteps) * (Math.PI * 0.5);
+      const u = 1.0 - cu * (1 - Math.cos(angle));
+      const v = (1 - cv) + cv * Math.sin(angle);
+      frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
+    }
+    // Bottom jaw edge (u: 1 - cu -> cu, v = 1)
+    for (let i = 1; i <= edgeStepsU; i++) {
+      const t = i / edgeStepsU;
+      const u = (1 - cu) - t * (1 - 2 * cu);
+      frameCurvePoints.push(getVisorSurfacePoint(u, 1.0, -0.001));
+    }
+    // Bottom-right corner (u: cu -> 0, v: 1 -> 1 - cv)
+    for (let i = 1; i <= cornerSteps; i++) {
+      const angle = (i / cornerSteps) * (Math.PI * 0.5);
+      const u = cu * (1 - Math.sin(angle));
+      const v = 1.0 - cv * (1 - Math.cos(angle));
+      frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
+    }
+    // Right temple up (u = 0, v: 1 - cv -> cv)
+    for (let i = 1; i <= edgeStepsV; i++) {
+      const t = i / edgeStepsV;
+      const v = (1 - cv) - t * (1 - 2 * cv);
+      frameCurvePoints.push(getVisorSurfacePoint(0.0, v, -0.001));
+    }
+    // Top-right corner (u: 0 -> cu, v: cv -> 0)
+    for (let i = 1; i < cornerSteps; i++) {
+      const angle = (i / cornerSteps) * (Math.PI * 0.5);
+      const u = cu * (1 - Math.cos(angle));
+      const v = cv * (1 - Math.sin(angle));
+      frameCurvePoints.push(getVisorSurfacePoint(u, v, -0.001));
+    }
 
-  const frameCurve = new THREE.CatmullRomCurve3(frameCurvePoints, true, 'centripetal');
-  const frameGeo = new THREE.TubeGeometry(frameCurve, 100, 0.0028, 8, true);
+    const frameCurve = new THREE.CatmullRomCurve3(frameCurvePoints, true, 'centripetal');
+    return new THREE.TubeGeometry(frameCurve, 100, 0.0028, 8, true);
+  });
   const outerFrame = new THREE.Mesh(frameGeo, materials.visorOuterFrame);
   outerFrame.name = 'VisorOuterFrame';
   outerFrame.castShadow = true;

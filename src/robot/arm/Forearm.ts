@@ -28,6 +28,8 @@
 
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeAllGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface ForearmNodes {
   group: THREE.Group;
@@ -63,11 +65,13 @@ function createForearmCoherentArmor(
   shellType: 'primaryOuter' | 'secondaryInner',
   side: -1 | 1
 ): THREE.BufferGeometry {
-  const radialSegs = 32;
-  const heightSegs = 30;
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
+  const cacheKey = `Forearm_Armor_${shellType}_${side}`;
+  return geoCache.get(cacheKey, () => {
+    const radialSegs = 32;
+    const heightSegs = 30;
+    const positions: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
   const yTop = -0.006; // Originates directly flush at elbow lower housing collar (Y = -0.020m in forearmPivot)
   const totalLength = 0.160; // Extended length (+10mm) proportioned harmoniously to lengthened upper arm (150mm)
@@ -298,7 +302,8 @@ function createForearmCoherentArmor(
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
 
-  return geometry;
+    return geometry;
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -322,7 +327,7 @@ export function createForearm(
   forearmGroup.add(mechanicalCore);
 
   // 1. Proximal Elbow Docking Collar (interfaces with Elbow lower housing)
-  const dockGeo = new THREE.CylinderGeometry(0.0332, 0.0344, 0.016, 28);
+  const dockGeo = geoCache.get('Forearm_DockGeo', () => new THREE.CylinderGeometry(0.0332, 0.0344, 0.016, 28));
   const elbowSocketCollar = new THREE.Mesh(dockGeo, materials.joint);
   elbowSocketCollar.name = 'ForearmElbowSocketCollar';
   elbowSocketCollar.position.set(0, -0.008, 0);
@@ -330,7 +335,7 @@ export function createForearm(
   mechanicalCore.add(elbowSocketCollar);
 
   // 2. Main Structural Column / Spaceframe Spine (scaled & extended to 160mm)
-  const spineGeo = new THREE.BoxGeometry(0.021, 0.160, 0.024);
+  const spineGeo = geoCache.get('Forearm_SpineGeo', () => new THREE.BoxGeometry(0.021, 0.160, 0.024));
   const armatureSpine = new THREE.Mesh(spineGeo, materials.joint);
   armatureSpine.name = 'ForearmArmatureSpine';
   armatureSpine.position.set(0, -0.088, 0);
@@ -339,8 +344,8 @@ export function createForearm(
   mechanicalCore.add(armatureSpine);
 
   // CNC Weight-Reduction Cutouts on Spine
+  const cavGeo = geoCache.get('Forearm_CavGeo', () => new THREE.BoxGeometry(0.023, 0.018, 0.019));
   for (let c = 0; c < 4; c++) {
-    const cavGeo = new THREE.BoxGeometry(0.023, 0.018, 0.019);
     const cav = new THREE.Mesh(cavGeo, materials.joint);
     cav.position.set(0, -0.044 - c * 0.027, 0);
     mechanicalCore.add(cav);
@@ -348,19 +353,19 @@ export function createForearm(
 
   // 3. Substantial Bilateral Linear Flexor Actuator Cylinders & Chrome Piston Rods
   // Compacted load-bearing actuators nestled inside gauntlet spaceframe
+  const actCylGeo = geoCache.get('Forearm_ActCylGeo', () => new THREE.CylinderGeometry(0.0040, 0.0040, 0.056, 16));
+  const actRingGeo = geoCache.get('Forearm_ActRingGeo', () => new THREE.TorusGeometry(0.0046, 0.0008, 6, 16));
+  const pistonGeo = geoCache.get('Forearm_PistonGeo', () => new THREE.CylinderGeometry(0.0026, 0.0026, 0.060, 14));
   for (const aSide of [-1, 1]) {
-    const actCylGeo = new THREE.CylinderGeometry(0.0040, 0.0040, 0.056, 16);
     const actCyl = new THREE.Mesh(actCylGeo, materials.joint);
     actCyl.position.set(aSide * 0.0110, -0.074, 0.008);
     actCyl.castShadow = true;
     mechanicalCore.add(actCyl);
 
-    const actRingGeo = new THREE.TorusGeometry(0.0046, 0.0008, 6, 16);
     const actRing = new THREE.Mesh(actRingGeo, materials.metallic);
     actRing.position.set(aSide * 0.0110, -0.057, 0.008);
     mechanicalCore.add(actRing);
 
-    const pistonGeo = new THREE.CylinderGeometry(0.0026, 0.0026, 0.060, 14);
     const piston = new THREE.Mesh(pistonGeo, materials.metallic);
     piston.position.set(aSide * 0.0110, -0.124, 0.008);
     piston.castShadow = true;
@@ -368,7 +373,7 @@ export function createForearm(
   }
 
   // 4. Internal Protected Cable Conduit Raceway
-  const cableConduitGeo = new THREE.CylinderGeometry(0.0024, 0.0024, 0.156, 10);
+  const cableConduitGeo = geoCache.get('Forearm_CableConduitGeo', () => new THREE.CylinderGeometry(0.0024, 0.0024, 0.156, 10));
   const cableConduit = new THREE.Mesh(cableConduitGeo, materials.joint);
   cableConduit.position.set(0, -0.088, -0.010);
   cableConduit.castShadow = true;
@@ -380,7 +385,7 @@ export function createForearm(
   distalWristMount.position.set(0, -0.171, 0);
   mechanicalCore.add(distalWristMount);
 
-  const cuffGeo = new THREE.CylinderGeometry(0.0242, 0.0248, 0.010, 28);
+  const cuffGeo = geoCache.get('Forearm_CuffGeo', () => new THREE.CylinderGeometry(0.0242, 0.0248, 0.010, 28));
   const wristCuff = new THREE.Mesh(cuffGeo, materials.joint);
   wristCuff.name = 'ForearmWristCuff';
   wristCuff.position.set(0, 0.005, 0);
@@ -388,22 +393,28 @@ export function createForearm(
   wristCuff.receiveShadow = true;
   distalWristMount.add(wristCuff);
 
-  const cuffRimGeo = new THREE.TorusGeometry(0.0246, 0.00085, 6, 28);
-  cuffRimGeo.rotateX(Math.PI / 2);
+  const cuffRimGeo = geoCache.get('Forearm_CuffRimGeo', () => {
+    const g = new THREE.TorusGeometry(0.0246, 0.00085, 6, 28);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
   const cuffRim = new THREE.Mesh(cuffRimGeo, materials.metallic);
   cuffRim.position.set(0, 0.009, 0);
   distalWristMount.add(cuffRim);
 
   // Forearm -> Wrist Tapered Transition Collar (Interlocks with dedicated wrist housing)
-  const collarGeo = new THREE.CylinderGeometry(0.0242, 0.0248, 0.008, 28);
+  const collarGeo = geoCache.get('Forearm_CollarGeo', () => new THREE.CylinderGeometry(0.0242, 0.0248, 0.008, 28));
   const transitionCollar = new THREE.Mesh(collarGeo, materials.joint);
   transitionCollar.name = 'ForearmWristTransitionCollar';
   transitionCollar.position.set(0, -0.167, 0);
   transitionCollar.castShadow = true;
   forearmGroup.add(transitionCollar);
 
-  const collarRingGeo = new THREE.TorusGeometry(0.0246, 0.00085, 6, 28);
-  collarRingGeo.rotateX(Math.PI / 2);
+  const collarRingGeo = geoCache.get('Forearm_CollarRingGeo', () => {
+    const g = new THREE.TorusGeometry(0.0246, 0.00085, 6, 28);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
   const collarRing = new THREE.Mesh(collarRingGeo, materials.metallic);
   collarRing.position.set(0, -0.167, 0);
   forearmGroup.add(collarRing);
@@ -436,8 +447,11 @@ export function createForearm(
   const innerArmor = posteriorArmor;
 
   // Proximal compression gasket seal ring mating flush to elbow lower collar
-  const proxGasketGeo = new THREE.TorusGeometry(0.0342, 0.00095, 6, 32);
-  proxGasketGeo.rotateX(Math.PI / 2);
+  const proxGasketGeo = geoCache.get('Forearm_ProxGasketGeo', () => {
+    const g = new THREE.TorusGeometry(0.0342, 0.00095, 6, 32);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
   const proxGasket = new THREE.Mesh(proxGasketGeo, materials.joint);
   proxGasket.name = 'ForearmProximalElbowGasket';
   proxGasket.position.set(0, -0.006, 0);
@@ -460,20 +474,20 @@ export function createForearm(
   armorGroup.add(techBayGroup);
 
   // 1. Dark Titanium Recessed Tray / Cavity Housing
-  const bayHousingGeo = new THREE.BoxGeometry(0.0088, 0.038, 0.0020);
+  const bayHousingGeo = geoCache.get('Forearm_BayHousingGeo', () => new THREE.BoxGeometry(0.0088, 0.038, 0.0020));
   const bayHousing = new THREE.Mesh(bayHousingGeo, materials.joint);
   bayHousing.position.set(0, 0, -0.0006);
   bayHousing.castShadow = true;
   techBayGroup.add(bayHousing);
 
   // 2. Precision Machined Metallic Thin Bezel Rim
-  const bezelFrameGeo = new THREE.BoxGeometry(0.0096, 0.039, 0.0007);
+  const bezelFrameGeo = geoCache.get('Forearm_BezelFrameGeo', () => new THREE.BoxGeometry(0.0096, 0.039, 0.0007));
   const bezelFrame = new THREE.Mesh(bezelFrameGeo, materials.metallic);
   bezelFrame.position.set(0, 0, 0.0003);
   techBayGroup.add(bezelFrame);
 
   // 3. Centered Flush Purple Emissive Accent Strip
-  const purpleRodGeo = new THREE.CapsuleGeometry(0.0014, 0.024, 8, 16);
+  const purpleRodGeo = geoCache.get('Forearm_PurpleRodGeo', () => new THREE.CapsuleGeometry(0.0014, 0.024, 8, 16));
   const ledStrip = new THREE.Mesh(purpleRodGeo, materials.purpleEmissive);
   ledStrip.name = 'ForearmPurpleLEDAccent';
   ledStrip.position.set(0, 0, 0.0004);
@@ -481,7 +495,7 @@ export function createForearm(
   ledMeshes.push(ledStrip);
 
   // Controlled High-Intensity Bloom Glow (Calibrated radius to stay inside bezel)
-  const purpleBloomGeo = new THREE.CapsuleGeometry(0.0022, 0.024, 8, 16);
+  const purpleBloomGeo = geoCache.get('Forearm_PurpleBloomGeo', () => new THREE.CapsuleGeometry(0.0022, 0.024, 8, 16));
   const purpleBloomMesh = new THREE.Mesh(purpleBloomGeo, materials.purpleBloom);
   purpleBloomMesh.position.copy(ledStrip.position);
   techBayGroup.add(purpleBloomMesh);
@@ -492,8 +506,8 @@ export function createForearm(
   ventilationChannel.position.set(0, 0, 0);
   techBayGroup.add(ventilationChannel);
 
+  const slatGeo = geoCache.get('Forearm_SlatGeo', () => new THREE.BoxGeometry(0.0055, 0.0008, 0.0010));
   for (const lY of [-0.016, 0.016]) {
-    const slatGeo = new THREE.BoxGeometry(0.0055, 0.0008, 0.0010);
     const slat = new THREE.Mesh(slatGeo, materials.joint);
     slat.position.set(0, lY, 0.0002);
     ventilationChannel.add(slat);
@@ -501,10 +515,10 @@ export function createForearm(
 
   // 4b. Stepped Micro-Louvers Bilaterally Symmetrical flanking the purple strip (Matching 5-step ladder in UpperArm)
   const louverLadderCount = 5;
+  const louverGeo = geoCache.get('Forearm_LouverGeo', () => new THREE.BoxGeometry(0.0012, 0.0016, 0.0010));
   for (let i = 0; i < louverLadderCount; i++) {
     const lY = -0.010 + i * 0.0050;
     for (const flSide of [-1, 1]) {
-      const louverGeo = new THREE.BoxGeometry(0.0012, 0.0016, 0.0010);
       const louverMesh = new THREE.Mesh(louverGeo, materials.joint);
       louverMesh.position.set(flSide * 0.0030, lY, 0.0003);
       techBayGroup.add(louverMesh);
@@ -584,7 +598,7 @@ export function createForearm(
   // 5. Engineered Anterior Center Vertical Seam Segments (Matching UpperArm design language)
   // Upper segment: bridges from proximal collar down to the top of tech bay bezel
   // Conforms 100% to 3D gauntlet taper curvature, terminating cleanly with 1.5mm elbow gasket margin and 1.0mm bezel margin
-  const antSeamUpperGeo = createConformingForearmSeamGeo(-0.0075, -0.0705, 10);
+  const antSeamUpperGeo = geoCache.get('Forearm_AntSeamUpperGeo', () => createConformingForearmSeamGeo(-0.0075, -0.0705, 10));
   const antSeamUpper = new THREE.Mesh(antSeamUpperGeo, materials.joint);
   antSeamUpper.name = 'ForearmAnteriorCenterSeamUpper';
   antSeamUpper.castShadow = true;
@@ -592,43 +606,63 @@ export function createForearm(
 
   // Lower segment: bridges from bottom of tech bay bezel down to distal wrist collar
   // Conforms 100% to 3D gauntlet taper curvature, terminating cleanly with 1.0mm bezel margin and 2.5mm wrist collar margin
-  const antSeamLowerGeo = createConformingForearmSeamGeo(-0.1095, -0.1635, 10);
+  const antSeamLowerGeo = geoCache.get('Forearm_AntSeamLowerGeo', () => createConformingForearmSeamGeo(-0.1095, -0.1635, 10));
   const antSeamLower = new THREE.Mesh(antSeamLowerGeo, materials.joint);
   antSeamLower.name = 'ForearmAnteriorCenterSeamLower';
   antSeamLower.castShadow = true;
   armorGroup.add(antSeamLower);
 
   // 6. Engineered Parting Seam between inner and outer shells (Safely inside at radius 22mm)
-  const medSeamGeo = new THREE.BoxGeometry(0.0018, 0.160, 0.0025);
+  const medSeamGeo = geoCache.get('Forearm_MedSeamGeo', () => new THREE.BoxGeometry(0.0018, 0.160, 0.0025));
   const panelSeam = new THREE.Mesh(medSeamGeo, materials.joint);
   panelSeam.name = 'ForearmPartingSeam';
   panelSeam.position.set(-side * 0.022, -0.089, 0);
   armorGroup.add(panelSeam);
 
+  // 7. High-Performance Static Mesh Batching (Zero visual regression, massive draw call reduction)
+  const mergedArmor = mergeAllGroupMeshesByMaterial(armorGroup, {
+    namePrefix: side === -1 ? 'LeftForearmArmor' : 'RightForearmArmor',
+  });
+
+  const mergedDistal = mergeAllGroupMeshesByMaterial(distalWristMount, {
+    namePrefix: side === -1 ? 'LeftForearmWristMount' : 'RightForearmWristMount',
+  });
+
+  const mergedCore = mergeAllGroupMeshesByMaterial(mechanicalCore, {
+    excludeNames: [distalWristMount.name],
+    namePrefix: side === -1 ? 'LeftForearmCore' : 'RightForearmCore',
+  });
+
+  const mergedLed = mergedArmor.find((m) => m.material === materials.purpleEmissive);
+  if (mergedLed) {
+    ledMeshes.length = 0;
+    ledMeshes.push(mergedLed);
+  }
+
   // Compatibility aliases
-  const gauntletBody = anteriorArmor;
-  const innerSleeve = armatureSpine;
-  const brachioradialis = anteriorArmor;
+  const primaryArmorMesh = mergedArmor[0] || anteriorArmor;
+  const primaryCoreMesh = mergedCore[0] || armatureSpine;
+  const primaryWristCuff = mergedDistal[0] || wristCuff;
 
   return {
     group: forearmGroup,
     mechanicalCore,
-    armatureSpine,
+    armatureSpine: primaryCoreMesh,
     armorGroup,
-    anteriorArmor,
-    posteriorArmor,
-    sideArmor,
-    innerArmor,
+    anteriorArmor: primaryArmorMesh,
+    posteriorArmor: primaryArmorMesh,
+    sideArmor: primaryArmorMesh,
+    innerArmor: primaryArmorMesh,
     ventilationChannel,
-    ledStrip,
+    ledStrip: mergedLed || ledStrip,
     ledMeshes,
     distalWristMount,
-    wristCuff,
+    wristCuff: primaryWristCuff,
     // Aliases
-    gauntletBody,
-    innerSleeve,
-    elbowSocketCollar,
-    brachioradialis,
-    panelSeam,
+    gauntletBody: primaryArmorMesh,
+    innerSleeve: primaryCoreMesh,
+    elbowSocketCollar: primaryCoreMesh,
+    brachioradialis: primaryArmorMesh,
+    panelSeam: primaryArmorMesh,
   };
 }

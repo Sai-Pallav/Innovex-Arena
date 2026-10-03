@@ -246,6 +246,27 @@ export class ArmAnimationController {
   private poseTransitionRight: number = 1.0;
   private poseDurationRight: number = 0.4;
 
+  // Persistent target pools to eliminate per-frame allocations (600 allocs/sec saved)
+  private fingerTargetPool: [FingerPoseTarget[], FingerPoseTarget[]] = [
+    [
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+    ],
+    [
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+      { prox: 0, mid: 0, dist: 0, splay: 0 },
+    ],
+  ];
+
+  private thumbTargetPool: [ThumbPoseTarget, ThumbPoseTarget] = [
+    { pitch: 0, yaw: 0, roll: 0, prox: 0, dist: 0 },
+    { pitch: 0, yaw: 0, roll: 0, prox: 0, dist: 0 },
+  ];
+
   constructor(leftArm: RobotArmNodes, rightArm: RobotArmNodes) {
     this.leftArm = leftArm;
     this.rightArm = rightArm;
@@ -462,12 +483,15 @@ export class ArmAnimationController {
 
     // Exploded View smooth damping interpolation
     const targetExploded = this.isExploded ? 1.0 : 0.0;
-    this.explodedProgress = THREE.MathUtils.damp(this.explodedProgress, targetExploded, 6.0, dt);
-    const exp = this.explodedProgress;
-
-    // Apply exploded offsets to shoulders, elbows, and hands
-    this.applyExplodedOffsets(this.leftArm, -1, exp);
-    this.applyExplodedOffsets(this.rightArm, 1, exp);
+    const diff = Math.abs(this.explodedProgress - targetExploded);
+    if (diff > 0.0001) {
+      this.explodedProgress = THREE.MathUtils.damp(this.explodedProgress, targetExploded, 6.0, dt);
+      if (Math.abs(this.explodedProgress - targetExploded) <= 0.0001) {
+        this.explodedProgress = targetExploded;
+      }
+      this.applyExplodedOffsets(this.leftArm, -1, this.explodedProgress);
+      this.applyExplodedOffsets(this.rightArm, 1, this.explodedProgress);
+    }
 
     this.updateArmKinematics(
       this.leftArm,
@@ -843,6 +867,7 @@ export class ArmAnimationController {
 
   private getInterpolatedFingerTarget(side: -1 | 1, idx: number): FingerPoseTarget {
     const isLeft = side === -1;
+    const sideIdx = isLeft ? 0 : 1;
     const activePose = isLeft ? this.activePoseLeft : this.activePoseRight;
     const targetPose = isLeft ? this.targetPoseLeft : this.targetPoseRight;
     const progress = isLeft ? this.poseTransitionLeft : this.poseTransitionRight;
@@ -855,16 +880,17 @@ export class ArmAnimationController {
     }
 
     const s = progress * progress * (3.0 - 2.0 * progress);
-    return {
-      prox:  THREE.MathUtils.lerp(fromTarget.prox,  toTarget.prox,  s),
-      mid:   THREE.MathUtils.lerp(fromTarget.mid,   toTarget.mid,   s),
-      dist:  THREE.MathUtils.lerp(fromTarget.dist,  toTarget.dist,  s),
-      splay: THREE.MathUtils.lerp(fromTarget.splay, toTarget.splay, s),
-    };
+    const res = this.fingerTargetPool[sideIdx][idx];
+    res.prox = THREE.MathUtils.lerp(fromTarget.prox, toTarget.prox, s);
+    res.mid = THREE.MathUtils.lerp(fromTarget.mid, toTarget.mid, s);
+    res.dist = THREE.MathUtils.lerp(fromTarget.dist, toTarget.dist, s);
+    res.splay = THREE.MathUtils.lerp(fromTarget.splay, toTarget.splay, s);
+    return res;
   }
 
   private getInterpolatedThumbTarget(side: -1 | 1): ThumbPoseTarget {
     const isLeft = side === -1;
+    const sideIdx = isLeft ? 0 : 1;
     const activePose = isLeft ? this.activePoseLeft : this.activePoseRight;
     const targetPose = isLeft ? this.targetPoseLeft : this.targetPoseRight;
     const progress = isLeft ? this.poseTransitionLeft : this.poseTransitionRight;
@@ -877,13 +903,13 @@ export class ArmAnimationController {
     }
 
     const s = progress * progress * (3.0 - 2.0 * progress);
-    return {
-      pitch: THREE.MathUtils.lerp(fromTarget.pitch, toTarget.pitch, s),
-      yaw:   THREE.MathUtils.lerp(fromTarget.yaw,   toTarget.yaw,   s),
-      roll:  THREE.MathUtils.lerp(fromTarget.roll,  toTarget.roll,  s),
-      prox:  THREE.MathUtils.lerp(fromTarget.prox,  toTarget.prox,  s),
-      dist:  THREE.MathUtils.lerp(fromTarget.dist,  toTarget.dist,  s),
-    };
+    const res = this.thumbTargetPool[sideIdx];
+    res.pitch = THREE.MathUtils.lerp(fromTarget.pitch, toTarget.pitch, s);
+    res.yaw = THREE.MathUtils.lerp(fromTarget.yaw, toTarget.yaw, s);
+    res.roll = THREE.MathUtils.lerp(fromTarget.roll, toTarget.roll, s);
+    res.prox = THREE.MathUtils.lerp(fromTarget.prox, toTarget.prox, s);
+    res.dist = THREE.MathUtils.lerp(fromTarget.dist, toTarget.dist, s);
+    return res;
   }
 
   private updateFingerKinematics(

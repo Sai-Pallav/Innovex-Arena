@@ -1,0 +1,4823 @@
+{
+  "totalMeshes": 449,
+  "uniqueGeometries": 360,
+  "drawCalls": 423,
+  "breakdown": {
+    "Torso": 42,
+    "Arms": 142,
+    "Shoulders": 42,
+    "Head": 35,
+    "Hands": 26,
+    "Fingers": 86,
+    "Waist": 22,
+    "Legs": 38,
+    "Feet": 16
+  },
+  "materials": {
+    "RobotWhiteArmorMaterial": 72,
+    "RobotPurpleEmissiveMaterial": 85,
+    "RobotWhiteArmorDoubleSideMaterial": 11,
+    "RobotDarkTitaniumMaterial": 135,
+    "RobotMetallicMaterial": 95,
+    "RobotPurpleBloomMaterial": 38,
+    "RobotDarkTitaniumDoubleSideMaterial": 3,
+    "RobotMachinedLinkMaterial": 2,
+    "RobotWhiteCoreEmissiveMaterial": 6,
+    "RobotObsidianVisorMaterial": 1,
+    "RobotVisorOuterFrameMaterial": 1
+  },
+  "meshListSample": [
+    {
+      "name": "ChestPlate_Central",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 34,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 13820,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLogo_A",
+      "parentName": "ChestPlate_Central",
+      "subsystem": "Torso",
+      "geoId": 35,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 68,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLowerUndersideCowl",
+      "parentName": "ChestPlate_Central",
+      "subsystem": "Torso",
+      "geoId": 36,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 1008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestSidePanel_Left",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 37,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestSidePanel_Right",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 39,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLightStrip_Left",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 38,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLightStrip_Right",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 38,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestFlankArmor_Left",
+      "parentName": "ChestArmor",
+      "subsystem": "Arms",
+      "geoId": 40,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1196,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestFlankArmor_Right",
+      "parentName": "ChestArmor",
+      "subsystem": "Arms",
+      "geoId": 41,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1196,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftChestTransitionPanel",
+      "parentName": "LeftWhiteStructuralAssembly",
+      "subsystem": "Torso",
+      "geoId": 124,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftMountingFrame",
+      "parentName": "LeftWhiteStructuralAssembly",
+      "subsystem": "Shoulders",
+      "geoId": 125,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftMountingFrame_Bolts_Merged",
+      "parentName": "LeftMountingFrame",
+      "subsystem": "Shoulders",
+      "geoId": 140,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperShoulderHood",
+      "parentName": "LeftUpperShoulderShell",
+      "subsystem": "Shoulders",
+      "geoId": 141,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 4288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PauldronSubRim_TitaniumSeal",
+      "parentName": "LeftPauldronSubRim",
+      "subsystem": "Shoulders",
+      "geoId": 142,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PauldronSubRim_MetallicRace",
+      "parentName": "LeftPauldronSubRim",
+      "subsystem": "Shoulders",
+      "geoId": 143,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 48,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftShoulderNeckLed",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 147,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_L_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 168,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 472,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_L_RobotMetallicMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 173,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 272,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_L_RobotPurpleBloomMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 175,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShoulderEnergyRing_L",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 180,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1232,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 209,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 7344,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotMetallicMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 231,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 3248,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotPurpleBloomMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 233,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 704,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotWhiteArmorMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Arms",
+      "geoId": 235,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 704,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotDarkTitaniumDoubleSideMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 253,
+      "matName": "RobotDarkTitaniumDoubleSideMaterial",
+      "polyCount": 192,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryPivotRing_L",
+      "parentName": "PrimaryHubGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 259,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 320,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryHubGroup_L_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "PrimaryHubGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 279,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 408,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryHubGroup_L_RobotMetallicMaterial_Merged",
+      "parentName": "PrimaryHubGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 283,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 624,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftSecondaryAxisCarrier_LinksMerged_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 324,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 2008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftSecondaryAxisCarrier_LinksMerged_RobotMetallicMaterial_Merged",
+      "parentName": "LeftSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 329,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 624,
+      "isInstanced": false,
+      "instanceCount": 1
+    }
+  ],
+  "meshListAll": [
+    {
+      "name": "ChestPlate_Central",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 34,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 13820,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLogo_A",
+      "parentName": "ChestPlate_Central",
+      "subsystem": "Torso",
+      "geoId": 35,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 68,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLowerUndersideCowl",
+      "parentName": "ChestPlate_Central",
+      "subsystem": "Torso",
+      "geoId": 36,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 1008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestSidePanel_Left",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 37,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestSidePanel_Right",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 39,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLightStrip_Left",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 38,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestLightStrip_Right",
+      "parentName": "ChestArmor",
+      "subsystem": "Torso",
+      "geoId": 38,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestFlankArmor_Left",
+      "parentName": "ChestArmor",
+      "subsystem": "Arms",
+      "geoId": 40,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1196,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestFlankArmor_Right",
+      "parentName": "ChestArmor",
+      "subsystem": "Arms",
+      "geoId": 41,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1196,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftChestTransitionPanel",
+      "parentName": "LeftWhiteStructuralAssembly",
+      "subsystem": "Torso",
+      "geoId": 124,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftMountingFrame",
+      "parentName": "LeftWhiteStructuralAssembly",
+      "subsystem": "Shoulders",
+      "geoId": 125,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftMountingFrame_Bolts_Merged",
+      "parentName": "LeftMountingFrame",
+      "subsystem": "Shoulders",
+      "geoId": 140,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperShoulderHood",
+      "parentName": "LeftUpperShoulderShell",
+      "subsystem": "Shoulders",
+      "geoId": 141,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 4288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PauldronSubRim_TitaniumSeal",
+      "parentName": "LeftPauldronSubRim",
+      "subsystem": "Shoulders",
+      "geoId": 142,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PauldronSubRim_MetallicRace",
+      "parentName": "LeftPauldronSubRim",
+      "subsystem": "Shoulders",
+      "geoId": 143,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 48,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftShoulderNeckLed",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 147,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_L_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 168,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 472,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_L_RobotMetallicMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 173,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 272,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_L_RobotPurpleBloomMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 175,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShoulderEnergyRing_L",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 180,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1232,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 209,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 7344,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotMetallicMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 231,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 3248,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotPurpleBloomMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 233,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 704,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotWhiteArmorMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Arms",
+      "geoId": 235,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 704,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_L_RobotDarkTitaniumDoubleSideMaterial_Merged",
+      "parentName": "BearingHousingGroup_L",
+      "subsystem": "Head",
+      "geoId": 253,
+      "matName": "RobotDarkTitaniumDoubleSideMaterial",
+      "polyCount": 192,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryPivotRing_L",
+      "parentName": "PrimaryHubGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 259,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 320,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryHubGroup_L_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "PrimaryHubGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 279,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 408,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryHubGroup_L_RobotMetallicMaterial_Merged",
+      "parentName": "PrimaryHubGroup_L",
+      "subsystem": "Shoulders",
+      "geoId": 283,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 624,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftSecondaryAxisCarrier_LinksMerged_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 324,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 2008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftSecondaryAxisCarrier_LinksMerged_RobotMetallicMaterial_Merged",
+      "parentName": "LeftSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 329,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 624,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftSecondaryAxisCarrier_LinksMerged_RobotMachinedLinkMaterial_Merged",
+      "parentName": "LeftSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 333,
+      "matName": "RobotMachinedLinkMaterial",
+      "polyCount": 128,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftShoulderSocketReceiver_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftShoulderSocketReceiver",
+      "subsystem": "Shoulders",
+      "geoId": 346,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 496,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftShoulderSocketReceiver_RobotMetallicMaterial_Merged",
+      "parentName": "LeftShoulderSocketReceiver",
+      "subsystem": "Shoulders",
+      "geoId": 358,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 976,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftBicepRotationalLed",
+      "parentName": "LeftShoulderArmAdapter",
+      "subsystem": "Arms",
+      "geoId": 1166,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 768,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftShoulderArmAdapter",
+      "subsystem": "Shoulders",
+      "geoId": 1167,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 768,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AdapterJoint_Merged",
+      "parentName": "LeftShoulderArmAdapter",
+      "subsystem": "Shoulders",
+      "geoId": 1185,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1976,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AdapterMetallic_Merged",
+      "parentName": "LeftShoulderArmAdapter",
+      "subsystem": "Shoulders",
+      "geoId": 1204,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 2128,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftElbowRoot_UpperHousing_Joint_Merged",
+      "parentName": "ElbowUpperHousing",
+      "subsystem": "Arms",
+      "geoId": 1333,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 600,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftElbowRoot_UpperHousing_Metallic_Merged",
+      "parentName": "ElbowUpperHousing",
+      "subsystem": "Arms",
+      "geoId": 1344,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 964,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowHydraulicRam_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "ElbowHydraulicRam",
+      "subsystem": "Arms",
+      "geoId": 1441,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 136,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowHydraulicRam_RobotMetallicMaterial_Merged",
+      "parentName": "ElbowHydraulicRam",
+      "subsystem": "Arms",
+      "geoId": 1445,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowCentralAxlePin_RobotMetallicMaterial_Merged",
+      "parentName": "ElbowCentralAxlePin",
+      "subsystem": "Arms",
+      "geoId": 1349,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowCentralAxlePin_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "ElbowCentralAxlePin",
+      "subsystem": "Arms",
+      "geoId": 1354,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 224,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_Bezel_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LateralActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 1371,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 640,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_Bezel_RobotMetallicMaterial_Merged",
+      "parentName": "LateralActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 1385,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 144,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_Race_RobotMetallicMaterial_Merged",
+      "parentName": "LateralActuatorDisc_BearingRace",
+      "subsystem": "Head",
+      "geoId": 1389,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_PurpleEmissiveRing",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1360,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1361,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1362,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1363,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_CenterDot",
+      "parentName": "LateralActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1366,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_HubCap_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LateralActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1398,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_HubCap_RobotMetallicMaterial_Merged",
+      "parentName": "LateralActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1400,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 200,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_Bezel_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "MedialActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 1404,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 640,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_Bezel_RobotMetallicMaterial_Merged",
+      "parentName": "MedialActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 1418,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 144,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_Race_RobotMetallicMaterial_Merged",
+      "parentName": "MedialActuatorDisc_BearingRace",
+      "subsystem": "Head",
+      "geoId": 1422,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_PurpleEmissiveRing",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1360,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1361,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1362,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1363,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_CenterDot",
+      "parentName": "MedialActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1366,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_HubCap_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "MedialActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1431,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_HubCap_RobotMetallicMaterial_Merged",
+      "parentName": "MedialActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1433,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 200,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftElbowRoot_LowerHousing_Joint_Merged",
+      "parentName": "ElbowLowerHousing",
+      "subsystem": "Arms",
+      "geoId": 1453,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 236,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowOlecranonArmor",
+      "parentName": "ElbowLowerHousing",
+      "subsystem": "Arms",
+      "geoId": 1454,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 168,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowOlecranonSpineRib",
+      "parentName": "ElbowLowerHousing",
+      "subsystem": "Arms",
+      "geoId": 1455,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WristSmartCuff",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1531,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 672,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WristPurpleEmissiveSlot",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1536,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftWristStatic_RobotMetallicMaterial_Merged",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1559,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftWristStatic_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1565,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 220,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftWristStatic_RobotPurpleBloomMaterial_Merged",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1567,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WristDistalClevis",
+      "parentName": "LeftWristTrunnion",
+      "subsystem": "Hands",
+      "geoId": 1546,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandDorsalArmor",
+      "parentName": "LeftHandRoot",
+      "subsystem": "Hands",
+      "geoId": 1584,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1558,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandTelemetryLED",
+      "parentName": "LeftHandRoot",
+      "subsystem": "Hands",
+      "geoId": 1588,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftHandRoot",
+      "subsystem": "Hands",
+      "geoId": 1589,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandPalmJoint_Merged",
+      "parentName": "StaticPalmAssembly",
+      "subsystem": "Hands",
+      "geoId": 1628,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandPalmMetallic_Merged",
+      "parentName": "StaticPalmAssembly",
+      "subsystem": "Hands",
+      "geoId": 1648,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1296,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexProximal_Joint_Merged",
+      "parentName": "IndexProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1675,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexProximal_Metallic_Merged",
+      "parentName": "IndexProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1685,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexProximal_ArmorShell",
+      "parentName": "IndexProximal",
+      "subsystem": "Arms",
+      "geoId": 1686,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexMiddle_Joint_Merged",
+      "parentName": "IndexMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1713,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexMiddle_Metallic_Merged",
+      "parentName": "IndexMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1723,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexMiddle_ArmorShell",
+      "parentName": "IndexMiddle",
+      "subsystem": "Arms",
+      "geoId": 1724,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexDistal_Joint_Merged",
+      "parentName": "IndexDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1746,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexDistal_Metallic_Merged",
+      "parentName": "IndexDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1750,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexDistal_ArmorShell",
+      "parentName": "IndexDistal",
+      "subsystem": "Arms",
+      "geoId": 1751,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "IndexDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "IndexDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleProximal_Joint_Merged",
+      "parentName": "MiddleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1780,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleProximal_Metallic_Merged",
+      "parentName": "MiddleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1790,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleProximal_ArmorShell",
+      "parentName": "MiddleProximal",
+      "subsystem": "Arms",
+      "geoId": 1791,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleMiddle_Joint_Merged",
+      "parentName": "MiddleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1818,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleMiddle_Metallic_Merged",
+      "parentName": "MiddleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1828,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleMiddle_ArmorShell",
+      "parentName": "MiddleMiddle",
+      "subsystem": "Arms",
+      "geoId": 1829,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleDistal_Joint_Merged",
+      "parentName": "MiddleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1851,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleDistal_Metallic_Merged",
+      "parentName": "MiddleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1855,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleDistal_ArmorShell",
+      "parentName": "MiddleDistal",
+      "subsystem": "Arms",
+      "geoId": 1856,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MiddleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MiddleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingProximal_Joint_Merged",
+      "parentName": "RingProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1874,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingProximal_Metallic_Merged",
+      "parentName": "RingProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1884,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingProximal_ArmorShell",
+      "parentName": "RingProximal",
+      "subsystem": "Arms",
+      "geoId": 1885,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingMiddle_Joint_Merged",
+      "parentName": "RingMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1901,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingMiddle_Metallic_Merged",
+      "parentName": "RingMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1911,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingMiddle_ArmorShell",
+      "parentName": "RingMiddle",
+      "subsystem": "Arms",
+      "geoId": 1912,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingDistal_Joint_Merged",
+      "parentName": "RingDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1928,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingDistal_Metallic_Merged",
+      "parentName": "RingDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1932,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingDistal_ArmorShell",
+      "parentName": "RingDistal",
+      "subsystem": "Arms",
+      "geoId": 1933,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RingDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RingDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleProximal_Joint_Merged",
+      "parentName": "LittleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1960,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleProximal_Metallic_Merged",
+      "parentName": "LittleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1970,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleProximal_ArmorShell",
+      "parentName": "LittleProximal",
+      "subsystem": "Arms",
+      "geoId": 1971,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleMiddle_Joint_Merged",
+      "parentName": "LittleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 1995,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleMiddle_Metallic_Merged",
+      "parentName": "LittleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2005,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleMiddle_ArmorShell",
+      "parentName": "LittleMiddle",
+      "subsystem": "Arms",
+      "geoId": 2006,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleDistal_Joint_Merged",
+      "parentName": "LittleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2028,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleDistal_Metallic_Merged",
+      "parentName": "LittleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2032,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleDistal_ArmorShell",
+      "parentName": "LittleDistal",
+      "subsystem": "Arms",
+      "geoId": 2033,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LittleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LittleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbBaseJoint_Merged",
+      "parentName": "ThumbBase_Static",
+      "subsystem": "Fingers",
+      "geoId": 2043,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbBaseMetallic_Merged",
+      "parentName": "ThumbBase_Static",
+      "subsystem": "Fingers",
+      "geoId": 2047,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 344,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbProximal_Joint_Merged",
+      "parentName": "ThumbProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2074,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbProximal_Metallic_Merged",
+      "parentName": "ThumbProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2084,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbProximal_ArmorShell",
+      "parentName": "ThumbProximal",
+      "subsystem": "Fingers",
+      "geoId": 2085,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbDistal_Joint_Merged",
+      "parentName": "ThumbDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2107,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbDistal_Metallic_Merged",
+      "parentName": "ThumbDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2111,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbDistal_ArmorShell",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 2112,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 2113,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftWristTrunnion_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftWristTrunnion",
+      "subsystem": "Hands",
+      "geoId": 1572,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 224,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmCore_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftForearmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 1523,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 452,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmCore_RobotMetallicMaterial_Merged",
+      "parentName": "LeftForearmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 1530,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 832,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ForearmWristTransitionCollar",
+      "parentName": "LeftForearmAssembly",
+      "subsystem": "Hands",
+      "geoId": 1465,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftForearmAssembly",
+      "subsystem": "Arms",
+      "geoId": 1466,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmArmor_RobotWhiteArmorDoubleSideMaterial_Merged",
+      "parentName": "LeftForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1482,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 8176,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmArmor_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1501,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 680,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmArmor_RobotMetallicMaterial_Merged",
+      "parentName": "LeftForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1503,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmArmor_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "LeftForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1505,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftForearmArmor_RobotPurpleBloomMaterial_Merged",
+      "parentName": "LeftForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1507,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmCore_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftUpperArmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 1294,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 948,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmCore_RobotMetallicMaterial_Merged",
+      "parentName": "LeftUpperArmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 1309,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1720,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmArmor_RobotWhiteArmorDoubleSideMaterial_Merged",
+      "parentName": "LeftUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1252,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 9760,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmArmor_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1270,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 296,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmArmor_RobotMetallicMaterial_Merged",
+      "parentName": "LeftUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1272,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmArmor_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "LeftUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1274,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftUpperArmArmor_RobotPurpleBloomMaterial_Merged",
+      "parentName": "LeftUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 1276,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightChestTransitionPanel",
+      "parentName": "RightWhiteStructuralAssembly",
+      "subsystem": "Torso",
+      "geoId": 359,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightMountingFrame",
+      "parentName": "RightWhiteStructuralAssembly",
+      "subsystem": "Shoulders",
+      "geoId": 125,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightMountingFrame_Bolts_Merged",
+      "parentName": "RightMountingFrame",
+      "subsystem": "Shoulders",
+      "geoId": 373,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperShoulderHood",
+      "parentName": "RightUpperShoulderShell",
+      "subsystem": "Shoulders",
+      "geoId": 374,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 4288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PauldronSubRim_TitaniumSeal",
+      "parentName": "RightPauldronSubRim",
+      "subsystem": "Shoulders",
+      "geoId": 375,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PauldronSubRim_MetallicRace",
+      "parentName": "RightPauldronSubRim",
+      "subsystem": "Shoulders",
+      "geoId": 376,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 48,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightShoulderNeckLed",
+      "parentName": "StationaryAnchorGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 147,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_R_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 394,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 472,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_R_RobotMetallicMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 399,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 272,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "StationaryAnchorGroup_R_RobotPurpleBloomMaterial_Merged",
+      "parentName": "StationaryAnchorGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 401,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShoulderEnergyRing_R",
+      "parentName": "BearingHousingGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 180,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1232,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_R_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "BearingHousingGroup_R",
+      "subsystem": "Head",
+      "geoId": 420,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 7344,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_R_RobotMetallicMaterial_Merged",
+      "parentName": "BearingHousingGroup_R",
+      "subsystem": "Head",
+      "geoId": 442,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 3248,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_R_RobotPurpleBloomMaterial_Merged",
+      "parentName": "BearingHousingGroup_R",
+      "subsystem": "Head",
+      "geoId": 444,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 704,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_R_RobotWhiteArmorMaterial_Merged",
+      "parentName": "BearingHousingGroup_R",
+      "subsystem": "Arms",
+      "geoId": 446,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 704,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BearingHousingGroup_R_RobotDarkTitaniumDoubleSideMaterial_Merged",
+      "parentName": "BearingHousingGroup_R",
+      "subsystem": "Head",
+      "geoId": 464,
+      "matName": "RobotDarkTitaniumDoubleSideMaterial",
+      "polyCount": 192,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryPivotRing_R",
+      "parentName": "PrimaryHubGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 259,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 320,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryHubGroup_R_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "PrimaryHubGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 484,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 408,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PrimaryHubGroup_R_RobotMetallicMaterial_Merged",
+      "parentName": "PrimaryHubGroup_R",
+      "subsystem": "Shoulders",
+      "geoId": 488,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 624,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightSecondaryAxisCarrier_LinksMerged_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 520,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 2008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightSecondaryAxisCarrier_LinksMerged_RobotMetallicMaterial_Merged",
+      "parentName": "RightSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 525,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 624,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightSecondaryAxisCarrier_LinksMerged_RobotMachinedLinkMaterial_Merged",
+      "parentName": "RightSecondaryAxisCarrier_LinksMerged",
+      "subsystem": "Shoulders",
+      "geoId": 529,
+      "matName": "RobotMachinedLinkMaterial",
+      "polyCount": 128,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightShoulderSocketReceiver_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightShoulderSocketReceiver",
+      "subsystem": "Shoulders",
+      "geoId": 535,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 496,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightShoulderSocketReceiver_RobotMetallicMaterial_Merged",
+      "parentName": "RightShoulderSocketReceiver",
+      "subsystem": "Shoulders",
+      "geoId": 547,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 976,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightBicepRotationalLed",
+      "parentName": "RightShoulderArmAdapter",
+      "subsystem": "Arms",
+      "geoId": 1166,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 768,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightShoulderArmAdapter",
+      "subsystem": "Shoulders",
+      "geoId": 1167,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 768,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AdapterJoint_Merged",
+      "parentName": "RightShoulderArmAdapter",
+      "subsystem": "Shoulders",
+      "geoId": 2125,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1976,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AdapterMetallic_Merged",
+      "parentName": "RightShoulderArmAdapter",
+      "subsystem": "Shoulders",
+      "geoId": 2144,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 2128,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightElbowRoot_UpperHousing_Joint_Merged",
+      "parentName": "ElbowUpperHousing",
+      "subsystem": "Arms",
+      "geoId": 2234,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 600,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightElbowRoot_UpperHousing_Metallic_Merged",
+      "parentName": "ElbowUpperHousing",
+      "subsystem": "Arms",
+      "geoId": 2245,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 964,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowHydraulicRam_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "ElbowHydraulicRam",
+      "subsystem": "Arms",
+      "geoId": 2322,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 136,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowHydraulicRam_RobotMetallicMaterial_Merged",
+      "parentName": "ElbowHydraulicRam",
+      "subsystem": "Arms",
+      "geoId": 2326,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowCentralAxlePin_RobotMetallicMaterial_Merged",
+      "parentName": "ElbowCentralAxlePin",
+      "subsystem": "Arms",
+      "geoId": 2247,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowCentralAxlePin_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "ElbowCentralAxlePin",
+      "subsystem": "Arms",
+      "geoId": 2252,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 224,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_Bezel_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LateralActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 2256,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 640,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_Bezel_RobotMetallicMaterial_Merged",
+      "parentName": "LateralActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 2270,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 144,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_Race_RobotMetallicMaterial_Merged",
+      "parentName": "LateralActuatorDisc_BearingRace",
+      "subsystem": "Head",
+      "geoId": 2274,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_PurpleEmissiveRing",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1360,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1361,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1362,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LateralActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1363,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_CenterDot",
+      "parentName": "LateralActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1366,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_HubCap_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LateralActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 2283,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LateralActuatorDisc_HubCap_RobotMetallicMaterial_Merged",
+      "parentName": "LateralActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 2285,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 200,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_Bezel_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "MedialActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 2289,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 640,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_Bezel_RobotMetallicMaterial_Merged",
+      "parentName": "MedialActuatorDisc_OuterBezel",
+      "subsystem": "Arms",
+      "geoId": 2303,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 144,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_Race_RobotMetallicMaterial_Merged",
+      "parentName": "MedialActuatorDisc_BearingRace",
+      "subsystem": "Head",
+      "geoId": 2307,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_PurpleEmissiveRing",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1360,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1361,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1362,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MedialActuatorDisc",
+      "subsystem": "Arms",
+      "geoId": 1363,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_CenterDot",
+      "parentName": "MedialActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 1366,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 56,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_HubCap_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "MedialActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 2316,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MedialActuatorDisc_HubCap_RobotMetallicMaterial_Merged",
+      "parentName": "MedialActuatorDisc_HubCap",
+      "subsystem": "Arms",
+      "geoId": 2318,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 200,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightElbowRoot_LowerHousing_Joint_Merged",
+      "parentName": "ElbowLowerHousing",
+      "subsystem": "Arms",
+      "geoId": 2331,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 236,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowOlecranonArmor",
+      "parentName": "ElbowLowerHousing",
+      "subsystem": "Arms",
+      "geoId": 1454,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 168,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ElbowOlecranonSpineRib",
+      "parentName": "ElbowLowerHousing",
+      "subsystem": "Arms",
+      "geoId": 1455,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WristSmartCuff",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1531,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 672,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WristPurpleEmissiveSlot",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 1536,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightWristStatic_RobotMetallicMaterial_Merged",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 2397,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightWristStatic_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 2403,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 220,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightWristStatic_RobotPurpleBloomMaterial_Merged",
+      "parentName": "WristMechanics",
+      "subsystem": "Hands",
+      "geoId": 2405,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WristDistalClevis",
+      "parentName": "RightWristTrunnion",
+      "subsystem": "Hands",
+      "geoId": 1546,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandDorsalArmor",
+      "parentName": "RightHandRoot",
+      "subsystem": "Hands",
+      "geoId": 2411,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1558,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandTelemetryLED",
+      "parentName": "RightHandRoot",
+      "subsystem": "Hands",
+      "geoId": 1588,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightHandRoot",
+      "subsystem": "Hands",
+      "geoId": 1589,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandPalmJoint_Merged",
+      "parentName": "StaticPalmAssembly",
+      "subsystem": "Hands",
+      "geoId": 2439,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1008,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HandPalmMetallic_Merged",
+      "parentName": "StaticPalmAssembly",
+      "subsystem": "Hands",
+      "geoId": 2459,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1296,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexProximal_Joint_Merged",
+      "parentName": "IndexProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2472,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexProximal_Metallic_Merged",
+      "parentName": "IndexProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2482,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexProximal_ArmorShell",
+      "parentName": "IndexProximal",
+      "subsystem": "Arms",
+      "geoId": 1686,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexMiddle_Joint_Merged",
+      "parentName": "IndexMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2495,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexMiddle_Metallic_Merged",
+      "parentName": "IndexMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2505,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexMiddle_ArmorShell",
+      "parentName": "IndexMiddle",
+      "subsystem": "Arms",
+      "geoId": 1724,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexDistal_Joint_Merged",
+      "parentName": "IndexDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2516,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexDistal_Metallic_Merged",
+      "parentName": "IndexDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2520,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "IndexDistal_ArmorShell",
+      "parentName": "IndexDistal",
+      "subsystem": "Arms",
+      "geoId": 1751,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "IndexDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "IndexDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleProximal_Joint_Merged",
+      "parentName": "MiddleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2533,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleProximal_Metallic_Merged",
+      "parentName": "MiddleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2543,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleProximal_ArmorShell",
+      "parentName": "MiddleProximal",
+      "subsystem": "Arms",
+      "geoId": 1791,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleMiddle_Joint_Merged",
+      "parentName": "MiddleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2556,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleMiddle_Metallic_Merged",
+      "parentName": "MiddleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2566,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleMiddle_ArmorShell",
+      "parentName": "MiddleMiddle",
+      "subsystem": "Arms",
+      "geoId": 1829,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleDistal_Joint_Merged",
+      "parentName": "MiddleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2577,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleDistal_Metallic_Merged",
+      "parentName": "MiddleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2581,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "MiddleDistal_ArmorShell",
+      "parentName": "MiddleDistal",
+      "subsystem": "Arms",
+      "geoId": 1856,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MiddleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "MiddleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingProximal_Joint_Merged",
+      "parentName": "RingProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2594,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingProximal_Metallic_Merged",
+      "parentName": "RingProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2604,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingProximal_ArmorShell",
+      "parentName": "RingProximal",
+      "subsystem": "Arms",
+      "geoId": 1885,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingMiddle_Joint_Merged",
+      "parentName": "RingMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2617,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingMiddle_Metallic_Merged",
+      "parentName": "RingMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2627,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingMiddle_ArmorShell",
+      "parentName": "RingMiddle",
+      "subsystem": "Arms",
+      "geoId": 1912,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingDistal_Joint_Merged",
+      "parentName": "RingDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2638,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingDistal_Metallic_Merged",
+      "parentName": "RingDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2642,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RingDistal_ArmorShell",
+      "parentName": "RingDistal",
+      "subsystem": "Arms",
+      "geoId": 1933,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RingDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RingDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleProximal_Joint_Merged",
+      "parentName": "LittleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2655,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleProximal_Metallic_Merged",
+      "parentName": "LittleProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2665,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleProximal_ArmorShell",
+      "parentName": "LittleProximal",
+      "subsystem": "Arms",
+      "geoId": 1971,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleMiddle_Joint_Merged",
+      "parentName": "LittleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2678,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleMiddle_Metallic_Merged",
+      "parentName": "LittleMiddle_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2688,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleMiddle_ArmorShell",
+      "parentName": "LittleMiddle",
+      "subsystem": "Arms",
+      "geoId": 2006,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleDistal_Joint_Merged",
+      "parentName": "LittleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2699,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleDistal_Metallic_Merged",
+      "parentName": "LittleDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2703,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LittleDistal_ArmorShell",
+      "parentName": "LittleDistal",
+      "subsystem": "Arms",
+      "geoId": 2033,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LittleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LittleDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbBaseJoint_Merged",
+      "parentName": "ThumbBase_Static",
+      "subsystem": "Fingers",
+      "geoId": 2708,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbBaseMetallic_Merged",
+      "parentName": "ThumbBase_Static",
+      "subsystem": "Fingers",
+      "geoId": 2712,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 344,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbProximal_Joint_Merged",
+      "parentName": "ThumbProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2725,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbProximal_Metallic_Merged",
+      "parentName": "ThumbProximal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2735,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1204,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbProximal_ArmorShell",
+      "parentName": "ThumbProximal",
+      "subsystem": "Fingers",
+      "geoId": 2085,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 396,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbDistal_Joint_Merged",
+      "parentName": "ThumbDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2746,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 288,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbDistal_Metallic_Merged",
+      "parentName": "ThumbDistal_StaticFrame",
+      "subsystem": "Fingers",
+      "geoId": 2750,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 276,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThumbDistal_ArmorShell",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 2112,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 552,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 1752,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 140,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 1753,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 80,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "ThumbDistal",
+      "subsystem": "Fingers",
+      "geoId": 2113,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightWristTrunnion_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightWristTrunnion",
+      "subsystem": "Hands",
+      "geoId": 2410,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 224,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmCore_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightForearmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 2378,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 452,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmCore_RobotMetallicMaterial_Merged",
+      "parentName": "RightForearmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 2385,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 832,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ForearmWristTransitionCollar",
+      "parentName": "RightForearmAssembly",
+      "subsystem": "Hands",
+      "geoId": 1465,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightForearmAssembly",
+      "subsystem": "Arms",
+      "geoId": 1466,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmArmor_RobotWhiteArmorDoubleSideMaterial_Merged",
+      "parentName": "RightForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2337,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 8176,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmArmor_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2356,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 680,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmArmor_RobotMetallicMaterial_Merged",
+      "parentName": "RightForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2358,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmArmor_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "RightForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2360,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightForearmArmor_RobotPurpleBloomMaterial_Merged",
+      "parentName": "RightForearmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2362,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmCore_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightUpperArmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 2207,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 948,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmCore_RobotMetallicMaterial_Merged",
+      "parentName": "RightUpperArmMechanicalCore",
+      "subsystem": "Arms",
+      "geoId": 2222,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1720,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmArmor_RobotWhiteArmorDoubleSideMaterial_Merged",
+      "parentName": "RightUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2165,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 9760,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmArmor_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2183,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 296,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmArmor_RobotMetallicMaterial_Merged",
+      "parentName": "RightUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2185,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmArmor_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "RightUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2187,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightUpperArmArmor_RobotPurpleBloomMaterial_Merged",
+      "parentName": "RightUpperArmArmorGroup",
+      "subsystem": "Arms",
+      "geoId": 2189,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "NeckCollar",
+      "parentName": "UpperTorsoFrame",
+      "subsystem": "Head",
+      "geoId": 44,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 2880,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "UpperChestFrameJoint_Merged",
+      "parentName": "UpperTorsoFrame",
+      "subsystem": "Torso",
+      "geoId": 51,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "NeckCollarLightRing",
+      "parentName": "UpperTorsoFrame",
+      "subsystem": "Head",
+      "geoId": 52,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 800,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "NeckCollarLightSlit",
+      "parentName": "UpperTorsoFrame",
+      "subsystem": "Head",
+      "geoId": 53,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ChestBackArmor",
+      "parentName": "UpperTorsoFrame",
+      "subsystem": "Arms",
+      "geoId": 54,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1036,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BackLightBar",
+      "parentName": "UpperTorsoFrame",
+      "subsystem": "Torso",
+      "geoId": 55,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "SubXiphoidStatusLed",
+      "parentName": "LowerChestFrame",
+      "subsystem": "Torso",
+      "geoId": 65,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LowerChestFrame_Merged",
+      "parentName": "LowerChestFrame",
+      "subsystem": "Torso",
+      "geoId": 111,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 984,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LowerChestMetallic_Merged",
+      "parentName": "LowerChestFrame",
+      "subsystem": "Torso",
+      "geoId": 120,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 392,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LowerChestFrame",
+      "subsystem": "Torso",
+      "geoId": 121,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LowerChestFrame",
+      "subsystem": "Torso",
+      "geoId": 122,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LowerChestFrame",
+      "subsystem": "Torso",
+      "geoId": 123,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "NeckStructure_Merged",
+      "parentName": "Neck",
+      "subsystem": "Head",
+      "geoId": 1152,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 5680,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "NeckSpacers_Merged",
+      "parentName": "Neck",
+      "subsystem": "Head",
+      "geoId": 1157,
+      "matName": "RobotDarkTitaniumDoubleSideMaterial",
+      "polyCount": 336,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "InnerSkullCore",
+      "parentName": "RobotHead",
+      "subsystem": "Head",
+      "geoId": 1072,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 816,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BrowTrim",
+      "parentName": "OuterShell",
+      "subsystem": "Head",
+      "geoId": 1074,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 576,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HelmetArmor_Merged",
+      "parentName": "OuterShell",
+      "subsystem": "Arms",
+      "geoId": 1085,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 8824,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RearNapeLEDGroup",
+      "subsystem": "Head",
+      "geoId": 1086,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 256,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RearNapeLED",
+      "parentName": "RearNapeLEDGroup",
+      "subsystem": "Head",
+      "geoId": 1087,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 256,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RearNapeLEDGroup",
+      "subsystem": "Head",
+      "geoId": 1088,
+      "matName": "RobotWhiteCoreEmissiveMaterial",
+      "polyCount": 192,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "BlackVisor",
+      "parentName": "VisorAssembly",
+      "subsystem": "Head",
+      "geoId": 1089,
+      "matName": "RobotObsidianVisorMaterial",
+      "polyCount": 3888,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VisorOuterFrame",
+      "parentName": "VisorAssembly",
+      "subsystem": "Head",
+      "geoId": 1090,
+      "matName": "RobotVisorOuterFrameMaterial",
+      "polyCount": 1600,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VisorLEDBloom",
+      "parentName": "PurpleVisorLED",
+      "subsystem": "Head",
+      "geoId": 1091,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 1056,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VisorLEDBar",
+      "parentName": "PurpleVisorLED",
+      "subsystem": "Head",
+      "geoId": 1092,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1056,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VisorLEDCore",
+      "parentName": "PurpleVisorLED",
+      "subsystem": "Head",
+      "geoId": 1093,
+      "matName": "RobotWhiteCoreEmissiveMaterial",
+      "polyCount": 880,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "EarMount",
+      "parentName": "LeftSideModule",
+      "subsystem": "Arms",
+      "geoId": 1094,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1280,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "EarEmissiveRing",
+      "parentName": "LeftSideModule",
+      "subsystem": "Head",
+      "geoId": 1098,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1920,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "EarCoreRingWhite",
+      "parentName": "LeftSideModule",
+      "subsystem": "Head",
+      "geoId": 1099,
+      "matName": "RobotWhiteCoreEmissiveMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftSideModule_JointMerged",
+      "parentName": "LeftSideModule",
+      "subsystem": "Head",
+      "geoId": 1108,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1776,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "EarMount",
+      "parentName": "RightSideModule",
+      "subsystem": "Arms",
+      "geoId": 1094,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1280,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "EarEmissiveRing",
+      "parentName": "RightSideModule",
+      "subsystem": "Head",
+      "geoId": 1098,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1920,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "EarCoreRingWhite",
+      "parentName": "RightSideModule",
+      "subsystem": "Head",
+      "geoId": 1099,
+      "matName": "RobotWhiteCoreEmissiveMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightSideModule_JointMerged",
+      "parentName": "RightSideModule",
+      "subsystem": "Head",
+      "geoId": 1108,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1776,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "JawShell",
+      "parentName": "JawAssembly",
+      "subsystem": "Head",
+      "geoId": 1109,
+      "matName": "RobotWhiteArmorDoubleSideMaterial",
+      "polyCount": 3240,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "JawJoint_Merged",
+      "parentName": "JawAssembly",
+      "subsystem": "Head",
+      "geoId": 1117,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 236,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "SpineUpperMount_Joint_Merged",
+      "parentName": "SpineUpperMount",
+      "subsystem": "Torso",
+      "geoId": 552,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 128,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "SpineUpperMount_Metallic_Merged",
+      "parentName": "SpineUpperMount",
+      "subsystem": "Torso",
+      "geoId": 556,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1416,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "SpineUpperMount",
+      "subsystem": "Torso",
+      "geoId": 557,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "SpineCentralShaft",
+      "parentName": "ArticulatedSpineAssembly",
+      "subsystem": "Torso",
+      "geoId": 558,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_01_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "VertebraModule_01",
+      "subsystem": "Torso",
+      "geoId": 597,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 608,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_01_RobotMetallicMaterial_Merged",
+      "parentName": "VertebraModule_01",
+      "subsystem": "Torso",
+      "geoId": 609,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1016,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_01_RobotWhiteArmorMaterial_Merged",
+      "parentName": "VertebraModule_01",
+      "subsystem": "Arms",
+      "geoId": 613,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 40,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_01_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "VertebraModule_01",
+      "subsystem": "Torso",
+      "geoId": 617,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 24,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_02_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "VertebraModule_02",
+      "subsystem": "Torso",
+      "geoId": 646,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 572,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_02_RobotMetallicMaterial_Merged",
+      "parentName": "VertebraModule_02",
+      "subsystem": "Torso",
+      "geoId": 656,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 920,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_02_RobotWhiteArmorMaterial_Merged",
+      "parentName": "VertebraModule_02",
+      "subsystem": "Arms",
+      "geoId": 658,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 28,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_02_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "VertebraModule_02",
+      "subsystem": "Torso",
+      "geoId": 660,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_03_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "VertebraModule_03",
+      "subsystem": "Torso",
+      "geoId": 697,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 596,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_03_RobotMetallicMaterial_Merged",
+      "parentName": "VertebraModule_03",
+      "subsystem": "Torso",
+      "geoId": 710,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1112,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_03_RobotWhiteArmorMaterial_Merged",
+      "parentName": "VertebraModule_03",
+      "subsystem": "Arms",
+      "geoId": 712,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 28,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_03_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "VertebraModule_03",
+      "subsystem": "Torso",
+      "geoId": 716,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 108,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_04_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "VertebraModule_04",
+      "subsystem": "Torso",
+      "geoId": 745,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 572,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_04_RobotMetallicMaterial_Merged",
+      "parentName": "VertebraModule_04",
+      "subsystem": "Torso",
+      "geoId": 755,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 920,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_04_RobotWhiteArmorMaterial_Merged",
+      "parentName": "VertebraModule_04",
+      "subsystem": "Arms",
+      "geoId": 757,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 28,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_04_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "VertebraModule_04",
+      "subsystem": "Torso",
+      "geoId": 759,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_05_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "VertebraModule_05",
+      "subsystem": "Torso",
+      "geoId": 782,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 272,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_05_RobotMetallicMaterial_Merged",
+      "parentName": "VertebraModule_05",
+      "subsystem": "Torso",
+      "geoId": 792,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 920,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_05_RobotWhiteArmorMaterial_Merged",
+      "parentName": "VertebraModule_05",
+      "subsystem": "Arms",
+      "geoId": 794,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 28,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "VertebraModule_05_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "VertebraModule_05",
+      "subsystem": "Torso",
+      "geoId": 796,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistTransitionDeck_RobotMetallicMaterial_Merged",
+      "parentName": "WaistTransitionDeckAssembly",
+      "subsystem": "Waist",
+      "geoId": 841,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 1688,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistTransitionDeck_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "WaistTransitionDeckAssembly",
+      "subsystem": "Waist",
+      "geoId": 843,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 416,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistTransitionDeck_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "WaistTransitionDeckAssembly",
+      "subsystem": "Waist",
+      "geoId": 847,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1344,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistTransitionDeck_RobotWhiteArmorMaterial_Merged",
+      "parentName": "WaistTransitionDeckAssembly",
+      "subsystem": "Arms",
+      "geoId": 851,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 24,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftActuatorClusterAssembly_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "LeftActuatorClusterAssembly",
+      "subsystem": "Torso",
+      "geoId": 921,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1776,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftActuatorClusterAssembly_RobotMetallicMaterial_Merged",
+      "parentName": "LeftActuatorClusterAssembly",
+      "subsystem": "Torso",
+      "geoId": 925,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 3432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "LeftActuatorClusterAssembly_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "LeftActuatorClusterAssembly",
+      "subsystem": "Torso",
+      "geoId": 929,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 256,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightActuatorClusterAssembly_RobotDarkTitaniumMaterial_Merged",
+      "parentName": "RightActuatorClusterAssembly",
+      "subsystem": "Torso",
+      "geoId": 976,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1776,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightActuatorClusterAssembly_RobotMetallicMaterial_Merged",
+      "parentName": "RightActuatorClusterAssembly",
+      "subsystem": "Torso",
+      "geoId": 980,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 3432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "RightActuatorClusterAssembly_RobotPurpleEmissiveMaterial_Merged",
+      "parentName": "RightActuatorClusterAssembly",
+      "subsystem": "Torso",
+      "geoId": 984,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 256,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistCore_Merged",
+      "parentName": "WaistCore",
+      "subsystem": "Waist",
+      "geoId": 1031,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 14952,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistMetallic_Merged",
+      "parentName": "WaistCore",
+      "subsystem": "Waist",
+      "geoId": 1033,
+      "matName": "RobotMetallicMaterial",
+      "polyCount": 864,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "WaistCoreAccentRings_Merged",
+      "parentName": "WaistCore",
+      "subsystem": "Waist",
+      "geoId": 1039,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1152,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipBracketArm",
+      "parentName": "LeftHipPivot",
+      "subsystem": "Arms",
+      "geoId": 1040,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipRotaryHub",
+      "parentName": "LeftHipPivot",
+      "subsystem": "Waist",
+      "geoId": 1041,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipAccentRing",
+      "parentName": "LeftHipPivot",
+      "subsystem": "Waist",
+      "geoId": 1042,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 448,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipCowlArmor",
+      "parentName": "LeftHipPivot",
+      "subsystem": "Arms",
+      "geoId": 1043,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 812,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipHousingJoint_L",
+      "parentName": "HipHousing_L",
+      "subsystem": "Waist",
+      "geoId": 2766,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1184,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipAccentRing_L",
+      "parentName": "LeftHip",
+      "subsystem": "Waist",
+      "geoId": 2767,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighMount_Merged_L",
+      "parentName": "ThighMount_L",
+      "subsystem": "Legs",
+      "geoId": 2795,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighFrame_Merged_L",
+      "parentName": "ThighFrame_L",
+      "subsystem": "Legs",
+      "geoId": 2824,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 688,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighAnteriorArmor_L",
+      "parentName": "LeftThigh",
+      "subsystem": "Arms",
+      "geoId": 2826,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 4516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighLateralArmor_L",
+      "parentName": "LeftThigh",
+      "subsystem": "Arms",
+      "geoId": 2827,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1196,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighLedStrip_L",
+      "parentName": "LeftThigh",
+      "subsystem": "Legs",
+      "geoId": 2828,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftThigh",
+      "subsystem": "Legs",
+      "geoId": 2829,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighStaticArmor_L",
+      "parentName": "LeftThigh",
+      "subsystem": "Arms",
+      "geoId": 2836,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 2804,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "KneeCondyleMesh_L",
+      "parentName": "KneeCore_L",
+      "subsystem": "Legs",
+      "geoId": 2872,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1200,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "KneeAccents_L",
+      "parentName": "LeftKnee",
+      "subsystem": "Legs",
+      "geoId": 2878,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PatellaShield_L",
+      "parentName": "LeftKnee",
+      "subsystem": "Legs",
+      "geoId": 2879,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 236,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PatellaLedBezel",
+      "parentName": "PatellaShield_L",
+      "subsystem": "Legs",
+      "geoId": 2880,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PatellaLed_L",
+      "parentName": "PatellaShield_L",
+      "subsystem": "Legs",
+      "geoId": 2881,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "PatellaShield_L",
+      "subsystem": "Legs",
+      "geoId": 2882,
+      "matName": "RobotWhiteCoreEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "PatellaShield_L",
+      "subsystem": "Legs",
+      "geoId": 2883,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "KneeLowerStructure_L",
+      "parentName": "LeftShinPivot",
+      "subsystem": "Legs",
+      "geoId": 2889,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 124,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShinFrame_Merged_L",
+      "parentName": "ShinFrame_L",
+      "subsystem": "Legs",
+      "geoId": 2921,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 596,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftShin",
+      "subsystem": "Legs",
+      "geoId": 2922,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 384,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShinAnteriorKeel_L",
+      "parentName": "LeftShin",
+      "subsystem": "Legs",
+      "geoId": 2923,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1216,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShinLedStrip_L",
+      "parentName": "LeftShin",
+      "subsystem": "Legs",
+      "geoId": 2924,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftShin",
+      "subsystem": "Legs",
+      "geoId": 2925,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "CalfArmor_L",
+      "parentName": "LeftShin",
+      "subsystem": "Arms",
+      "geoId": 2926,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1308,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "CalfVents_L",
+      "parentName": "LeftShin",
+      "subsystem": "Legs",
+      "geoId": 2933,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 36,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "CalfGlows_L",
+      "parentName": "LeftShin",
+      "subsystem": "Legs",
+      "geoId": 2938,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 36,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleJointMesh_L",
+      "parentName": "AnkleJointCore_L",
+      "subsystem": "Feet",
+      "geoId": 2957,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 948,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleAccentLat_L",
+      "parentName": "LeftAnkle",
+      "subsystem": "Feet",
+      "geoId": 2942,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 384,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleAccentMed_L",
+      "parentName": "LeftAnkle",
+      "subsystem": "Feet",
+      "geoId": 2942,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 384,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleCaps_L",
+      "parentName": "LeftAnkle",
+      "subsystem": "Feet",
+      "geoId": 2947,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 160,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "FootJointMesh_L",
+      "parentName": "FootJointCore_L",
+      "subsystem": "Feet",
+      "geoId": 2979,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftFoot",
+      "subsystem": "Feet",
+      "geoId": 2965,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 2,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "FootDorsalArmor_L",
+      "parentName": "LeftFoot",
+      "subsystem": "Arms",
+      "geoId": 2966,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 524,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "LeftFoot",
+      "subsystem": "Feet",
+      "geoId": 2967,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ToeArmor_L",
+      "parentName": "LeftToePivot",
+      "subsystem": "Arms",
+      "geoId": 2968,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 728,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HeelArmor_L",
+      "parentName": "LeftFoot",
+      "subsystem": "Arms",
+      "geoId": 2969,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 296,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "FootUnderglow_L",
+      "parentName": "LeftFoot",
+      "subsystem": "Feet",
+      "geoId": 2984,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipBracketArm",
+      "parentName": "RightHipPivot",
+      "subsystem": "Arms",
+      "geoId": 1044,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 432,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipRotaryHub",
+      "parentName": "RightHipPivot",
+      "subsystem": "Waist",
+      "geoId": 1045,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 96,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipAccentRing",
+      "parentName": "RightHipPivot",
+      "subsystem": "Waist",
+      "geoId": 1046,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 448,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipCowlArmor",
+      "parentName": "RightHipPivot",
+      "subsystem": "Arms",
+      "geoId": 1047,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 812,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipHousingJoint_R",
+      "parentName": "HipHousing_R",
+      "subsystem": "Waist",
+      "geoId": 3000,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1184,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HipAccentRing_R",
+      "parentName": "RightHip",
+      "subsystem": "Waist",
+      "geoId": 3001,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighMount_Merged_R",
+      "parentName": "ThighMount_R",
+      "subsystem": "Legs",
+      "geoId": 3029,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighFrame_Merged_R",
+      "parentName": "ThighFrame_R",
+      "subsystem": "Legs",
+      "geoId": 3050,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 688,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighAnteriorArmor_R",
+      "parentName": "RightThigh",
+      "subsystem": "Arms",
+      "geoId": 2826,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 4516,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighLateralArmor_R",
+      "parentName": "RightThigh",
+      "subsystem": "Arms",
+      "geoId": 2827,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1196,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighLedStrip_R",
+      "parentName": "RightThigh",
+      "subsystem": "Legs",
+      "geoId": 2828,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightThigh",
+      "subsystem": "Legs",
+      "geoId": 2829,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ThighStaticArmor_R",
+      "parentName": "RightThigh",
+      "subsystem": "Arms",
+      "geoId": 3055,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 2804,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "KneeCondyleMesh_R",
+      "parentName": "KneeCore_R",
+      "subsystem": "Legs",
+      "geoId": 3082,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1200,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "KneeAccents_R",
+      "parentName": "RightKnee",
+      "subsystem": "Legs",
+      "geoId": 3086,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 1536,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PatellaShield_R",
+      "parentName": "RightKnee",
+      "subsystem": "Legs",
+      "geoId": 2879,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 236,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PatellaLedBezel",
+      "parentName": "PatellaShield_R",
+      "subsystem": "Legs",
+      "geoId": 2880,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PatellaLed_R",
+      "parentName": "PatellaShield_R",
+      "subsystem": "Legs",
+      "geoId": 2881,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "PatellaShield_R",
+      "subsystem": "Legs",
+      "geoId": 2882,
+      "matName": "RobotWhiteCoreEmissiveMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "PatellaShield_R",
+      "subsystem": "Legs",
+      "geoId": 2883,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 544,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "KneeLowerStructure_R",
+      "parentName": "RightShinPivot",
+      "subsystem": "Legs",
+      "geoId": 3090,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 124,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShinFrame_Merged_R",
+      "parentName": "ShinFrame_R",
+      "subsystem": "Legs",
+      "geoId": 3112,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 596,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightShin",
+      "subsystem": "Legs",
+      "geoId": 2922,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 384,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShinAnteriorKeel_R",
+      "parentName": "RightShin",
+      "subsystem": "Legs",
+      "geoId": 2923,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1216,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ShinLedStrip_R",
+      "parentName": "RightShin",
+      "subsystem": "Legs",
+      "geoId": 2924,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightShin",
+      "subsystem": "Legs",
+      "geoId": 2925,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "CalfArmor_R",
+      "parentName": "RightShin",
+      "subsystem": "Arms",
+      "geoId": 2926,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1308,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "CalfVents_R",
+      "parentName": "RightShin",
+      "subsystem": "Legs",
+      "geoId": 3117,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 36,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "CalfGlows_R",
+      "parentName": "RightShin",
+      "subsystem": "Legs",
+      "geoId": 3122,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 36,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleJointMesh_R",
+      "parentName": "AnkleJointCore_R",
+      "subsystem": "Feet",
+      "geoId": 3141,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 948,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleAccentLat_R",
+      "parentName": "RightAnkle",
+      "subsystem": "Feet",
+      "geoId": 3126,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 384,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleAccentMed_R",
+      "parentName": "RightAnkle",
+      "subsystem": "Feet",
+      "geoId": 3126,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 384,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "AnkleCaps_R",
+      "parentName": "RightAnkle",
+      "subsystem": "Feet",
+      "geoId": 3131,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 160,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "FootJointMesh_R",
+      "parentName": "FootJointCore_R",
+      "subsystem": "Feet",
+      "geoId": 3150,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 1304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightFoot",
+      "subsystem": "Feet",
+      "geoId": 2965,
+      "matName": "RobotPurpleBloomMaterial",
+      "polyCount": 2,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "FootDorsalArmor_R",
+      "parentName": "RightFoot",
+      "subsystem": "Arms",
+      "geoId": 2966,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 524,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "RightFoot",
+      "subsystem": "Feet",
+      "geoId": 2967,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "ToeArmor_R",
+      "parentName": "RightToePivot",
+      "subsystem": "Arms",
+      "geoId": 2968,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 728,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "HeelArmor_R",
+      "parentName": "RightFoot",
+      "subsystem": "Arms",
+      "geoId": 2969,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 296,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "FootUnderglow_R",
+      "parentName": "RightFoot",
+      "subsystem": "Feet",
+      "geoId": 3154,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 304,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PelvicShieldPlate",
+      "parentName": "HipConnection",
+      "subsystem": "Waist",
+      "geoId": 1048,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 1024,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PelvicIntakePocket",
+      "parentName": "PelvicShieldPlate",
+      "subsystem": "Waist",
+      "geoId": 1056,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 36,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "PelvicAccentLight",
+      "parentName": "PelvicShieldPlate",
+      "subsystem": "Waist",
+      "geoId": 1057,
+      "matName": "RobotPurpleEmissiveMaterial",
+      "polyCount": 12,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "InguinalFlap_L",
+      "parentName": "HipConnection",
+      "subsystem": "Waist",
+      "geoId": 1058,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "InguinalFlap_L",
+      "subsystem": "Waist",
+      "geoId": 1059,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 48,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "InguinalFlap_R",
+      "parentName": "HipConnection",
+      "subsystem": "Waist",
+      "geoId": 1060,
+      "matName": "RobotWhiteArmorMaterial",
+      "polyCount": 512,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "unnamed",
+      "parentName": "InguinalFlap_R",
+      "subsystem": "Waist",
+      "geoId": 1061,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 48,
+      "isInstanced": false,
+      "instanceCount": 1
+    },
+    {
+      "name": "SubPelvisCradle",
+      "parentName": "HipConnection",
+      "subsystem": "Waist",
+      "geoId": 1071,
+      "matName": "RobotDarkTitaniumMaterial",
+      "polyCount": 148,
+      "isInstanced": false,
+      "instanceCount": 1
+    }
+  ]
+}

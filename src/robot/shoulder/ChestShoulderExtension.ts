@@ -14,6 +14,8 @@
 
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { safeMergeGeometries } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 import {
   createMultiAxisShoulderJoint,
   MultiAxisShoulderJointNodes,
@@ -485,14 +487,14 @@ function createPauldronSubRim(
   group.name = side === -1 ? 'LeftPauldronSubRim' : 'RightPauldronSubRim';
 
   // Sub-rim reveal ribbon extending under the white armor edge to meet the rotational ring
-  const subRimGeo = createCurvedRibbon(0.03, 0.97, 0.94, 1.02, side, 28, 2, -0.0008);
+  const subRimGeo = geoCache.get(`PauldronSubRimGeo_${side}`, () => createCurvedRibbon(0.03, 0.97, 0.94, 1.02, side, 28, 2, -0.0008));
   const subRimMesh = new THREE.Mesh(subRimGeo, materials.joint);
   subRimMesh.name = 'PauldronSubRim_TitaniumSeal';
   subRimMesh.castShadow = true;
   group.add(subRimMesh);
 
   // Precision metallic labyrinth seal wire
-  const raceGeo = createCurvedRibbon(0.06, 0.94, 0.97, 0.995, side, 24, 1, -0.0003);
+  const raceGeo = geoCache.get(`PauldronRaceGeo_${side}`, () => createCurvedRibbon(0.06, 0.94, 0.97, 0.995, side, 24, 1, -0.0003));
   const raceMesh = new THREE.Mesh(raceGeo, materials.metallic);
   raceMesh.name = 'PauldronSubRim_MetallicRace';
   group.add(raceMesh);
@@ -517,7 +519,7 @@ function createUpperShoulderShell(
   group.name = side === -1 ? 'LeftUpperShoulderShell' : 'RightUpperShoulderShell';
 
   // 1. Continuous sculpted white ceramic pauldron cowl
-  const geo = createSculptedPauldronGeometry(side);
+  const geo = geoCache.get(`SculptedPauldronGeo_${side}`, () => createSculptedPauldronGeometry(side));
   const mesh = new THREE.Mesh(geo, materials.armorDoubleSide);
   mesh.name = side === -1 ? 'LeftUpperShoulderHood' : 'RightUpperShoulderHood';
   mesh.castShadow = true;
@@ -589,21 +591,24 @@ function createMountingBulkhead(
   const plateRadius = 0.0440;
   const innerR = 0.0380;
 
-  const shape = new THREE.Shape();
-  shape.absarc(0, 0, plateRadius, 0, Math.PI * 2, false);
-  const hole = new THREE.Path();
-  hole.absarc(0, 0, innerR, 0, Math.PI * 2, true);
-  shape.holes.push(hole);
+  const geo = geoCache.get('MountingBulkheadPlateGeo', () => {
+    const shape = new THREE.Shape();
+    shape.absarc(0, 0, plateRadius, 0, Math.PI * 2, false);
+    const hole = new THREE.Path();
+    hole.absarc(0, 0, innerR, 0, Math.PI * 2, true);
+    shape.holes.push(hole);
 
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.0035,
-    bevelEnabled: true,
-    bevelThickness: 0.0010,
-    bevelSize: 0.0008,
-    bevelSegments: 2,
-    curveSegments: 32,
+    const g = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.0035,
+      bevelEnabled: true,
+      bevelThickness: 0.0010,
+      bevelSize: 0.0008,
+      bevelSegments: 2,
+      curveSegments: 32,
+    });
+    g.center();
+    return g;
   });
-  geo.center();
 
   const mesh = new THREE.Mesh(geo, materials.joint);
   mesh.name = side === -1 ? 'LeftMountingFrame' : 'RightMountingFrame';
@@ -612,17 +617,30 @@ function createMountingBulkhead(
   mesh.castShadow = true;
   mesh.receiveShadow = true;
 
-  for (let b = 0; b < 12; b++) {
-    const angle = (b / 12) * Math.PI * 2;
-    const boltGeo = new THREE.CylinderGeometry(0.0013, 0.0013, 0.0035, 6);
-    boltGeo.rotateZ(Math.PI / 2);
-    const bolt = new THREE.Mesh(boltGeo, materials.metallic);
-    bolt.position.set(
-      side * 0.0020,
-      Math.sin(angle) * 0.0410,
-      Math.cos(angle) * 0.0410
-    );
-    mesh.add(bolt);
+  const boltGeo = geoCache.get('MountingBulkheadBoltGeo', () => {
+    const g = new THREE.CylinderGeometry(0.0013, 0.0013, 0.0035, 6);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
+
+  const mergedBoltsGeo = geoCache.get(`MountingBulkheadMergedBoltsGeo_${side}`, () => {
+    const boltItems: { geometry: THREE.BufferGeometry; matrix: THREE.Matrix4 }[] = [];
+    for (let b = 0; b < 12; b++) {
+      const angle = (b / 12) * Math.PI * 2;
+      const m = new THREE.Matrix4().makeTranslation(
+        side * 0.0020,
+        Math.sin(angle) * 0.0410,
+        Math.cos(angle) * 0.0410
+      );
+      boltItems.push({ geometry: boltGeo, matrix: m });
+    }
+    return safeMergeGeometries(boltItems);
+  });
+
+  if (mergedBoltsGeo) {
+    const boltMesh = new THREE.Mesh(mergedBoltsGeo, materials.metallic);
+    boltMesh.name = `${mesh.name}_Bolts_Merged`;
+    mesh.add(boltMesh);
   }
 
   return mesh;
@@ -649,7 +667,7 @@ export function createChestShoulderExtension(
   group.add(whiteStructuralAssembly);
 
   // 1. Inboard White Collar (chestTransitionPanel) — stops at X = ±0.205
-  const transitionGeo = createChestTransitionGeometry(side);
+  const transitionGeo = geoCache.get(`ChestTransitionGeo_${side}`, () => createChestTransitionGeometry(side));
   const chestTransitionPanel = new THREE.Mesh(transitionGeo, materials.armorDoubleSide);
   chestTransitionPanel.name =
     side === -1 ? 'LeftChestTransitionPanel' : 'RightChestTransitionPanel';

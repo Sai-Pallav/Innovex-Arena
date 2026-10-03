@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeAllGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // WRIST MODULE — High-Precision Ergonomic Humanoid Robotic Gauntlet Cuff
@@ -176,6 +178,26 @@ function createSquircleRingGeometry(
   return geo;
 }
 
+function getSquircleCuffGeometry(
+  width: number = 0.0432,
+  depth: number = 0.0332,
+  height: number = 0.0135,
+  power: number = 3.2
+): THREE.BufferGeometry {
+  const key = `SquircleCuff_${width.toFixed(5)}_${depth.toFixed(5)}_${height.toFixed(5)}_${power.toFixed(2)}`;
+  return geoCache.get(key, () => createSquircleCuffGeometry(width, depth, height, power));
+}
+
+function getSquircleRingGeometry(
+  width: number,
+  depth: number,
+  height: number = 0.0010,
+  power: number = 3.2
+): THREE.BufferGeometry {
+  const key = `SquircleRing_${width.toFixed(5)}_${depth.toFixed(5)}_${height.toFixed(5)}_${power.toFixed(2)}`;
+  return geoCache.get(key, () => createSquircleRingGeometry(width, depth, height, power));
+}
+
 export function createWrist(
   side: -1 | 1,
   materials: RobotMaterialPalette
@@ -199,7 +221,7 @@ export function createWrist(
   const cuffD = 0.0388; // 38.8 mm deep (eliminates narrow bottleneck while preserving sleek articulation)
   const cuffH = 0.0152; // 15.2 mm controlled athletic height
 
-  const cuffGeo = createSquircleCuffGeometry(cuffW, cuffD, cuffH, 3.2);
+  const cuffGeo = getSquircleCuffGeometry(cuffW, cuffD, cuffH, 3.2);
   const swivelCollar = new THREE.Mesh(cuffGeo, materials.joint);
   swivelCollar.name = 'WristSmartCuff';
   swivelCollar.position.set(0, 0, 0);
@@ -211,14 +233,14 @@ export function createWrist(
   // 2. POLISHED METALLIC TRIM BEZELS (Upper Forearm & Lower Carpal)
   // ════════════════════════════════════════════════════════════
   // Upper trim docking with forearm gauntlet collar (zero air gap)
-  const topTrimGeo = createSquircleRingGeometry(cuffW * 1.006, cuffD * 1.006, 0.0010, 3.2);
+  const topTrimGeo = getSquircleRingGeometry(cuffW * 1.006, cuffD * 1.006, 0.0010, 3.2);
   const topTrim = new THREE.Mesh(topTrimGeo, materials.metallic);
   topTrim.position.set(0, 0.0001, 0);
   mechanicsGroup.add(topTrim);
   ribbedRings.push(topTrim);
 
   // Lower trim docking with carpal hand base
-  const botTrimGeo = createSquircleRingGeometry(cuffW * 0.975, cuffD * 0.975, 0.0010, 3.2);
+  const botTrimGeo = getSquircleRingGeometry(cuffW * 0.975, cuffD * 0.975, 0.0010, 3.2);
   const botTrim = new THREE.Mesh(botTrimGeo, materials.metallic);
   botTrim.position.set(0, -cuffH + 0.0006, 0);
   mechanicsGroup.add(botTrim);
@@ -234,21 +256,33 @@ export function createWrist(
   const slotZ = (cuffD * 0.50) * 1.015 - 0.0002;
 
   // Recessed dark backing tray
-  const trayGeo = new THREE.BoxGeometry(slotLength + 0.0046, slotRadius * 2.8, 0.0010);
+  const trayGeo = geoCache.getBox(slotLength + 0.0046, slotRadius * 2.8, 0.0010);
   const slotTray = new THREE.Mesh(trayGeo, materials.joint);
   slotTray.position.set(0, slotY, slotZ - 0.0004);
   mechanicsGroup.add(slotTray);
 
   // Precision polished chrome capsule bezel frame
-  const bezelGeo = new THREE.CapsuleGeometry(slotRadius * 1.35, slotLength, 8, 16);
-  bezelGeo.rotateZ(Math.PI / 2);
+  const bezelGeo = geoCache.get(
+    `WristBezel_${slotRadius.toFixed(5)}_${slotLength.toFixed(5)}`,
+    () => {
+      const g = new THREE.CapsuleGeometry(slotRadius * 1.35, slotLength, 8, 16);
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
+  );
   const slotBezel = new THREE.Mesh(bezelGeo, materials.metallic);
   slotBezel.position.set(0, slotY, slotZ - 0.0001);
   mechanicsGroup.add(slotBezel);
 
   // Glowing Cybernetic Purple Emissive Element
-  const ledGeo = new THREE.CapsuleGeometry(slotRadius, slotLength * 0.95, 8, 16);
-  ledGeo.rotateZ(Math.PI / 2);
+  const ledGeo = geoCache.get(
+    `WristLed_${slotRadius.toFixed(5)}_${slotLength.toFixed(5)}`,
+    () => {
+      const g = new THREE.CapsuleGeometry(slotRadius, slotLength * 0.95, 8, 16);
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
+  );
   const accentRing = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   accentRing.name = 'WristPurpleEmissiveSlot';
   accentRing.position.set(0, slotY, slotZ + 0.0002);
@@ -256,16 +290,28 @@ export function createWrist(
   ledMeshes.push(accentRing);
 
   // Soft Purple Bloom Aura
-  const bloomGeo = new THREE.CapsuleGeometry(slotRadius * 1.5, slotLength * 1.05, 8, 16);
-  bloomGeo.rotateZ(Math.PI / 2);
+  const bloomGeo = geoCache.get(
+    `WristBloom_${slotRadius.toFixed(5)}_${slotLength.toFixed(5)}`,
+    () => {
+      const g = new THREE.CapsuleGeometry(slotRadius * 1.5, slotLength * 1.05, 8, 16);
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
+  );
   const bloomMesh = new THREE.Mesh(bloomGeo, materials.purpleBloom);
   bloomMesh.position.copy(accentRing.position);
   mechanicsGroup.add(bloomMesh);
 
   // Micro sensor apertures flanking display (Reference Image 1)
+  const sensorGeo = geoCache.get(
+    'WristSensorAperture',
+    () => {
+      const g = new THREE.CylinderGeometry(0.0005, 0.0005, 0.0008, 8);
+      g.rotateX(Math.PI / 2);
+      return g;
+    }
+  );
   for (const sX of [-0.0130, 0.0130]) {
-    const sensorGeo = new THREE.CylinderGeometry(0.0005, 0.0005, 0.0008, 8);
-    sensorGeo.rotateX(Math.PI / 2);
     const sensor = new THREE.Mesh(sensorGeo, materials.metallic);
     sensor.position.set(sX, slotY, slotZ - 0.0002);
     mechanicsGroup.add(sensor);
@@ -277,15 +323,21 @@ export function createWrist(
   // ════════════════════════════════════════════════════════════
   const pivotY = -0.0120;
 
-  const coreGeo = new THREE.CylinderGeometry(0.0080, 0.0080, 0.0096, 20);
+  const coreGeo = geoCache.getCylinder(0.0080, 0.0080, 0.0096, 20);
   const rotaryCore = new THREE.Mesh(coreGeo, materials.joint);
   rotaryCore.name = 'WristRotaryCore';
   rotaryCore.position.set(0, pivotY, 0);
   rotaryCore.castShadow = true;
   mechanicsGroup.add(rotaryCore);
 
-  const pinGeo = new THREE.CylinderGeometry(0.0038, 0.0038, cuffW + 0.0018, 18);
-  pinGeo.rotateZ(Math.PI / 2);
+  const pinGeo = geoCache.get(
+    `WristPivotPin_${cuffW.toFixed(5)}`,
+    () => {
+      const g = new THREE.CylinderGeometry(0.0038, 0.0038, cuffW + 0.0018, 18);
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
+  );
   const pivotPin = new THREE.Mesh(pinGeo, materials.metallic);
   pivotPin.name = 'WristPivotPin';
   pivotPin.position.set(0, pivotY, 0);
@@ -293,27 +345,37 @@ export function createWrist(
   mechanicsGroup.add(pivotPin);
 
   // Lateral & Medial styloid rotary bearing hubs on pivot axis
+  const collarGeo = geoCache.get('WristStyloidCollar', () => {
+    const g = new THREE.CylinderGeometry(0.0052, 0.0052, 0.0013, 16);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
+  const ringGeo = geoCache.get('WristStyloidRing', () => {
+    const g = new THREE.TorusGeometry(0.0039, 0.00045, 6, 16);
+    g.rotateY(Math.PI / 2);
+    return g;
+  });
+  const boltGeo = geoCache.get('WristStyloidBolt', () => {
+    const g = new THREE.CylinderGeometry(0.0013, 0.0013, 0.0015, 6);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
+
   for (const pSide of [-1, 1]) {
     const hubX = pSide * (cuffW * 0.50 + 0.0002);
 
     // Bearing race outer collar
-    const collarGeo = new THREE.CylinderGeometry(0.0052, 0.0052, 0.0013, 16);
-    collarGeo.rotateZ(Math.PI / 2);
     const collar = new THREE.Mesh(collarGeo, materials.joint);
     collar.position.set(hubX, pivotY, 0);
     mechanicsGroup.add(collar);
     styloidCaps.push(collar);
 
     // Polished chrome accent ring
-    const ringGeo = new THREE.TorusGeometry(0.0039, 0.00045, 6, 16);
-    ringGeo.rotateY(Math.PI / 2);
     const ring = new THREE.Mesh(ringGeo, materials.metallic);
     ring.position.set(hubX + pSide * 0.0006, pivotY, 0);
     mechanicsGroup.add(ring);
 
     // Central axle cap with hex socket
-    const boltGeo = new THREE.CylinderGeometry(0.0013, 0.0013, 0.0015, 6);
-    boltGeo.rotateZ(Math.PI / 2);
     const bolt = new THREE.Mesh(boltGeo, materials.metallic);
     bolt.position.set(hubX + pSide * 0.0008, pivotY, 0);
     mechanicsGroup.add(bolt);
@@ -322,7 +384,7 @@ export function createWrist(
   // ════════════════════════════════════════════════════════════
   // 5. COMPATIBILITY PROXIES (Exploded View Nodes)
   // ════════════════════════════════════════════════════════════
-  const dummyArmorGeo = new THREE.BufferGeometry();
+  const dummyArmorGeo = geoCache.get('DummyArmorGeo', () => new THREE.BufferGeometry());
   const styloidArmorLeft = new THREE.Mesh(dummyArmorGeo, materials.armor);
   styloidArmorLeft.visible = false;
   mechanicsGroup.add(styloidArmorLeft);
@@ -342,12 +404,15 @@ export function createWrist(
   const trunnionPivot = new THREE.Group();
   trunnionPivot.name = side === -1 ? 'LeftWristTrunnion' : 'RightWristTrunnion';
   trunnionPivot.position.set(0, pivotY, 0);
-  mechanicsGroup.add(trunnionPivot);
+  wristGroup.add(trunnionPivot);
 
   // Dual-shear titanium clevis yoke embracing axle pin
+  const earGeo = geoCache.get('WristTrunnionEar', () => {
+    const g = new THREE.CylinderGeometry(0.0052, 0.0052, 0.0022, 16);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
   for (const cSide of [-1, 1]) {
-    const earGeo = new THREE.CylinderGeometry(0.0052, 0.0052, 0.0022, 16);
-    earGeo.rotateZ(Math.PI / 2);
     const ear = new THREE.Mesh(earGeo, materials.joint);
     ear.position.set(cSide * 0.0145, 0, 0);
     ear.castShadow = true;
@@ -355,7 +420,7 @@ export function createWrist(
   }
 
   // Clevis bridge base linking ears
-  const bridgeGeo = new THREE.BoxGeometry(0.0290, 0.0026, 0.0145);
+  const bridgeGeo = geoCache.getBox(0.0290, 0.0026, 0.0145);
   const distalClevis = new THREE.Mesh(bridgeGeo, materials.joint);
   distalClevis.name = 'WristDistalClevis';
   distalClevis.position.set(0, -0.0016, 0);
@@ -364,7 +429,7 @@ export function createWrist(
   trunnionPivot.add(distalClevis);
 
   // Precision centering carpal socket collar
-  const socketGeo = new THREE.CylinderGeometry(0.0150, 0.0160, 0.0020, 24);
+  const socketGeo = geoCache.getCylinder(0.0150, 0.0160, 0.0020, 24);
   const distalSocket = new THREE.Mesh(socketGeo, materials.joint);
   distalSocket.position.set(0, -0.0020, 0);
   trunnionPivot.add(distalSocket);
@@ -377,6 +442,18 @@ export function createWrist(
 
   // Natural athletic resting flexion: subtle forward tilt (~2.5°)
   trunnionPivot.rotation.set(0.042, 0, 0);
+
+  // Batch static meshes in mechanicsGroup (excluding animated swivelCollar and purple LED)
+  mergeAllGroupMeshesByMaterial(mechanicsGroup, {
+    excludeNames: [swivelCollar.name, accentRing.name],
+    namePrefix: side === -1 ? 'LeftWristStatic' : 'RightWristStatic',
+  });
+
+  // Batch rigid ears and socket in trunnionPivot (excluding distalHandMount group and animated distalClevis)
+  mergeAllGroupMeshesByMaterial(trunnionPivot, {
+    excludeNames: [distalHandMount.name, distalClevis.name],
+    namePrefix: side === -1 ? 'LeftWristTrunnion' : 'RightWristTrunnion',
+  });
 
   return {
     group: wristGroup,

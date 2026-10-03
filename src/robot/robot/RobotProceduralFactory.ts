@@ -191,41 +191,29 @@ export function createProceduralRobot(): RobotNodes {
   };
 }
 
-let preloadedRobot: RobotNodes | null = null;
-let isPreloading = false;
+import { RobotResourceManager } from './RobotResourceManager';
 
 /**
- * Eagerly pre-warms the procedural robot model in memory so it mounts instantly (0ms)
- * when the homepage opens.
+ * Eagerly pre-warms the shared procedural robot geometry and materials
+ * in cooperative background batches without blocking or duplicating scene instances.
  */
 export function preloadProceduralRobot(): void {
-  if (preloadedRobot || isPreloading) return;
-  isPreloading = true;
-  try {
-    preloadedRobot = createProceduralRobot();
-  } catch (err) {
+  RobotResourceManager.getInstance().ensureResources().catch((err) => {
     console.warn('[RobotProceduralFactory] Preload error:', err);
-  } finally {
-    isPreloading = false;
-  }
+  });
 }
 
 /**
- * Retrieves the pre-warmed procedural robot or builds a fresh one immediately.
- * Automatically schedules background preloading for subsequent navigations.
+ * Retrieves a fresh procedural robot instance from the resource manager asynchronously.
+ */
+export async function getProceduralRobotAsync(): Promise<RobotNodes> {
+  return RobotResourceManager.getInstance().acquireRobotInstanceAsync();
+}
+
+/**
+ * Retrieves a fresh procedural robot instance synchronously.
  */
 export function getProceduralRobot(): RobotNodes {
-  if (preloadedRobot) {
-    const robot = preloadedRobot;
-    preloadedRobot = null;
-    // Schedule background pre-warming for when the user returns to the home page
-    if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
-      (window as any).requestIdleCallback(() => preloadProceduralRobot());
-    } else {
-      setTimeout(() => preloadProceduralRobot(), 800);
-    }
-    return robot;
-  }
-  return createProceduralRobot();
+  return RobotResourceManager.getInstance().acquireRobotInstanceSync();
 }
 

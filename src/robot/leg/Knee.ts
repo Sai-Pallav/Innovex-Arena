@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface KneeNodes {
   group: THREE.Group;
@@ -176,12 +177,12 @@ export function createKnee(
   // =========================================================================
   // 1. TRANSVERSE HINGE AXLE PIN & CENTRAL FRAME (Mechanical Rotational Core)
   // =========================================================================
-  const pinGeo = new THREE.CylinderGeometry(
+  const pinGeo = geoCache.get('KneePinGeo', () => new THREE.CylinderGeometry(
     cfg.centralAxleRadius,
     cfg.centralAxleRadius,
     cfg.centralAxleLength,
     24
-  );
+  ));
   const centralPin = new THREE.Mesh(pinGeo, materials.joint);
   centralPin.name = side === -1 ? 'KneeAxlePin_L' : 'KneeAxlePin_R';
   centralPin.rotation.z = Math.PI / 2;
@@ -189,13 +190,13 @@ export function createKnee(
   condyleCoreGroup.add(centralPin);
 
   // Hex end caps on central axle ends
+  const capGeo = geoCache.get('KneeAxleCapGeo', () => new THREE.CylinderGeometry(
+    cfg.centralAxleRadius * 1.30,
+    cfg.centralAxleRadius * 1.30,
+    0.0025,
+    6
+  ));
   for (const dir of [-1, 1]) {
-    const capGeo = new THREE.CylinderGeometry(
-      cfg.centralAxleRadius * 1.30,
-      cfg.centralAxleRadius * 1.30,
-      0.0025,
-      6
-    );
     const cap = new THREE.Mesh(capGeo, materials.joint);
     cap.rotation.z = Math.PI / 2;
     cap.position.x = dir * (cfg.centralAxleLength * 0.5 + 0.001);
@@ -206,11 +207,11 @@ export function createKnee(
   // 2. UPPER DARK KNEE STRUCTURE (Supporting Thigh directly above joint)
   // Compact, load-bearing dark titanium housing fitting under angled thigh cutout
   // =========================================================================
-  const upperHousingGeo = createUpperKneeHousingGeometry(
+  const upperHousingGeo = geoCache.get('KneeUpperHousingGeo', () => createUpperKneeHousingGeometry(
     cfg.housingWidth,
     cfg.upperStructureHeight,
     cfg.housingDepth
-  );
+  ));
   const upperHousing = new THREE.Mesh(upperHousingGeo, materials.joint);
   upperHousing.position.set(0, cfg.upperStructureHeight * 0.5, -0.001);
   upperHousing.castShadow = true;
@@ -218,11 +219,11 @@ export function createKnee(
   condyleCoreGroup.add(upperHousing);
 
   // Beveled transition plate interfacing with thigh frame mount
-  const upperFlangeGeo = new THREE.BoxGeometry(
+  const upperFlangeGeo = geoCache.get('KneeUpperFlangeGeo', () => new THREE.BoxGeometry(
     cfg.housingWidth * 0.75,
     0.006,
     cfg.housingDepth * 1.08
-  );
+  ));
   const upperFlange = new THREE.Mesh(upperFlangeGeo, materials.joint);
   upperFlange.position.set(0, cfg.upperStructureHeight - 0.003, -0.001);
   upperFlange.castShadow = true;
@@ -232,12 +233,12 @@ export function createKnee(
   // 3. INTEGRATED SIDE BEARING ASSEMBLIES (Flush with outer leg architecture)
   // Compact cylindrical bearing housings with concentric purple glowing rings
   // =========================================================================
-  const discGeo = new THREE.CylinderGeometry(
+  const discGeo = geoCache.get('KneeDiscGeo', () => new THREE.CylinderGeometry(
     cfg.discRadius,
     cfg.discRadius,
     cfg.discWidth,
     32
-  );
+  ));
 
   // Outer (lateral) rotary disc
   const lateralDisc = new THREE.Mesh(discGeo, materials.joint);
@@ -258,33 +259,34 @@ export function createKnee(
   condyleCoreGroup.add(medialDisc);
 
   // Beveled outer race collars, recessed dark caps, and central bosses
+  const flangeGeo = geoCache.get('KneeFlangeGeo', () => new THREE.CylinderGeometry(
+    cfg.discRadius * 1.04,
+    cfg.discRadius * 1.04,
+    0.0022,
+    32
+  ));
+  const centerCapGeo = geoCache.get('KneeCenterCapGeo', () => new THREE.CylinderGeometry(
+    cfg.centerCapRadius,
+    cfg.centerCapRadius * 0.94,
+    0.0024,
+    24
+  ));
+  const bossGeo = geoCache.get('KneeBossGeo', () => new THREE.CylinderGeometry(0.0055, 0.0055, 0.0025, 16));
+
   for (const discX of [side * (cfg.outerDiscSpacing * 0.5), -side * (cfg.outerDiscSpacing * 0.5)]) {
-    const flangeGeo = new THREE.CylinderGeometry(
-      cfg.discRadius * 1.04,
-      cfg.discRadius * 1.04,
-      0.0022,
-      32
-    );
     const flange = new THREE.Mesh(flangeGeo, materials.joint);
     flange.rotation.z = Math.PI / 2;
     flange.position.x = discX;
     condyleCoreGroup.add(flange);
 
     // Recessed dark metal center cap inside purple ring
-    const capGeo = new THREE.CylinderGeometry(
-      cfg.centerCapRadius,
-      cfg.centerCapRadius * 0.94,
-      0.0024,
-      24
-    );
-    const cap = new THREE.Mesh(capGeo, materials.joint);
+    const cap = new THREE.Mesh(centerCapGeo, materials.joint);
     cap.rotation.z = Math.PI / 2;
     cap.position.x = discX + Math.sign(discX) * (cfg.discWidth * 0.5 + 0.0012);
     cap.castShadow = true;
     condyleCoreGroup.add(cap);
 
     // Central circular dark metallic axle boss
-    const bossGeo = new THREE.CylinderGeometry(0.0055, 0.0055, 0.0025, 16);
     const boss = new THREE.Mesh(bossGeo, materials.joint);
     boss.rotation.z = Math.PI / 2;
     boss.position.x = discX + Math.sign(discX) * (cfg.discWidth * 0.5 + 0.0024);
@@ -293,9 +295,9 @@ export function createKnee(
 
   // 12 internal mechanical spline teeth on bearing collar for mechanical detail
   const toothCount = 12;
+  const toothGeo = geoCache.get('KneeToothGeo', () => new THREE.BoxGeometry(0.0018, cfg.discWidth * 0.70, 0.0020));
   for (let i = 0; i < toothCount; i++) {
     const angle = (i / toothCount) * Math.PI * 2;
-    const toothGeo = new THREE.BoxGeometry(0.0018, cfg.discWidth * 0.70, 0.0020);
     const tooth = new THREE.Mesh(toothGeo, materials.joint);
     tooth.position.set(
       side * (cfg.outerDiscSpacing * 0.5),
@@ -318,8 +320,8 @@ export function createKnee(
   // 4. CONCENTRIC PURPLE EMISSIVE ACCENT RINGS (Bilateral Rotary Face Indicators)
   // =========================================================================
   const kneeAccentGroup = new THREE.Group();
-  const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0016, 12, 32);
-  const ringBloomGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0022, 12, 32);
+  const ringGeo = geoCache.get('KneeRingGeo', () => new THREE.TorusGeometry(cfg.accentRingRadius, 0.0016, 12, 32));
+  const ringBloomGeo = geoCache.get('KneeRingBloomGeo', () => new THREE.TorusGeometry(cfg.accentRingRadius, 0.0022, 12, 32));
 
   // Lateral accent ring (Outer Flank)
   const accentRingLateral = new THREE.Mesh(ringGeo, materials.purpleEmissive);
@@ -359,11 +361,11 @@ export function createKnee(
   // 5. CENTRAL WHITE KNEE COVER (Primary Visual Feature from Reference)
   // Compact, faceted white ceramic cover centered on knee axis with purple LED slit
   // =========================================================================
-  const coverGeo = createCentralKneeCoverGeometry(
+  const coverGeo = geoCache.get('KneePatellaCoverGeo', () => createCentralKneeCoverGeometry(
     cfg.patella.width,
     cfg.patella.height,
     cfg.patella.thickness
-  );
+  ));
   const rotX = (cfg.patella as any).rotX || 0;
   const patellaShield = new THREE.Mesh(coverGeo, materials.armor);
   patellaShield.name = side === -1 ? 'PatellaShield_L' : 'PatellaShield_R';
@@ -376,7 +378,7 @@ export function createKnee(
   // Precision Horizontal Capsule / Pill Purple Glowing LED Slit in Dark Recessed Bezel
   // Surface at y = -0.0065, x = 0 is at Z = (thickness * 0.5 + 0.0022 [bevel]) + 0.0040 [ridge] + 0.0020 [curve] ≈ 0.0127m
   const frontZ = cfg.patella.thickness * 0.5 + 0.0084; // 0.0129m
-  const bezelGeo = new THREE.BoxGeometry(0.0130, 0.0034, 0.0022);
+  const bezelGeo = geoCache.get('KneePatellaBezelGeo', () => new THREE.BoxGeometry(0.0130, 0.0034, 0.0022));
   const patellaBezel = new THREE.Mesh(bezelGeo, materials.joint);
   patellaBezel.name = 'PatellaLedBezel';
   patellaBezel.position.set(0, -0.0065, frontZ - 0.0004);
@@ -384,8 +386,11 @@ export function createKnee(
 
   // Capsule geometry with smooth hemispherical ends matching reference crop
   // Width matching reference (~9.5mm total length, ~2mm height)
-  const ledCapsuleGeo = new THREE.CapsuleGeometry(0.0011, 0.0075, 8, 16);
-  ledCapsuleGeo.rotateZ(Math.PI / 2); // Orient horizontally
+  const ledCapsuleGeo = geoCache.get('KneeLedCapsuleGeo', () => {
+    const g = new THREE.CapsuleGeometry(0.0011, 0.0075, 8, 16);
+    g.rotateZ(Math.PI / 2); // Orient horizontally
+    return g;
+  });
   const patellaLed = new THREE.Mesh(ledCapsuleGeo, materials.purpleEmissive);
   patellaLed.name = side === -1 ? 'PatellaLed_L' : 'PatellaLed_R';
   patellaLed.position.set(0, -0.0065, frontZ + 0.0008);
@@ -393,14 +398,20 @@ export function createKnee(
   ledMeshes.push(patellaLed);
 
   // Glowing hot core matching high-intensity emissive line in reference
-  const coreCapsuleGeo = new THREE.CapsuleGeometry(0.0006, 0.0065, 8, 16);
-  coreCapsuleGeo.rotateZ(Math.PI / 2);
+  const coreCapsuleGeo = geoCache.get('KneeCoreCapsuleGeo', () => {
+    const g = new THREE.CapsuleGeometry(0.0006, 0.0065, 8, 16);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
   const patellaCore = new THREE.Mesh(coreCapsuleGeo, materials.whiteCoreEmissive);
   patellaCore.position.set(0, -0.0065, frontZ + 0.0011);
   patellaShield.add(patellaCore);
 
-  const bloomCapsuleGeo = new THREE.CapsuleGeometry(0.0020, 0.0085, 8, 16);
-  bloomCapsuleGeo.rotateZ(Math.PI / 2);
+  const bloomCapsuleGeo = geoCache.get('KneeBloomCapsuleGeo', () => {
+    const g = new THREE.CapsuleGeometry(0.0020, 0.0085, 8, 16);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
   const patellaBloom = new THREE.Mesh(bloomCapsuleGeo, materials.purpleBloom);
   patellaBloom.position.set(0, -0.0065, frontZ + 0.0010);
   patellaShield.add(patellaBloom);
@@ -417,11 +428,11 @@ export function createKnee(
   const clevisGroup = new THREE.Group();
 
   // Solid dark titanium lower neck connecting joint core into shin
-  const lowerNeckGeo = createLowerKneeStructureGeometry(
+  const lowerNeckGeo = geoCache.get('KneeLowerNeckGeo', () => createLowerKneeStructureGeometry(
     cfg.housingWidth * 0.78,
     cfg.lowerStructureHeight,
     cfg.housingDepth * 0.90
-  );
+  ));
   const lowerNeck = new THREE.Mesh(lowerNeckGeo, materials.joint);
   lowerNeck.position.set(0, -cfg.lowerStructureHeight * 0.5, -0.001);
   lowerNeck.castShadow = true;
@@ -429,7 +440,7 @@ export function createKnee(
   clevisGroup.add(lowerNeck);
 
   // Lower mounting collar seating flush into shin tibial plateau
-  const lowerCollarGeo = new THREE.CylinderGeometry(0.018, 0.022, 0.014, 20);
+  const lowerCollarGeo = geoCache.get('KneeLowerCollarGeo', () => new THREE.CylinderGeometry(0.018, 0.022, 0.014, 20));
   const lowerCollar = new THREE.Mesh(lowerCollarGeo, materials.joint);
   lowerCollar.position.set(0, -cfg.lowerStructureHeight + 0.007, -0.001);
   lowerCollar.castShadow = true;

@@ -3,6 +3,8 @@ import { RobotScene } from '../../robot/scene/RobotScene';
 import { DebugStats } from '../../robot/arm/DebugManager';
 import { Cpu, Activity, Layers } from 'lucide-react';
 
+import { runPerformanceBenchmark } from '../../robot/utils/benchmark';
+
 interface RobotCanvasProps {
   className?: string;
 }
@@ -32,6 +34,7 @@ export const RobotCanvas: React.FC<RobotCanvasProps> = ({ className = '' }) => {
         if (spinnerTimer) clearTimeout(spinnerTimer);
         setIsLoading(false);
         setIsRendered(true);
+        runPerformanceBenchmark();
       },
       onError: (err) => {
         if (isCancelled) return;

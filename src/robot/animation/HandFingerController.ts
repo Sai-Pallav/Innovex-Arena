@@ -5,10 +5,15 @@ import { ANIMATION_CONFIG } from './AnimationConfig';
 export class HandFingerController {
   private leftHandOffsets: HandOffsets;
   private rightHandOffsets: HandOffsets;
+  private returnWrapper: { leftHand: HandOffsets; rightHand: HandOffsets };
 
   constructor() {
     this.leftHandOffsets = this.createDefaultOffsets();
     this.rightHandOffsets = this.createDefaultOffsets();
+    this.returnWrapper = {
+      leftHand: this.leftHandOffsets,
+      rightHand: this.rightHandOffsets,
+    };
   }
 
   private createDefaultOffsets(): HandOffsets {
@@ -30,10 +35,7 @@ export class HandFingerController {
     reducedMotion: boolean
   ): { leftHand: HandOffsets; rightHand: HandOffsets } {
     if (reducedMotion) {
-      return {
-        leftHand: this.leftHandOffsets,
-        rightHand: this.rightHandOffsets,
-      };
+      return this.returnWrapper;
     }
 
     const cfg = ANIMATION_CONFIG.hand;
@@ -98,9 +100,6 @@ export class HandFingerController {
     this.rightHandOffsets.thumbPitch = rightThumbWave;
     this.rightHandOffsets.thumbYaw = rightThumbWave * 0.2;
 
-    return {
-      leftHand: this.leftHandOffsets,
-      rightHand: this.rightHandOffsets,
-    };
+    return this.returnWrapper;
   }
 }

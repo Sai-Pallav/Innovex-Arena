@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { createFinger, createThumb, FingerNodes, ThumbNodes, FingerSpec } from './Finger';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HAND MODULE — Ultra-Realistic Humanoid Robotic Hand & Metacarpal Architecture
@@ -102,45 +104,48 @@ function getFingerSpecs(side: -1 | 1): FingerSpec[] {
 // Matches the wrist gauntlet cross-section perfectly
 // ─────────────────────────────────────────────────────────────────────────────
 function createCarpalSquircleGeo(width: number, depth: number, height: number): THREE.BufferGeometry {
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
+  const key = `CarpalSquircle_${width.toFixed(5)}_${depth.toFixed(5)}_${height.toFixed(5)}`;
+  return geoCache.get(key, () => {
+    const positions: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
-  const radialSegments = 32;
-  const a = width * 0.5;
-  const b = depth * 0.5;
-  const power = 3.2;
+    const radialSegments = 32;
+    const a = width * 0.5;
+    const b = depth * 0.5;
+    const power = 3.2;
 
-  for (let j = 0; j <= 1; j++) {
-    const y = -j * height;
-    const v = j;
-    for (let i = 0; i <= radialSegments; i++) {
-      const u = i / radialSegments;
-      const theta = u * Math.PI * 2;
-      const cosT = Math.cos(theta);
-      const sinT = Math.sin(theta);
-      const sX = Math.sign(cosT) * Math.pow(Math.abs(cosT), 2 / power);
-      const sZ = Math.sign(sinT) * Math.pow(Math.abs(sinT), 2 / power);
+    for (let j = 0; j <= 1; j++) {
+      const y = -j * height;
+      const v = j;
+      for (let i = 0; i <= radialSegments; i++) {
+        const u = i / radialSegments;
+        const theta = u * Math.PI * 2;
+        const cosT = Math.cos(theta);
+        const sinT = Math.sin(theta);
+        const sX = Math.sign(cosT) * Math.pow(Math.abs(cosT), 2 / power);
+        const sZ = Math.sign(sinT) * Math.pow(Math.abs(sinT), 2 / power);
 
-      positions.push(a * sX, y, b * sZ);
-      uvs.push(u, v);
+        positions.push(a * sX, y, b * sZ);
+        uvs.push(u, v);
+      }
     }
-  }
 
-  for (let i = 0; i < radialSegments; i++) {
-    const p1 = i;
-    const p2 = i + 1;
-    const p3 = (radialSegments + 1) + i;
-    const p4 = p3 + 1;
-    indices.push(p1, p3, p2, p2, p3, p4);
-  }
+    for (let i = 0; i < radialSegments; i++) {
+      const p1 = i;
+      const p2 = i + 1;
+      const p3 = (radialSegments + 1) + i;
+      const p4 = p3 + 1;
+      indices.push(p1, p3, p2, p2, p3, p4);
+    }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geo.setIndex(indices);
-  geo.computeVertexNormals();
-  return geo;
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -319,11 +324,14 @@ function createDorsalPlate(side: -1 | 1, materials: RobotMaterialPalette): THREE
     indices.push(topA, botA, topB, topB, botA, botB);
   }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geo.setIndex(indices);
-  geo.computeVertexNormals();
+  const geo = geoCache.get(`HandDorsalPlateGeo_${side}`, () => {
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    g.setIndex(indices);
+    g.computeVertexNormals();
+    return g;
+  });
 
   const mesh = new THREE.Mesh(geo, materials.armor);
   mesh.name = 'HandDorsalArmor';
@@ -343,9 +351,12 @@ export function createHand(
   handGroup.name = side === -1 ? 'LeftHandRoot' : 'RightHandRoot';
 
   const ledMeshes: THREE.Mesh[] = [];
-  const knuckles: THREE.Mesh[] = [];
-  const knuckleCaps: THREE.Mesh[] = [];
-  const palmarPads: THREE.Mesh[] = [];
+  let knuckles: THREE.Mesh[] = [];
+  let knuckleCaps: THREE.Mesh[] = [];
+  let palmarPads: THREE.Mesh[] = [];
+
+  const staticPalmGroup = new THREE.Group();
+  staticPalmGroup.name = 'StaticPalmAssembly';
 
   // ════════════════════════════════════════════════════════════
   // 1. CARPAL INTERFACE DOCKING COLLAR
@@ -358,44 +369,44 @@ export function createHand(
   const cuffRimGeo = createCarpalSquircleGeo(cuffW, cuffD, 0.0014);
   const cuffRim = new THREE.Mesh(cuffRimGeo, materials.metallic);
   cuffRim.position.set(0, 0.0000, 0);
-  handGroup.add(cuffRim);
+  staticPalmGroup.add(cuffRim);
 
   // Dark titanium interior seal collar
   const cuffGeo = createCarpalSquircleGeo(cuffW * 0.96, cuffD * 0.96, 0.0022);
-  const carpalCuff = new THREE.Mesh(cuffGeo, materials.joint);
+  let carpalCuff: THREE.Mesh = new THREE.Mesh(cuffGeo, materials.joint);
   carpalCuff.name = 'HandCarpalCuff';
   carpalCuff.position.set(0, -0.0008, 0);
   carpalCuff.castShadow = true;
-  handGroup.add(carpalCuff);
+  staticPalmGroup.add(carpalCuff);
 
   // ════════════════════════════════════════════════════════════
   // 2. INTERNAL TITANIUM CHASSIS CORE & METACARPAL KNUCKLE BED
   //    Strictly enclosed inside white armor shell (zero flank clipping)
   // ════════════════════════════════════════════════════════════
   // Contoured internal chassis filling palm volume seamlessly
-  const palmGeo = new THREE.BoxGeometry(0.0410, 0.0370, 0.0125);
-  const palmChassis = new THREE.Mesh(palmGeo, materials.joint);
+  const palmGeo = geoCache.getBox(0.0410, 0.0370, 0.0125);
+  let palmChassis: THREE.Mesh = new THREE.Mesh(palmGeo, materials.joint);
   palmChassis.name = 'PalmChassis';
   palmChassis.position.set(0, -0.0240, -0.0035);
   palmChassis.castShadow = true;
   palmChassis.receiveShadow = true;
-  handGroup.add(palmChassis);
+  staticPalmGroup.add(palmChassis);
 
   // Transverse Metacarpal Knuckle Anchor Bar (flush within palm contour)
-  const knuckleBarGeo = new THREE.BoxGeometry(0.0510, 0.0040, 0.0055);
+  const knuckleBarGeo = geoCache.getBox(0.0510, 0.0040, 0.0055);
   const knuckleBar = new THREE.Mesh(knuckleBarGeo, materials.joint);
   knuckleBar.name = 'MetacarpalKnuckleBed';
   knuckleBar.position.set(0, -0.0455, 0.0005);
   knuckleBar.castShadow = true;
   knuckleBar.receiveShadow = true;
-  handGroup.add(knuckleBar);
+  staticPalmGroup.add(knuckleBar);
 
   // CNC Weight-reduction pockets along palmar face of chassis
+  const pockGeo = geoCache.getBox(0.0080, 0.0100, 0.0024);
   for (let p = 0; p < 3; p++) {
-    const pockGeo = new THREE.BoxGeometry(0.0080, 0.0100, 0.0024);
     const pock = new THREE.Mesh(pockGeo, materials.joint);
     pock.position.set((p - 1) * 0.0105, -0.0240, -0.0095);
-    handGroup.add(pock);
+    staticPalmGroup.add(pock);
   }
 
   // ── Palmar Tactile Friction Grip Pads (Thenar + Hypothenar) ────────────────
@@ -407,18 +418,18 @@ export function createHand(
     { x: 0,               y: -0.0415, h: 0.0065, w: 0.0400 }, // Transverse MCP palm pad
   ];
   for (const pd of padData) {
-    const padGeo = new THREE.BoxGeometry(pd.w, pd.h, 0.0020);
+    const padGeo = geoCache.getBox(pd.w, pd.h, 0.0020);
     const pad = new THREE.Mesh(padGeo, materials.joint);
     pad.position.set(pd.x, pd.y, -0.0095);
     pad.castShadow = true;
-    handGroup.add(pad);
+    staticPalmGroup.add(pad);
     palmarPads.push(pad);
 
     // Polished metallic perimeter trim for pad
-    const padTrimGeo = new THREE.BoxGeometry(pd.w + 0.0006, pd.h + 0.0006, 0.0004);
+    const padTrimGeo = geoCache.getBox(pd.w + 0.0006, pd.h + 0.0006, 0.0004);
     const padTrim = new THREE.Mesh(padTrimGeo, materials.metallic);
     padTrim.position.set(pd.x, pd.y, -0.0087);
-    handGroup.add(padTrim);
+    staticPalmGroup.add(padTrim);
   }
 
   // ════════════════════════════════════════════════════════════
@@ -434,18 +445,24 @@ export function createHand(
     { x: -side * 0.0185, y: -0.0355, z: 0.0088 },
     { x:  side * 0.0185, y: -0.0355, z: 0.0088 },
   ];
+  const screwGeo = geoCache.get('HandScrewGeo', () => {
+    const g = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0014, 6);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
+  const washerGeo = geoCache.get('HandWasherGeo', () => {
+    const g = new THREE.TorusGeometry(0.0012, 0.00028, 6, 12);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
   for (const f of fastenerCoords) {
-    const screwGeo = new THREE.CylinderGeometry(0.0008, 0.0008, 0.0014, 6);
-    screwGeo.rotateX(Math.PI / 2);
     const screw = new THREE.Mesh(screwGeo, materials.joint);
     screw.position.set(f.x, f.y, f.z);
-    handGroup.add(screw);
+    staticPalmGroup.add(screw);
 
-    const washerGeo = new THREE.TorusGeometry(0.0012, 0.00028, 6, 12);
-    washerGeo.rotateX(Math.PI / 2);
     const washer = new THREE.Mesh(washerGeo, materials.metallic);
     washer.position.copy(screw.position);
-    handGroup.add(washer);
+    staticPalmGroup.add(washer);
   }
 
   // Signature Cybernetic Purple Telemetry Status Capsule on upper dorsum (Longitudinal Slit matching Reference Image 1)
@@ -453,12 +470,12 @@ export function createHand(
   const ledY = -0.0120;
   const ledZ = 0.0162;
 
-  const ledBezelGeo = new THREE.BoxGeometry(0.0022, 0.0080, 0.0012);
+  const ledBezelGeo = geoCache.getBox(0.0022, 0.0080, 0.0012);
   const ledBezel = new THREE.Mesh(ledBezelGeo, materials.metallic);
   ledBezel.position.set(ledX, ledY, ledZ);
-  handGroup.add(ledBezel);
+  staticPalmGroup.add(ledBezel);
 
-  const ledGeo = new THREE.BoxGeometry(0.0012, 0.0068, 0.0014);
+  const ledGeo = geoCache.getBox(0.0012, 0.0068, 0.0014);
   const ledMesh = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   ledMesh.name = 'HandTelemetryLED';
   ledMesh.position.set(ledX, ledY, ledZ + 0.0003);
@@ -466,7 +483,7 @@ export function createHand(
   ledMeshes.push(ledMesh);
 
   // Subtle bloom aura for telemetry LED
-  const bloomGeo = new THREE.BoxGeometry(0.0018, 0.0078, 0.0018);
+  const bloomGeo = geoCache.getBox(0.0018, 0.0078, 0.0018);
   const bloomMesh = new THREE.Mesh(bloomGeo, materials.purpleBloom);
   bloomMesh.position.copy(ledMesh.position);
   handGroup.add(bloomMesh);
@@ -474,17 +491,23 @@ export function createHand(
   // Micro sensor dot / fastener adjacent to telemetry capsule (as seen in Reference Image 1)
   const dotX = -side * 0.0090;
   const dotY = -0.0125;
-  const dotGeo = new THREE.CylinderGeometry(0.0007, 0.0007, 0.0012, 12);
-  dotGeo.rotateX(Math.PI / 2);
+  const dotGeo = geoCache.get('HandDotGeo', () => {
+    const g = new THREE.CylinderGeometry(0.0007, 0.0007, 0.0012, 12);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
   const dotMesh = new THREE.Mesh(dotGeo, materials.joint);
   dotMesh.position.set(dotX, dotY, ledZ + 0.0001);
-  handGroup.add(dotMesh);
+  staticPalmGroup.add(dotMesh);
 
-  const dotPinGeo = new THREE.CylinderGeometry(0.00035, 0.00035, 0.0014, 8);
-  dotPinGeo.rotateX(Math.PI / 2);
+  const dotPinGeo = geoCache.get('HandDotPinGeo', () => {
+    const g = new THREE.CylinderGeometry(0.00035, 0.00035, 0.0014, 8);
+    g.rotateX(Math.PI / 2);
+    return g;
+  });
   const dotPin = new THREE.Mesh(dotPinGeo, materials.metallic);
   dotPin.position.copy(dotMesh.position);
-  handGroup.add(dotPin);
+  staticPalmGroup.add(dotPin);
 
   // ════════════════════════════════════════════════════════════
   // 4. METACARPOPHALANGEAL (MCP) KNUCKLE ASSEMBLIES
@@ -497,36 +520,70 @@ export function createHand(
     const kWidth = spec.proximalRadius * 1.78;
 
     // Transverse knuckle barrel
-    const kGeo = new THREE.CylinderGeometry(kRadius, kRadius, kWidth, 20);
-    kGeo.rotateZ(Math.PI / 2);
+    const kGeo = geoCache.get(
+      `HandKnuckle_${kRadius.toFixed(5)}_${kWidth.toFixed(5)}`,
+      () => {
+        const g = new THREE.CylinderGeometry(kRadius, kRadius, kWidth, 20);
+        g.rotateZ(Math.PI / 2);
+        return g;
+      }
+    );
     const knuckle = new THREE.Mesh(kGeo, materials.joint);
     knuckle.position.set(spec.spreadX, spec.offsetY, spec.offsetZ);
     knuckle.castShadow = true;
-    handGroup.add(knuckle);
+    staticPalmGroup.add(knuckle);
     knuckles.push(knuckle);
 
     // Precision flush metallic pivot caps with micro hex detail
     const capRadius = spec.proximalRadius * 0.72;
     const capX = kWidth * 0.50 + 0.0003;
+    const capGeo = geoCache.get(
+      `HandKnuckleCap_${capRadius.toFixed(5)}`,
+      () => {
+        const g = new THREE.CylinderGeometry(capRadius, capRadius * 0.94, 0.0008, 18);
+        g.rotateZ(Math.PI / 2);
+        return g;
+      }
+    );
+    const capHubGeo = geoCache.get(
+      `HandKnuckleHub_${capRadius.toFixed(5)}`,
+      () => {
+        const g = new THREE.CylinderGeometry(capRadius * 0.46, capRadius * 0.46, 0.0010, 12);
+        g.rotateZ(Math.PI / 2);
+        return g;
+      }
+    );
+
     for (const cSide of [-1, 1]) {
-      const capGeo = new THREE.CylinderGeometry(capRadius, capRadius * 0.94, 0.0008, 18);
-      capGeo.rotateZ(Math.PI / 2);
       const cap = new THREE.Mesh(capGeo, materials.metallic);
       cap.position.set(
         spec.spreadX + cSide * capX,
         spec.offsetY,
         spec.offsetZ
       );
-      handGroup.add(cap);
+      staticPalmGroup.add(cap);
       knuckleCaps.push(cap);
 
       // Inner micro hub pin
-      const capHubGeo = new THREE.CylinderGeometry(capRadius * 0.46, capRadius * 0.46, 0.0010, 12);
-      capHubGeo.rotateZ(Math.PI / 2);
       const capHub = new THREE.Mesh(capHubGeo, materials.joint);
       capHub.position.copy(cap.position);
-      handGroup.add(capHub);
+      staticPalmGroup.add(capHub);
     }
+  }
+
+  // Merge static palm components by material for optimal batching
+  const mergedJoint = mergeGroupMeshesByMaterial(staticPalmGroup, materials.joint, 'HandPalmJoint_Merged', true, true);
+  const mergedMetallic = mergeGroupMeshesByMaterial(staticPalmGroup, materials.metallic, 'HandPalmMetallic_Merged', true);
+  handGroup.add(staticPalmGroup);
+
+  if (mergedJoint) {
+    palmChassis = mergedJoint;
+    carpalCuff = mergedJoint;
+    knuckles = [mergedJoint];
+    palmarPads = [mergedJoint];
+  }
+  if (mergedMetallic) {
+    knuckleCaps = [mergedMetallic];
   }
 
   // ════════════════════════════════════════════════════════════

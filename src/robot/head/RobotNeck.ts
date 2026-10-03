@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface NeckNodes {
   group: THREE.Group;
@@ -28,7 +29,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   const neckSpacerGroup = new THREE.Group();
 
   // 1. Central Dark Structural Shaft (Part 10)
-  const shaftGeo = new THREE.CylinderGeometry(0.040, 0.044, 0.22, 32);
+  const shaftGeo = geoCache.get('NeckShaftGeo', () => new THREE.CylinderGeometry(0.040, 0.044, 0.22, 32));
   const centralShaft = new THREE.Mesh(shaftGeo, materials.joint);
   centralShaft.name = 'NeckCentralShaft';
   centralShaft.position.set(0, 0.095, 0);
@@ -36,7 +37,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   neckJointGroup.add(centralShaft);
 
   // 2. Base Collar / Pedestal Mount (Part 10: Base collar)
-  const baseCollarGeo = new THREE.CylinderGeometry(0.062, 0.074, 0.024, 36);
+  const baseCollarGeo = geoCache.get('NeckBaseCollarGeo', () => new THREE.CylinderGeometry(0.062, 0.074, 0.024, 36));
   const baseCollar = new THREE.Mesh(baseCollarGeo, materials.joint);
   baseCollar.name = 'NeckBaseCollar';
   baseCollar.position.set(0, 0.010, 0);
@@ -45,7 +46,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   neckJointGroup.add(baseCollar);
 
   // Rounded rim on base collar
-  const baseRimGeo = new THREE.TorusGeometry(0.073, 0.004, 14, 36);
+  const baseRimGeo = geoCache.get('NeckBaseRimGeo', () => new THREE.TorusGeometry(0.073, 0.004, 14, 36));
   const baseRim = new THREE.Mesh(baseRimGeo, materials.joint);
   baseRim.rotation.x = Math.PI / 2;
   baseRim.position.set(0, 0.004, 0);
@@ -64,7 +65,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     const spec = ringSpecs[i];
 
     // Main collar ring cylinder
-    const ringGeo = new THREE.CylinderGeometry(spec.radius, spec.radius * 1.02, spec.height, 36);
+    const ringGeo = geoCache.get(`NeckRingGeo_${i}`, () => new THREE.CylinderGeometry(spec.radius, spec.radius * 1.02, spec.height, 36));
     const ringMesh = new THREE.Mesh(ringGeo, materials.joint);
     ringMesh.name = `NeckRing0${i + 1}`;
     ringMesh.position.set(0, spec.y, 0);
@@ -74,7 +75,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     rings.push(ringMesh);
 
     // Beveled highlight rim around the upper edge of each collar ring
-    const rimGeo = new THREE.TorusGeometry(spec.radius, 0.0032, 12, 36);
+    const rimGeo = geoCache.get(`NeckRimGeo_${i}`, () => new THREE.TorusGeometry(spec.radius, 0.0032, 12, 36));
     const rimMesh = new THREE.Mesh(rimGeo, materials.joint);
     rimMesh.rotation.x = Math.PI / 2;
     rimMesh.position.set(0, spec.y + spec.height * 0.44, 0);
@@ -82,7 +83,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
 
     // Dark recessed gasket spacer between rings
     if (i < ringSpecs.length - 1) {
-      const spacerGeo = new THREE.CylinderGeometry(spec.radius * 0.86, spec.radius * 0.86, 0.008, 28);
+      const spacerGeo = geoCache.get(`NeckSpacerGeo_${i}`, () => new THREE.CylinderGeometry(spec.radius * 0.86, spec.radius * 0.86, 0.008, 28));
       const spacer = new THREE.Mesh(spacerGeo, materials.jointDoubleSide);
       spacer.position.set(0, spec.y + spec.height * 0.5 + 0.004, 0);
       neckSpacerGroup.add(spacer);
@@ -90,8 +91,9 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   }
 
   // 4. Lateral Cervical Hydraulic Struts (Left & Right sternocleidomastoid pistons)
+  const pistonBaseGeo = geoCache.get('NeckPistonBaseGeo', () => new THREE.CylinderGeometry(0.006, 0.007, 0.065, 16));
+  const rodGeo = geoCache.get('NeckRodGeo', () => new THREE.CylinderGeometry(0.0035, 0.0035, 0.060, 14));
   for (const side of [-1, 1]) {
-    const pistonBaseGeo = new THREE.CylinderGeometry(0.006, 0.007, 0.065, 16);
     const pistonBase = new THREE.Mesh(pistonBaseGeo, materials.joint);
     pistonBase.position.set(side * 0.038, 0.048, -0.010);
     pistonBase.rotation.z = side * -0.14;
@@ -99,7 +101,6 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
     pistonBase.castShadow = true;
     neckJointGroup.add(pistonBase);
 
-    const rodGeo = new THREE.CylinderGeometry(0.0035, 0.0035, 0.060, 14);
     const rod = new THREE.Mesh(rodGeo, materials.joint);
     rod.position.set(side * 0.032, 0.088, -0.008);
     rod.rotation.z = side * -0.14;
@@ -108,7 +109,7 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   }
 
   // 5. Cervical Upper Connector (Part 10: Upper connector linking to skull)
-  const cervicalGeo = new THREE.CylinderGeometry(0.044, 0.048, 0.028, 32);
+  const cervicalGeo = geoCache.get('NeckCervicalGeo', () => new THREE.CylinderGeometry(0.044, 0.048, 0.028, 32));
   const cervicalConnector = new THREE.Mesh(cervicalGeo, materials.joint);
   cervicalConnector.name = 'NeckCervicalConnector';
   cervicalConnector.position.set(0, 0.150, -0.005);
@@ -116,16 +117,26 @@ export function createRobotNeck(materials: RobotMaterialPalette): NeckNodes {
   neckJointGroup.add(cervicalConnector);
 
   // Merge static joint structure of neck
-  const mergedNeckJoint = mergeGroupMeshesByMaterial(neckJointGroup, materials.joint, 'NeckStructure_Merged', false);
-  if (mergedNeckJoint) {
+  const cachedMergedNeckJointGeo = geoCache.get('NeckStructureMergedGeo', () => {
+    const merged = mergeGroupMeshesByMaterial(neckJointGroup, materials.joint, 'NeckStructure_Merged', false);
+    return merged ? merged.geometry : null;
+  });
+  if (cachedMergedNeckJointGeo) {
+    const mergedNeckJoint = new THREE.Mesh(cachedMergedNeckJointGeo, materials.joint);
+    mergedNeckJoint.name = 'NeckStructure_Merged';
     mergedNeckJoint.castShadow = true;
     mergedNeckJoint.receiveShadow = true;
     group.add(mergedNeckJoint);
   }
 
   // Merge spacer gaskets
-  const mergedSpacers = mergeGroupMeshesByMaterial(neckSpacerGroup, materials.jointDoubleSide, 'NeckSpacers_Merged', false);
-  if (mergedSpacers) {
+  const cachedMergedSpacersGeo = geoCache.get('NeckSpacersMergedGeo', () => {
+    const merged = mergeGroupMeshesByMaterial(neckSpacerGroup, materials.jointDoubleSide, 'NeckSpacers_Merged', false);
+    return merged ? merged.geometry : null;
+  });
+  if (cachedMergedSpacersGeo) {
+    const mergedSpacers = new THREE.Mesh(cachedMergedSpacersGeo, materials.jointDoubleSide);
+    mergedSpacers.name = 'NeckSpacers_Merged';
     group.add(mergedSpacers);
   }
 

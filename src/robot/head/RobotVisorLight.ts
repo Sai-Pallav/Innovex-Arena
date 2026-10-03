@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { ROBOT_ACCENT } from '../config';
 import { getVisorSurfacePoint } from './RobotVisor';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface VisorLightNodes {
   group: THREE.Group;
@@ -36,21 +37,21 @@ export function createRobotVisorLight(materials: RobotMaterialPalette): VisorLig
   const curve = new THREE.CatmullRomCurve3(points);
 
   // 1. Soft Volumetric Purple Bloom Tube (Restrained glow halo)
-  const bloomGeo = new THREE.TubeGeometry(curve, 44, 0.0036, 12, false);
+  const bloomGeo = geoCache.get('VisorLightBloomGeo', () => new THREE.TubeGeometry(curve, 44, 0.0036, 12, false));
   const bloomMesh = new THREE.Mesh(bloomGeo, materials.purpleBloom);
   bloomMesh.name = 'VisorLEDBloom';
   bloomMesh.renderOrder = 900;
   group.add(bloomMesh);
 
   // 2. Vibrant Brand Purple Neon Tube (Part 6 & 15: ROBOT_ACCENT)
-  const ledGeo = new THREE.TubeGeometry(curve, 44, 0.0024, 12, false);
+  const ledGeo = geoCache.get('VisorLightLedGeo', () => new THREE.TubeGeometry(curve, 44, 0.0024, 12, false));
   const ledMesh = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   ledMesh.name = 'VisorLEDBar';
   ledMesh.renderOrder = 901;
   group.add(ledMesh);
 
   // 3. Incandescent Pure White Laser Center Core (Gives crisp hardware optical core)
-  const coreGeo = new THREE.TubeGeometry(curve, 44, 0.0011, 10, false);
+  const coreGeo = geoCache.get('VisorLightCoreGeo', () => new THREE.TubeGeometry(curve, 44, 0.0011, 10, false));
   const coreMesh = new THREE.Mesh(coreGeo, materials.whiteCoreEmissive);
   coreMesh.name = 'VisorLEDCore';
   coreMesh.renderOrder = 902;

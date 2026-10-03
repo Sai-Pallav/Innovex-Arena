@@ -4,6 +4,7 @@ import { CameraManager } from './camera';
 import { createStudioLighting, SceneLights } from './lighting';
 import { loadRobotModel, loadRobotModelSync, LoadRobotResult } from '../robot/RobotLoader';
 import { RobotNodes } from '../robot/RobotProceduralFactory';
+import { RobotResourceManager } from '../robot/RobotResourceManager';
 import { RobotController } from '../robot/RobotController';
 import { RobotInteraction } from '../robot/RobotInteraction';
 import { getOptimalPixelRatio, deepDispose } from '../utils/performance';
@@ -32,9 +33,11 @@ export class RobotScene {
 
   private isRunning: boolean = false;
   private isVisible: boolean = true;
+  private isIntersecting: boolean = true;
   private animFrameId: number | null = null;
   private lastTime: number = performance.now();
   private resizeObserver: ResizeObserver | null = null;
+  private intersectionObserver: IntersectionObserver | null = null;
   private boundVisibilityChange: () => void;
 
   public isReady: boolean = false;
@@ -87,8 +90,9 @@ export class RobotScene {
     // 5. Interaction setup
     this.interaction = new RobotInteraction(this.container);
 
-    // 6. Responsive Resize Observer
+    // 6. Responsive Resize Observer & Viewport Intersection Observer
     this.setupResizeObserver();
+    this.setupIntersectionObserver();
 
     // 7. Page Visibility Listener
     this.boundVisibilityChange = this.onVisibilityChange.bind(this);
@@ -99,11 +103,8 @@ export class RobotScene {
   }
 
   private initModel(options: RobotSceneOptions): void {
-    if (options.modelUrl) {
-      this.initModelAsync(options);
-    } else {
-      this.initModelSync(options);
-    }
+    // Asynchronous non-blocking initialization allows React loading spinner to render immediately
+    this.initModelAsync(options);
   }
 
   private initModelSync(options: RobotSceneOptions): void {
@@ -259,6 +260,23 @@ export class RobotScene {
     this.resizeObserver.observe(this.container);
   }
 
+  private setupIntersectionObserver(): void {
+    if (typeof IntersectionObserver === 'undefined') return;
+
+    this.intersectionObserver = new IntersectionObserver(
+      ([entry]) => {
+        this.isIntersecting = entry.isIntersecting;
+        if (this.isIntersecting && this.isVisible && this.isRunning && !this.animFrameId) {
+          this.lastTime = performance.now();
+          this.loop();
+        }
+      },
+      { threshold: 0.01 }
+    );
+
+    this.intersectionObserver.observe(this.container);
+  }
+
   private onVisibilityChange(): void {
     this.isVisible = document.visibilityState === 'visible';
     if (this.isVisible) {
@@ -290,7 +308,7 @@ export class RobotScene {
   }
 
   private loop = (): void => {
-    if (!this.isRunning || !this.isVisible) return;
+    if (!this.isRunning || !this.isVisible || !this.isIntersecting) return;
 
     const now = performance.now();
     const dt = Math.max((now - this.lastTime) / 1000, 0.001);
@@ -408,6 +426,11 @@ export class RobotScene {
       this.resizeObserver = null;
     }
 
+    if (this.intersectionObserver) {
+      this.intersectionObserver.disconnect();
+      this.intersectionObserver = null;
+    }
+
     document.removeEventListener('visibilitychange', this.boundVisibilityChange);
     this.interaction.dispose();
     this.controller?.dispose();
@@ -418,7 +441,24 @@ export class RobotScene {
       this.scene.environment = null;
     }
 
-    deepDispose(this.scene);
+    // Clean up instance-specific robot nodes without destroying shared geometries/materials
+    if (this.robotNodes?.root) {
+      this.scene.remove(this.robotNodes.root);
+      RobotResourceManager.getInstance().disposeInstance(this.robotNodes);
+      this.robotNodes = null;
+    }
+
+    if (this.lights?.group) {
+      this.scene.remove(this.lights.group);
+      if (this.lights.contactShadow) {
+        this.lights.contactShadow.geometry?.dispose();
+        if (Array.isArray(this.lights.contactShadow.material)) {
+          this.lights.contactShadow.material.forEach((m) => m.dispose());
+        } else {
+          this.lights.contactShadow.material?.dispose();
+        }
+      }
+    }
 
     if (this.renderer.domElement && this.renderer.domElement.parentNode) {
       this.renderer.domElement.parentNode.removeChild(this.renderer.domElement);

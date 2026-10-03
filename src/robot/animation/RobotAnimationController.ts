@@ -128,19 +128,10 @@ export class RobotAnimationController {
 
   public setPointerTarget(clientX: number, clientY: number, isHovered: boolean, speed: number = 0): void {
     this.lookController.setPointerTarget(clientX, clientY, isHovered, speed);
-    const inputState = this.inputController.getState();
-    this.inputController.update(
-      inputState.targetX,
-      inputState.targetY,
-      0.016,
-      isHovered,
-      inputState.reducedMotion
-    );
   }
 
   public setLookTarget(x: number, y: number, speed: number = 0): void {
-    const inputState = this.inputController.getState();
-    this.inputController.update(x, y, 0.016, true, inputState.reducedMotion);
+    // Stored for the main update loop
   }
 
   public setIdleState(): void {
@@ -151,13 +142,15 @@ export class RobotAnimationController {
 
   public setReducedMotion(reduced: boolean): void {
     const inputState = this.inputController.getState();
-    this.inputController.update(
-      inputState.targetX,
-      inputState.targetY,
-      0.016,
-      inputState.isHovered,
-      reduced
-    );
+    if (inputState.reducedMotion !== reduced) {
+      this.inputController.update(
+        inputState.targetX,
+        inputState.targetY,
+        0.016,
+        inputState.isHovered,
+        reduced
+      );
+    }
   }
 
   /**

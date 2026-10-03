@@ -16,6 +16,22 @@ export class TorsoWaistController {
   // Abdominal segment offsets
   private segmentPitches: number[] = [0, 0, 0, 0, 0];
 
+  private result = {
+    chestPitch: 0,
+    chestYaw: 0,
+    chestRoll: 0,
+    waistOffsets: {
+      segment01Pitch: 0,
+      segment02Pitch: 0,
+      segment03Pitch: 0,
+      segment04Pitch: 0,
+      segment05Pitch: 0,
+      waistPivotPitch: 0,
+      waistPivotYaw: 0,
+      waistPivotRoll: 0,
+    },
+  };
+
   public update(
     gaze: HierarchicalGazeAngles,
     time: number,
@@ -78,20 +94,21 @@ export class TorsoWaistController {
     this.currentWaistYaw += (targetWaistYaw - this.currentWaistYaw) * waistDamp;
     this.currentWaistRoll += (targetWaistRoll - this.currentWaistRoll) * waistDamp;
 
-    return {
-      chestPitch: this.currentChestPitch,
-      chestYaw: this.currentChestYaw,
-      chestRoll: this.currentChestRoll,
-      waistOffsets: {
-        segment01Pitch: this.segmentPitches[0],
-        segment02Pitch: this.segmentPitches[1],
-        segment03Pitch: this.segmentPitches[2],
-        segment04Pitch: this.segmentPitches[3],
-        segment05Pitch: this.segmentPitches[4],
-        waistPivotPitch: this.currentWaistPitch,
-        waistPivotYaw: this.currentWaistYaw,
-        waistPivotRoll: this.currentWaistRoll,
-      },
-    };
+    const res = this.result;
+    res.chestPitch = this.currentChestPitch;
+    res.chestYaw = this.currentChestYaw;
+    res.chestRoll = this.currentChestRoll;
+
+    const w = res.waistOffsets;
+    w.segment01Pitch = this.segmentPitches[0];
+    w.segment02Pitch = this.segmentPitches[1];
+    w.segment03Pitch = this.segmentPitches[2];
+    w.segment04Pitch = this.segmentPitches[3];
+    w.segment05Pitch = this.segmentPitches[4];
+    w.waistPivotPitch = this.currentWaistPitch;
+    w.waistPivotYaw = this.currentWaistYaw;
+    w.waistPivotRoll = this.currentWaistRoll;
+
+    return res;
   }
 }

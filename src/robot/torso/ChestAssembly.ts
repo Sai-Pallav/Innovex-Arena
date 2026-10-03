@@ -4,6 +4,7 @@ import { TORSO_CONFIG } from './TorsoConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
 import { ROBOT_ACCENT } from '../config';
 import { createChestShoulderExtension, ShoulderExtensionNodes } from '../shoulder/ChestShoulderExtension';
+import { geoCache } from '../utils/GeometryCache';
 
 // ─── Public interfaces (strictly preserved for animation controller compatibility) ──
 
@@ -54,26 +55,29 @@ export interface ChestAssemblyNodes {
 
 // ─── 1. CENTRAL LOGO "A" ─────────────────────────────────────────────────────
 function createChestLogo(materials: RobotMaterialPalette): THREE.Mesh {
-  const shape = new THREE.Shape();
-  const W = TORSO_CONFIG.chest.logoWidth * 0.5;
-  const H = TORSO_CONFIG.chest.logoHeight * 0.5;
+  const geo = geoCache.get('ChestLogoGeo', () => {
+    const shape = new THREE.Shape();
+    const W = TORSO_CONFIG.chest.logoWidth * 0.5;
+    const H = TORSO_CONFIG.chest.logoHeight * 0.5;
 
-  shape.moveTo(0, H);
-  shape.lineTo(W, -H);
-  shape.lineTo(W * 0.62, -H);
-  shape.lineTo(0, -H * 0.18);
-  shape.lineTo(-W * 0.62, -H);
-  shape.lineTo(-W, -H);
-  shape.closePath();
+    shape.moveTo(0, H);
+    shape.lineTo(W, -H);
+    shape.lineTo(W * 0.62, -H);
+    shape.lineTo(0, -H * 0.18);
+    shape.lineTo(-W * 0.62, -H);
+    shape.lineTo(-W, -H);
+    shape.closePath();
 
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.005,
-    bevelEnabled: true,
-    bevelThickness: 0.0016,
-    bevelSize: 0.0012,
-    bevelSegments: 2,
+    const g = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.005,
+      bevelEnabled: true,
+      bevelThickness: 0.0016,
+      bevelSize: 0.0012,
+      bevelSegments: 2,
+    });
+    g.center();
+    return g;
   });
-  geo.center();
 
   const logo = new THREE.Mesh(geo, materials.purpleEmissive);
   logo.name = 'ChestLogo_A';
@@ -97,119 +101,116 @@ function createCentralChestPlate(materials: RobotMaterialPalette): {
   mesh: THREE.Mesh;
   frontZ: number;
 } {
-  const shape = new THREE.Shape();
-  // Expanded & refined upper chest neckline rising smoothly to cup the neck collar
-  shape.moveTo(0, 0.178);
-  // Curve smoothly up from suprasternal notch to left clavicle peak
-  shape.bezierCurveTo(-0.024, 0.180, -0.054, 0.185, -0.088, 0.190);
-  // Clavicle shoulder ridge sloping out toward left shoulder mount
-  shape.bezierCurveTo(-0.124, 0.185, -0.152, 0.172, -0.172, 0.156);
-  // Upper pectoral outer contour
-  shape.quadraticCurveTo(-0.188, 0.118, -0.178, 0.072);
-  // Outer flank sweeps smoothly down and arches cleanly into the sculpted lower chest contour
-  shape.bezierCurveTo(-0.168, 0.038, -0.150, 0.008, -0.125, -0.008);
-  // Dips into the sculpted lower pectoral contour (deeper at sides around x = -0.075 to -0.095)
-  shape.bezierCurveTo(-0.105, -0.018, -0.075, -0.022, -0.045, -0.014);
-  // Gently tapers upward toward the center sub-xiphoid arch/notch framing purple status LED
-  shape.bezierCurveTo(-0.026, -0.008, -0.012, 0.000, 0.000, 0.004);
-  // Symmetrically on the right side
-  shape.bezierCurveTo(0.012, 0.000, 0.026, -0.008, 0.045, -0.014);
-  shape.bezierCurveTo(0.075, -0.022, 0.105, -0.018, 0.125, -0.008);
-  shape.bezierCurveTo(0.150, 0.008, 0.168, 0.038, 0.178, 0.072);
-  shape.quadraticCurveTo(0.188, 0.118, 0.172, 0.156);
-  shape.bezierCurveTo(0.152, 0.172, 0.124, 0.185, 0.088, 0.190);
-  shape.bezierCurveTo(0.054, 0.185, 0.024, 0.180, 0, 0.178);
-  shape.closePath();
+  const geo = geoCache.get('CentralChestPlateGeo', () => {
+    const shape = new THREE.Shape();
+    // Expanded & refined upper chest neckline rising smoothly to cup the neck collar
+    shape.moveTo(0, 0.178);
+    // Curve smoothly up from suprasternal notch to left clavicle peak
+    shape.bezierCurveTo(-0.024, 0.180, -0.054, 0.185, -0.088, 0.190);
+    // Clavicle shoulder ridge sloping out toward left shoulder mount
+    shape.bezierCurveTo(-0.124, 0.185, -0.152, 0.172, -0.172, 0.156);
+    // Upper pectoral outer contour
+    shape.quadraticCurveTo(-0.188, 0.118, -0.178, 0.072);
+    // Outer flank sweeps smoothly down and arches cleanly into the sculpted lower chest contour
+    shape.bezierCurveTo(-0.168, 0.038, -0.150, 0.008, -0.125, -0.008);
+    // Dips into the sculpted lower pectoral contour (deeper at sides around x = -0.075 to -0.095)
+    shape.bezierCurveTo(-0.105, -0.018, -0.075, -0.022, -0.045, -0.014);
+    // Gently tapers upward toward the center sub-xiphoid arch/notch framing purple status LED
+    shape.bezierCurveTo(-0.026, -0.008, -0.012, 0.000, 0.000, 0.004);
+    // Symmetrically on the right side
+    shape.bezierCurveTo(0.012, 0.000, 0.026, -0.008, 0.045, -0.014);
+    shape.bezierCurveTo(0.075, -0.022, 0.105, -0.018, 0.125, -0.008);
+    shape.bezierCurveTo(0.150, 0.008, 0.168, 0.038, 0.178, 0.072);
+    shape.quadraticCurveTo(0.188, 0.118, 0.172, 0.156);
+    shape.bezierCurveTo(0.152, 0.172, 0.124, 0.185, 0.088, 0.190);
+    shape.bezierCurveTo(0.054, 0.185, 0.024, 0.180, 0, 0.178);
+    shape.closePath();
 
-  const extrudeSettings: THREE.ExtrudeGeometryOptions = {
-    depth: 0.026,
-    bevelEnabled: true,
-    bevelThickness: 0.0065,
-    bevelSize: 0.0050,
-    bevelSegments: 5,
-    curveSegments: 48,
-  };
+    const extrudeSettings: THREE.ExtrudeGeometryOptions = {
+      depth: 0.026,
+      bevelEnabled: true,
+      bevelThickness: 0.0065,
+      bevelSize: 0.0050,
+      bevelSegments: 5,
+      curveSegments: 48,
+    };
 
-  const geo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
-  geo.center();
+    const g = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    g.center();
 
-  // Precision 3D hard-surface sculpting:
-  // - Clavicle crest elevation and sharp light-catching crease
-  // - Upper collar chamfer facet sloping backwards toward neck cavity
-  // - Triangular suprasternal notch depression reflecting neck purple LED
-  // - Forward athletic pectoral compound curvature and lateral wrap
-  // - Sculpted lower armor lip and recessed underside transition (Requirement 4B, 4C, 4F)
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const y = pos.getY(i);
-    const z = pos.getZ(i);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      const z = pos.getZ(i);
 
-    if (z > 0) {
-      const ax = Math.abs(x);
+      if (z > 0) {
+        const ax = Math.abs(x);
 
-      // 1. Clavicle crest Y position as a function of |x| in centered coordinates
-      let yCrest: number;
-      if (ax <= 0.088) {
-        const t = ax / 0.088;
-        yCrest = 0.094 + (0.106 - 0.094) * Math.sin(t * (Math.PI / 2));
+        // 1. Clavicle crest Y position as a function of |x| in centered coordinates
+        let yCrest: number;
+        if (ax <= 0.088) {
+          const t = ax / 0.088;
+          yCrest = 0.094 + (0.106 - 0.094) * Math.sin(t * (Math.PI / 2));
+        } else {
+          const t = Math.min(1.0, (ax - 0.088) / (0.172 - 0.088));
+          yCrest = 0.106 - (0.106 - 0.072) * t;
+        }
+
+        // 2. Clavicle bone ridge elevation (raised proud along the crest line)
+        const distToCrest = y - yCrest;
+        let ridgeElev = 0;
+        if (Math.abs(distToCrest) < 0.024) {
+          ridgeElev = Math.cos((distToCrest / 0.024) * (Math.PI / 2)) * 0.008;
+        }
+
+        // 3. Upper collar chamfer facet (sloping back towards neck socket above the crest)
+        let chamferSlope = 0;
+        if (y > yCrest - 0.015) {
+          const chamferT = Math.min(1.0, (y - (yCrest - 0.015)) / 0.035);
+          chamferSlope = -chamferT * 0.022;
+        }
+
+        // 4. Suprasternal notch triangular recessed facet (sternal depression)
+        let notchRecess = 0;
+        if (ax < 0.036 && y > 0.070) {
+          const tX = 1.0 - ax / 0.036;
+          const tY = Math.min(1.0, (y - 0.070) / 0.024);
+          notchRecess = -tX * tY * 0.005;
+        }
+
+        // 5. Pectoral muscle dome curvature (athletic forward bulge below the clavicle)
+        let pectoralBulge = 0;
+        if (y < yCrest) {
+          const nx = Math.min(1.0, ax / 0.175);
+          const ny = Math.min(1.0, Math.max(0, (y + 0.080) / 0.140));
+          pectoralBulge = Math.cos(nx * (Math.PI / 2)) * Math.sin(ny * Math.PI) * 0.018;
+        }
+
+        // 6. Lateral aerodynamic wrap towards side panels
+        const wrapNx = Math.min(1.0, ax / 0.175);
+        const lateralWrap = -Math.pow(wrapNx, 2.2) * 0.012;
+
+        // 7. Sculpted lower armor lip (Requirement 4C)
+        let lowerLip = 0;
+        if (y < -0.030) {
+          const tLip = Math.min(1.0, (-y - 0.030) / 0.065);
+          lowerLip = Math.sin(tLip * Math.PI) * 0.0042;
+        }
+
+        pos.setZ(i, z + ridgeElev + chamferSlope + notchRecess + pectoralBulge + lateralWrap + lowerLip);
       } else {
-        const t = Math.min(1.0, (ax - 0.088) / (0.172 - 0.088));
-        yCrest = 0.106 - (0.106 - 0.072) * t;
-      }
-
-      // 2. Clavicle bone ridge elevation (raised proud along the crest line)
-      const distToCrest = y - yCrest;
-      let ridgeElev = 0;
-      if (Math.abs(distToCrest) < 0.024) {
-        ridgeElev = Math.cos((distToCrest / 0.024) * (Math.PI / 2)) * 0.008;
-      }
-
-      // 3. Upper collar chamfer facet (sloping back towards neck socket above the crest)
-      let chamferSlope = 0;
-      if (y > yCrest - 0.015) {
-        const chamferT = Math.min(1.0, (y - (yCrest - 0.015)) / 0.035);
-        chamferSlope = -chamferT * 0.022;
-      }
-
-      // 4. Suprasternal notch triangular recessed facet (sternal depression)
-      let notchRecess = 0;
-      if (ax < 0.036 && y > 0.070) {
-        const tX = 1.0 - ax / 0.036;
-        const tY = Math.min(1.0, (y - 0.070) / 0.024);
-        notchRecess = -tX * tY * 0.005;
-      }
-
-      // 5. Pectoral muscle dome curvature (athletic forward bulge below the clavicle)
-      let pectoralBulge = 0;
-      if (y < yCrest) {
-        const nx = Math.min(1.0, ax / 0.175);
-        const ny = Math.min(1.0, Math.max(0, (y + 0.080) / 0.140));
-        pectoralBulge = Math.cos(nx * (Math.PI / 2)) * Math.sin(ny * Math.PI) * 0.018;
-      }
-
-      // 6. Lateral aerodynamic wrap towards side panels
-      const wrapNx = Math.min(1.0, ax / 0.175);
-      const lateralWrap = -Math.pow(wrapNx, 2.2) * 0.012;
-
-      // 7. Sculpted lower armor lip (Requirement 4C)
-      let lowerLip = 0;
-      if (y < -0.030) {
-        const tLip = Math.min(1.0, (-y - 0.030) / 0.065);
-        lowerLip = Math.sin(tLip * Math.PI) * 0.0042;
-      }
-
-      pos.setZ(i, z + ridgeElev + chamferSlope + notchRecess + pectoralBulge + lateralWrap + lowerLip);
-    } else {
-      // Recessed underside transition (Requirement 4C & 4F)
-      if (y < -0.030) {
-        const tUnder = Math.min(1.0, (-y - 0.030) / 0.065);
-        pos.setZ(i, z + Math.sin(tUnder * (Math.PI / 2)) * 0.0075);
-        pos.setY(i, y + tUnder * 0.0040);
+        // Recessed underside transition (Requirement 4C & 4F)
+        if (y < -0.030) {
+          const tUnder = Math.min(1.0, (-y - 0.030) / 0.065);
+          pos.setZ(i, z + Math.sin(tUnder * (Math.PI / 2)) * 0.0075);
+          pos.setY(i, y + tUnder * 0.0040);
+        }
       }
     }
-  }
-  geo.computeVertexNormals();
+    g.computeVertexNormals();
+    return g;
+  });
 
   const mesh = new THREE.Mesh(geo, materials.armor);
   mesh.name = 'ChestPlate_Central';
@@ -226,35 +227,38 @@ function createChestSidePanel(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): { panel: THREE.Mesh; lightStrip: THREE.Mesh } {
-  const shape = new THREE.Shape();
-  // Sculpted side panel framing the diagonal purple light strip and meeting the extension seam cleanly
-  shape.moveTo(side * 0.156, 0.082);
-  shape.bezierCurveTo(side * 0.144, 0.010, side * 0.118, -0.028, side * 0.072, -0.046);
-  shape.lineTo(side * 0.134, -0.048);
-  shape.bezierCurveTo(side * 0.152, -0.015, side * 0.162, 0.050, side * 0.158, 0.142);
-  shape.lineTo(side * 0.144, 0.144);
-  shape.closePath();
+  const geo = geoCache.get(`ChestSidePanelGeo_${side}`, () => {
+    const shape = new THREE.Shape();
+    // Sculpted side panel framing the diagonal purple light strip and meeting the extension seam cleanly
+    shape.moveTo(side * 0.156, 0.082);
+    shape.bezierCurveTo(side * 0.144, 0.010, side * 0.118, -0.028, side * 0.072, -0.046);
+    shape.lineTo(side * 0.134, -0.048);
+    shape.bezierCurveTo(side * 0.152, -0.015, side * 0.162, 0.050, side * 0.158, 0.142);
+    shape.lineTo(side * 0.144, 0.144);
+    shape.closePath();
 
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.022,
-    bevelEnabled: true,
-    bevelThickness: 0.0052,
-    bevelSize: 0.0040,
-    bevelSegments: 4,
-    curveSegments: 32,
-  });
-  geo.center();
+    const g = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.022,
+      bevelEnabled: true,
+      bevelThickness: 0.0052,
+      bevelSize: 0.0040,
+      bevelSegments: 4,
+      curveSegments: 32,
+    });
+    g.center();
 
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const z = pos.getZ(i);
-    if (z > 0) {
-      const d = Math.abs(x) / 0.16;
-      pos.setZ(i, z + Math.sin(d * Math.PI) * 0.010);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      if (z > 0) {
+        const d = Math.abs(x) / 0.16;
+        pos.setZ(i, z + Math.sin(d * Math.PI) * 0.010);
+      }
     }
-  }
-  geo.computeVertexNormals();
+    g.computeVertexNormals();
+    return g;
+  });
 
   const panel = new THREE.Mesh(geo, materials.armor);
   panel.name = side === -1 ? 'ChestSidePanel_Left' : 'ChestSidePanel_Right';
@@ -265,8 +269,7 @@ function createChestSidePanel(
   panel.receiveShadow = true;
 
   // Diagonal Purple Emissive Light Strip aligned flush with side panel
-  const stripLength = 0.128;
-  const stripGeo = new THREE.CylinderGeometry(0.0032, 0.0032, stripLength, 14);
+  const stripGeo = geoCache.get('ChestLightStripGeo', () => new THREE.CylinderGeometry(0.0032, 0.0032, 0.128, 14));
   const lightStrip = new THREE.Mesh(stripGeo, materials.purpleEmissive);
   lightStrip.name = side === -1 ? 'ChestLightStrip_Left' : 'ChestLightStrip_Right';
   lightStrip.position.set(side * 0.124, 0.029, 0.064);
@@ -282,36 +285,39 @@ function createChestFlankArmor(
   side: -1 | 1,
   materials: RobotMaterialPalette
 ): THREE.Mesh {
-  const shape = new THREE.Shape();
-  shape.moveTo(0.048, 0.048);
-  shape.lineTo(0.056, 0.018);
-  // Curves downward with controlled clearance, contouring cleanly into rib actuator clearance
-  shape.bezierCurveTo(0.058, -0.015, 0.048, -0.036, 0.028, -0.044);
-  shape.quadraticCurveTo(0.005, -0.038, -0.018, -0.038);
-  shape.bezierCurveTo(-0.036, -0.036, -0.046, -0.015, -0.048, 0.018);
-  shape.lineTo(-0.032, 0.048);
-  shape.closePath();
+  const geo = geoCache.get(`ChestFlankArmorGeo_${side}`, () => {
+    const shape = new THREE.Shape();
+    shape.moveTo(0.048, 0.048);
+    shape.lineTo(0.056, 0.018);
+    // Curves downward with controlled clearance, contouring cleanly into rib actuator clearance
+    shape.bezierCurveTo(0.058, -0.015, 0.048, -0.036, 0.028, -0.044);
+    shape.quadraticCurveTo(0.005, -0.038, -0.018, -0.038);
+    shape.bezierCurveTo(-0.036, -0.036, -0.046, -0.015, -0.048, 0.018);
+    shape.lineTo(-0.032, 0.048);
+    shape.closePath();
 
-  const geo = new THREE.ExtrudeGeometry(shape, {
-    depth: 0.026,
-    bevelEnabled: true,
-    bevelThickness: 0.0045,
-    bevelSize: 0.0035,
-    bevelSegments: 3,
-    curveSegments: 24,
-  });
-  geo.center();
+    const g = new THREE.ExtrudeGeometry(shape, {
+      depth: 0.026,
+      bevelEnabled: true,
+      bevelThickness: 0.0045,
+      bevelSize: 0.0035,
+      bevelSegments: 3,
+      curveSegments: 24,
+    });
+    g.center();
 
-  const pos = geo.attributes.position;
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i);
-    const z = pos.getZ(i);
-    if (z > 0) {
-      const d = Math.abs(x) / 0.05;
-      pos.setZ(i, z + Math.cos(d * Math.PI * 0.5) * 0.008);
+    const pos = g.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const z = pos.getZ(i);
+      if (z > 0) {
+        const d = Math.abs(x) / 0.05;
+        pos.setZ(i, z + Math.cos(d * Math.PI * 0.5) * 0.008);
+      }
     }
-  }
-  geo.computeVertexNormals();
+    g.computeVertexNormals();
+    return g;
+  });
 
   const mesh = new THREE.Mesh(geo, materials.armor);
   mesh.name = side === -1 ? 'ChestFlankArmor_Left' : 'ChestFlankArmor_Right';
@@ -330,58 +336,61 @@ function createChestFlankArmor(
  * chassis frame and rib mechanism with visible depth, compound curvature, and clean clearance.
  */
 function createChestLowerUndersideCowl(materials: RobotMaterialPalette): THREE.Mesh {
-  const xSegs = 36;
-  const ySegs = 14;
-  const positions: number[] = [];
-  const uvs: number[] = [];
-  const indices: number[] = [];
+  const geo = geoCache.get('ChestLowerUndersideCowlGeo', () => {
+    const xSegs = 36;
+    const ySegs = 14;
+    const positions: number[] = [];
+    const uvs: number[] = [];
+    const indices: number[] = [];
 
-  for (let iy = 0; iy <= ySegs; iy++) {
-    const ty = iy / ySegs; // 0 = front lip, 1 = recessed underside rear
-    for (let ix = 0; ix <= xSegs; ix++) {
-      const tx = (ix / xSegs) * 2 - 1; // -1 to +1 across chest
-      const x = tx * 0.128;
-      const ax = Math.abs(x);
+    for (let iy = 0; iy <= ySegs; iy++) {
+      const ty = iy / ySegs; // 0 = front lip, 1 = recessed underside rear
+      for (let ix = 0; ix <= xSegs; ix++) {
+        const tx = (ix / xSegs) * 2 - 1; // -1 to +1 across chest
+        const x = tx * 0.128;
+        const ax = Math.abs(x);
 
-      // Pectoral lower edge compound curve in local centered space
-      let edgeY: number;
-      if (ax < 0.025) {
-        edgeY = -0.098 + 0.003 * (1 - ax / 0.025);
-      } else if (ax < 0.085) {
-        const t = (ax - 0.025) / 0.060;
-        edgeY = -0.098 - 0.012 * Math.sin(t * (Math.PI / 2));
-      } else {
-        const t = Math.min(1.0, (ax - 0.085) / 0.043);
-        edgeY = -0.110 + 0.022 * t;
+        // Pectoral lower edge compound curve in local centered space
+        let edgeY: number;
+        if (ax < 0.025) {
+          edgeY = -0.098 + 0.003 * (1 - ax / 0.025);
+        } else if (ax < 0.085) {
+          const t = (ax - 0.025) / 0.060;
+          edgeY = -0.098 - 0.012 * Math.sin(t * (Math.PI / 2));
+        } else {
+          const t = Math.min(1.0, (ax - 0.085) / 0.043);
+          edgeY = -0.110 + 0.022 * t;
+        }
+
+        // Front lip: starts proud at Z = 0.022 (flush with lower armor lip)
+        // Recessed back: sweeps backward to Z = -0.008, angling upward to Y + 0.012
+        const curX = x * (1 - ty * 0.06); // gentle side taper toward abdomen
+        const curY = edgeY + ty * 0.014;
+        const curZ = 0.022 * (1 - ty) - 0.008 * ty - Math.pow(ax / 0.128, 2.0) * 0.006;
+
+        positions.push(curX, curY, curZ);
+        uvs.push(ix / xSegs, iy / ySegs);
       }
-
-      // Front lip: starts proud at Z = 0.022 (flush with lower armor lip)
-      // Recessed back: sweeps backward to Z = -0.008, angling upward to Y + 0.012
-      const curX = x * (1 - ty * 0.06); // gentle side taper toward abdomen
-      const curY = edgeY + ty * 0.014;
-      const curZ = 0.022 * (1 - ty) - 0.008 * ty - Math.pow(ax / 0.128, 2.0) * 0.006;
-
-      positions.push(curX, curY, curZ);
-      uvs.push(ix / xSegs, iy / ySegs);
     }
-  }
 
-  for (let iy = 0; iy < ySegs; iy++) {
-    for (let ix = 0; ix < xSegs; ix++) {
-      const a = iy * (xSegs + 1) + ix;
-      const b = a + 1;
-      const c = a + (xSegs + 1);
-      const d = c + 1;
-      indices.push(a, b, c);
-      indices.push(b, d, c);
+    for (let iy = 0; iy < ySegs; iy++) {
+      for (let ix = 0; ix < xSegs; ix++) {
+        const a = iy * (xSegs + 1) + ix;
+        const b = a + 1;
+        const c = a + (xSegs + 1);
+        const d = c + 1;
+        indices.push(a, b, c);
+        indices.push(b, d, c);
+      }
     }
-  }
 
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-  geo.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
-  geo.setIndex(indices);
-  geo.computeVertexNormals();
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    g.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+    g.setIndex(indices);
+    g.computeVertexNormals();
+    return g;
+  });
 
   const mesh = new THREE.Mesh(geo, materials.armorDoubleSide);
   mesh.name = 'ChestLowerUndersideCowl';
@@ -458,7 +467,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const frameJointGroup = new THREE.Group();
 
   // Central dark spinal column inside chest — sized to terminate cleanly at the sub-sternal chassis bulkhead
-  const spineGeo = new THREE.CylinderGeometry(0.064, 0.052, 0.180, 24);
+  const spineGeo = geoCache.get('ChestSpineGeo', () => new THREE.CylinderGeometry(0.064, 0.052, 0.180, 24));
   const frameSpine = new THREE.Mesh(spineGeo, materials.joint);
   frameSpine.name = 'ChestFrameSpine';
   frameSpine.position.set(0, 0.032, -0.020);
@@ -468,7 +477,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   frameJointGroup.add(frameSpine);
 
   // Transverse Clavicle Beams — wider span (0.160 → 0.200) matching expanded shoulders
-  const clavicleBeamGeo = new THREE.CylinderGeometry(0.018, 0.018, 0.200, 14);
+  const clavicleBeamGeo = geoCache.get('ChestClavicleBeamGeo', () => new THREE.CylinderGeometry(0.018, 0.018, 0.200, 14));
 
   const frameClavicleLeft = new THREE.Mesh(clavicleBeamGeo, materials.joint);
   frameClavicleLeft.rotation.z = Math.PI / 2;
@@ -481,26 +490,29 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   frameJointGroup.add(frameClavicleRight);
 
   // 3. Sculpted White Ceramic Collar Bezel (Mantle cupping the neck base flush)
-  const collarShape = new THREE.Shape();
-  const cOuterRx = 0.088;
-  const cOuterRz = 0.084;
-  collarShape.absellipse(0, 0, cOuterRx, cOuterRz, 0, Math.PI * 2, false, 0);
+  const collarExtrude = geoCache.get('NeckCollarExtrudeGeo', () => {
+    const collarShape = new THREE.Shape();
+    const cOuterRx = 0.088;
+    const cOuterRz = 0.084;
+    collarShape.absellipse(0, 0, cOuterRx, cOuterRz, 0, Math.PI * 2, false, 0);
 
-  const collarHole = new THREE.Path();
-  const cInnerRx = 0.0745;
-  const cInnerRz = 0.0745;
-  collarHole.absellipse(0, 0, cInnerRx, cInnerRz, 0, Math.PI * 2, true, 0);
-  collarShape.holes.push(collarHole);
+    const collarHole = new THREE.Path();
+    const cInnerRx = 0.0745;
+    const cInnerRz = 0.0745;
+    collarHole.absellipse(0, 0, cInnerRx, cInnerRz, 0, Math.PI * 2, true, 0);
+    collarShape.holes.push(collarHole);
 
-  const collarExtrude = new THREE.ExtrudeGeometry(collarShape, {
-    depth: 0.018,
-    bevelEnabled: true,
-    bevelThickness: 0.0035,
-    bevelSize: 0.0030,
-    bevelSegments: 4,
-    curveSegments: 36,
+    const g = new THREE.ExtrudeGeometry(collarShape, {
+      depth: 0.018,
+      bevelEnabled: true,
+      bevelThickness: 0.0035,
+      bevelSize: 0.0030,
+      bevelSegments: 4,
+      curveSegments: 36,
+    });
+    g.center();
+    return g;
   });
-  collarExtrude.center();
 
   const neckCollar = new THREE.Mesh(collarExtrude, materials.armor);
   neckCollar.name = 'NeckCollar';
@@ -511,7 +523,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   group.add(neckCollar);
 
   // Stepped internal dark titanium mounting sleeve
-  const collarSleeveGeo = new THREE.CylinderGeometry(0.073, 0.070, 0.024, 32);
+  const collarSleeveGeo = geoCache.get('NeckCollarSleeveGeo', () => new THREE.CylinderGeometry(0.073, 0.070, 0.024, 32));
   const neckCollarSleeve = new THREE.Mesh(collarSleeveGeo, materials.joint);
   neckCollarSleeve.position.set(0, TORSO_CONFIG.chest.collarY - 0.008, TORSO_CONFIG.chest.collarZ);
   neckCollarSleeve.castShadow = true;
@@ -525,7 +537,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   }
 
   // 4. Horizontal Glowing Purple Light Ring at Collar Seam
-  const lightRingGeo = new THREE.TorusGeometry(0.0745, 0.0016, 10, 40);
+  const lightRingGeo = geoCache.get('NeckLightRingGeo', () => new THREE.TorusGeometry(0.0745, 0.0016, 10, 40));
   const neckCollarLightRing = new THREE.Mesh(lightRingGeo, materials.purpleEmissive);
   neckCollarLightRing.name = 'NeckCollarLightRing';
   neckCollarLightRing.rotation.x = Math.PI / 2;
@@ -534,7 +546,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   ledMeshes.push(neckCollarLightRing);
 
   // 5. Central Vertical Purple Light Slit at Suprasternal Notch
-  const slitGeo = new THREE.BoxGeometry(0.0032, 0.012, 0.004);
+  const slitGeo = geoCache.get('NeckLightSlitGeo', () => new THREE.BoxGeometry(0.0032, 0.012, 0.004));
   const neckCollarLightSlit = new THREE.Mesh(slitGeo, materials.purpleEmissive);
   neckCollarLightSlit.name = 'NeckCollarLightSlit';
   neckCollarLightSlit.position.set(0, 0.124, 0.058);
@@ -549,29 +561,32 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
 
 
   // Sculpted White Upper Back Armor (Reference Blueprint: "BACK VIEW")
-  const backShape = new THREE.Shape();
-  backShape.moveTo(-0.120, 0.104);
-  backShape.quadraticCurveTo(-0.074, 0.120, -0.066, 0.120);
-  backShape.quadraticCurveTo(0, 0.106, 0.066, 0.120);
-  backShape.quadraticCurveTo(0.074, 0.120, 0.120, 0.104);
-  backShape.bezierCurveTo(0.130, 0.045, 0.118, -0.020, 0.082, -0.048);
-  backShape.lineTo(0.036, -0.054);
-  // Trapezoidal opening exposing internal spinal column
-  backShape.lineTo(0.016, -0.018);
-  backShape.lineTo(-0.016, -0.018);
-  backShape.lineTo(-0.036, -0.054);
-  backShape.lineTo(-0.082, -0.048);
-  backShape.bezierCurveTo(-0.118, -0.020, -0.130, 0.045, -0.120, 0.104);
-  backShape.closePath();
+  const backGeo = geoCache.get('ChestBackGeo', () => {
+    const backShape = new THREE.Shape();
+    backShape.moveTo(-0.120, 0.104);
+    backShape.quadraticCurveTo(-0.074, 0.120, -0.066, 0.120);
+    backShape.quadraticCurveTo(0, 0.106, 0.066, 0.120);
+    backShape.quadraticCurveTo(0.074, 0.120, 0.120, 0.104);
+    backShape.bezierCurveTo(0.130, 0.045, 0.118, -0.020, 0.082, -0.048);
+    backShape.lineTo(0.036, -0.054);
+    // Trapezoidal opening exposing internal spinal column
+    backShape.lineTo(0.016, -0.018);
+    backShape.lineTo(-0.016, -0.018);
+    backShape.lineTo(-0.036, -0.054);
+    backShape.lineTo(-0.082, -0.048);
+    backShape.bezierCurveTo(-0.118, -0.020, -0.130, 0.045, -0.120, 0.104);
+    backShape.closePath();
 
-  const backGeo = new THREE.ExtrudeGeometry(backShape, {
-    depth: 0.020,
-    bevelEnabled: true,
-    bevelThickness: 0.005,
-    bevelSize: 0.004,
-    bevelSegments: 3,
+    const g = new THREE.ExtrudeGeometry(backShape, {
+      depth: 0.020,
+      bevelEnabled: true,
+      bevelThickness: 0.005,
+      bevelSize: 0.004,
+      bevelSegments: 3,
+    });
+    g.center();
+    return g;
   });
-  backGeo.center();
 
   const backArmor = new THREE.Mesh(backGeo, materials.armor);
   backArmor.name = 'ChestBackArmor';
@@ -582,7 +597,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   group.add(backArmor);
 
   // Horizontal Purple Emissive Scapula Light Bar
-  const backLightGeo = new THREE.BoxGeometry(0.100, 0.0050, 0.006);
+  const backLightGeo = geoCache.get('ChestBackLightGeo', () => new THREE.BoxGeometry(0.100, 0.0050, 0.006));
   const backLightBar = new THREE.Mesh(backLightGeo, materials.purpleEmissive);
   backLightBar.name = 'BackLightBar';
   backLightBar.position.set(0, 0.001, -0.094);
@@ -656,7 +671,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   }
 
   // 3. Central Sub-Xiphoid Status LED nestled in the xiphoid notch
-  const xiphoidLedGeo = new THREE.BoxGeometry(0.0032, 0.007, 0.004);
+  const xiphoidLedGeo = geoCache.get('XiphoidLedGeo', () => new THREE.BoxGeometry(0.0032, 0.007, 0.004));
   const xiphoidLed = new THREE.Mesh(xiphoidLedGeo, materials.purpleEmissive);
   xiphoidLed.name = 'SubXiphoidStatusLed';
   xiphoidLed.position.set(0, -0.066, 0.046);
@@ -724,7 +739,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
 
   const mergedLower = mergeGroupMeshesByMaterial(tempLower, materials.joint, 'LowerChestFrame_Merged')!;
   tempLower.traverse((child) => {
-    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+    if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry && !geoCache.isCached((child as THREE.Mesh).geometry)) {
       (child as THREE.Mesh).geometry.dispose();
     }
   });
@@ -733,7 +748,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   const mergedMetallic = mergeGroupMeshesByMaterial(tempMetallic, materials.metallic, 'LowerChestMetallic_Merged', false);
   if (mergedMetallic) {
     tempMetallic.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry) {
+      if ((child as THREE.Mesh).isMesh && (child as THREE.Mesh).geometry && !geoCache.isCached((child as THREE.Mesh).geometry)) {
         (child as THREE.Mesh).geometry.dispose();
       }
     });
@@ -741,7 +756,7 @@ export function createUpperTorsoFrame(materials: RobotMaterialPalette): UpperTor
   }
 
   // Purple Emissive Accent Ring recessed inside the lower gimbal housing
-  const lowerAccentGeo = new THREE.TorusGeometry(0.034, 0.0016, 8, 32);
+  const lowerAccentGeo = geoCache.get('LowerAccentRingGeo', () => new THREE.TorusGeometry(0.034, 0.0016, 8, 32));
   const lowerAccentRing = new THREE.Mesh(lowerAccentGeo, materials.purpleEmissive);
   lowerAccentRing.rotation.x = Math.PI / 2;
   lowerAccentRing.position.set(0, -0.080, 0.008);

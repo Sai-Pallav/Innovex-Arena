@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface FootNodes {
   group: THREE.Group;
@@ -126,15 +127,28 @@ export function createFoot(
   soleShape.quadraticCurveTo(-halfW * 0.85, 0, -halfW * 0.75, cfg.heelOffset);
   soleShape.closePath();
 
-  const soleGeo = new THREE.ExtrudeGeometry(soleShape, {
-    depth: cfg.soleThickness,
-    bevelEnabled: true,
-    bevelThickness: 0.0025,
-    bevelSize: 0.002,
-    bevelSegments: 2,
-    curveSegments: 24,
+  const soleGeo = geoCache.get('Foot_SoleGeo', () => {
+    const soleShape = new THREE.Shape();
+    soleShape.moveTo(-halfW * 0.75, cfg.heelOffset);
+    soleShape.lineTo(halfW * 0.75, cfg.heelOffset);
+    soleShape.quadraticCurveTo(halfW * 0.85, 0, halfW, cfg.toeOffset * 0.55);
+    soleShape.quadraticCurveTo(halfW * 0.95, cfg.toeOffset * 0.90, halfW * 0.65, cfg.toeOffset);
+    soleShape.lineTo(-halfW * 0.65, cfg.toeOffset);
+    soleShape.quadraticCurveTo(-halfW * 0.95, cfg.toeOffset * 0.90, -halfW, cfg.toeOffset * 0.55);
+    soleShape.quadraticCurveTo(-halfW * 0.85, 0, -halfW * 0.75, cfg.heelOffset);
+    soleShape.closePath();
+
+    const g = new THREE.ExtrudeGeometry(soleShape, {
+      depth: cfg.soleThickness,
+      bevelEnabled: true,
+      bevelThickness: 0.0025,
+      bevelSize: 0.002,
+      bevelSegments: 2,
+      curveSegments: 24,
+    });
+    g.center();
+    return g;
   });
-  soleGeo.center();
 
   // Group containing stationary sole chassis, tread pads, and heel thruster
   const footJointGroup = new THREE.Group();
@@ -157,7 +171,7 @@ export function createFoot(
   for (let i = 0; i < padCount; i++) {
     const padZ = cfg.heelOffset + (i + 1) * padSpacing;
     const padW = cfg.width * (0.65 + Math.sin((i / padCount) * Math.PI) * 0.25);
-    const padGeo = new THREE.BoxGeometry(padW, 0.0028, padSpacing * 0.55);
+    const padGeo = geoCache.get(`Foot_PadGeo_${i}`, () => new THREE.BoxGeometry(padW, 0.0028, padSpacing * 0.55));
     const pad = new THREE.Mesh(padGeo, materials.joint);
     pad.position.set(0, -cfg.height + 0.0014, padZ);
     pad.castShadow = true;
@@ -168,34 +182,36 @@ export function createFoot(
   // ==========================================
   // 3. GROUND-EFFECT PURPLE NEON UNDERGLOW STRIP
   // ==========================================
-  // Inset contour along the perimeter of the sole base casting light downwards
-  const underglowShape = new THREE.Shape();
-  const ugW = halfW * 0.92;
-  underglowShape.moveTo(-ugW * 0.75, cfg.heelOffset + 0.004);
-  underglowShape.lineTo(ugW * 0.75, cfg.heelOffset + 0.004);
-  underglowShape.lineTo(ugW, cfg.toeOffset * 0.55);
-  underglowShape.lineTo(ugW * 0.65, cfg.toeOffset - 0.004);
-  underglowShape.lineTo(-ugW * 0.65, cfg.toeOffset - 0.004);
-  underglowShape.lineTo(-ugW, cfg.toeOffset * 0.55);
-  underglowShape.closePath();
+  const underglowGeo = geoCache.get('Foot_UnderglowGeo', () => {
+    const underglowShape = new THREE.Shape();
+    const ugW = halfW * 0.92;
+    underglowShape.moveTo(-ugW * 0.75, cfg.heelOffset + 0.004);
+    underglowShape.lineTo(ugW * 0.75, cfg.heelOffset + 0.004);
+    underglowShape.lineTo(ugW, cfg.toeOffset * 0.55);
+    underglowShape.lineTo(ugW * 0.65, cfg.toeOffset - 0.004);
+    underglowShape.lineTo(-ugW * 0.65, cfg.toeOffset - 0.004);
+    underglowShape.lineTo(-ugW, cfg.toeOffset * 0.55);
+    underglowShape.closePath();
 
-  const ugHole = new THREE.Path();
-  const ugIW = halfW * 0.82;
-  ugHole.moveTo(-ugIW * 0.75, cfg.heelOffset + 0.008);
-  ugHole.lineTo(ugIW * 0.75, cfg.heelOffset + 0.008);
-  ugHole.lineTo(ugIW, cfg.toeOffset * 0.55);
-  ugHole.lineTo(ugIW * 0.65, cfg.toeOffset - 0.008);
-  ugHole.lineTo(-ugIW * 0.65, cfg.toeOffset - 0.008);
-  ugHole.lineTo(-ugIW, cfg.toeOffset * 0.55);
-  ugHole.closePath();
-  underglowShape.holes.push(ugHole);
+    const ugHole = new THREE.Path();
+    const ugIW = halfW * 0.82;
+    ugHole.moveTo(-ugIW * 0.75, cfg.heelOffset + 0.008);
+    ugHole.lineTo(ugIW * 0.75, cfg.heelOffset + 0.008);
+    ugHole.lineTo(ugIW, cfg.toeOffset * 0.55);
+    ugHole.lineTo(ugIW * 0.65, cfg.toeOffset - 0.008);
+    ugHole.lineTo(-ugIW * 0.65, cfg.toeOffset - 0.008);
+    ugHole.lineTo(-ugIW, cfg.toeOffset * 0.55);
+    ugHole.closePath();
+    underglowShape.holes.push(ugHole);
 
-  const underglowGeo = new THREE.ExtrudeGeometry(underglowShape, {
-    depth: 0.0022,
-    bevelEnabled: false,
-    curveSegments: 16,
+    const g = new THREE.ExtrudeGeometry(underglowShape, {
+      depth: 0.0022,
+      bevelEnabled: false,
+      curveSegments: 16,
+    });
+    g.center();
+    return g;
   });
-  underglowGeo.center();
 
   const tempFootLeds = new THREE.Group();
 
@@ -205,7 +221,7 @@ export function createFoot(
   tempFootLeds.add(underglowStripRaw);
 
   // Soft purple bloom ground reflection mesh
-  const ugBloomGeo = new THREE.PlaneGeometry(cfg.width * 1.3, cfg.length * 1.15);
+  const ugBloomGeo = geoCache.get('Foot_UgBloomGeo', () => new THREE.PlaneGeometry(cfg.width * 1.3, cfg.length * 1.15));
   const ugBloom = new THREE.Mesh(ugBloomGeo, materials.purpleBloom);
   ugBloom.rotation.x = -Math.PI / 2;
   ugBloom.position.set(0, -cfg.height + 0.0005, (cfg.toeOffset + cfg.heelOffset) * 0.5);
@@ -214,11 +230,11 @@ export function createFoot(
   // ==========================================
   // 4. SCULPTED WHITE CERAMIC DORSAL ARMOR SHIELD
   // ==========================================
-  const dorsalGeo = createDorsalArmorGeometry(
+  const dorsalGeo = geoCache.get('Foot_DorsalGeo', () => createDorsalArmorGeometry(
     cfg.dorsalPlate.width,
     cfg.dorsalPlate.length,
     cfg.dorsalPlate.thickness
-  );
+  ));
   const dorsalArmor = new THREE.Mesh(dorsalGeo, materials.armor);
   dorsalArmor.name = side === -1 ? 'FootDorsalArmor_L' : 'FootDorsalArmor_R';
   dorsalArmor.rotation.x = Math.PI / 2 + 0.18; // Angled forward over the foot bridge
@@ -228,7 +244,7 @@ export function createFoot(
   footGroup.add(dorsalArmor);
 
   // Tech groove with purple LED strip across dorsal armor
-  const dorsalLedGeo = new THREE.BoxGeometry(0.0028, 0.052, 0.002);
+  const dorsalLedGeo = geoCache.get('Foot_DorsalLedGeo', () => new THREE.BoxGeometry(0.0028, 0.052, 0.002));
   const dorsalLed = new THREE.Mesh(dorsalLedGeo, materials.purpleEmissive);
   dorsalLed.rotation.x = Math.PI / 2 + 0.18;
   dorsalLed.position.set(0, -cfg.height * 0.38, 0.026);
@@ -243,11 +259,11 @@ export function createFoot(
   toePivot.position.set(0, -cfg.height + 0.016, cfg.toeOffset * 0.65);
   footGroup.add(toePivot);
 
-  const toeGeo = createToeCapGeometry(
+  const toeGeo = geoCache.get('Foot_ToeGeo', () => createToeCapGeometry(
     cfg.toeCap.width,
     cfg.toeCap.length,
     cfg.toeCap.height
-  );
+  ));
   const toeArmor = new THREE.Mesh(toeGeo, materials.armor);
   toeArmor.name = side === -1 ? 'ToeArmor_L' : 'ToeArmor_R';
   toeArmor.rotation.x = Math.PI / 2;
@@ -259,21 +275,24 @@ export function createFoot(
   // ==========================================
   // 6. REAR HEEL COUNTER & MICRO-THRUSTER NOZZLE
   // ==========================================
-  const heelShape = new THREE.Shape();
-  heelShape.moveTo(-halfW * 0.72, 0);
-  heelShape.lineTo(halfW * 0.72, 0);
-  heelShape.quadraticCurveTo(halfW * 0.68, cfg.height * 0.65, 0, cfg.height * 0.72);
-  heelShape.quadraticCurveTo(-halfW * 0.68, cfg.height * 0.65, -halfW * 0.72, 0);
-  heelShape.closePath();
+  const heelGeo = geoCache.get('Foot_HeelGeo', () => {
+    const heelShape = new THREE.Shape();
+    heelShape.moveTo(-halfW * 0.72, 0);
+    heelShape.lineTo(halfW * 0.72, 0);
+    heelShape.quadraticCurveTo(halfW * 0.68, cfg.height * 0.65, 0, cfg.height * 0.72);
+    heelShape.quadraticCurveTo(-halfW * 0.68, cfg.height * 0.65, -halfW * 0.72, 0);
+    heelShape.closePath();
 
-  const heelGeo = new THREE.ExtrudeGeometry(heelShape, {
-    depth: 0.018,
-    bevelEnabled: true,
-    bevelThickness: 0.0025,
-    bevelSize: 0.002,
-    bevelSegments: 2,
+    const g = new THREE.ExtrudeGeometry(heelShape, {
+      depth: 0.018,
+      bevelEnabled: true,
+      bevelThickness: 0.0025,
+      bevelSize: 0.002,
+      bevelSegments: 2,
+    });
+    g.center();
+    return g;
   });
-  heelGeo.center();
 
   const heelArmor = new THREE.Mesh(heelGeo, materials.armor);
   heelArmor.name = side === -1 ? 'HeelArmor_L' : 'HeelArmor_R';
@@ -282,12 +301,12 @@ export function createFoot(
   footGroup.add(heelArmor);
 
   // Micro-thruster exhaust nozzle at rear heel base
-  const thrusterGeo = new THREE.CylinderGeometry(
+  const thrusterGeo = geoCache.get('Foot_ThrusterGeo', () => new THREE.CylinderGeometry(
     cfg.heelThruster.radius,
     cfg.heelThruster.radius * 1.18,
     cfg.heelThruster.depth,
     18
-  );
+  ));
   const heelThruster = new THREE.Mesh(thrusterGeo, materials.joint);
   heelThruster.name = side === -1 ? 'HeelThruster_L' : 'HeelThruster_R';
   heelThruster.rotation.x = Math.PI / 2;
@@ -299,7 +318,7 @@ export function createFoot(
   const mergedSole = mergeGroupMeshesByMaterial(footJointGroup, materials.joint, side === -1 ? 'FootJointMesh_L' : 'FootJointMesh_R', true) || soleChassis;
 
   // Thruster interior purple glow ring
-  const nozzleGlowGeo = new THREE.TorusGeometry(cfg.heelThruster.radius * 0.65, 0.0016, 8, 16);
+  const nozzleGlowGeo = geoCache.get('Foot_NozzleGlowGeo', () => new THREE.TorusGeometry(cfg.heelThruster.radius * 0.65, 0.0016, 8, 16));
   const nozzleGlow = new THREE.Mesh(nozzleGlowGeo, materials.purpleEmissive);
   nozzleGlow.position.set(0, -cfg.height + 0.016, cfg.heelOffset - 0.010);
   tempFootLeds.add(nozzleGlow);

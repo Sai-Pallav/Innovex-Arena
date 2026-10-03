@@ -10,6 +10,14 @@ export class IdleSuspensionController {
   private smoothedTorsoMicroPitch: number = 0;
   private smoothedTorsoMicroYaw: number = 0;
 
+  private result: IdleSuspensionState = {
+    floatingY: 0,
+    floatingPitch: 0,
+    floatingRoll: 0,
+    torsoMicroPitch: 0,
+    torsoMicroYaw: 0,
+  };
+
   public update(
     time: number,
     dt: number,
@@ -25,13 +33,13 @@ export class IdleSuspensionController {
       this.smoothedTorsoMicroPitch += (0 - this.smoothedTorsoMicroPitch) * settleDamp;
       this.smoothedTorsoMicroYaw += (0 - this.smoothedTorsoMicroYaw) * settleDamp;
 
-      return {
-        floatingY: this.smoothedFloatingY,
-        floatingPitch: this.smoothedFloatingPitch,
-        floatingRoll: this.smoothedFloatingRoll,
-        torsoMicroPitch: this.smoothedTorsoMicroPitch,
-        torsoMicroYaw: this.smoothedTorsoMicroYaw,
-      };
+      const res = this.result;
+      res.floatingY = this.smoothedFloatingY;
+      res.floatingPitch = this.smoothedFloatingPitch;
+      res.floatingRoll = this.smoothedFloatingRoll;
+      res.torsoMicroPitch = this.smoothedTorsoMicroPitch;
+      res.torsoMicroYaw = this.smoothedTorsoMicroYaw;
+      return res;
     }
 
     // LAYER 1: Floating Suspension Motion (Section 16)
@@ -53,12 +61,12 @@ export class IdleSuspensionController {
     this.smoothedTorsoMicroPitch += (rawTorsoMicroPitch - this.smoothedTorsoMicroPitch) * damp;
     this.smoothedTorsoMicroYaw += (rawTorsoMicroYaw - this.smoothedTorsoMicroYaw) * damp;
 
-    return {
-      floatingY: this.smoothedFloatingY,
-      floatingPitch: this.smoothedFloatingPitch,
-      floatingRoll: this.smoothedFloatingRoll,
-      torsoMicroPitch: this.smoothedTorsoMicroPitch,
-      torsoMicroYaw: this.smoothedTorsoMicroYaw,
-    };
+    const res = this.result;
+    res.floatingY = this.smoothedFloatingY;
+    res.floatingPitch = this.smoothedFloatingPitch;
+    res.floatingRoll = this.smoothedFloatingRoll;
+    res.torsoMicroPitch = this.smoothedTorsoMicroPitch;
+    res.torsoMicroYaw = this.smoothedTorsoMicroYaw;
+    return res;
   }
 }

@@ -158,71 +158,77 @@ export class TorsoAnimationController {
 
     // 1. Exploded view animation interpolation
     const targetExploded = this.isExploded ? 1.0 : 0.0;
-    this.explodedProgress = THREE.MathUtils.damp(this.explodedProgress, targetExploded, 6.0, dt);
+    const diff = Math.abs(this.explodedProgress - targetExploded);
+    if (diff > 0.0001) {
+      this.explodedProgress = THREE.MathUtils.damp(this.explodedProgress, targetExploded, 6.0, dt);
+      if (Math.abs(this.explodedProgress - targetExploded) <= 0.0001) {
+        this.explodedProgress = targetExploded;
+      }
 
-    const exp = this.explodedProgress;
-    // Explode offsets:
-    // - Front chest plate moves +Z (forward, carrying the embedded logo cleanly)
-    this.torso.chestArmor.centerPanel.position.z = 0.070 + exp * 0.12;
-    // - Left & Right flank panels move ±X
-    this.torso.chestArmor.leftPanel.position.x = -0.134 - exp * 0.08;
-    this.torso.chestArmor.rightPanel.position.x = 0.134 + exp * 0.08;
-    // - Back armor moves -Z (backward)
-    this.torso.upperTorsoFrame.backArmor.position.z = -0.085 - exp * 0.10;
-    this.torso.upperTorsoFrame.backLightBar.position.z = -0.100 - exp * 0.10;
-    // - Stomach rings spread vertically along spine
-    const ringCount = this.torso.stomach.rings.length;
-    const midIdx = (ringCount - 1) / 2;
-    this.torso.stomach.rings.forEach((ring, idx) => {
-      const spread = (idx - midIdx) * 0.024 * exp;
-      ring.group.position.y = this.baseRingYs[idx] + spread;
-    });
+      const exp = this.explodedProgress;
+      // Explode offsets:
+      // - Front chest plate moves +Z (forward, carrying the embedded logo cleanly)
+      this.torso.chestArmor.centerPanel.position.z = 0.070 + exp * 0.12;
+      // - Left & Right flank panels move ±X
+      this.torso.chestArmor.leftPanel.position.x = -0.134 - exp * 0.08;
+      this.torso.chestArmor.rightPanel.position.x = 0.134 + exp * 0.08;
+      // - Back armor moves -Z (backward)
+      this.torso.upperTorsoFrame.backArmor.position.z = -0.085 - exp * 0.10;
+      this.torso.upperTorsoFrame.backLightBar.position.z = -0.100 - exp * 0.10;
+      // - Stomach rings spread vertically along spine
+      const ringCount = this.torso.stomach.rings.length;
+      const midIdx = (ringCount - 1) / 2;
+      this.torso.stomach.rings.forEach((ring, idx) => {
+        const spread = (idx - midIdx) * 0.024 * exp;
+        ring.group.position.y = this.baseRingYs[idx] + spread;
+      });
 
-    // - Abdominal side mechanism clusters (bilateral actuators) expand laterally in ±X during exploded view
-    if (this.torso.stomach.sideMechanismLeft && this.torso.stomach.sideMechanismRight) {
-      this.torso.stomach.sideMechanismLeft.position.x = -exp * 0.045;
-      this.torso.stomach.sideMechanismLeft.position.z = exp * 0.020;
-      this.torso.stomach.sideMechanismRight.position.x = exp * 0.045;
-      this.torso.stomach.sideMechanismRight.position.z = exp * 0.020;
-    }
-    // - Waist and hips drop slightly in -Y
-    this.torso.waist.waistPivot.position.y = -exp * 0.06;
+      // - Abdominal side mechanism clusters (bilateral actuators) expand laterally in ±X during exploded view
+      if (this.torso.stomach.sideMechanismLeft && this.torso.stomach.sideMechanismRight) {
+        this.torso.stomach.sideMechanismLeft.position.x = -exp * 0.045;
+        this.torso.stomach.sideMechanismLeft.position.z = exp * 0.020;
+        this.torso.stomach.sideMechanismRight.position.x = exp * 0.045;
+        this.torso.stomach.sideMechanismRight.position.z = exp * 0.020;
+      }
+      // - Waist and hips drop slightly in -Y
+      this.torso.waist.waistPivot.position.y = -exp * 0.06;
 
-    // - Upper and Lower Waist Collars separate vertically, exposing the central turntable bearing core & stator teeth!
-    this.torso.waist.upperWaistRing.position.y = this.baseUpperWaistRingY + exp * 0.032;
-    this.torso.waist.lowerWaistRing.position.y = this.baseLowerWaistRingY - exp * 0.032;
+      // - Upper and Lower Waist Collars separate vertically, exposing the central turntable bearing core & stator teeth!
+      this.torso.waist.upperWaistRing.position.y = this.baseUpperWaistRingY + exp * 0.032;
+      this.torso.waist.lowerWaistRing.position.y = this.baseLowerWaistRingY - exp * 0.032;
 
-    // - Pelvic shield (carrying nested intake vent & violet optical sensor) moves forward in +Z
-    this.torso.waist.pelvicPlate.position.z = 0.046 + exp * 0.09;
+      // - Pelvic shield (carrying nested intake vent & violet optical sensor) moves forward in +Z
+      this.torso.waist.pelvicPlate.position.z = 0.046 + exp * 0.09;
 
-    // - Left & Right Inguinal Flaps slide diagonally outward and forward in ±X, +Z
-    if (this.torso.waist.inguinalFlapLeft && this.torso.waist.inguinalFlapRight) {
-      this.torso.waist.inguinalFlapLeft.position.set(
-        this.baseInguinalFlapLeftPos.x - exp * 0.038,
-        this.baseInguinalFlapLeftPos.y,
-        this.baseInguinalFlapLeftPos.z + exp * 0.045
-      );
-      this.torso.waist.inguinalFlapRight.position.set(
-        this.baseInguinalFlapRightPos.x + exp * 0.038,
-        this.baseInguinalFlapRightPos.y,
-        this.baseInguinalFlapRightPos.z + exp * 0.045
-      );
-    }
+      // - Left & Right Inguinal Flaps slide diagonally outward and forward in ±X, +Z
+      if (this.torso.waist.inguinalFlapLeft && this.torso.waist.inguinalFlapRight) {
+        this.torso.waist.inguinalFlapLeft.position.set(
+          this.baseInguinalFlapLeftPos.x - exp * 0.038,
+          this.baseInguinalFlapLeftPos.y,
+          this.baseInguinalFlapLeftPos.z + exp * 0.045
+        );
+        this.torso.waist.inguinalFlapRight.position.set(
+          this.baseInguinalFlapRightPos.x + exp * 0.038,
+          this.baseInguinalFlapRightPos.y,
+          this.baseInguinalFlapRightPos.z + exp * 0.045
+        );
+      }
 
-    // - Iliac Crest pauldron cowls slide laterally outward from hip hubs
-    if (this.torso.waist.leftHip.iliacCrestArmor && this.torso.waist.rightHip.iliacCrestArmor) {
-      this.torso.waist.leftHip.iliacCrestArmor.position.x = this.baseLeftIliacCrestX - exp * 0.024;
-      this.torso.waist.rightHip.iliacCrestArmor.position.x = this.baseRightIliacCrestX + exp * 0.024;
-    }
+      // - Iliac Crest pauldron cowls slide laterally outward from hip hubs
+      if (this.torso.waist.leftHip.iliacCrestArmor && this.torso.waist.rightHip.iliacCrestArmor) {
+        this.torso.waist.leftHip.iliacCrestArmor.position.x = this.baseLeftIliacCrestX - exp * 0.024;
+        this.torso.waist.rightHip.iliacCrestArmor.position.x = this.baseRightIliacCrestX + exp * 0.024;
+      }
 
-    // - Left & Right Hip assemblies separate laterally along ±X
-    const hipCfg = TORSO_CONFIG.waist.hipConnector;
-    this.torso.waist.leftHip.group.position.x = -hipCfg.mountX - exp * 0.055;
-    this.torso.waist.rightHip.group.position.x = hipCfg.mountX + exp * 0.055;
+      // - Left & Right Hip assemblies separate laterally along ±X
+      const hipCfg = TORSO_CONFIG.waist.hipConnector;
+      this.torso.waist.leftHip.group.position.x = -hipCfg.mountX - exp * 0.055;
+      this.torso.waist.rightHip.group.position.x = hipCfg.mountX + exp * 0.055;
 
-    // - Sub-Pelvic Mechanical Cradle drops downward in -Y to reveal lower spine connection
-    if (this.torso.waist.subPelvisCradle) {
-      this.torso.waist.subPelvisCradle.position.y = this.baseSubPelvisCradleY - exp * 0.042;
+      // - Sub-Pelvic Mechanical Cradle drops downward in -Y to reveal lower spine connection
+      if (this.torso.waist.subPelvisCradle) {
+        this.torso.waist.subPelvisCradle.position.y = this.baseSubPelvisCradleY - exp * 0.042;
+      }
     }
 
     // If fully exploded for inspection, pause kinematic rotations
@@ -254,6 +260,7 @@ export class TorsoAnimationController {
 
     // Subtle cascaded compression across the articulated stomach rings
     const ringBend = this.overrides.abdomenBend ?? Math.sin(this.time * 0.42 + 0.3) * 0.014;
+    const ringCount = this.torso.stomach.rings.length || 1;
     this.torso.stomach.rings.forEach((ring, idx) => {
       const ringWeight = (idx + 1) / ringCount;
       ring.group.rotation.x = ringBend * ringWeight * 0.4;

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface ThighNodes {
   group: THREE.Group;
@@ -231,12 +232,12 @@ export function createThigh(
   // =========================================================================
 
   // A. Titanium Receiving Socket Flange (Bolts flush to Hip Mount Flange)
-  const collarSocketGeo = new THREE.CylinderGeometry(
+  const collarSocketGeo = geoCache.get('Thigh_CollarSocketGeo', () => new THREE.CylinderGeometry(
     cfg.frame.upperCollarRadius * 1.08,
     cfg.frame.upperCollarRadius * 1.02,
     cfg.frame.upperCollarHeight * 0.45,
     28
-  );
+  ));
   const collarSocket = new THREE.Mesh(collarSocketGeo, materials.joint);
   collarSocket.position.set(0, -cfg.frame.upperCollarHeight * 0.22, 0);
   collarSocket.castShadow = true;
@@ -244,9 +245,9 @@ export function createThigh(
   frameGroup.add(collarSocket);
 
   // Perimeter coupling bolts through the receiving flange
+  const boltGeo = geoCache.get('Thigh_FlangeBoltGeo', () => new THREE.CylinderGeometry(0.0020, 0.0020, 0.004, 6));
   for (let i = 0; i < 6; i++) {
     const angle = (i / 6) * Math.PI * 2;
-    const boltGeo = new THREE.CylinderGeometry(0.0020, 0.0020, 0.004, 6);
     const bolt = new THREE.Mesh(boltGeo, materials.joint);
     bolt.position.set(
       Math.cos(angle) * (cfg.frame.upperCollarRadius * 0.96),
@@ -257,12 +258,12 @@ export function createThigh(
   }
 
   // B. Lower Clamping Sleeve (Clamps the titanium femur spine)
-  const lowerCollarGeo = new THREE.CylinderGeometry(
+  const lowerCollarGeo = geoCache.get('Thigh_LowerCollarGeo', () => new THREE.CylinderGeometry(
     cfg.frame.upperCollarRadius * 0.98,
     cfg.frame.upperCollarRadius * 0.92,
     cfg.frame.upperCollarHeight * 0.55,
     28
-  );
+  ));
   const lowerCollar = new THREE.Mesh(lowerCollarGeo, materials.joint);
   lowerCollar.position.set(0, -cfg.frame.upperCollarHeight * 0.72, 0);
   lowerCollar.castShadow = true;
@@ -270,8 +271,8 @@ export function createThigh(
   frameGroup.add(lowerCollar);
 
   // Structural diagonal side gussets (outriggers transferring torque to femur flanks)
+  const gussetGeo = geoCache.get('Thigh_GussetGeo', () => new THREE.BoxGeometry(0.006, 0.024, 0.018));
   for (const bSide of [-1, 1]) {
-    const gussetGeo = new THREE.BoxGeometry(0.006, 0.024, 0.018);
     const gusset = new THREE.Mesh(gussetGeo, materials.joint);
     gusset.position.set(
       bSide * (cfg.frame.upperCollarRadius * 0.85),
@@ -286,11 +287,11 @@ export function createThigh(
   // 2. CENTRAL TITANIUM BOX-SECTION BACKBONE SPINE
   // Continuous load-bearing column running directly to the distal mount
   // =========================================================================
-  const spineGeo = new THREE.BoxGeometry(
+  const spineGeo = geoCache.get('Thigh_SpineGeo', () => new THREE.BoxGeometry(
     cfg.frame.spineWidth,
     0.204,
     cfg.frame.spineDepth
-  );
+  ));
   const spineMesh = new THREE.Mesh(spineGeo, materials.joint);
   spineMesh.position.set(0, -0.118, 0);
   spineMesh.castShadow = true;
@@ -298,12 +299,12 @@ export function createThigh(
   frameGroup.add(spineMesh);
 
   // CNC transverse reinforcement bulkheads along the femur spine
+  const ribGeo = geoCache.get('Thigh_BulkheadRibGeo', () => new THREE.BoxGeometry(
+    cfg.frame.spineWidth * 1.25,
+    0.007,
+    cfg.frame.spineDepth * 1.15
+  ));
   for (const bY of [-0.050, -0.095, -0.140, -0.185]) {
-    const ribGeo = new THREE.BoxGeometry(
-      cfg.frame.spineWidth * 1.25,
-      0.007,
-      cfg.frame.spineDepth * 1.15
-    );
     const rib = new THREE.Mesh(ribGeo, materials.joint);
     rib.position.set(0, bY, 0);
     rib.castShadow = true;
@@ -314,27 +315,30 @@ export function createThigh(
   // 3. DISTAL FEMUR FRAME INTERFACE
   // Precision-machined titanium interface mount with chamfers meeting knee upper housing
   // =========================================================================
-  const mountShape = new THREE.Shape();
-  const halfMW = (cfg.frame.spineWidth * 1.05) * 0.5;
-  const halfMD = (cfg.frame.spineDepth * 0.90) * 0.5;
-  mountShape.moveTo(-halfMW * 0.85, -halfMD);
-  mountShape.lineTo(halfMW * 0.85, -halfMD);
-  mountShape.lineTo(halfMW, -halfMD * 0.70);
-  mountShape.lineTo(halfMW, halfMD * 0.70);
-  mountShape.lineTo(halfMW * 0.85, halfMD);
-  mountShape.lineTo(-halfMW * 0.85, halfMD);
-  mountShape.lineTo(-halfMW, halfMD * 0.70);
-  mountShape.lineTo(-halfMW, -halfMD * 0.70);
-  mountShape.closePath();
+  const distalMountGeo = geoCache.get('Thigh_DistalMountGeo', () => {
+    const mountShape = new THREE.Shape();
+    const halfMW = (cfg.frame.spineWidth * 1.05) * 0.5;
+    const halfMD = (cfg.frame.spineDepth * 0.90) * 0.5;
+    mountShape.moveTo(-halfMW * 0.85, -halfMD);
+    mountShape.lineTo(halfMW * 0.85, -halfMD);
+    mountShape.lineTo(halfMW, -halfMD * 0.70);
+    mountShape.lineTo(halfMW, halfMD * 0.70);
+    mountShape.lineTo(halfMW * 0.85, halfMD);
+    mountShape.lineTo(-halfMW * 0.85, halfMD);
+    mountShape.lineTo(-halfMW, halfMD * 0.70);
+    mountShape.lineTo(-halfMW, -halfMD * 0.70);
+    mountShape.closePath();
 
-  const distalMountGeo = new THREE.ExtrudeGeometry(mountShape, {
-    depth: 0.016,
-    bevelEnabled: true,
-    bevelThickness: 0.0016,
-    bevelSize: 0.0012,
-    bevelSegments: 2,
+    const g = new THREE.ExtrudeGeometry(mountShape, {
+      depth: 0.016,
+      bevelEnabled: true,
+      bevelThickness: 0.0016,
+      bevelSize: 0.0012,
+      bevelSegments: 2,
+    });
+    g.center();
+    return g;
   });
-  distalMountGeo.center();
 
   const distalMount = new THREE.Mesh(distalMountGeo, materials.joint);
   distalMount.rotation.x = Math.PI / 2;
@@ -344,8 +348,8 @@ export function createThigh(
   frameGroup.add(distalMount);
 
   // Armor mounting standoffs/bosses along the spine
+  const bossGeo = geoCache.get('Thigh_BossGeo', () => new THREE.CylinderGeometry(0.0045, 0.0045, 0.018, 12));
   for (const bY of [-0.065, -0.125, -0.185]) {
-    const bossGeo = new THREE.CylinderGeometry(0.0045, 0.0045, 0.018, 12);
     const boss = new THREE.Mesh(bossGeo, materials.joint);
     boss.rotation.x = Math.PI / 2;
     boss.position.set(0, bY, cfg.frame.spineDepth * 0.5 + 0.005);
@@ -363,12 +367,12 @@ export function createThigh(
   // 4. ENGINEERED WHITE CERAMIC TROCHANTER SHELL COLLAR
   // Sculpted transition cowl cupping upper femur neck and bridging hip flange into quad armor
   // =========================================================================
-  const trochanterGeo = createTrochanterArmorGeometry(
+  const trochanterGeo = geoCache.get('Thigh_TrochanterGeo', () => createTrochanterArmorGeometry(
     side,
     cfg.frame.upperCollarRadius,
     0.036,
     0.012
-  );
+  ));
   const trochanterHood = new THREE.Mesh(trochanterGeo, materials.armor);
   trochanterHood.name = side === -1 ? 'TrochanterHood_L' : 'TrochanterHood_R';
   trochanterHood.position.set(
@@ -386,13 +390,13 @@ export function createThigh(
   // 5. SEGMENTED SCULPTED WHITE CERAMIC ANTERIOR QUAD ARMOR
   // Segmented length: leaves ~60mm of visible frame & clearance above knee!
   // =========================================================================
-  const antGeo = createSegmentedAnteriorArmorGeometry(
+  const antGeo = geoCache.get('Thigh_AnteriorArmorGeo', () => createSegmentedAnteriorArmorGeometry(
     cfg.anteriorArmor.widthTop,
     cfg.anteriorArmor.widthBottom,
     cfg.anteriorArmor.length,
     cfg.anteriorArmor.thickness,
     cfg.anteriorArmor.keelProtrusion
-  );
+  ));
   const anteriorArmor = new THREE.Mesh(antGeo, materials.armor);
   anteriorArmor.name = side === -1 ? 'ThighAnteriorArmor_L' : 'ThighAnteriorArmor_R';
   // Positioned over the spine standoffs, leaving upper collar and lower fork exposed
@@ -409,11 +413,11 @@ export function createThigh(
   // 6. SCULPTED LATERAL ARMOR COWL (Vastus Lateralis)
   // Mounted flush to outer flank with verified bilateral mirror symmetry
   // =========================================================================
-  const latGeo = createThighFlankArmorGeometry(
+  const latGeo = geoCache.get('Thigh_LateralArmorGeo', () => createThighFlankArmorGeometry(
     cfg.lateralArmor.cowlLength,
     cfg.lateralArmor.width,
     cfg.lateralArmor.thickness
-  );
+  ));
   const lateralArmor = new THREE.Mesh(latGeo, materials.armor);
   lateralArmor.name = side === -1 ? 'ThighLateralArmor_L' : 'ThighLateralArmor_R';
   lateralArmor.position.set(
@@ -427,7 +431,7 @@ export function createThigh(
   thighGroup.add(lateralArmor);
 
   // Recessed purple neon LED conduit along the lateral armor edge
-  const ledGeo = new THREE.BoxGeometry(cfg.ledStrip.width, cfg.ledStrip.length, cfg.ledStrip.depth);
+  const ledGeo = geoCache.get('Thigh_LedGeo', () => new THREE.BoxGeometry(cfg.ledStrip.width, cfg.ledStrip.length, cfg.ledStrip.depth));
   const ledStrip = new THREE.Mesh(ledGeo, materials.purpleEmissive);
   ledStrip.name = side === -1 ? 'ThighLedStrip_L' : 'ThighLedStrip_R';
   ledStrip.position.set(
@@ -439,11 +443,11 @@ export function createThigh(
   ledMeshes.push(ledStrip);
 
   // Subtle bloom glow
-  const bloomGeo = new THREE.BoxGeometry(
+  const bloomGeo = geoCache.get('Thigh_BloomGeo', () => new THREE.BoxGeometry(
     cfg.ledStrip.width * 2.0,
     cfg.ledStrip.length,
     cfg.ledStrip.depth * 1.5
-  );
+  ));
   const bloomMesh = new THREE.Mesh(bloomGeo, materials.purpleBloom);
   bloomMesh.position.copy(ledStrip.position);
   thighGroup.add(bloomMesh);
@@ -452,11 +456,11 @@ export function createThigh(
   // 7. MEDIAL PROTECTOR PLATE
   // Preserves inner leg clearance while shielding internal wiring
   // =========================================================================
-  const medGeo = createThighFlankArmorGeometry(
+  const medGeo = geoCache.get('Thigh_MedialArmorGeo', () => createThighFlankArmorGeometry(
     cfg.medialArmor.cowlLength,
     cfg.medialArmor.width,
     cfg.medialArmor.thickness
-  );
+  ));
   const medialArmor = new THREE.Mesh(medGeo, materials.armor);
   medialArmor.name = side === -1 ? 'ThighMedialArmor_L' : 'ThighMedialArmor_R';
   medialArmor.position.set(
@@ -470,22 +474,25 @@ export function createThigh(
   // =========================================================================
   // 8. POSTERIOR HAMSTRING COVER PLATE
   // =========================================================================
-  const postShape = new THREE.Shape();
-  const postH = cfg.anteriorArmor.length * 0.38;
-  postShape.moveTo(-0.020, postH);
-  postShape.lineTo(0.020, postH);
-  postShape.lineTo(0.016, -postH);
-  postShape.lineTo(-0.016, -postH);
-  postShape.closePath();
+  const postGeo = geoCache.get('Thigh_PosteriorPlateGeo', () => {
+    const postShape = new THREE.Shape();
+    const postH = cfg.anteriorArmor.length * 0.38;
+    postShape.moveTo(-0.020, postH);
+    postShape.lineTo(0.020, postH);
+    postShape.lineTo(0.016, -postH);
+    postShape.lineTo(-0.016, -postH);
+    postShape.closePath();
 
-  const postGeo = new THREE.ExtrudeGeometry(postShape, {
-    depth: 0.010,
-    bevelEnabled: true,
-    bevelThickness: 0.0025,
-    bevelSize: 0.0020,
-    bevelSegments: 2,
+    const g = new THREE.ExtrudeGeometry(postShape, {
+      depth: 0.010,
+      bevelEnabled: true,
+      bevelThickness: 0.0025,
+      bevelSize: 0.0020,
+      bevelSegments: 2,
+    });
+    g.center();
+    return g;
   });
-  postGeo.center();
 
   const posteriorPlate = new THREE.Mesh(postGeo, materials.armor);
   posteriorPlate.name = side === -1 ? 'ThighPosteriorPlate_L' : 'ThighPosteriorPlate_R';

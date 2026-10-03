@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { ROBOT_ACCENT } from '../config';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface SideModuleNodes {
   group: THREE.Group;
@@ -36,7 +37,7 @@ export function createRobotSideModule(
   group.rotation.set(0, side * (Math.PI / 2), 0);
 
   // 1. White Armor Mounting Cowl (Part 8: Integrates hardware into helmet shell)
-  const mountGeo = new THREE.TorusGeometry(0.044, 0.0050, 16, 40);
+  const mountGeo = geoCache.get('EarMountGeo', () => new THREE.TorusGeometry(0.044, 0.0050, 16, 40));
   const mount = new THREE.Mesh(mountGeo, materials.armor);
   mount.name = 'EarMount';
   mount.position.set(0, 0, -0.002);
@@ -46,7 +47,7 @@ export function createRobotSideModule(
   const earJointGroup = new THREE.Group();
 
   // 2. Dark Titanium Stepped Outer Rotary Bezel (Part 7: outer dark-metal ring)
-  const outerRingGeo = new THREE.CylinderGeometry(0.038, 0.042, 0.012, 40);
+  const outerRingGeo = geoCache.get('EarOuterRingGeo', () => new THREE.CylinderGeometry(0.038, 0.042, 0.012, 40));
   const outerRing = new THREE.Mesh(outerRingGeo, materials.joint);
   outerRing.name = 'EarOuterRing';
   outerRing.rotation.x = Math.PI / 2;
@@ -55,35 +56,35 @@ export function createRobotSideModule(
   earJointGroup.add(outerRing);
 
   // Recessed dark chamber
-  const chamberGeo = new THREE.CylinderGeometry(0.035, 0.035, 0.008, 36);
+  const chamberGeo = geoCache.get('EarChamberGeo', () => new THREE.CylinderGeometry(0.035, 0.035, 0.008, 36));
   const chamber = new THREE.Mesh(chamberGeo, materials.joint);
   chamber.rotation.x = Math.PI / 2;
   chamber.position.set(0, 0, 0.010);
   earJointGroup.add(chamber);
 
   // 3. Chamfered Metallic Inner Rim Ring (Part 7: inner metallic ring)
-  const innerRingGeo = new THREE.TorusGeometry(0.033, 0.0020, 16, 40);
+  const innerRingGeo = geoCache.get('EarInnerRingGeo', () => new THREE.TorusGeometry(0.033, 0.0020, 16, 40));
   const innerRing = new THREE.Mesh(innerRingGeo, materials.joint);
   innerRing.name = 'EarInnerRing';
   innerRing.position.set(0, 0, 0.014);
   earJointGroup.add(innerRing);
 
   // 4. Glowing Neon Purple Ring (Part 7 & 15: ROBOT_ACCENT)
-  const emissiveRingGeo = new THREE.TorusGeometry(0.026, 0.0036, 20, 48);
+  const emissiveRingGeo = geoCache.get('EarEmissiveRingGeo', () => new THREE.TorusGeometry(0.026, 0.0036, 20, 48));
   const emissiveRing = new THREE.Mesh(emissiveRingGeo, materials.purpleEmissive);
   emissiveRing.name = 'EarEmissiveRing';
   emissiveRing.position.set(0, 0, 0.016);
   group.add(emissiveRing);
 
   // Incandescent pure white core inside the glowing purple torus
-  const coreRingWhiteGeo = new THREE.TorusGeometry(0.026, 0.0012, 16, 48);
+  const coreRingWhiteGeo = geoCache.get('EarCoreRingWhiteGeo', () => new THREE.TorusGeometry(0.026, 0.0012, 16, 48));
   const coreRingWhite = new THREE.Mesh(coreRingWhiteGeo, materials.whiteCoreEmissive);
   coreRingWhite.name = 'EarCoreRingWhite';
   coreRingWhite.position.set(0, 0, 0.017);
   group.add(coreRingWhite);
 
   // 5. Recessed Circular Sensor Core (Part 7: recessed circular core)
-  const coreGeo = new THREE.CylinderGeometry(0.016, 0.014, 0.007, 32);
+  const coreGeo = geoCache.get('EarCoreGeo', () => new THREE.CylinderGeometry(0.016, 0.014, 0.007, 32));
   const core = new THREE.Mesh(coreGeo, materials.joint);
   core.name = 'EarCore';
   core.rotation.x = Math.PI / 2;
@@ -91,7 +92,7 @@ export function createRobotSideModule(
   earJointGroup.add(core);
 
   // 6. Central Dark Lens / Aperture Pin (Part 7: central dark lens)
-  const centerLensGeo = new THREE.CylinderGeometry(0.003, 0.003, 0.008, 16);
+  const centerLensGeo = geoCache.get('EarCenterLensGeo', () => new THREE.CylinderGeometry(0.003, 0.003, 0.008, 16));
   const centerLens = new THREE.Mesh(centerLensGeo, materials.joint);
   centerLens.name = 'EarCenterLens';
   centerLens.rotation.x = Math.PI / 2;
@@ -99,9 +100,15 @@ export function createRobotSideModule(
   earJointGroup.add(centerLens);
 
   // Merge static joint hardware of the ear module
-  const mergedEarJoint = mergeGroupMeshesByMaterial(earJointGroup, materials.joint, `${group.name}_JointMerged`, false);
-  if (mergedEarJoint) {
+  const cachedMergedEarJointGeo = geoCache.get('EarJointMergedGeo', () => {
+    const merged = mergeGroupMeshesByMaterial(earJointGroup, materials.joint, 'EarJointMerged', false);
+    return merged ? merged.geometry : null;
+  });
+  if (cachedMergedEarJointGeo) {
+    const mergedEarJoint = new THREE.Mesh(cachedMergedEarJointGeo, materials.joint);
+    mergedEarJoint.name = `${group.name}_JointMerged`;
     mergedEarJoint.castShadow = true;
+    mergedEarJoint.receiveShadow = true;
     group.add(mergedEarJoint);
   }
 

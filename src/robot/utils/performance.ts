@@ -10,22 +10,32 @@ export function getOptimalPixelRatio(maxRatio: number = 2.0): number {
 }
 
 /**
- * Safely dispose of Three.js objects, geometries, materials, and textures.
+ * Safely dispose of Three.js objects, geometries, materials, and textures without double-disposal.
  */
 export function deepDispose(root: THREE.Object3D | null | undefined): void {
   if (!root) return;
 
+  const disposedGeometries = new Set<number | string>();
+  const disposedMaterials = new Set<string>();
+
   root.traverse((child) => {
     if ((child as THREE.Mesh).isMesh || (child as THREE.Line).isLine || (child as THREE.Points).isPoints) {
       const mesh = child as THREE.Mesh;
-      if (mesh.geometry) {
+      if (mesh.geometry && !disposedGeometries.has(mesh.geometry.id)) {
+        disposedGeometries.add(mesh.geometry.id);
         mesh.geometry.dispose();
       }
 
       if (mesh.material) {
         if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((mat) => disposeMaterial(mat));
-        } else {
+          mesh.material.forEach((mat) => {
+            if (!disposedMaterials.has(mat.uuid)) {
+              disposedMaterials.add(mat.uuid);
+              disposeMaterial(mat);
+            }
+          });
+        } else if (!disposedMaterials.has(mesh.material.uuid)) {
+          disposedMaterials.add(mesh.material.uuid);
           disposeMaterial(mesh.material);
         }
       }

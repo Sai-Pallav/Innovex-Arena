@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { getVisorSurfacePoint } from './RobotVisor';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface JawNodes {
   group: THREE.Group;
@@ -111,7 +112,7 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
     return geo;
   }
 
-  const jawGeo = createJawGeometry();
+  const jawGeo = geoCache.get('JawGeometry', () => createJawGeometry());
   const jawShell = new THREE.Mesh(jawGeo, materials.armorDoubleSide);
   jawShell.name = 'JawShell';
   jawShell.castShadow = true;
@@ -121,7 +122,7 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   const jawJointGroup = new THREE.Group();
 
   // 2. Lower Dark Titanium Sub-Chin Undercut Chamfer Trim
-  const underBevelGeo = new THREE.BoxGeometry(0.038, 0.007, 0.020);
+  const underBevelGeo = geoCache.get('ChinUnderBevelGeo', () => new THREE.BoxGeometry(0.038, 0.007, 0.020));
   const chinUnderBevel = new THREE.Mesh(underBevelGeo, materials.joint);
   chinUnderBevel.name = 'ChinUnderBevel';
   chinUnderBevel.position.set(0, -0.116, 0.132);
@@ -130,7 +131,7 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   jawJointGroup.add(chinUnderBevel);
 
   // 3. Dark Titanium Submental Intake Vent (Recessed neatly underneath chin)
-  const ventGeo = new THREE.CylinderGeometry(0.018, 0.024, 0.016, 24);
+  const ventGeo = geoCache.get('SubmentalVentGeo', () => new THREE.CylinderGeometry(0.018, 0.024, 0.016, 24));
   const submentalVent = new THREE.Mesh(ventGeo, materials.joint);
   submentalVent.name = 'SubmentalVent';
   submentalVent.position.set(0, -0.122, 0.096);
@@ -139,7 +140,7 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   jawJointGroup.add(submentalVent);
 
   // 4. Dark Titanium Neck Socket Gorget Collar (Underneath the jaw)
-  const socketGeo = new THREE.CylinderGeometry(0.054, 0.050, 0.020, 32);
+  const socketGeo = geoCache.get('JawNeckSocketGeo', () => new THREE.CylinderGeometry(0.054, 0.050, 0.020, 32));
   const neckSocket = new THREE.Mesh(socketGeo, materials.joint);
   neckSocket.name = 'JawNeckSocketGorget';
   neckSocket.position.set(0, -0.124, 0.010);
@@ -147,8 +148,13 @@ export function createRobotJaw(materials: RobotMaterialPalette): JawNodes {
   neckSocket.receiveShadow = true;
   jawJointGroup.add(neckSocket);
 
-  const mergedJawJoint = mergeGroupMeshesByMaterial(jawJointGroup, materials.joint, 'JawJoint_Merged', false);
-  if (mergedJawJoint) {
+  const cachedMergedJawJointGeo = geoCache.get('JawJointMergedGeo', () => {
+    const merged = mergeGroupMeshesByMaterial(jawJointGroup, materials.joint, 'JawJoint_Merged', false);
+    return merged ? merged.geometry : null;
+  });
+  if (cachedMergedJawJointGeo) {
+    const mergedJawJoint = new THREE.Mesh(cachedMergedJawJointGeo, materials.joint);
+    mergedJawJoint.name = 'JawJoint_Merged';
     mergedJawJoint.castShadow = true;
     mergedJawJoint.receiveShadow = true;
     group.add(mergedJawJoint);

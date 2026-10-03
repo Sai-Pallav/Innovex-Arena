@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // FINGER / THUMB MODULE — Ultra-Realistic Humanoid Robotic Digits
@@ -212,7 +214,7 @@ function createPalmarPad(
 
   // Base elastomer cushion slab with joint margin clearance
   const slabLength = isDistalTip ? length * 0.85 : length * 0.78;
-  const slabGeo = new THREE.BoxGeometry(width, slabLength, thickness);
+  const slabGeo = geoCache.getBox(width, slabLength, thickness);
   const basePad = new THREE.Mesh(slabGeo, materials.joint);
   basePad.castShadow = true;
   padGroup.add(basePad);
@@ -225,18 +227,25 @@ function createPalmarPad(
   for (let r = 0; r < ribCount; r++) {
     const ry = ribStartY - (r + 1) * ribSpacing;
     const ribW = width * (isDistalTip ? (0.88 - r * 0.08) : 0.88);
-    const ribGeo = new THREE.BoxGeometry(ribW, 0.0009, thickness * 0.40);
-    const rib = new THREE.Mesh(ribGeo, materials.jointDoubleSide);
+    const ribGeo = geoCache.getBox(ribW, 0.0009, thickness * 0.40);
+    const rib = new THREE.Mesh(ribGeo, materials.joint);
     rib.position.set(0, ry, -thickness * 0.52);
     padGroup.add(rib);
   }
 
   // Smooth flush tactile pulp cushion (anatomical, flush with white armor)
   if (isDistalTip) {
-    const tipCushionGeo = new THREE.CylinderGeometry(
-      width * 0.42, width * 0.28, length * 0.22, 16
+    const rT = width * 0.42;
+    const rB = width * 0.28;
+    const cH = length * 0.22;
+    const tipCushionGeo = geoCache.get(
+      `TipCushion_${rT.toFixed(5)}_${rB.toFixed(5)}_${cH.toFixed(5)}`,
+      () => {
+        const g = new THREE.CylinderGeometry(rT, rB, cH, 16);
+        g.rotateX(Math.PI / 2);
+        return g;
+      }
     );
-    tipCushionGeo.rotateX(Math.PI / 2);
     const tipCushion = new THREE.Mesh(tipCushionGeo, materials.joint);
     tipCushion.position.set(0, -slabLength * 0.48, -thickness * 0.15);
     padGroup.add(tipCushion);
@@ -260,61 +269,103 @@ function createKnuckleHinge(
   const caps: THREE.Mesh[] = [];
 
   // Central dark titanium bearing housing barrel
-  const barrelGeo = new THREE.CylinderGeometry(
-    pinRadius * 1.00, pinRadius * 1.00, spanWidth * 0.64, 22
+  const barrelGeo = geoCache.get(
+    `KnuckleBarrel_${pinRadius.toFixed(5)}_${spanWidth.toFixed(5)}`,
+    () => {
+      const g = new THREE.CylinderGeometry(
+        pinRadius * 1.00, pinRadius * 1.00, spanWidth * 0.64, 22
+      );
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
   );
-  barrelGeo.rotateZ(Math.PI / 2);
   const hingePin = new THREE.Mesh(barrelGeo, materials.joint);
   hingePin.castShadow = true;
   group.add(hingePin);
 
   // High-tensile stainless steel axle pin (core)
-  const axleGeo = new THREE.CylinderGeometry(
-    pinRadius * 0.68, pinRadius * 0.68, spanWidth * 0.96, 18
+  const axleGeo = geoCache.get(
+    `KnuckleAxle_${pinRadius.toFixed(5)}_${spanWidth.toFixed(5)}`,
+    () => {
+      const g = new THREE.CylinderGeometry(
+        pinRadius * 0.68, pinRadius * 0.68, spanWidth * 0.96, 18
+      );
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
   );
-  axleGeo.rotateZ(Math.PI / 2);
   const axle = new THREE.Mesh(axleGeo, materials.metallic);
   group.add(axle);
 
   // Precision CNC end caps with concentric bearing retainers (flush with armor profile)
+  const capGeo = geoCache.get(
+    `KnuckleCap_${pinRadius.toFixed(5)}`,
+    () => {
+      const g = new THREE.CylinderGeometry(
+        pinRadius * 0.95, pinRadius * 0.90, 0.0009, 20
+      );
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
+  );
+  const hubGeo = geoCache.get(
+    `KnuckleHub_${pinRadius.toFixed(5)}`,
+    () => {
+      const g = new THREE.CylinderGeometry(
+        pinRadius * 0.55, pinRadius * 0.55, 0.0011, 16
+      );
+      g.rotateZ(Math.PI / 2);
+      return g;
+    }
+  );
+  const ringGeo = geoCache.get(
+    `KnuckleRing_${pinRadius.toFixed(5)}`,
+    () => {
+      const g = new THREE.TorusGeometry(pinRadius * 0.78, 0.0002, 6, 18);
+      g.rotateY(Math.PI / 2);
+      return g;
+    }
+  );
+
   for (const cSide of [-1, 1]) {
     const capX = cSide * spanWidth * 0.32;
 
-    // Chamfered outer bearing bezel
-    const capGeo = new THREE.CylinderGeometry(
-      pinRadius * 0.95, pinRadius * 0.90, 0.0009, 20
-    );
-    capGeo.rotateZ(Math.PI / 2);
     const cap = new THREE.Mesh(capGeo, materials.metallic);
     cap.position.set(capX, 0, 0);
     cap.castShadow = true;
     group.add(cap);
     caps.push(cap);
 
-    // Inner dark titanium hub with micro hex socket
-    const hubGeo = new THREE.CylinderGeometry(
-      pinRadius * 0.55, pinRadius * 0.55, 0.0011, 16
-    );
-    hubGeo.rotateZ(Math.PI / 2);
     const hub = new THREE.Mesh(hubGeo, materials.joint);
     hub.position.set(capX + cSide * 0.0001, 0, 0);
     group.add(hub);
 
-    // Concentric micro accent ring
-    const ringGeo = new THREE.TorusGeometry(pinRadius * 0.78, 0.0002, 6, 18);
-    ringGeo.rotateY(Math.PI / 2);
     const ring = new THREE.Mesh(ringGeo, materials.metallic);
     ring.position.set(capX, 0, 0);
     group.add(ring);
   }
 
   // Mechanical joint extension limit stop tab (recessed for maximum flexion range)
-  const stopGeo = new THREE.BoxGeometry(spanWidth * 0.50, pinRadius * 0.45, pinRadius * 0.32);
+  const stopGeo = geoCache.getBox(spanWidth * 0.50, pinRadius * 0.45, pinRadius * 0.32);
   const stopMesh = new THREE.Mesh(stopGeo, materials.joint);
   stopMesh.position.set(0, pinRadius * 0.78, pinRadius * 0.22);
   group.add(stopMesh);
 
-  return { group, hingePin, caps };
+  return {
+    group,
+    hingePin,
+    caps,
+  };
+}
+
+function getPhalanxArmorGeo(
+  width: number,
+  length: number,
+  depth: number,
+  isDistalTip: boolean = false
+): THREE.BufferGeometry {
+  const key = `PhalanxArmor_${width.toFixed(5)}_${length.toFixed(5)}_${depth.toFixed(5)}_${isDistalTip ? 1 : 0}`;
+  return geoCache.get(key, () => createPhalanxArmorGeo(width, length, depth, isDistalTip));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -327,89 +378,84 @@ function buildSegment(
   radius: number,
   length: number,
   isDistal: boolean,
-  materials: RobotMaterialPalette
+  materials: RobotMaterialPalette,
+  distalHingeGroup?: THREE.Group
 ): FingerSegmentNodes {
   const group = new THREE.Group();
   group.name = name;
 
+  const staticFrame = new THREE.Group();
+  staticFrame.name = `${name}_StaticFrame`;
+
+  const armorW = radius * 2.05;
+  const armorD = radius * 1.88;
+  const collarH = Math.max(0.0022, length * 0.075);
+  const collarR = radius * 0.94;
+
   // 1. Dark Titanium Internal Structural Bone Core (strictly internal)
-  const boneGeo = new THREE.CylinderGeometry(
+  const boneGeo = geoCache.getCylinder(
     radius * 0.25, radius * 0.22, length * 0.85, 16
   );
-  const boneMesh = new THREE.Mesh(boneGeo, materials.joint);
+  let boneMesh: THREE.Mesh = new THREE.Mesh(boneGeo, materials.joint);
   boneMesh.name = `${name}_BoneCore`;
   boneMesh.position.set(0, -length * 0.5, 0);
   boneMesh.castShadow = true;
-  group.add(boneMesh);
+  staticFrame.add(boneMesh);
 
   // CNC Metallic structural spine intersecting the core (strictly internal)
-  const spineGeo = new THREE.BoxGeometry(radius * 0.18, length * 0.45, radius * 0.35);
+  const spineGeo = geoCache.getBox(radius * 0.18, length * 0.45, radius * 0.35);
   const spine = new THREE.Mesh(spineGeo, materials.metallic);
   spine.position.set(0, -length * 0.50, 0);
-  group.add(spine);
+  staticFrame.add(spine);
 
   // 2. Proximal Joint Interface Collar Ring (beveled for free pivot articulation)
-  const collarH = Math.max(0.0022, length * 0.075);
-  const collarR = radius * 0.94;
-  const proxCollarGeo = new THREE.CylinderGeometry(collarR, collarR * 0.94, collarH, 22);
+  const proxCollarGeo = geoCache.getCylinder(collarR, collarR * 0.94, collarH, 22);
   const proxCollar = new THREE.Mesh(proxCollarGeo, materials.joint);
   proxCollar.position.set(0, -collarH * 0.5, 0);
   proxCollar.castShadow = true;
-  group.add(proxCollar);
+  staticFrame.add(proxCollar);
 
   // Polished chrome collar retainer trim ring
-  const proxTrimGeo = new THREE.TorusGeometry(collarR, 0.00030, 6, 22);
-  proxTrimGeo.rotateX(Math.PI / 2);
+  const proxTrimGeo = geoCache.get(
+    `ProxTrim_${collarR.toFixed(5)}`,
+    () => {
+      const g = new THREE.TorusGeometry(collarR, 0.00030, 6, 22);
+      g.rotateX(Math.PI / 2);
+      return g;
+    }
+  );
   const proxTrim = new THREE.Mesh(proxTrimGeo, materials.metallic);
   proxTrim.position.set(0, -collarH * 0.5, 0);
-  group.add(proxTrim);
+  staticFrame.add(proxTrim);
 
   // 3. Distal Joint Collar (on non-distal segments)
   if (!isDistal) {
-    const distCollarGeo = new THREE.CylinderGeometry(collarR * 0.92, collarR * 0.94, collarH, 22);
+    const distCollarGeo = geoCache.getCylinder(collarR * 0.92, collarR * 0.94, collarH, 22);
     const distCollar = new THREE.Mesh(distCollarGeo, materials.joint);
     distCollar.position.set(0, -length + collarH * 0.5, 0);
     distCollar.castShadow = true;
-    group.add(distCollar);
+    staticFrame.add(distCollar);
 
-    const distTrimGeo = new THREE.TorusGeometry(collarR * 0.92, 0.00030, 6, 22);
-    distTrimGeo.rotateX(Math.PI / 2);
+    const distTrimGeo = geoCache.get(
+      `DistTrim_${collarR.toFixed(5)}`,
+      () => {
+        const g = new THREE.TorusGeometry(collarR * 0.92, 0.00030, 6, 22);
+        g.rotateX(Math.PI / 2);
+        return g;
+      }
+    );
     const distTrim = new THREE.Mesh(distTrimGeo, materials.metallic);
     distTrim.position.set(0, -length + collarH * 0.5, 0);
-    group.add(distTrim);
+    staticFrame.add(distTrim);
   }
-
-  // 4. Sculpted White Ceramic Dorsal Armor Shell
-  const armorW = radius * 2.05;
-  const armorD = radius * 1.88;
-  const armorStartY = 0.0005; // Anchored flush with proximal collar margin
-  const armorLen = isDistal ? length : (length - collarH * 0.65);
-  const armorGeo = createPhalanxArmorGeo(armorW, armorLen, armorD, isDistal);
-  const armorMesh = new THREE.Mesh(armorGeo, materials.armor);
-  armorMesh.name = `${name}_ArmorShell`;
-  armorMesh.position.set(0, -armorStartY, 0);
-  armorMesh.castShadow = true;
-  armorMesh.receiveShadow = true;
-  group.add(armorMesh);
 
   // 5. Dorsal Sensor Nail Plate on Distal Phalanx (High-Tech Detail)
   if (isDistal) {
-    const nailGeo = new THREE.BoxGeometry(armorW * 0.50, length * 0.28, 0.0008);
+    const nailGeo = geoCache.getBox(armorW * 0.50, length * 0.28, 0.0008);
     const nailMesh = new THREE.Mesh(nailGeo, materials.joint);
     nailMesh.name = `${name}_SensorNailPlate`;
     nailMesh.position.set(0, -length * 0.68, armorD * 0.44);
-    group.add(nailMesh);
-
-    // Micro optical sensor jewel with bloom
-    const dotGeo = new THREE.SphereGeometry(0.0007, 10, 8);
-    const dotMesh = new THREE.Mesh(dotGeo, materials.purpleEmissive);
-    dotMesh.position.set(0, -length * 0.72, armorD * 0.44 + 0.0004);
-    group.add(dotMesh);
-
-    const dotBloomGeo = new THREE.SphereGeometry(0.0011, 8, 6);
-    const dotBloomMesh = new THREE.Mesh(dotBloomGeo, materials.purpleBloom);
-    dotBloomMesh.position.copy(dotMesh.position);
-    group.add(dotBloomMesh);
+    staticFrame.add(nailMesh);
   }
 
   // 6. Palmar Tactile Elastomer Friction Pad
@@ -417,10 +463,48 @@ function buildSegment(
     armorW * 0.72, length * 0.68, 0.0022, isDistal, materials
   );
   padGroup.position.set(0, -length * 0.50, -armorD * 0.35);
-  group.add(padGroup);
+  staticFrame.add(padGroup);
 
-  const padMesh = padGroup.children[0] as THREE.Mesh;
-  return { group, boneMesh, armorMesh, padMesh };
+  // Add distal knuckle hinge into staticFrame before merging if provided
+  if (distalHingeGroup) {
+    distalHingeGroup.position.set(0, -length, 0);
+    staticFrame.add(distalHingeGroup);
+  }
+
+  // Merge static internal frame components by material
+  const mergedJoint = mergeGroupMeshesByMaterial(staticFrame, materials.joint, `${name}_Joint_Merged`, true, true);
+  mergeGroupMeshesByMaterial(staticFrame, materials.metallic, `${name}_Metallic_Merged`, true);
+  group.add(staticFrame);
+
+  if (mergedJoint) {
+    boneMesh = mergedJoint;
+  }
+
+  // 4. Sculpted White Ceramic Dorsal Armor Shell
+  const armorStartY = 0.0005; // Anchored flush with proximal collar margin
+  const armorLen = isDistal ? length : (length - collarH * 0.65);
+  const armorGeo = getPhalanxArmorGeo(armorW, armorLen, armorD, isDistal);
+  const armorMesh = new THREE.Mesh(armorGeo, materials.armor);
+  armorMesh.name = `${name}_ArmorShell`;
+  armorMesh.position.set(0, -armorStartY, 0);
+  armorMesh.castShadow = true;
+  armorMesh.receiveShadow = true;
+  group.add(armorMesh);
+
+  // Optical sensor jewels on Distal Phalanx
+  if (isDistal) {
+    const dotGeo = geoCache.getSphere(0.0007, 10, 8);
+    const dotMesh = new THREE.Mesh(dotGeo, materials.purpleEmissive);
+    dotMesh.position.set(0, -length * 0.72, armorD * 0.44 + 0.0004);
+    group.add(dotMesh);
+
+    const dotBloomGeo = geoCache.getSphere(0.0011, 8, 6);
+    const dotBloomMesh = new THREE.Mesh(dotBloomGeo, materials.purpleBloom);
+    dotBloomMesh.position.copy(dotMesh.position);
+    group.add(dotBloomMesh);
+  }
+
+  return { group, boneMesh, armorMesh, padMesh: boneMesh };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -436,33 +520,23 @@ export function createFinger(
   fingerGroup.name = `${spec.name}Finger`;
   fingerGroup.position.set(spec.spreadX, spec.offsetY, spec.offsetZ);
 
-  // ── PROXIMAL PHALANX ──────────────────────────────────────────────────────
-  const proxSeg = buildSegment(
-    `${spec.name}Proximal`,
-    spec.proximalRadius, spec.proximalLength,
-    false, materials
-  );
-  fingerGroup.add(proxSeg.group);
-
   // PIP Hinge at distal end of proximal phalanx
   const pipHinge = createKnuckleHinge(
     spec.proximalRadius * 0.95,
     spec.proximalRadius * 2.10,
     materials
   );
-  pipHinge.group.position.set(0, -spec.proximalLength, 0);
-  proxSeg.group.add(pipHinge.group);
-  proxSeg.hingeMesh = pipHinge.hingePin;
-  proxSeg.hingeCaps  = pipHinge.caps;
 
-  // ── MIDDLE PHALANX ────────────────────────────────────────────────────────
-  const midSeg = buildSegment(
-    `${spec.name}Middle`,
-    spec.middleRadius, spec.middleLength,
-    false, materials
+  // ── PROXIMAL PHALANX ──────────────────────────────────────────────────────
+  const proxSeg = buildSegment(
+    `${spec.name}Proximal`,
+    spec.proximalRadius, spec.proximalLength,
+    false, materials,
+    pipHinge.group
   );
-  midSeg.group.position.set(0, -spec.proximalLength, 0);
-  proxSeg.group.add(midSeg.group);
+  fingerGroup.add(proxSeg.group);
+  proxSeg.hingeMesh = proxSeg.boneMesh;
+  proxSeg.hingeCaps  = pipHinge.caps;
 
   // DIP Hinge at distal end of middle phalanx
   const dipHinge = createKnuckleHinge(
@@ -470,9 +544,17 @@ export function createFinger(
     spec.middleRadius * 2.05,
     materials
   );
-  dipHinge.group.position.set(0, -spec.middleLength, 0);
-  midSeg.group.add(dipHinge.group);
-  midSeg.hingeMesh = dipHinge.hingePin;
+
+  // ── MIDDLE PHALANX ────────────────────────────────────────────────────────
+  const midSeg = buildSegment(
+    `${spec.name}Middle`,
+    spec.middleRadius, spec.middleLength,
+    false, materials,
+    dipHinge.group
+  );
+  midSeg.group.position.set(0, -spec.proximalLength, 0);
+  proxSeg.group.add(midSeg.group);
+  midSeg.hingeMesh = midSeg.boneMesh;
   midSeg.hingeCaps  = dipHinge.caps;
 
   // ── DISTAL PHALANX & ERGONOMIC FINGERTIP ──────────────────────────────────
@@ -539,50 +621,72 @@ export function createThumb(
   thumbGroup.rotation.set(0.32, -radial * 0.18, radial * 0.26);
 
   // ── 1. THENAR HOUSING & COMPACT CMC ACTUATOR ──────────────────────────────
+  const thumbBaseGroup = new THREE.Group();
+  thumbBaseGroup.name = 'ThumbBase_Static';
+
   // Sleek mounting socket recessed in the palm radial flank
-  const thenarSocketGeo = new THREE.CylinderGeometry(0.0062, 0.0068, 0.0040, 18);
-  thenarSocketGeo.rotateZ(Math.PI / 2);
+  const thenarSocketGeo = geoCache.get('ThumbThenarSocket', () => {
+    const g = new THREE.CylinderGeometry(0.0062, 0.0068, 0.0040, 18);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
   const thenarSocket = new THREE.Mesh(thenarSocketGeo, materials.joint);
   thenarSocket.name = 'ThumbThenarSocket';
   thenarSocket.position.set(-radial * 0.0018, 0.0009, -0.0014);
   thenarSocket.castShadow = true;
-  thumbGroup.add(thenarSocket);
+  thumbBaseGroup.add(thenarSocket);
 
   // Compact dark titanium cylindrical actuator core (flush within socket)
-  const trunnionGeo = new THREE.CylinderGeometry(0.0064, 0.0064, 0.0078, 22);
-  trunnionGeo.rotateZ(Math.PI / 2);
-  const baseBall = new THREE.Mesh(trunnionGeo, materials.joint);
+  const trunnionGeo = geoCache.get('ThumbCMCActuatorHousing', () => {
+    const g = new THREE.CylinderGeometry(0.0064, 0.0064, 0.0078, 22);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
+  let baseBall: THREE.Mesh = new THREE.Mesh(trunnionGeo, materials.joint);
   baseBall.name = 'ThumbCMCActuatorHousing';
   baseBall.castShadow = true;
-  thumbGroup.add(baseBall);
+  thumbBaseGroup.add(baseBall);
 
   // Flush chrome bezel ring
-  const baseRingGeo = new THREE.TorusGeometry(0.0064, 0.0006, 6, 22);
-  baseRingGeo.rotateY(Math.PI / 2);
+  const baseRingGeo = geoCache.get('ThumbBaseRing', () => {
+    const g = new THREE.TorusGeometry(0.0064, 0.0006, 6, 22);
+    g.rotateY(Math.PI / 2);
+    return g;
+  });
   const baseRing = new THREE.Mesh(baseRingGeo, materials.metallic);
   baseRing.position.set(radial * 0.0036, 0, 0);
-  thumbGroup.add(baseRing);
+  thumbBaseGroup.add(baseRing);
 
   // Precision metallic bearing disc
-  const discGeo = new THREE.CylinderGeometry(0.0052, 0.0052, 0.0007, 20);
-  discGeo.rotateZ(Math.PI / 2);
+  const discGeo = geoCache.get('ThumbBearingDisc', () => {
+    const g = new THREE.CylinderGeometry(0.0052, 0.0052, 0.0007, 20);
+    g.rotateZ(Math.PI / 2);
+    return g;
+  });
   const bearingDisc = new THREE.Mesh(discGeo, materials.metallic);
   bearingDisc.position.set(radial * 0.0039, 0, 0);
-  thumbGroup.add(bearingDisc);
+  thumbBaseGroup.add(bearingDisc);
 
   // Swivel mounting collar interface
-  const collarGeo = new THREE.CylinderGeometry(0.0062, 0.0068, 0.0034, 20);
-  const baseCollar = new THREE.Mesh(collarGeo, materials.joint);
+  const collarGeo = geoCache.getCylinder(0.0062, 0.0068, 0.0034, 20);
+  let baseCollar: THREE.Mesh = new THREE.Mesh(collarGeo, materials.joint);
   baseCollar.name = 'ThumbSwivelCollar';
   baseCollar.position.set(0, -0.0048, 0);
   baseCollar.castShadow = true;
-  thumbGroup.add(baseCollar);
+  thumbBaseGroup.add(baseCollar);
+
+  const mergedThumbJoint = mergeGroupMeshesByMaterial(thumbBaseGroup, materials.joint, 'ThumbBaseJoint_Merged', true, true);
+  mergeGroupMeshesByMaterial(thumbBaseGroup, materials.metallic, 'ThumbBaseMetallic_Merged', true);
+  thumbGroup.add(thumbBaseGroup);
+
+  if (mergedThumbJoint) {
+    baseBall = mergedThumbJoint;
+    baseCollar = mergedThumbJoint;
+  }
 
   // ── 2. PROXIMAL PHALANX ───────────────────────────────────────────────────
   const proxLen = 0.0295;
   const proxRad = 0.0064;
-  const proxSeg = buildSegment('ThumbProximal', proxRad, proxLen, false, materials);
-  thumbGroup.add(proxSeg.group);
 
   // Interphalangeal (IP) Mechanical Knuckle Hinge
   const ipHinge = createKnuckleHinge(
@@ -590,9 +694,10 @@ export function createThumb(
     proxRad * 2.05,
     materials
   );
-  ipHinge.group.position.set(0, -proxLen, 0);
-  proxSeg.group.add(ipHinge.group);
-  proxSeg.hingeMesh = ipHinge.hingePin;
+
+  const proxSeg = buildSegment('ThumbProximal', proxRad, proxLen, false, materials, ipHinge.group);
+  thumbGroup.add(proxSeg.group);
+  proxSeg.hingeMesh = proxSeg.boneMesh;
   proxSeg.hingeCaps  = ipHinge.caps;
 
   // ── 3. DISTAL PHALANX & OPPOSABLE THUMBTIP ────────────────────────────────
@@ -610,7 +715,7 @@ export function createThumb(
   distSeg.group.rotation.z = -radial * 0.06; // inward return towards index finger
 
   // Purple telemetry accent strip on lateral distal thumb
-  const thumbLedGeo = new THREE.BoxGeometry(0.0007, 0.0036, 0.0007);
+  const thumbLedGeo = geoCache.getBox(0.0007, 0.0036, 0.0007);
   const thumbLed = new THREE.Mesh(thumbLedGeo, materials.purpleEmissive);
   thumbLed.position.set(radial * (distRad * 0.88), -distLen * 0.50, distRad * 0.20);
   distSeg.group.add(thumbLed);

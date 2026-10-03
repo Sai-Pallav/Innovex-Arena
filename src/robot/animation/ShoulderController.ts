@@ -13,6 +13,17 @@ export class ShoulderController {
   private currentRightRoll: number = 0;
   private currentRightPosY: number = 0;
 
+  private result: ShoulderOffset = {
+    leftPitch: 0,
+    leftYaw: 0,
+    leftRoll: 0,
+    leftPosY: 0,
+    rightPitch: 0,
+    rightYaw: 0,
+    rightRoll: 0,
+    rightPosY: 0,
+  };
+
   public update(headYaw: number, headPitch: number, dt: number, breathOffset: number): ShoulderOffset {
     const cfg = ANIMATION_CONFIG.shoulder;
     const smooth = 1.0 - Math.exp(-cfg.smoothing * dt);
@@ -46,15 +57,16 @@ export class ShoulderController {
     this.currentRightRoll += (targetRightRoll - this.currentRightRoll) * smooth;
     this.currentRightPosY += (targetRightPosY - this.currentRightPosY) * smooth;
 
-    return {
-      leftPitch: this.currentLeftPitch,
-      leftYaw: this.currentLeftYaw,
-      leftRoll: this.currentLeftRoll,
-      leftPosY: this.currentLeftPosY,
-      rightPitch: this.currentRightPitch,
-      rightYaw: this.currentRightYaw,
-      rightRoll: this.currentRightRoll,
-      rightPosY: this.currentRightPosY,
-    };
+    const res = this.result;
+    res.leftPitch = this.currentLeftPitch;
+    res.leftYaw = this.currentLeftYaw;
+    res.leftRoll = this.currentLeftRoll;
+    res.leftPosY = this.currentLeftPosY;
+    res.rightPitch = this.currentRightPitch;
+    res.rightYaw = this.currentRightYaw;
+    res.rightRoll = this.currentRightRoll;
+    res.rightPosY = this.currentRightPosY;
+
+    return res;
   }
 }

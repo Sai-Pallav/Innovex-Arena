@@ -42,6 +42,40 @@ export class ArmElbowController {
   private rightWristRoll: number = 0;
   private rightWristYaw: number = 0;
 
+  private result = {
+    pose: {
+      leftElbowBend: 0,
+      rightElbowBend: 0,
+      leftUpperPitch: 0,
+      rightUpperPitch: 0,
+      leftUpperRoll: 0,
+      rightUpperRoll: 0,
+      leftElbowRoll: 0,
+      rightElbowRoll: 0,
+    },
+    leftWrist: {
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+    },
+    rightWrist: {
+      pitch: 0,
+      roll: 0,
+      yaw: 0,
+    },
+  };
+
+  private copyState(dst: ActiveArmState, src: ActiveArmState): void {
+    dst.leftElbow = src.leftElbow;
+    dst.rightElbow = src.rightElbow;
+    dst.leftUpperPitch = src.leftUpperPitch;
+    dst.rightUpperPitch = src.rightUpperPitch;
+    dst.leftUpperRoll = src.leftUpperRoll;
+    dst.rightUpperRoll = src.rightUpperRoll;
+    dst.leftElbowRoll = src.leftElbowRoll;
+    dst.rightElbowRoll = src.rightElbowRoll;
+  }
+
   constructor() {
     const pA = ANIMATION_CONFIG.arm.poses.poseA;
     this.currentPoseState = {
@@ -102,7 +136,7 @@ export class ArmElbowController {
         this.transitionTimer += dt;
         if (this.transitionTimer >= this.nextTransitionTime) {
           this.targetPoseKey = this.selectNextPose();
-          this.startPoseState = { ...this.currentPoseState };
+          this.copyState(this.startPoseState, this.currentPoseState);
           this.isTransitioning = true;
           this.transitionProgress = 0;
         }
@@ -207,27 +241,27 @@ export class ArmElbowController {
     this.rightWristRoll += (targetRightWRoll - this.rightWristRoll) * wSmooth;
     this.rightWristYaw += (targetRightWYaw - this.rightWristYaw) * wSmooth;
 
-    return {
-      pose: {
-        leftElbowBend: this.smoothedLeftElbow,
-        rightElbowBend: this.smoothedRightElbow,
-        leftUpperPitch: this.smoothedLeftUpperPitch,
-        rightUpperPitch: this.smoothedRightUpperPitch,
-        leftUpperRoll: this.smoothedLeftUpperRoll,
-        rightUpperRoll: this.smoothedRightUpperRoll,
-        leftElbowRoll: this.smoothedLeftElbowRoll,
-        rightElbowRoll: this.smoothedRightElbowRoll,
-      },
-      leftWrist: {
-        pitch: this.leftWristPitch,
-        roll: this.leftWristRoll,
-        yaw: this.leftWristYaw,
-      },
-      rightWrist: {
-        pitch: this.rightWristPitch,
-        roll: this.rightWristRoll,
-        yaw: this.rightWristYaw,
-      },
-    };
+    const res = this.result;
+    const p = res.pose;
+    p.leftElbowBend = this.smoothedLeftElbow;
+    p.rightElbowBend = this.smoothedRightElbow;
+    p.leftUpperPitch = this.smoothedLeftUpperPitch;
+    p.rightUpperPitch = this.smoothedRightUpperPitch;
+    p.leftUpperRoll = this.smoothedLeftUpperRoll;
+    p.rightUpperRoll = this.smoothedRightUpperRoll;
+    p.leftElbowRoll = this.smoothedLeftElbowRoll;
+    p.rightElbowRoll = this.smoothedRightElbowRoll;
+
+    const lw = res.leftWrist;
+    lw.pitch = this.leftWristPitch;
+    lw.roll = this.leftWristRoll;
+    lw.yaw = this.leftWristYaw;
+
+    const rw = res.rightWrist;
+    rw.pitch = this.rightWristPitch;
+    rw.roll = this.rightWristRoll;
+    rw.yaw = this.rightWristYaw;
+
+    return res;
   }
 }

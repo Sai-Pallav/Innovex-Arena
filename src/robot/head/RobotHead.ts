@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
+import { geoCache } from '../utils/GeometryCache';
 import { createRobotShell, ShellNodes } from './RobotShell';
 import { createRobotVisor, VisorAssemblyNodes } from './RobotVisor';
 import { createRobotVisorLight, VisorLightNodes } from './RobotVisorLight';
@@ -42,7 +43,7 @@ export function createRobotHead(materials: RobotMaterialPalette): HeadAssemblyNo
 
   // 1. Internal Structural Skull Core
   // Dark titanium interior volume preventing hollow see-through artifacts behind visor
-  const innerSkullGeo = new THREE.SphereGeometry(0.102, 24, 18);
+  const innerSkullGeo = geoCache.get('InnerSkullGeo', () => new THREE.SphereGeometry(0.102, 24, 18));
   const innerSkull = new THREE.Mesh(innerSkullGeo, materials.joint);
   innerSkull.name = 'InnerSkullCore';
   innerSkull.position.set(0, 0.020, -0.012);
