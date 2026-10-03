@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 /**
  * Master Geometric & Kinematic Configuration for the Procedural Robot Legs & Feet Assembly.
  * Proportioned for an athletic, heroic humanoid mecha aesthetic matching the torso, head, and arms.

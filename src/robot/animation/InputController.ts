@@ -1,5 +1,4 @@
 import { NormalizedInputState } from './AnimationTypes';
-import { ANIMATION_CONFIG } from './AnimationConfig';
 
 export class InputController {
   private state: NormalizedInputState = {
@@ -11,7 +10,6 @@ export class InputController {
     reducedMotion: false,
   };
 
-  private lastTime: number = performance.now();
   private lastX: number = 0;
   private lastY: number = 0;
 

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { ROBOT_CONFIG, ROBOT_ACCENT } from '../config';
+import { ROBOT_ACCENT } from '../config';
 
 export interface RobotMaterialPalette {
   armor: THREE.MeshPhysicalMaterial;
@@ -22,8 +22,6 @@ export interface RobotMaterialPalette {
  * - Purple Emissive: subtle and controlled brand accent
  */
 export function createRobotMaterials(): RobotMaterialPalette {
-  const cfg = ROBOT_CONFIG;
-
   const armor = new THREE.MeshPhysicalMaterial({
     color: 0xe2e7f4, // Luminous pearl ceramic off-white with smooth gradient falloff
     roughness: 0.22, // Silky smooth ceramic surface

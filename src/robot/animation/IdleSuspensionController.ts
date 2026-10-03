@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { IdleSuspensionState } from './AnimationTypes';
 import { ANIMATION_CONFIG } from './AnimationConfig';
 

@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 export interface NormalizedInputState {
   targetX: number;           // Normalized [-1, 1] across viewport
   targetY: number;           // Normalized [-1, 1]

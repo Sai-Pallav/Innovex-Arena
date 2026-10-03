@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
-import { ROBOT_CONFIG } from '../config';
 import { geoCache } from '../utils/GeometryCache';
 
 export interface VisorAssemblyNodes {

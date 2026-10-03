@@ -1,6 +1,5 @@
 // Centralized Brand Accent Color (Part 14 & 15: Purple is the ONLY emissive accent)
 export const ROBOT_ACCENT = 0xa855f7;
-export const ROBOT_ACCENT_HEX = '#a855f7';
 
 // =========================================================================
 // CENTRALIZED MASTER PRODUCTION CONFIGURATION CONSTANTS (Hero Refinement)

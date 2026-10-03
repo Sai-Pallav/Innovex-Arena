@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-03T16:09:42.338Z",
+  "timestamp": "2026-10-03T17:16:05.958Z",
   "sceneStats": {
     "meshCount": 449,
     "uniqueGeometries": 360,
@@ -7,58 +7,58 @@
     "materialCount": 12
   },
   "idle": {
-    "fps": 59,
-    "avgFrameTimeMs": 16.95,
-    "minFrameTimeMs": 11.8,
-    "maxFrameTimeMs": 24.2,
+    "fps": 60.1,
+    "avgFrameTimeMs": 16.63,
+    "minFrameTimeMs": 10,
+    "maxFrameTimeMs": 25.7,
     "drawCalls": 423,
     "triangles": 356536,
     "geometries": 343,
-    "heapMB": 94.3,
-    "sampleCount": 148
+    "heapMB": 90.8,
+    "sampleCount": 151
   },
   "cursor": {
-    "fps": 50.3,
-    "avgFrameTimeMs": 19.87,
-    "minFrameTimeMs": 11.7,
-    "maxFrameTimeMs": 48.8,
+    "fps": 60,
+    "avgFrameTimeMs": 16.67,
+    "minFrameTimeMs": 9.7,
+    "maxFrameTimeMs": 25.6,
     "drawCalls": 423,
     "triangles": 356536,
     "geometries": 343,
-    "heapMB": 101.6,
-    "sampleCount": 112
+    "heapMB": 91.2,
+    "sampleCount": 132
   },
   "animation": {
-    "fps": 59.5,
-    "avgFrameTimeMs": 16.8,
-    "minFrameTimeMs": 9.2,
+    "fps": 60.1,
+    "avgFrameTimeMs": 16.65,
+    "minFrameTimeMs": 10,
+    "maxFrameTimeMs": 21.3,
+    "drawCalls": 423,
+    "triangles": 356536,
+    "geometries": 343,
+    "heapMB": 96.8,
+    "sampleCount": 151
+  },
+  "exploded": {
+    "fps": 60,
+    "avgFrameTimeMs": 16.67,
+    "minFrameTimeMs": 8.1,
     "maxFrameTimeMs": 23.1,
     "drawCalls": 423,
     "triangles": 356536,
     "geometries": 343,
-    "heapMB": 103,
-    "sampleCount": 149
-  },
-  "exploded": {
-    "fps": 59.5,
-    "avgFrameTimeMs": 16.82,
-    "minFrameTimeMs": 10,
-    "maxFrameTimeMs": 26.9,
-    "drawCalls": 423,
-    "triangles": 356536,
-    "geometries": 343,
-    "heapMB": 92.6,
-    "sampleCount": 149
+    "heapMB": 94,
+    "sampleCount": 150
   },
   "debug": {
-    "fps": 26.8,
-    "avgFrameTimeMs": 37.35,
-    "minFrameTimeMs": 20.6,
-    "maxFrameTimeMs": 103,
+    "fps": 27.6,
+    "avgFrameTimeMs": 36.29,
+    "minFrameTimeMs": 25,
+    "maxFrameTimeMs": 46.5,
     "drawCalls": 451,
     "triangles": 0,
     "geometries": 371,
-    "heapMB": 101.3,
-    "sampleCount": 67
+    "heapMB": 106.6,
+    "sampleCount": 69
   }
 }

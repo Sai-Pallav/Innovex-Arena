@@ -11,7 +11,6 @@ import { EmissiveController } from './EmissiveController';
 import { ArmAnimationController, HandPoseName } from '../arm/ArmAnimationController';
 import { TorsoAnimationController } from '../torso/TorsoAnimationController';
 import { LegAnimationController } from '../leg/LegAnimationController';
-import { ANIMATION_CONFIG } from './AnimationConfig';
 
 export class RobotAnimationController {
   private nodes: RobotNodes;

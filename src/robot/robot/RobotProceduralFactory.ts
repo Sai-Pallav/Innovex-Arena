@@ -194,16 +194,6 @@ export function createProceduralRobot(): RobotNodes {
 import { RobotResourceManager } from './RobotResourceManager';
 
 /**
- * Eagerly pre-warms the shared procedural robot geometry and materials
- * in cooperative background batches without blocking or duplicating scene instances.
- */
-export function preloadProceduralRobot(): void {
-  RobotResourceManager.getInstance().ensureResources().catch((err) => {
-    console.warn('[RobotProceduralFactory] Preload error:', err);
-  });
-}
-
-/**
  * Retrieves a fresh procedural robot instance from the resource manager asynchronously.
  */
 export async function getProceduralRobotAsync(): Promise<RobotNodes> {

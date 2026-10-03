@@ -3,7 +3,6 @@ import { ANIMATION_CONFIG } from './AnimationConfig';
 
 export class EmissiveController {
   private currentIntensity: number = ANIMATION_CONFIG.emissive.baseIntensity;
-  private blinkTimer: number = 0;
   private nextBlinkTime: number = 4.5;
   private isBlinking: boolean = false;
   private blinkProgress: number = 1.0;

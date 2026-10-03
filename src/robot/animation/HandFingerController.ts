@@ -1,5 +1,4 @@
-import * as THREE from 'three';
-import { HandOffsets, HandFingerOffsets } from './AnimationTypes';
+import { HandOffsets } from './AnimationTypes';
 import { ANIMATION_CONFIG } from './AnimationConfig';
 
 export class HandFingerController {
@@ -42,7 +41,6 @@ export class HandFingerController {
 
     // Coordinated Finger Micro-curl Cycle:
     // Gentle progression 0° -> 2° -> 4° -> 1° over several seconds (~18-22s period)
-    const baseCycle = Math.sin(time * cfg.cycleSpeed);
     // Smooth dual harmonic shape
     const normalizedCurl = (Math.sin(time * cfg.cycleSpeed) * 0.7 + Math.sin(time * cfg.cycleSpeed * 0.5 + 1.0) * 0.3 + 1.0) * 0.5; // [0, 1]
     const baseCurl = cfg.minCurl + normalizedCurl * (cfg.maxCurl - cfg.minCurl);

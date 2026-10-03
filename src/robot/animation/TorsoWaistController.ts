@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { HierarchicalGazeAngles, WaistSuspensionOffsets } from './AnimationTypes';
 import { ANIMATION_CONFIG } from './AnimationConfig';
 
@@ -70,7 +69,6 @@ export class TorsoWaistController {
     // Lower segment: -0.2° (-0.0035 rad)
     // Lower waist:   -0.3° (-0.0052 rad)
     // Different phases across segments create a true suspension flexure
-    const suspensionCycle = Math.sin(time * cfg.cycleSpeed);
     const s0 = (Math.sin(time * cfg.cycleSpeed) * cfg.upperSegmentPitch) * motionScale;
     const s1 = (Math.sin(time * cfg.cycleSpeed + 0.45) * cfg.middleSegmentPitch) * motionScale;
     const s2 = (Math.sin(time * cfg.cycleSpeed + 0.90) * (cfg.middleSegmentPitch * 0.5)) * motionScale;

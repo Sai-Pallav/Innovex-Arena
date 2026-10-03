@@ -11,8 +11,6 @@ export class RobotController {
   private targetLookX: number = 0;
   private targetLookY: number = 0;
   private cursorSpeed: number = 0;
-  private isInteracting: boolean = false;
-  private reducedMotion: boolean = false;
 
   constructor(nodes: RobotNodes) {
     this.nodes = nodes;
@@ -25,7 +23,6 @@ export class RobotController {
 
   public setPointerTarget(clientX: number, clientY: number, isHovered: boolean, speed: number = 0): void {
     this.cursorSpeed = speed;
-    this.isInteracting = isHovered;
     this.animController.setPointerTarget(clientX, clientY, isHovered, speed);
   }
 
@@ -33,7 +30,6 @@ export class RobotController {
     this.targetLookX = Math.max(-1, Math.min(1, x));
     this.targetLookY = Math.max(-1, Math.min(1, y));
     this.cursorSpeed = speed;
-    this.isInteracting = true;
     this.animController.setLookTarget(this.targetLookX, this.targetLookY, speed);
   }
 
@@ -41,19 +37,16 @@ export class RobotController {
     this.targetLookX = 0;
     this.targetLookY = 0;
     this.cursorSpeed = 0;
-    this.isInteracting = false;
     this.animController.setIdleState();
   }
 
   public setInteractionState(active: boolean): void {
-    this.isInteracting = active;
     if (!active) {
       this.animController.setIdleState();
     }
   }
 
   public setReducedMotion(reduced: boolean): void {
-    this.reducedMotion = reduced;
     this.animController.setReducedMotion(reduced);
   }
 

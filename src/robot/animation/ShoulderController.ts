@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import { ShoulderOffset } from './AnimationTypes';
 import { ANIMATION_CONFIG } from './AnimationConfig';
 
