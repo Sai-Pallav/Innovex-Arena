@@ -767,15 +767,7 @@ export function createMultiAxisShoulderJoint(
   materials: RobotMaterialPalette,
   ledMeshes: THREE.Mesh[]
 ): MultiAxisShoulderJointNodes {
-  const linkMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0xdde6f5,
-    metalness: 0.90,
-    roughness: 0.18,
-    clearcoat: 0.70,
-    clearcoatRoughness: 0.10,
-    reflectivity: 0.98,
-    name: 'RobotMachinedLinkMaterial',
-  });
+  const linkMaterial = materials.machinedLink;
 
   // 1. Stationary Shoulder Foundation (Grounds into Part 3 Housing at X = ±0.234, Y = 0.052, Z = 0.015)
   // Perfectly calibrated to provide clear visibility of the dark mounting collar and purple glow

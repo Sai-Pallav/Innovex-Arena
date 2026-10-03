@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-10-03T17:16:05.958Z",
+  "timestamp": "2026-10-03T18:11:32.098Z",
   "sceneStats": {
     "meshCount": 449,
     "uniqueGeometries": 360,
@@ -7,58 +7,58 @@
     "materialCount": 12
   },
   "idle": {
-    "fps": 60.1,
-    "avgFrameTimeMs": 16.63,
-    "minFrameTimeMs": 10,
-    "maxFrameTimeMs": 25.7,
-    "drawCalls": 423,
-    "triangles": 356536,
-    "geometries": 343,
-    "heapMB": 90.8,
-    "sampleCount": 151
-  },
-  "cursor": {
-    "fps": 60,
-    "avgFrameTimeMs": 16.67,
-    "minFrameTimeMs": 9.7,
-    "maxFrameTimeMs": 25.6,
-    "drawCalls": 423,
-    "triangles": 356536,
-    "geometries": 343,
-    "heapMB": 91.2,
-    "sampleCount": 132
-  },
-  "animation": {
-    "fps": 60.1,
-    "avgFrameTimeMs": 16.65,
-    "minFrameTimeMs": 10,
-    "maxFrameTimeMs": 21.3,
+    "fps": 58.6,
+    "avgFrameTimeMs": 17.07,
+    "minFrameTimeMs": 8.7,
+    "maxFrameTimeMs": 60.5,
     "drawCalls": 423,
     "triangles": 356536,
     "geometries": 343,
     "heapMB": 96.8,
-    "sampleCount": 151
+    "sampleCount": 147
   },
-  "exploded": {
-    "fps": 60,
-    "avgFrameTimeMs": 16.67,
-    "minFrameTimeMs": 8.1,
-    "maxFrameTimeMs": 23.1,
+  "cursor": {
+    "fps": 60.2,
+    "avgFrameTimeMs": 16.62,
+    "minFrameTimeMs": 8.3,
+    "maxFrameTimeMs": 25.6,
     "drawCalls": 423,
     "triangles": 356536,
     "geometries": 343,
-    "heapMB": 94,
-    "sampleCount": 150
+    "heapMB": 97.3,
+    "sampleCount": 133
+  },
+  "animation": {
+    "fps": 60,
+    "avgFrameTimeMs": 16.66,
+    "minFrameTimeMs": 9.5,
+    "maxFrameTimeMs": 24.5,
+    "drawCalls": 423,
+    "triangles": 356536,
+    "geometries": 343,
+    "heapMB": 103,
+    "sampleCount": 151
+  },
+  "exploded": {
+    "fps": 60.1,
+    "avgFrameTimeMs": 16.65,
+    "minFrameTimeMs": 10.3,
+    "maxFrameTimeMs": 22.8,
+    "drawCalls": 423,
+    "triangles": 356536,
+    "geometries": 343,
+    "heapMB": 99.6,
+    "sampleCount": 151
   },
   "debug": {
-    "fps": 27.6,
-    "avgFrameTimeMs": 36.29,
-    "minFrameTimeMs": 25,
-    "maxFrameTimeMs": 46.5,
+    "fps": 32.4,
+    "avgFrameTimeMs": 30.87,
+    "minFrameTimeMs": 18.4,
+    "maxFrameTimeMs": 44.1,
     "drawCalls": 451,
     "triangles": 0,
     "geometries": 371,
-    "heapMB": 106.6,
-    "sampleCount": 69
+    "heapMB": 102.8,
+    "sampleCount": 81
   }
 }

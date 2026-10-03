@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { RobotMaterialPalette } from '../materials/RobotMaterials';
 import { LEG_CONFIG } from './LegConfig';
 import { mergeGroupMeshesByMaterial } from '../utils/geometryMerger';
+import { geoCache } from '../utils/GeometryCache';
 
 export interface AchillesDamperNodes {
   group: THREE.Group;
@@ -105,22 +106,27 @@ export function createAnkle(
   malleolusMedial.castShadow = true;
   ankleJointGroup.add(malleolusMedial);
 
-  // Concentric purple emissive rings on lateral and medial malleolus
-  const ringGeo = new THREE.TorusGeometry(cfg.accentRingRadius, 0.0016, 8, 24);
+  // Concentric purple emissive rings on lateral and medial malleolus (InstancedMesh)
+  const ringGeo = geoCache.getTorus(cfg.accentRingRadius, 0.0016, 8, 24);
+  const accentRings = new THREE.InstancedMesh(ringGeo, materials.purpleEmissive, 2);
+  accentRings.name = side === -1 ? 'AnkleAccents_L' : 'AnkleAccents_R';
 
-  const accentRingLateral = new THREE.Mesh(ringGeo, materials.purpleEmissive);
-  accentRingLateral.name = side === -1 ? 'AnkleAccentLat_L' : 'AnkleAccentLat_R';
-  accentRingLateral.rotation.y = Math.PI / 2;
-  accentRingLateral.position.x = side * (discSpacing * 0.5 + cfg.malleolusDiscWidth * 0.5 + 0.001);
-  ankleGroup.add(accentRingLateral);
-  ledMeshes.push(accentRingLateral);
+  const dummy = new THREE.Object3D();
+  dummy.rotation.y = Math.PI / 2;
 
-  const accentRingMedial = new THREE.Mesh(ringGeo, materials.purpleEmissive);
-  accentRingMedial.name = side === -1 ? 'AnkleAccentMed_L' : 'AnkleAccentMed_R';
-  accentRingMedial.rotation.y = Math.PI / 2;
-  accentRingMedial.position.x = -side * (discSpacing * 0.5 + cfg.malleolusDiscWidth * 0.5 + 0.001);
-  ankleGroup.add(accentRingMedial);
-  ledMeshes.push(accentRingMedial);
+  // Lateral ring instance
+  dummy.position.set(side * (discSpacing * 0.5 + cfg.malleolusDiscWidth * 0.5 + 0.001), 0, 0);
+  dummy.updateMatrix();
+  accentRings.setMatrixAt(0, dummy.matrix);
+
+  // Medial ring instance
+  dummy.position.set(-side * (discSpacing * 0.5 + cfg.malleolusDiscWidth * 0.5 + 0.001), 0, 0);
+  dummy.updateMatrix();
+  accentRings.setMatrixAt(1, dummy.matrix);
+
+  accentRings.instanceMatrix.needsUpdate = true;
+  ankleGroup.add(accentRings);
+  ledMeshes.push(accentRings);
 
   // White ceramic outer accent caps on the malleolus discs
   const malleolusCapGroup = new THREE.Group();
@@ -194,8 +200,8 @@ export function createAnkle(
     clevisHousing: mergedAnkle,
     malleolusLateral: mergedAnkle,
     malleolusMedial: mergedAnkle,
-    accentRingLateral,
-    accentRingMedial,
+    accentRingLateral: accentRings,
+    accentRingMedial: accentRings,
     achillesDamper: {
       group: damperGroup,
       cylinder: mergedAnkle,

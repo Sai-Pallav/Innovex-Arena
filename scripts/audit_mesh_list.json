@@ -1,6 +1,6 @@
 {
-  "totalMeshes": 449,
-  "uniqueGeometries": 360,
+  "totalMeshes": 447,
+  "uniqueGeometries": 359,
   "drawCalls": 423,
   "breakdown": {
     "Torso": 42,
@@ -11,11 +11,11 @@
     "Fingers": 86,
     "Waist": 22,
     "Legs": 38,
-    "Feet": 16
+    "Feet": 14
   },
   "materials": {
     "RobotWhiteArmorMaterial": 72,
-    "RobotPurpleEmissiveMaterial": 85,
+    "RobotPurpleEmissiveMaterial": 83,
     "RobotWhiteArmorDoubleSideMaterial": 11,
     "RobotDarkTitaniumMaterial": 135,
     "RobotMetallicMaterial": 95,
@@ -4240,24 +4240,14 @@
       "instanceCount": 1
     },
     {
-      "name": "AnkleAccentLat_L",
+      "name": "AnkleAccents_L",
       "parentName": "LeftAnkle",
       "subsystem": "Feet",
       "geoId": 2942,
       "matName": "RobotPurpleEmissiveMaterial",
       "polyCount": 384,
-      "isInstanced": false,
-      "instanceCount": 1
-    },
-    {
-      "name": "AnkleAccentMed_L",
-      "parentName": "LeftAnkle",
-      "subsystem": "Feet",
-      "geoId": 2942,
-      "matName": "RobotPurpleEmissiveMaterial",
-      "polyCount": 384,
-      "isInstanced": false,
-      "instanceCount": 1
+      "isInstanced": true,
+      "instanceCount": 2
     },
     {
       "name": "AnkleCaps_L",
@@ -4633,37 +4623,27 @@
       "name": "AnkleJointMesh_R",
       "parentName": "AnkleJointCore_R",
       "subsystem": "Feet",
-      "geoId": 3141,
+      "geoId": 3140,
       "matName": "RobotDarkTitaniumMaterial",
       "polyCount": 948,
       "isInstanced": false,
       "instanceCount": 1
     },
     {
-      "name": "AnkleAccentLat_R",
+      "name": "AnkleAccents_R",
       "parentName": "RightAnkle",
       "subsystem": "Feet",
-      "geoId": 3126,
+      "geoId": 2942,
       "matName": "RobotPurpleEmissiveMaterial",
       "polyCount": 384,
-      "isInstanced": false,
-      "instanceCount": 1
-    },
-    {
-      "name": "AnkleAccentMed_R",
-      "parentName": "RightAnkle",
-      "subsystem": "Feet",
-      "geoId": 3126,
-      "matName": "RobotPurpleEmissiveMaterial",
-      "polyCount": 384,
-      "isInstanced": false,
-      "instanceCount": 1
+      "isInstanced": true,
+      "instanceCount": 2
     },
     {
       "name": "AnkleCaps_R",
       "parentName": "RightAnkle",
       "subsystem": "Feet",
-      "geoId": 3131,
+      "geoId": 3130,
       "matName": "RobotWhiteArmorMaterial",
       "polyCount": 160,
       "isInstanced": false,
@@ -4673,7 +4653,7 @@
       "name": "FootJointMesh_R",
       "parentName": "FootJointCore_R",
       "subsystem": "Feet",
-      "geoId": 3150,
+      "geoId": 3149,
       "matName": "RobotDarkTitaniumMaterial",
       "polyCount": 1304,
       "isInstanced": false,
@@ -4733,7 +4713,7 @@
       "name": "FootUnderglow_R",
       "parentName": "RightFoot",
       "subsystem": "Feet",
-      "geoId": 3154,
+      "geoId": 3153,
       "matName": "RobotPurpleEmissiveMaterial",
       "polyCount": 304,
       "isInstanced": false,

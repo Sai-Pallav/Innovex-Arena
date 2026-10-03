@@ -12,6 +12,7 @@ export interface RobotMaterialPalette {
   whiteCoreEmissive: THREE.MeshBasicMaterial;
   purpleBloom: THREE.MeshBasicMaterial;
   metallic: THREE.MeshPhysicalMaterial;
+  machinedLink: THREE.MeshPhysicalMaterial;
 }
 
 /**
@@ -103,6 +104,16 @@ export function createRobotMaterials(): RobotMaterialPalette {
     name: 'RobotMetallicMaterial',
   });
 
+  const machinedLink = new THREE.MeshPhysicalMaterial({
+    color: 0xdde6f5,
+    metalness: 0.90,
+    roughness: 0.18,
+    clearcoat: 0.70,
+    clearcoatRoughness: 0.10,
+    reflectivity: 0.98,
+    name: 'RobotMachinedLinkMaterial',
+  });
+
   return {
     armor,
     armorDoubleSide,
@@ -114,5 +125,6 @@ export function createRobotMaterials(): RobotMaterialPalette {
     whiteCoreEmissive,
     purpleBloom,
     metallic,
+    machinedLink,
   };
 }

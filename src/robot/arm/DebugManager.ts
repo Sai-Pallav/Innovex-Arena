@@ -24,9 +24,28 @@ export class DebugManager {
   private isEnabled: boolean = false;
   private axesHelpers: THREE.AxesHelper[] = [];
   private originalMaterials: Map<THREE.Mesh, THREE.Material | THREE.Material[]> = new Map();
+  private debugArmorMaterial = new THREE.MeshBasicMaterial({ wireframe: true, color: 0xc8d6e5, name: 'DebugWireframeArmor' });
+  private debugJointMaterial = new THREE.MeshBasicMaterial({ wireframe: true, color: 0x5a6578, name: 'DebugWireframeJoint' });
+  private debugMetallicMaterial = new THREE.MeshBasicMaterial({ wireframe: true, color: 0x82b1ff, name: 'DebugWireframeMetallic' });
+  private debugAccentMaterial = new THREE.MeshBasicMaterial({ wireframe: true, color: 0xa855f7, name: 'DebugWireframeAccent' });
 
   constructor(targetGroup: THREE.Group) {
     this.targetGroup = targetGroup;
+  }
+
+  private getDebugWireframeMaterial(orig: THREE.Material | THREE.Material[] | undefined): THREE.Material {
+    const mat = Array.isArray(orig) ? orig[0] : orig;
+    const name = mat?.name || '';
+    if (name.includes('Armor')) {
+      return this.debugArmorMaterial;
+    }
+    if (name.includes('Metallic') || name.includes('Machined')) {
+      return this.debugMetallicMaterial;
+    }
+    if (name.includes('Purple') || name.includes('Emissive') || name.includes('Bloom')) {
+      return this.debugAccentMaterial;
+    }
+    return this.debugJointMaterial;
   }
 
   /**
@@ -153,14 +172,7 @@ export class DebugManager {
         if (!this.originalMaterials.has(mesh)) {
           this.originalMaterials.set(mesh, mesh.material);
         }
-
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((mat) => {
-            if ('wireframe' in mat) (mat as any).wireframe = true;
-          });
-        } else if (mesh.material && 'wireframe' in mesh.material) {
-          (mesh.material as any).wireframe = true;
-        }
+        mesh.material = this.getDebugWireframeMaterial(this.originalMaterials.get(mesh));
       }
     });
   }
@@ -169,15 +181,13 @@ export class DebugManager {
     this.targetGroup.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (Array.isArray(mesh.material)) {
-          mesh.material.forEach((mat) => {
-            if ('wireframe' in mat) (mat as any).wireframe = false;
-          });
-        } else if (mesh.material && 'wireframe' in mesh.material) {
-          (mesh.material as any).wireframe = false;
+        const orig = this.originalMaterials.get(mesh);
+        if (orig) {
+          mesh.material = orig;
         }
       }
     });
+    this.originalMaterials.clear();
   }
 
   private attachAxesHelpers(): void {
@@ -213,6 +223,10 @@ export class DebugManager {
 
   public dispose(): void {
     this.setDebugMode(false);
+    this.debugArmorMaterial.dispose();
+    this.debugJointMaterial.dispose();
+    this.debugMetallicMaterial.dispose();
+    this.debugAccentMaterial.dispose();
     this.originalMaterials.clear();
   }
 }

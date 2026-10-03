@@ -495,11 +495,13 @@ function buildSegment(
   if (isDistal) {
     const dotGeo = geoCache.getSphere(0.0007, 10, 8);
     const dotMesh = new THREE.Mesh(dotGeo, materials.purpleEmissive);
+    dotMesh.name = `${name}_SensorJewel`;
     dotMesh.position.set(0, -length * 0.72, armorD * 0.44 + 0.0004);
     group.add(dotMesh);
 
     const dotBloomGeo = geoCache.getSphere(0.0011, 8, 6);
     const dotBloomMesh = new THREE.Mesh(dotBloomGeo, materials.purpleBloom);
+    dotBloomMesh.name = `${name}_SensorJewelBloom`;
     dotBloomMesh.position.copy(dotMesh.position);
     group.add(dotBloomMesh);
   }
@@ -717,6 +719,7 @@ export function createThumb(
   // Purple telemetry accent strip on lateral distal thumb
   const thumbLedGeo = geoCache.getBox(0.0007, 0.0036, 0.0007);
   const thumbLed = new THREE.Mesh(thumbLedGeo, materials.purpleEmissive);
+  thumbLed.name = 'ThumbTelemetryLed';
   thumbLed.position.set(radial * (distRad * 0.88), -distLen * 0.50, distRad * 0.20);
   distSeg.group.add(thumbLed);
 

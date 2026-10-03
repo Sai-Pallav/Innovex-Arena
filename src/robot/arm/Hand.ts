@@ -485,6 +485,7 @@ export function createHand(
   // Subtle bloom aura for telemetry LED
   const bloomGeo = geoCache.getBox(0.0018, 0.0078, 0.0018);
   const bloomMesh = new THREE.Mesh(bloomGeo, materials.purpleBloom);
+  bloomMesh.name = 'HandTelemetryBloom';
   bloomMesh.position.copy(ledMesh.position);
   handGroup.add(bloomMesh);
 

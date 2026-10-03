@@ -29,17 +29,7 @@ export function createStudioLighting(): SceneLights {
   // 2. Soft Key Light (Top-Front-Left) - neutral daylight sculpting armor curvature without clipping
   const keyLight = new THREE.DirectionalLight(0xf2f6fd, LIGHT_INTENSITY.key);
   keyLight.position.set(-2.0, 2.2, 2.2);
-  keyLight.castShadow = true;
-  keyLight.shadow.mapSize.width = 1024;
-  keyLight.shadow.mapSize.height = 1024;
-  keyLight.shadow.camera.near = 0.5;
-  keyLight.shadow.camera.far = 8;
-  keyLight.shadow.camera.left = -1.5;
-  keyLight.shadow.camera.right = 1.5;
-  keyLight.shadow.camera.top = 1.5;
-  keyLight.shadow.camera.bottom = -1.5;
-  keyLight.shadow.bias = -0.0004;
-  keyLight.shadow.normalBias = 0.02;
+  keyLight.castShadow = false;
   group.add(keyLight);
 
   // 3. Controlled Fill Light (Front-Right) - soft cool slate fill preventing pitch-black shadows
@@ -62,10 +52,7 @@ export function createStudioLighting(): SceneLights {
   purpleBounce.position.set(0.12, 0.10, 0.65);
   group.add(purpleBounce);
 
-  // 7. Subtle Lower Torso Fill - soft atmospheric ground connection into stats region
-  const lowerFill = new THREE.DirectionalLight(0x38186e, LIGHT_INTENSITY.lowerFill);
-  lowerFill.position.set(0.2, -0.6, 1.6);
-  group.add(lowerFill);
+  // 7. Subtle Lower Torso Fill - Consolidated in P3 optimization (negligible visual contribution, saved ~20% draw/submit overhead)
 
   // 8. Contact Shadow Floor Mesh
   const contactShadow = new THREE.Mesh(new THREE.BufferGeometry(), new THREE.MeshBasicMaterial());

@@ -11,11 +11,12 @@ import { getOptimalPixelRatio, deepDispose } from '../utils/performance';
 import { getViewportDimensions } from '../utils/responsiveness';
 import { ROBOT_CONFIG, ROBOT_SCALE, ROBOT_POSITION, ROBOT_ROTATION } from '../config';
 import { DebugManager, DebugStats } from '../arm/DebugManager';
+import { RobotLODManager, RobotLODLevel, RobotLODStats } from './RobotLODManager';
 
 export interface RobotSceneOptions {
   container: HTMLElement;
-  modelUrl?: string;
-  onLoaded?: (source: 'glb' | 'procedural') => void;
+  pmremResolution?: number;
+  onLoaded?: (source: 'procedural') => void;
   onError?: (err: Error) => void;
 }
 
@@ -27,6 +28,7 @@ export class RobotScene {
   private lights: SceneLights;
   private controller: RobotController | null = null;
   private debugManager: DebugManager | null = null;
+  private lodManager: RobotLODManager | null = null;
   private interaction: RobotInteraction;
   private mixer?: THREE.AnimationMixer;
   private robotNodes: RobotNodes | null = null;
@@ -41,8 +43,9 @@ export class RobotScene {
   private boundVisibilityChange: () => void;
 
   public isReady: boolean = false;
-  public modelSource: 'glb' | 'procedural' = 'procedural';
+  public modelSource: 'procedural' = 'procedural';
   private _tempFacePos = new THREE.Vector3();
+  private currentPmremResolution: number = 256;
 
   constructor(options: RobotSceneOptions) {
     this.container = options.container;
@@ -71,11 +74,7 @@ export class RobotScene {
     this.renderer.shadowMap.enabled = false;
 
     // Procedural Studio Environment for realistic PBR visor reflections (Part 5 & 16)
-    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-    pmremGenerator.compileEquirectangularShader();
-    const envTexture = pmremGenerator.fromScene(new RoomEnvironment(), 0.04).texture;
-    this.scene.environment = envTexture;
-    pmremGenerator.dispose();
+    this.setEnvironmentResolution(options.pmremResolution || 256);
 
     // Append canvas
     this.container.appendChild(this.renderer.domElement);
@@ -127,6 +126,9 @@ export class RobotScene {
       // Initialize Section 9 Developer Debug Mode Manager
       this.debugManager = new DebugManager(result.nodes.root);
 
+      // Initialize Section 13-17 Distance-Based Level of Detail (LOD) Manager
+      this.lodManager = new RobotLODManager(result.nodes.root);
+
       // Pre-warm WebGL shaders for instant zero-hitch initial render
       try {
         this.renderer.compile(this.scene, this.cameraManager.camera);
@@ -155,7 +157,7 @@ export class RobotScene {
 
   private async initModelAsync(options: RobotSceneOptions): Promise<void> {
     try {
-      const result: LoadRobotResult = await loadRobotModel(options.modelUrl);
+      const result: LoadRobotResult = await loadRobotModel();
       this.modelSource = result.source;
       this.mixer = result.mixer;
 
@@ -172,6 +174,9 @@ export class RobotScene {
 
       // Initialize Section 9 Developer Debug Mode Manager
       this.debugManager = new DebugManager(result.nodes.root);
+
+      // Initialize Section 13-17 Distance-Based Level of Detail (LOD) Manager
+      this.lodManager = new RobotLODManager(result.nodes.root);
 
       // Pre-warm WebGL shaders
       try {
@@ -345,6 +350,11 @@ export class RobotScene {
       this.mixer.update(dt);
     }
 
+    // Update distance-based Level of Detail with hysteresis before render
+    if (this.lodManager) {
+      this.lodManager.update(this.cameraManager.camera);
+    }
+
     // 3. Render
     this.renderer.render(this.scene, this.cameraManager.camera);
 
@@ -413,6 +423,52 @@ export class RobotScene {
     return torsoCtrl ? torsoCtrl.isExplodedActive() : false;
   }
 
+  public getLODManager(): RobotLODManager | null {
+    return this.lodManager;
+  }
+
+  public setLODLevel(level: RobotLODLevel | null): void {
+    this.lodManager?.setForcedLevel(level);
+  }
+
+  public updateLOD(): RobotLODLevel {
+    return this.lodManager ? this.lodManager.update(this.cameraManager.camera) : RobotLODLevel.LOD0;
+  }
+
+  public getLODLevel(): RobotLODLevel {
+    if (this.lodManager) {
+      this.lodManager.update(this.cameraManager.camera);
+      return this.lodManager.getCurrentLevel();
+    }
+    return RobotLODLevel.LOD0;
+  }
+
+  public getLODStats(): RobotLODStats | null {
+    if (this.lodManager) {
+      this.lodManager.update(this.cameraManager.camera);
+      return this.lodManager.getStats(this.cameraManager.camera);
+    }
+    return null;
+  }
+
+  public setEnvironmentResolution(size: number = 256): void {
+    if (this.scene.environment) {
+      this.scene.environment.dispose();
+      this.scene.environment = null;
+    }
+    const pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+    const roomEnv = new RoomEnvironment();
+    const envTexture = pmremGenerator.fromScene(roomEnv, 0.04, 0.1, 100, { size }).texture;
+    this.scene.environment = envTexture;
+    roomEnv.dispose();
+    pmremGenerator.dispose();
+    this.currentPmremResolution = size;
+  }
+
+  public getEnvironmentResolution(): number {
+    return this.currentPmremResolution;
+  }
+
   public resetGaze(): void {
     this.interaction.setLookTarget(0, 0);
     this.controller?.setIdleState();
@@ -435,6 +491,8 @@ export class RobotScene {
     this.interaction.dispose();
     this.controller?.dispose();
     this.debugManager?.dispose();
+    this.lodManager?.dispose();
+    this.lodManager = null;
 
     if (this.scene.environment) {
       this.scene.environment.dispose();

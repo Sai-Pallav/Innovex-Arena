@@ -46,8 +46,6 @@ export interface ForearmNodes {
   distalWristMount: THREE.Group;
   wristCuff: THREE.Mesh;
   // Compatibility aliases
-  gauntletBody: THREE.Mesh;
-  innerSleeve: THREE.Mesh;
   elbowSocketCollar: THREE.Mesh;
   brachioradialis: THREE.Mesh;
   panelSeam: THREE.Mesh;
@@ -659,8 +657,6 @@ export function createForearm(
     distalWristMount,
     wristCuff: primaryWristCuff,
     // Aliases
-    gauntletBody: primaryArmorMesh,
-    innerSleeve: primaryCoreMesh,
     elbowSocketCollar: primaryCoreMesh,
     brachioradialis: primaryArmorMesh,
     panelSeam: primaryArmorMesh,
